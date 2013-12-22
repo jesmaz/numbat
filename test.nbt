@@ -1,0 +1,82 @@
+ operator ' ( )' : 200 ltr
+#operator '_(_)' : 200 ltr
+ operator ' . ' : 200 ltr
+#operator '_._' : 200 ltr
+ operator ' ~' : 300 rtl
+#operator '~'arg : 300 rtl
+operator '! ' : 300 rtl
+operator ' * ' : 500 ltr
+operator ' / ' : 500 ltr
+operator ' + ' : 600 ltr
+operator ' = ' : 1600 rtl
+
+
+
+typedef raw 8 @sint : int8
+typedef raw 64 @sint : int64
+
+typedef raw 32 @fint : float
+typedef raw 64 @fint : double
+
+#struct vec2 $<type T> {T i, T j}
+
+#def Scale (alias vec2int8 vec): {int8}
+#	int8 i = vec.i
+#	int8 j = vec.j
+#	return i * i + j * j
+
+def ' = ' (alias int8 lhs, int8 rhs) : {int8}
+	asm 'numbat' : 'mov lhs, rhs'
+	return lhs
+
+def ' = ' (alias int64 lhs, int64 rhs) : {int64}
+	asm 'numbat' : 'mov lhs, rhs'
+	return lhs
+
+def ' = ' (alias double lhs, double rhs) : {double}
+	asm 'numbat' : 'mov lhs, rhs'
+	return lhs
+
+#def ' = ' $<type T> (alias T lhs, T rhs) : {T}
+#	asm 'numbat' : 'mov lhs, rhs'
+#	return lhs
+
+def ' * ' (int8 lhs, int8 rhs) : {int8}
+	return asm 'numbat' : 'mul lhs, rhs'
+
+#def (int8 lhs)'+'(int8 rhs) : {int8}
+
+def ' + ' (int8 lhs, int8 rhs) : {int8}
+	return asm 'numbat' : 'add lhs, rhs'
+
+def ' + ' (double lhs, double rhs) : {double}
+	return asm 'numbat' : 'fadd lhs, rhs'
+
+def func (int8 num): {int8}
+	return num
+
+def max (int8 a, int8 b) : {int8}
+	return a
+
+def test () : {int8}
+	int8 n = 90
+	return n
+
+def testFunc (int8 lhs, int8 rhs): {int8}
+	#vec2 $<int8> vec
+	int8 a = 12
+	a = rhs * (a + 32)
+	int8 b
+	int64 c
+	c = b
+	b = func ((a + b) * lhs + rhs * 2)
+	a = max (a, b)
+	return a
+
+def tfunc (alias int64 t) : {}
+	t = 40
+	return
+
+def tfunc (alias double t) : {}
+	t = 40
+	return
