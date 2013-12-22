@@ -30,21 +30,24 @@ void Numbat::loadFromTokenStr (const tkstring & tks) {
 	FunctionPassManager fpm (module);
 	fpm.add (new DataLayout(*engine->getDataLayout()));
 	fpm.add (createBasicAliasAnalysisPass ());
-	fpm.add (createInstructionCombiningPass ());
 	fpm.add (createReassociatePass ());
 	fpm.add (createGVNPass ());
 	fpm.add (createCFGSimplificationPass ());
+	fpm.add (createInstructionCombiningPass ());
 	fpm.doInitialization ();
-	parser::BodyGenerator generator (module, &fpm);
+	parser::BodyGenerator generator (module);
 	generator.visit (ast);
 	PassManager mpm;
 	mpm.add (new DataLayout(*engine->getDataLayout()));
 	mpm.add (createFunctionInliningPass ());
 	mpm.run (*module);
+	std::cerr << "Post Inline:\n\n\n";
 	module->dump ();
 	for (Function & func : module->getFunctionList ()) {
 		fpm.run (func);
 	}
+	std::cerr << "Second optimise pass:\n\n\n";
+	module->dump ();
 }
 
 
