@@ -53,6 +53,17 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 		}
 	}
 	
+	for (std::pair <string, tkitt> & pair : typeReparse) {
+		itt = pair.second;
+		if (itt->iden == "{") {
+			NumbatType & type = *types [pair.first];
+			nextToken (end);
+			auto endItt = findToken ("}", end);
+			type.buildData (parseArgs (&AbstractSyntaxTree::parseParameter, endItt));
+			nextToken (end);
+		}
+	}
+	
 	auto oldVariables = variables;
 	for (std::pair <FunctionDecleration *, std::pair <size_t, tkitt>> & pair : funcReparse) {
 		if (pair.first) {
@@ -65,17 +76,6 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 			}
 			pair.first->assignBody (parseBody (end));
 			variables = oldVariables;
-		}
-	}
-	
-	for (std::pair <string, tkitt> & pair : typeReparse) {
-		itt = pair.second;
-		if (itt->iden == "{") {
-			NumbatType & type = *types [pair.first];
-			nextToken (end);
-			auto endItt = findToken ("}", end);
-			type.buildData (parseArgs (&AbstractSyntaxTree::parseParameter, endItt));
-			nextToken (end);
 		}
 	}
 	
@@ -224,18 +224,18 @@ ASTnode AbstractSyntaxTree::parseExpression (std::list <OperatorDecleration::Ope
 	while (!node and matches.size ()) {
 		match = matches.front ();
 		matches.pop_front ();
-		node = parseOperator (*match.opp, matches, match.ptr, end);
+		node = parseOperator (*match.opp, matches, match.ptr, end, args);
 	}
 	
 	if (node == nullptr) {
-		return parsePrimaryExpression (end);
+		return parsePrimaryExpression (end, args);
 	}
 	
 	return node;
 	
 }
 
-ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt matchPtr, tkitt end) {
+ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt matchPtr, tkitt end, const std::vector <ASTnode> * prevArgs) {
 	
 	std::vector <tkitt> oppLoc;
 	const std::vector <string> & symb = opp.getSymbols ();
@@ -265,6 +265,9 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 	ASTnode callee = nullptr;
 	std::vector <ASTnode> args;
 	
+	if (prevArgs)
+		args = *prevArgs;
+	
 	switch (opp.getType ()) {
 		case OperatorDecleration::TYPE::array:
 			itt = oppLoc [0] + 1;
@@ -277,7 +280,17 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 				splitListAboutTkn (lhs, matches, oppLoc [0]);
 				args.push_back (parseExpression (lhs, oppLoc [0]));
 				itt = oppLoc [0] + 1;
-				args.push_back (parseExpression (matches, end));
+				
+				if (opp.getPattern () == " . ") {
+					ASTnode expr = parseExpression (matches, end, &args);
+					if (expr->isCallable ()) {
+						callee = expr;
+					} else {
+						return expr;
+					}
+				} else {
+					args.push_back (parseExpression (matches, end));
+				}
 			}
 			break;
 			
@@ -372,6 +385,16 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 	if (itt->type == TOKEN::raw or itt->type == TOKEN::typemodifier or types.find (itt->iden) != types.end ()) {
 		ASTnode type = parseType (end);
 		return ASTnode (new ASTvariable (variables [itt->iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden))));
+	}
+	
+	if (args and args->size () == 1 and args->front ()->getType ()) {
+		std::cerr << args->front ()->toString (" --> ") << std::endl;
+		std::cerr << args->front ()->getType ()->toString (" --> ") << std::endl;
+		int index = args->front ()->getType ()->findMember (itt->iden);
+		if (index >= 0) {
+			nextToken (end);
+			return ASTnode (new ASTstructIndex (index, args->front ()));
+		}
 	}
 	
 	auto var = variables.find (itt->iden);

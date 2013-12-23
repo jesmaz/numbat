@@ -20,6 +20,8 @@ typedef raw 64 @fint : double
 
 #struct vec2 $<type T> {T i, T j}
 
+struct testStruct {int64 i, double d}
+
 #def Scale (alias vec2int8 vec): {int8}
 #	int8 i = vec.i
 #	int8 j = vec.j
@@ -80,3 +82,6 @@ def tfunc (alias int64 t) : {}
 def tfunc (alias double t) : {}
 	t = 40
 	return
+
+def I (alias testStruct ts) : {int64}
+	return ts.i

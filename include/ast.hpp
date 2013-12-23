@@ -109,6 +109,14 @@ class NumbatType {
 			return ss.str ();
 		}
 		
+		int findMember (const std::string & iden) {
+			for (int i=0, l=members.size (); i<l; ++i) {
+				if (members [i]->getIden () == iden) {
+					return i;
+				}
+			}
+			return -1;
+		}
 		void buildData (std::vector <ASTnode> data) {members = data;}
 		
 		NumbatType () {}
@@ -537,6 +545,26 @@ class ASTreturnvoid : public ASTbase {
 	private:
 };
 
+class ASTstructIndex : public ASTbase {
+	VISITABLE
+	public:
+		const ASTnode & getExpr () const {return expr;}
+		const size_t & getIndex () const {return index;}
+		virtual bool isAlias () const {return expr->isAlias ();}
+		virtual bool isConst () const {return expr->isConst ();}
+		virtual bool isValid () const {return expr->isValid ();}
+		virtual shared_ptr <NumbatType> getType () const {return expr->getType ()->getMembers ()[index]->getType ();}
+		virtual size_t getSize () const {return expr->getType ()->getMembers ()[index]->getSize ();}
+		virtual string getIden () const {return expr->getType ()->getMembers ()[index]->getIden ();}
+		virtual string toString (const string & indent = "") const {return expr->toString (indent) + "." + expr->getType ()->getMembers ()[index]->getIden ();}
+		
+		ASTstructIndex () {}
+		ASTstructIndex (size_t index, const ASTnode & expr) : index (index), expr (expr) {}
+	private:
+		size_t index;
+		ASTnode expr;
+};
+
 class ASTtype : public ASTbase {
 	VISITABLE
 	public:
@@ -604,7 +632,7 @@ struct AbstractSyntaxTree {
 		ASTnode parseBody (tkitt end); // TODO: needs template info parem
 		ASTnode parseExpression (tkitt end);
 		ASTnode parseExpression (std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end, const std::vector <ASTnode> * args = nullptr);
-		ASTnode parseOperator (const OperatorDecleration & opp, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt softEnd, tkitt end);
+		ASTnode parseOperator (const OperatorDecleration & opp, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt softEnd, tkitt end, const std::vector <ASTnode> * prevArgs = nullptr);
 		ASTnode parseParameter (tkitt end);
 		ASTnode parsePrimaryExpression (tkitt end) {return parsePrimaryExpression (end, nullptr);}
 		ASTnode parsePrimaryExpression (tkitt end, const std::vector <ASTnode> * args);

@@ -380,6 +380,15 @@ void BodyGenerator::visit (ASTreturnvoid & exp) {
 	stack.push (builder.CreateRetVoid ());
 }
 
+void BodyGenerator::visit (ASTstructIndex & exp) {
+	exp.getExpr ()->accept (*this);
+	Value * val = stack.top (); stack.pop ();
+	if (val->getType ()->isPointerTy ()) {
+		val = builder.CreateGEP (val, 0);
+	}
+	stack.push (builder.CreateExtractValue (val, exp.getIndex ()));
+}
+
 void BodyGenerator::visit (ASTvariable & exp) {
 	
 	Value * v = getVariableHandle (exp.getVariable ().get ());
