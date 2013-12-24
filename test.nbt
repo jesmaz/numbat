@@ -66,7 +66,9 @@ def test () : {int8}
 
 def testFunc (int8 lhs, int8 rhs): {int8}
 	#vec2 $<int8> vec
+	testStruct ts
 	int8 a = 12
+	a = ts.I
 	a = rhs * (a + 32)
 	int8 b
 	int64 c

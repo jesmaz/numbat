@@ -397,6 +397,14 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 		}
 	}
 	
+	if (args and args->size () and args->front ()->getType ()) {
+		ASTnode node = findFunction (itt->iden, *args);
+		if (node->isValid ()) {
+			nextToken (end);
+			return node;
+		}
+	}
+	
 	auto var = variables.find (itt->iden);
 	if (var != variables.end ()) {
 		nextToken (end);
