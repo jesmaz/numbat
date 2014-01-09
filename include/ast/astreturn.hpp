@@ -1,0 +1,47 @@
+#ifndef ASTRETURN_HPP
+#define ASTRETURN_HPP
+
+#include "astbase.hpp"
+#include "numbattype.hpp"
+
+
+namespace numbat {
+namespace parser {
+
+
+class ASTreturn : public ASTbase {
+	VISITABLE
+	public:
+		const ASTnode & getExpr () const {return expr;}
+		virtual bool isAlias () const {return expr->isAlias ();}
+		virtual bool isConst () const {return expr->isConst ();}
+		virtual bool isValid () const {return expr->isValid ();}
+		virtual shared_ptr <NumbatType> getType () const {return expr->getType ();}
+		virtual size_t getSize () const {return expr->getSize ();}
+		virtual string getIden () const {return expr->getIden ();}
+		virtual string toString (const string & indent = "") const {return indent + "return " + expr->toString ();}
+		
+		ASTreturn () {}
+		ASTreturn (const ASTnode expr) : expr (expr) {}
+	private:
+		ASTnode expr;
+};
+
+class ASTreturnvoid : public ASTbase {
+	VISITABLE
+	public:
+		virtual bool isValid () const {return true;}
+		virtual size_t getSize () const {return 0;}
+		virtual string getIden () const {return "";}
+		virtual string toString (const string & indent = "") const {return indent + "return void";}
+		
+		ASTreturnvoid () {}
+	private:
+};
+
+
+}
+}
+
+
+#endif /*ASTRETURN_HPP*/

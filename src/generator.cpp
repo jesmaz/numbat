@@ -312,6 +312,8 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		val = builder.CreateFAdd (args [0], args [1], instr);
 	} else if (instr == "fdiv") {
 		val = builder.CreateFDiv (args [0], args [1], instr);
+	} else if (instr == "fmul") {
+		val = builder.CreateFMul (args [0], args [1], instr);
 	} else if (instr == "fneg") {
 		val = builder.CreateFNeg (args [0], instr);
 	} else if (instr == "frem") {

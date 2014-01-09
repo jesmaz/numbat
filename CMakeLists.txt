@@ -19,6 +19,13 @@ set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3 ${LLVM_FLAGS}")
 
 
 set(sources ${sources} src/ast.cpp)
+set(sources ${sources} src/ast/astbody.cpp)
+set(sources ${sources} src/ast/astcall.cpp)
+set(sources ${sources} src/ast/astnumbatinstr.cpp)
+set(sources ${sources} src/ast/functiondecleration.cpp)
+set(sources ${sources} src/ast/numbatrawtype.cpp)
+set(sources ${sources} src/ast/numbattype.cpp)
+set(sources ${sources} src/ast/operatordecleration.cpp)
 set(sources ${sources} src/lexer.cpp)
 set(sources ${sources} src/numbat.cpp)
 set(sources ${sources} src/generator.cpp)
