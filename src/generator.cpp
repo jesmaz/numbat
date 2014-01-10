@@ -132,12 +132,25 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 		funcType.push_back (getType (node));
 	}
 	
-	if (funcType.size () == 1 and funcType.front ()->isVoidTy ()) {
-		retType = funcType.front ();
-	} else if (funcType.size ()) {
-		retType = StructType::get (context, funcType);
+	if (func->hasTag ("cstyle")) {
+		
+		if (funcType.size () == 1) {
+			retType = funcType.front ();
+		} else {
+			retType = Type::getVoidTy (context);
+			std::cerr << "SEVERE: cstyle function has made it to the generator" << std::endl;
+		}
+		
 	} else {
-		retType = Type::getVoidTy (context);
+		
+		if (funcType.size () == 1 and funcType.front ()->isVoidTy ()) {
+			retType = funcType.front ();
+		} else if (funcType.size ()) {
+			retType = StructType::get (context, funcType);
+		} else {
+			retType = Type::getVoidTy (context);
+		}
+		
 	}
 	
 	FunctionType * ft = FunctionType::get (retType, args, false);
@@ -224,13 +237,17 @@ void BodyGenerator::visit (ASTcallindex & exp) {
 		retVal = tempValues [call.get ()] = stack.top (); stack.pop ();
 	}
 	
-	if (retVal->getType ()->isPointerTy ()) {
-		std::vector <Value *> indicies (2);
-		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
-		indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
-		stack.push (builder.CreateGEP (retVal, indicies));
+	if (call->getFunction ()->hasTag ("cstyle")) {
+		stack.push (retVal);
 	} else {
-		stack.push (builder.CreateExtractValue (retVal, exp.getIndex ()));
+		if (retVal->getType ()->isPointerTy ()) {
+			std::vector <Value *> indicies (2);
+			indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
+			indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
+			stack.push (builder.CreateGEP (retVal, indicies));
+		} else {
+			stack.push (builder.CreateExtractValue (retVal, exp.getIndex ()));
+		}
 	}
 	
 }

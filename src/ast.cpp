@@ -593,6 +593,7 @@ bool AbstractSyntaxTree::parseFunctionPrototype (std::vector <ASTnode> & args, s
 FunctionDecleration * AbstractSyntaxTree::parseFunctionDecleration (tkitt end) {
 	
 	nextToken (end); // eat def token
+	std::set <string> metaTags;
 	std::vector <ASTnode> args;
 	std::vector <ASTnode> type;
 	std::vector <ASTnode> templateArgs;
@@ -608,7 +609,7 @@ FunctionDecleration * AbstractSyntaxTree::parseFunctionDecleration (tkitt end) {
 		templateArgs = parseTemplateArgs (end);
 	}
 	
-	//TODO: parse meta tags
+	metaTags = parseMetaTags (end);
 	
 	if (itt->iden != "(") {
 		error ("'(' expected after '" + iden + "'", end);
@@ -637,9 +638,14 @@ FunctionDecleration * AbstractSyntaxTree::parseFunctionDecleration (tkitt end) {
 			tkitt argEnd = findToken ("}", end);
 			type = parseArgs (&AbstractSyntaxTree::parseType, argEnd);
 			nextToken (end); // eat '}' token
+			
+			if (metaTags.count ("cstyle") and type.size () > 1) {
+				error ("Function is decleared cstyle but has multiple reuturn values", end);
+			}
+			
 		}
 		
-		decl = new FunctionDecleration (iden, args, type);
+		decl = new FunctionDecleration (iden, args, type, metaTags);
 		functions.insert (std::make_pair (iden, unique_ptr <FunctionDecleration> (decl)));
 	}
 	

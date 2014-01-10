@@ -27,7 +27,7 @@ struct testStruct {int64 i, double d}
 #	int8 j = vec.j
 #	return i * i + j * j
 
-extern def sin (double d) : {double}
+extern def sin @cstyle (double d) : {double}
 
 def ' = ' (alias int8 lhs, int8 rhs) : {int8}
 	asm 'numbat' : 'mov lhs, rhs'
