@@ -49,7 +49,7 @@ int main (int argl, char ** args) {
 	uint64_t t;
 	//numbat.getFunction <void, uint64_t *> ("tfunc") (&t);
 	//std::cout << t << std::endl;
-	std::cout << (int)*(numbat.getFunction <uint8_t *> ("func") ()) << std::endl;
+	std::cout << (numbat.getFunction <int64_t> ("cCallbackTest") ()) << std::endl;
 	return 0;
 }
 

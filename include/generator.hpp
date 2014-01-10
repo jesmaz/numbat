@@ -80,6 +80,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		AbstractSyntaxTree * tree;
 		BasicBlock * breakBlock, * continueBlock;
 		Function * activeFunction;
+		FunctionDecleration * activeFunctionDecleration;
 		IRBuilder<> builder;
 		LLVMContext & context;
 		Module * module;

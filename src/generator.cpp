@@ -72,7 +72,11 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 		
 	}
 	
-	std::cerr << type->toString () << " : ";
+	if (type) {
+		std::cerr << type->toString () << " : ";
+	} else {
+		std::cerr << "void : ";
+	}
 	s->dump ();
 	std::cerr << std::endl;
 	return structures [type] = s;
@@ -174,7 +178,8 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 	}
 	
 	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : ast.getFunctions ()) {
-		activeFunction = functions [func.second.get ()];
+		activeFunctionDecleration = func.second.get ();
+		activeFunction = functions [activeFunctionDecleration];
 		ASTnode body = func.second->getBody ();
 		if (body) {
 			builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
@@ -385,12 +390,11 @@ void BodyGenerator::visit (ASTreturn & exp) {
 	if (stack.size ()) {
 		std::vector <Value *> members;
 		members.push_back (stack.top ());
-		//Type * type = activeFunction->getReturnType ();
-		//if (type->isStructTy ()) {
-			//StructType * structType = reinterpret_cast <StructType *> (type);
-			//Value * ret = builder.CreateAggregateRet ();
-		stack.top () = builder.CreateAggregateRet (members.data (), 1);
-		//}
+		if (!activeFunctionDecleration->hasTag ("cstyle")) {
+			stack.top () = builder.CreateAggregateRet (members.data (), 1);
+		} else {
+			stack.top () = builder.CreateRet (stack.top ());
+		}
 	}
 	
 }

@@ -87,3 +87,6 @@ def tfunc (alias double t) : {}
 
 def I (alias testStruct ts) : {int64}
 	return ts.i
+
+def cCallbackTest @cstyle () : {int64}
+	return 1273
