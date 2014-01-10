@@ -26,6 +26,12 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 				}
 				break;
 				
+			case TOKEN::externdef:
+				nextToken (end);
+				parseFunctionDecleration (end);
+				eatSemicolon (end);
+				break;
+				
 			case TOKEN::indent:
 				nextToken (end);
 				break;
