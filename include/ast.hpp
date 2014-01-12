@@ -20,8 +20,9 @@
 #include "ast/numbattype.hpp"
 #include "ast/numbatvariable.hpp"
 #include "ast/operatordecleration.hpp"
-#include "token.hpp"
 #include "lexer.hpp"
+#include "module.hpp"
+#include "token.hpp"
 #include "visitor.hpp"
 
 #include <algorithm>
@@ -52,7 +53,8 @@ struct AbstractSyntaxTree {
 	
 	public:
 		const bool buildSuccessfull () const {return !buildFail;}
-		const std::multimap <string, shared_ptr <FunctionDecleration>> getFunctions () const {return functions;}
+		const std::map <string, shared_ptr <NumbatType>> & getTypes () const {return types;}
+		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
 		string toString (const string & indent = "") const {
 			string str="";
 			for (auto & itt : types) {
@@ -133,14 +135,14 @@ struct AbstractSyntaxTree {
 		
 		std::map <string, shared_ptr <NumbatType>> types;
 		std::map <string, shared_ptr <NumbatVariable>> variables;
-		std::map <string, shared_ptr <OperatorDecleration>> operators;
+		static std::map <string, shared_ptr <OperatorDecleration>> operators;
 		
 		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
-		std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
+		static std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
 		
-		std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
+		static std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
 		
-		std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
+		static std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
 		
 };
 

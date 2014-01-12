@@ -4,6 +4,11 @@ namespace numbat {
 using namespace lexer;
 namespace parser {
 
+std::map <string, shared_ptr <OperatorDecleration>> AbstractSyntaxTree::operators;
+std::multimap <string, shared_ptr <OperatorDecleration>> AbstractSyntaxTree::operatorsByFirstToken;
+std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> AbstractSyntaxTree::precidenceOrderedOperators;
+std::unordered_set <string> AbstractSyntaxTree::parenOpperators, AbstractSyntaxTree::oppTokens, AbstractSyntaxTree::ternaryStart;
+
 
 AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 	

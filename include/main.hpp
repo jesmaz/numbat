@@ -3,6 +3,7 @@
 
 #include "ast.hpp"
 #include "numbat.hpp"
+#include "module.hpp"
 #include "generator.hpp"
 #include "lexer.hpp"
 

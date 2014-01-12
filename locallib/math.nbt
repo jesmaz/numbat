@@ -1,0 +1,74 @@
+operator ' :: ' : 100 ltr
+
+operator ' ++' : 200 ltr
+operator ' --' : 200 ltr
+operator ' ( )' : 200 ltr
+operator ' [ ]' : 200 ltr
+operator ' . ' : 200 ltr
+
+operator '++ ' : 300 rtl
+operator '-- ' : 300 rtl
+operator '+ ' : 300 rtl
+operator '- ' : 300 rtl
+operator '! ' : 300 rtl
+operator 'not ' : 300 rtl
+operator ' ~' : 300 rtl
+
+operator ' * ' : 500 ltr
+operator ' / ' : 500 ltr
+operator ' % ' : 500 ltr
+
+operator ' + ' : 600 ltr
+operator ' - ' : 600 ltr
+
+operator ' << ' : 700 ltr
+operator ' >> ' : 700 ltr
+
+operator ' < ' : 800 ltr
+operator ' <= ' : 800 ltr
+operator ' > ' : 800 ltr
+operator ' >= ' : 800 ltr
+
+operator ' == ' : 900 ltr
+operator ' != ' : 900 ltr
+
+operator ' & ' : 1000 ltr
+
+operator ' ^ ' : 1100 ltr
+
+operator ' | ' : 1200 ltr
+
+operator ' and ' : 1300 ltr
+
+operator ' or ' : 1400 ltr
+
+operator ' = ' : 1600 rtl
+operator ' += ' : 1600 rtl
+operator ' -= ' : 1600 rtl
+operator ' *= ' : 1600 rtl
+operator ' /= ' : 1600 rtl
+operator ' %= ' : 1600 rtl
+operator ' <<= ' : 1600 rtl
+operator ' >>= ' : 1600 rtl
+operator ' &= ' : 1600 rtl
+operator ' ^= ' : 1600 rtl
+operator ' |= ' : 1600 rtl
+
+
+
+typedef raw 1 @uint : bool
+
+typedef raw 8 @sint : int8
+typedef raw 16 @sint : int16
+typedef raw 32 @sint : int32
+typedef raw 64 @sint : int64
+
+typedef raw 8 @uint : uint8
+typedef raw 16 @uint : uint16
+typedef raw 32 @uint : uint32
+typedef raw 64 @uint : uint64
+
+typedef raw 16 @fint : half
+typedef raw 32 @fint : float
+typedef raw 64 @fint : double
+typedef raw 128 @fint : quad

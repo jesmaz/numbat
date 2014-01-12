@@ -54,7 +54,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		virtual void visit (ASTtype & exp) {}
 		virtual void visit (ASTvariable & exp);
 		//std::vector <Value *> operator () (AbstractSyntaxTree & ast) {tree = &ast; ast.getBody ().accept (*this); return body;}
-		BodyGenerator (Module * mod, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), activeFunction (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
+		BodyGenerator (llvm::Module * mod, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), activeFunction (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
 	protected:
 	private:
 		
@@ -83,7 +83,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		FunctionDecleration * activeFunctionDecleration;
 		IRBuilder<> builder;
 		LLVMContext & context;
-		Module * module;
+		llvm::Module * module;
 		FunctionPassManager * fpm;
 		std::map <const ASTbase *, Value *> tempValues;
 		std::map <const FunctionDecleration *, Function *> functions;

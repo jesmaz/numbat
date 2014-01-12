@@ -22,6 +22,7 @@ enum class TOKEN {
 	fortkn,
 	identifier,
 	iftkn,
+	import,
 	indent,
 	numericliteral,
 	operatortkn,

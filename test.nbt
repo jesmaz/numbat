@@ -1,3 +1,7 @@
+import 'locallib'
+
+
+operator ' :: ' : 100 ltr
  operator ' ( )' : 200 ltr
 #operator '_(_)' : 200 ltr
  operator ' . ' : 200 ltr
