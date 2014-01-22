@@ -9,6 +9,7 @@ operator ' :: ' : 100 ltr
  operator ' ~' : 300 rtl
 #operator '~'arg : 300 rtl
 operator '! ' : 300 rtl
+operator ' , ' : 400 ltr
 operator ' * ' : 500 ltr
 operator ' / ' : 500 ltr
 operator ' + ' : 600 ltr

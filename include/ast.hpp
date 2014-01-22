@@ -13,6 +13,8 @@
 #include "ast/astrawdata.hpp"
 #include "ast/astreturn.hpp"
 #include "ast/aststructindex.hpp"
+#include "ast/asttuple.hpp"
+#include "ast/asttuplecall.hpp"
 #include "ast/asttype.hpp"
 #include "ast/astvariable.hpp"
 #include "ast/functiondecleration.hpp"
@@ -72,8 +74,10 @@ struct AbstractSyntaxTree {
 		
 	private:
 		
+		ASTnode createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end);
 		ASTnode createCallNode (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args);
 		ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth=1);
+		ASTnode createTuple (const ASTnode & lhs, const ASTnode & rhs);
 		ASTnode parseAssembly (const string & type, const string & code);
 		ASTnode parseBody (tkitt end); // TODO: needs template info parem
 		ASTnode parseExpression (tkitt end);
@@ -119,6 +123,7 @@ struct AbstractSyntaxTree {
 		
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
 		void printError (const string & message) {buildFail = true; std::cerr << "error on line " << line << ": " << message << '\n';}
+		void parseImport (tkitt end);
 		void parseOperatorDecleration (tkitt end);
 		void parseTypeDef (tkitt end);
 		
@@ -135,14 +140,14 @@ struct AbstractSyntaxTree {
 		
 		std::map <string, shared_ptr <NumbatType>> types;
 		std::map <string, shared_ptr <NumbatVariable>> variables;
-		static std::map <string, shared_ptr <OperatorDecleration>> operators;
+		std::map <string, shared_ptr <OperatorDecleration>> operators;
 		
 		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
-		static std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
+		std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
 		
-		static std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
+		std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
 		
-		static std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
+		std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
 		
 };
 
