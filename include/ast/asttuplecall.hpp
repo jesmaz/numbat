@@ -13,6 +13,9 @@ namespace parser {
 class ASTtuplecall : public ASTbase {
 	VISITABLE
 	public:
+		const std::list <ASTnode> & getLhsArgs () const {return lhsArgs;}
+		const std::list <ASTnode> & getRhsArgs () const {return rhsArgs;}
+		const std::vector <shared_ptr <ASTcallable>> & getCalls () const {return calls;}
 		virtual bool isCallable () const {return true;}
 		virtual bool isValid () const;
 		virtual size_t getSize () const {return 0;}

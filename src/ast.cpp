@@ -117,6 +117,8 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		std::vector <shared_ptr <ASTcallable>> calls;
 		std::vector <ASTnode> args (2);
 		
+		std::list <ASTnode> lhsArgs, rhsArgs;
+		
 		for (; lhsItt != lhsEnd and rhsItt != rhsEnd; ++lhsItt, ++rhsItt) {
 			args [0] = *lhsItt;
 			args [1] = *rhsItt;
@@ -125,13 +127,15 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 			if (!call->isValid ()) {
 				printError (call->toString ());
 			}
+			lhsArgs.push_back (createStaticCast (args [0], call->getFunction ()->getArgs () [0]));
+			rhsArgs.push_back (createStaticCast (args [1], call->getFunction ()->getArgs () [1]));
 		}
 		
-		return ASTnode (new ASTtuplecall (func, calls, tupleLhs->getElements (), tupleRhs->getElements ()));
+		return ASTnode (new ASTtuplecall (func, calls, lhsArgs, rhsArgs));
 		
 	} else if (tupleLhs or tupleRhs) {
 		 
-		error ("Binary operations with tuples and structs are not currently suported.", end);
+		error ("Composite binary tuple operations are unfortunetly not yet supported.", end);
 		return ASTnode (new ASTerror ("Type mismatch"));
 		
 	} else {

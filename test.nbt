@@ -80,6 +80,7 @@ def testFunc (int8 lhs, int8 rhs): {int8}
 	c = b
 	b = func ((a + b) * lhs + rhs * 2)
 	a = max (a, b)
+	a, b, c = b, c, a
 	return a
 
 def tfunc (alias int64 t) : {}

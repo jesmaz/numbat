@@ -37,7 +37,7 @@ using namespace llvm;
 using visitor::Visitor;
 
 
-class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconstantInt>, public Visitor <ASTfunctionPointer>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtype>, public Visitor <ASTvariable> {
+class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconstantInt>, public Visitor <ASTfunctionPointer>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable> {
 	public:
 		virtual void visit (AbstractSyntaxTree & exp);
 		virtual void visit (ASTbody & exp);
@@ -51,6 +51,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		virtual void visit (ASTreturn & exp);
 		virtual void visit (ASTreturnvoid & exp);
 		virtual void visit (ASTstructIndex & exp);
+		virtual void visit (ASTtuplecall & exp);
 		virtual void visit (ASTtype & exp) {}
 		virtual void visit (ASTvariable & exp);
 		//std::vector <Value *> operator () (AbstractSyntaxTree & ast) {tree = &ast; ast.getBody ().accept (*this); return body;}
