@@ -4,10 +4,10 @@ namespace numbat {
 using namespace lexer;
 namespace parser {
 
-std::map <string, shared_ptr <OperatorDecleration>> AbstractSyntaxTree::operators;
-std::multimap <string, shared_ptr <OperatorDecleration>> AbstractSyntaxTree::operatorsByFirstToken;
-std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> AbstractSyntaxTree::precidenceOrderedOperators;
-std::unordered_set <string> AbstractSyntaxTree::parenOpperators, AbstractSyntaxTree::oppTokens, AbstractSyntaxTree::ternaryStart;
+//std::map <string, shared_ptr <OperatorDecleration>> AbstractSyntaxTree::operators;
+//std::multimap <string, shared_ptr <OperatorDecleration>> AbstractSyntaxTree::operatorsByFirstToken;
+//std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> AbstractSyntaxTree::precidenceOrderedOperators;
+//std::unordered_set <string> AbstractSyntaxTree::parenOpperators, AbstractSyntaxTree::oppTokens, AbstractSyntaxTree::ternaryStart;
 
 
 AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
@@ -968,6 +968,35 @@ tkitt AbstractSyntaxTree::findToken (const string & token, tkitt tmpitt, tkitt e
 	
 }
 
+void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecleration & oppdec) {
+	
+	shared_ptr <OperatorDecleration> opp (new OperatorDecleration (oppdec));
+	
+	operators [pattern] = opp;
+	precidenceOrderedOperators.insert (opp);
+	
+	switch (oppdec.getType ()) {
+		case OperatorDecleration::TYPE::array:
+		case OperatorDecleration::TYPE::index_call:
+		case OperatorDecleration::TYPE::ternary:
+		{
+			size_t first = pattern.find_first_not_of (' ');
+			size_t last = pattern.find_first_of (first, ' ');
+			parenOpperators.insert (pattern.substr (first, last - first));
+		}
+		default:
+			break;
+	}
+	
+	for (const string & s : opp->getSymbols ()) {
+		if (s != " ") {
+			oppTokens.insert (s);
+			operatorsByFirstToken.insert (std::make_pair (s, opp));
+		}
+	}
+	
+}
+
 void AbstractSyntaxTree::parseOperatorDecleration (tkitt end) {
 	
 	int precidence;
@@ -1025,30 +1054,7 @@ void AbstractSyntaxTree::parseOperatorDecleration (tkitt end) {
 		error ("Operator aready defined", end);
 		return;
 	}
-	
-	shared_ptr <OperatorDecleration> opp (new OperatorDecleration (oppdec));
-	operators [pattern] = opp;
-	precidenceOrderedOperators.insert (opp);
-	
-	switch (oppdec.getType ()) {
-		case OperatorDecleration::TYPE::array:
-		case OperatorDecleration::TYPE::index_call:
-		case OperatorDecleration::TYPE::ternary:
-		{
-			size_t first = pattern.find_first_not_of (' ');
-			size_t last = pattern.find_first_of (first, ' ');
-			parenOpperators.insert (pattern.substr (first, last - first));
-		}
-		default:
-			break;
-	}
-	
-	for (const string & s : opp->getSymbols ()) {
-		if (s != " ") {
-			oppTokens.insert (s);
-			operatorsByFirstToken.insert (std::make_pair (s, opp));
-		}
-	}
+	addOperator (pattern, oppdec);
 	
 }
 

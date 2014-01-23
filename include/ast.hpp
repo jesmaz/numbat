@@ -117,6 +117,7 @@ struct AbstractSyntaxTree {
 		tkitt findToken (const string & token, tkitt end) {return findToken (token, itt, end);}
 		tkitt findToken (const string & token, tkitt beg, tkitt end);
 		
+		void addOperator (const string & pattern, const OperatorDecleration & oppdec);
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
 		void printError (const string & message) {buildFail = true; std::cerr << "error on line " << line << ": " << message << '\n';}
 		void parseOperatorDecleration (tkitt end);
@@ -135,14 +136,14 @@ struct AbstractSyntaxTree {
 		
 		std::map <string, shared_ptr <NumbatType>> types;
 		std::map <string, shared_ptr <NumbatVariable>> variables;
-		static std::map <string, shared_ptr <OperatorDecleration>> operators;
+		std::map <string, shared_ptr <OperatorDecleration>> operators;
 		
 		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
-		static std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
+		std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
 		
-		static std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
+		std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
 		
-		static std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
+		std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
 		
 };
 
