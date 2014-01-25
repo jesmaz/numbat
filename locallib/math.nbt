@@ -14,8 +14,6 @@ operator '! ' : 300 rtl
 operator 'not ' : 300 rtl
 operator ' ~' : 300 rtl
 
-#operator ' , ' : 400 ltr
-
 operator ' * ' : 500 ltr
 operator ' / ' : 500 ltr
 operator ' % ' : 500 ltr
@@ -26,23 +24,25 @@ operator ' - ' : 600 ltr
 operator ' << ' : 700 ltr
 operator ' >> ' : 700 ltr
 
-operator ' < ' : 800 ltr
-operator ' <= ' : 800 ltr
-operator ' > ' : 800 ltr
-operator ' >= ' : 800 ltr
+operator ' & ' : 800 ltr
 
-operator ' == ' : 900 ltr
-operator ' != ' : 900 ltr
+operator ' ^ ' : 900 ltr
 
-operator ' & ' : 1000 ltr
+operator ' | ' : 1000 ltr
 
-operator ' ^ ' : 1100 ltr
+operator ' < ' : 1100 ltr
+operator ' <= ' : 1100 ltr
+operator ' > ' : 1100 ltr
+operator ' >= ' : 1100 ltr
 
-operator ' | ' : 1200 ltr
+operator ' == ' : 1200 ltr
+operator ' != ' : 1200 ltr
 
 operator ' and ' : 1300 ltr
 
 operator ' or ' : 1400 ltr
+
+operator ' , ' : 1500 ltr
 
 operator ' = ' : 1600 rtl
 operator ' += ' : 1600 rtl
