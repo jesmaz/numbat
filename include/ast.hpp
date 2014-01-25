@@ -13,6 +13,8 @@
 #include "ast/astrawdata.hpp"
 #include "ast/astreturn.hpp"
 #include "ast/aststructindex.hpp"
+#include "ast/asttuple.hpp"
+#include "ast/asttuplecall.hpp"
 #include "ast/asttype.hpp"
 #include "ast/astvariable.hpp"
 #include "ast/functiondecleration.hpp"
@@ -72,8 +74,10 @@ struct AbstractSyntaxTree {
 		
 	private:
 		
+		ASTnode createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end);
 		ASTnode createCallNode (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args);
 		ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth=1);
+		ASTnode createTuple (const ASTnode & lhs, const ASTnode & rhs);
 		ASTnode parseAssembly (const string & type, const string & code);
 		ASTnode parseBody (tkitt end); // TODO: needs template info parem
 		ASTnode parseExpression (tkitt end);
@@ -120,6 +124,7 @@ struct AbstractSyntaxTree {
 		void addOperator (const string & pattern, const OperatorDecleration & oppdec);
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
 		void printError (const string & message) {buildFail = true; std::cerr << "error on line " << line << ": " << message << '\n';}
+		void parseImport (tkitt end);
 		void parseOperatorDecleration (tkitt end);
 		void parseTypeDef (tkitt end);
 		

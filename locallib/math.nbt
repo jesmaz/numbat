@@ -14,6 +14,8 @@ operator '! ' : 300 rtl
 operator 'not ' : 300 rtl
 operator ' ~' : 300 rtl
 
+#operator ' , ' : 400 ltr
+
 operator ' * ' : 500 ltr
 operator ' / ' : 500 ltr
 operator ' % ' : 500 ltr

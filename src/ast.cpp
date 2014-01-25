@@ -1,3 +1,4 @@
+
 #include "../include/ast.hpp"
 
 namespace numbat {
@@ -35,6 +36,10 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 				nextToken (end);
 				parseFunctionDecleration (end);
 				eatSemicolon (end);
+				break;
+				
+			case TOKEN::import:
+				parseImport (end);
 				break;
 				
 			case TOKEN::indent:
@@ -92,6 +97,58 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 	
 }
 
+ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+	
+	const ASTtuple * tupleLhs = dynamic_cast <const ASTtuple *> (lhs.get ());
+	const ASTtuple * tupleRhs = dynamic_cast <const ASTtuple *> (rhs.get ());
+	
+	if (tupleLhs and tupleRhs) {
+		
+		if (tupleLhs->getElements ().size () != tupleRhs->getElements ().size ()) {
+			error ("Binary operation has an unequal number of arguments.", end);
+			return ASTnode (new ASTerror ("Argument length mismatch"));
+		}
+		
+		auto lhsItt = tupleLhs->getElements ().begin ();
+		auto rhsItt = tupleRhs->getElements ().begin ();
+		auto lhsEnd = tupleLhs->getElements ().end ();
+		auto rhsEnd = tupleRhs->getElements ().end ();
+		
+		std::vector <shared_ptr <ASTcallable>> calls;
+		std::vector <ASTnode> args (2);
+		
+		std::list <ASTnode> lhsArgs, rhsArgs;
+		
+		for (; lhsItt != lhsEnd and rhsItt != rhsEnd; ++lhsItt, ++rhsItt) {
+			args [0] = *lhsItt;
+			args [1] = *rhsItt;
+			shared_ptr <ASTcallable> call = findFunction (func, args);
+			calls.push_back (call);
+			if (!call->isValid ()) {
+				printError (call->toString ());
+			}
+			lhsArgs.push_back (createStaticCast (args [0], call->getFunction ()->getArgs () [0]));
+			rhsArgs.push_back (createStaticCast (args [1], call->getFunction ()->getArgs () [1]));
+		}
+		
+		return ASTnode (new ASTtuplecall (func, calls, lhsArgs, rhsArgs));
+		
+	} else if (tupleLhs or tupleRhs) {
+		 
+		error ("Composite binary tuple operations are unfortunetly not yet supported.", end);
+		return ASTnode (new ASTerror ("Type mismatch"));
+		
+	} else {
+		
+		std::vector <ASTnode> args (2);
+		args [0] = lhs;
+		args [1] = rhs;
+		return createCallNode (findFunction (func, args), args);
+		
+	}
+	
+}
+
 ASTnode AbstractSyntaxTree::createCallNode (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args) {
 	if (!callee->isValid ()) return ASTnode (callee);
 	ASTnode node (new ASTcall (callee, createStaticCast (args, callee->getFunction ()->getArgs (), 1)));
@@ -139,6 +196,27 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 	}
 	
 	return ASTnode (new ASTerror ("No sutible conversion found."));
+	
+}
+
+ASTnode AbstractSyntaxTree::createTuple (const ASTnode & lhs, const ASTnode & rhs) {
+	
+	ASTnode ret = nullptr;
+	const ASTtuple * tupleLhs = dynamic_cast <const ASTtuple *> (lhs.get ());
+	const ASTtuple * tupleRhs = dynamic_cast <const ASTtuple *> (rhs.get ());
+	
+	if (tupleLhs) {
+		if (tupleRhs) {
+			ret = ASTnode (new ASTtuple (tupleLhs->getElements (), tupleRhs->getElements ()));
+		} else {
+			ret = ASTnode (new ASTtuple (tupleLhs->getElements (), rhs));
+		}
+	} else if (tupleRhs) {
+		ret = ASTnode (new ASTtuple (lhs, tupleRhs->getElements ()));
+	} else {
+		ret = ASTnode (new ASTtuple (lhs, rhs));
+	}
+	return ret;
 	
 }
 
@@ -299,8 +377,10 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 					} else {
 						return expr;
 					}
+				} else if (opp.getPattern () == " , ") {
+					return createTuple (args [0], parseExpression (matches, end));
 				} else {
-					args.push_back (parseExpression (matches, end));
+					return createBinaryCall (opp.getPattern (), args [0], parseExpression (matches, end), end);
 				}
 			}
 			break;
@@ -994,6 +1074,11 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 			operatorsByFirstToken.insert (std::make_pair (s, opp));
 		}
 	}
+	
+}
+
+void AbstractSyntaxTree::parseImport(tkitt end) {
+	nextToken (end);//eat 'import' token
 	
 }
 
