@@ -16,6 +16,30 @@ void Numbat::loadFromFile (const std::string & file) {
 	}
 }
 
+void Numbat::loadFromModule (const parser::Module & mod) {
+	FunctionPassManager fpm (module);
+	fpm.add (new DataLayout(*engine->getDataLayout()));
+	fpm.add (createBasicAliasAnalysisPass ());
+	fpm.add (createReassociatePass ());
+	fpm.add (createGVNPass ());
+	fpm.add (createCFGSimplificationPass ());
+	fpm.add (createInstructionCombiningPass ());
+	fpm.doInitialization ();
+	parser::BodyGenerator generator (module);
+	generator.visit (mod);
+	PassManager mpm;
+	mpm.add (new DataLayout(*engine->getDataLayout()));
+	mpm.add (createFunctionInliningPass ());
+	mpm.run (*module);
+	std::cerr << "Post Inline:\n\n\n";
+	module->dump ();
+	for (Function & func : module->getFunctionList ()) {
+		fpm.run (func);
+	}
+	std::cerr << "Second optimise pass:\n\n\n";
+	module->dump ();
+}
+
 void Numbat::loadFromStream (std::istream & is) {
 	std::string out;
 	std::string buffer;

@@ -69,6 +69,9 @@ def test () : {int8}
 	int8 n = 90
 	return n
 
+def swap (int8 lhs, int8 rhs) : {int8, int8}
+	return rhs, lhs
+
 def testFunc (int8 lhs, int8 rhs): {int8}
 	#vec2 $<int8> vec
 	testStruct ts
@@ -82,6 +85,12 @@ def testFunc (int8 lhs, int8 rhs): {int8}
 	a = max (a, b)
 	a, b, c = b, c, a
 	return a
+
+def tupletest () : {}
+	int8 a
+	int8 b
+	a, b = swap (a, b)
+	return
 
 def tfunc (alias int64 t) : {}
 	t = 40

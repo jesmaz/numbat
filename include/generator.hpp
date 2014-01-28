@@ -21,6 +21,7 @@
 #include <llvm/Transforms/Scalar.h>
 
 #include "ast.hpp"
+#include "module.hpp"
 #include "token.hpp"
 
 #include <iostream>
@@ -54,6 +55,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		virtual void visit (ASTtuplecall & exp);
 		virtual void visit (ASTtype & exp) {}
 		virtual void visit (ASTvariable & exp);
+		void visit (const Module & module);
 		//std::vector <Value *> operator () (AbstractSyntaxTree & ast) {tree = &ast; ast.getBody ().accept (*this); return body;}
 		BodyGenerator (llvm::Module * mod, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), activeFunction (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
 	protected:

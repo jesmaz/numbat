@@ -133,7 +133,43 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		
 		return ASTnode (new ASTtuplecall (func, calls, lhsArgs, rhsArgs));
 		
-	} else if (tupleLhs or tupleRhs) {
+	} else if (tupleLhs) {
+		
+		std::vector <ASTnode> args (2);
+		
+		if (rhs->isCallable ()) {
+			
+			std::vector <shared_ptr <ASTcallable>> calls;
+			shared_ptr <ASTcallable> rhsFunc = std::static_pointer_cast <ASTcallable> (rhs);
+			std::list <ASTnode> lhsArgs, rhsArgs;
+			size_t i=0;
+			
+			for (const ASTnode & lvar : tupleLhs->getElements ()) {
+				
+				if (!lvar->isNil ()) {
+					args [0] = lvar;
+					args [1] = ASTnode (new ASTcallindex (rhsFunc, i));;
+					shared_ptr <ASTcallable> call = findFunction (func, args);
+					calls.push_back (call);
+					lhsArgs.push_back (createStaticCast (args [0], call->getFunction ()->getArgs () [0]));
+					rhsArgs.push_back (createStaticCast (args [1], call->getFunction ()->getArgs () [1]));
+				}
+				++i;
+				
+			}
+			
+			if (lhsArgs.empty ()) {
+				return rhs;
+			} else {
+				return ASTnode (new ASTtuplecall (func, calls, lhsArgs, rhsArgs));
+			}
+			
+		} else {
+			error ("Composite binary tuple operations are unfortunetly not yet supported.", end);
+			return ASTnode (new ASTerror ("Type mismatch"));
+		}
+		
+	} else if (tupleRhs) {
 		 
 		error ("Composite binary tuple operations are unfortunetly not yet supported.", end);
 		return ASTnode (new ASTerror ("Type mismatch"));

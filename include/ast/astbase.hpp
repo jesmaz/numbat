@@ -26,6 +26,7 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual bool isCallable () const {return false;}
 		virtual bool isConst () const {return false;}
 		virtual bool isList () const {return false;}
+		virtual bool isNil () const {return false;}
 		virtual bool isRaw () const {return false;}
 		virtual bool isValid () const=0;
 		virtual shared_ptr <NumbatType> getType () const {return nullptr;}

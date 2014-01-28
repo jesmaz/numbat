@@ -386,17 +386,30 @@ void BodyGenerator::visit (ASTparamater & exp) {
 
 void BodyGenerator::visit (ASTreturn & exp) {
 	
-	exp.getExpr ()->accept (*this);
-	if (stack.size ()) {
-		std::vector <Value *> members;
-		members.push_back (stack.top ());
-		if (!activeFunctionDecleration->hasTag ("cstyle")) {
-			stack.top () = builder.CreateAggregateRet (members.data (), 1);
-		} else {
-			stack.top () = builder.CreateRet (stack.top ());
+	const ASTtuple * tuple = dynamic_cast <const ASTtuple *> (exp.getExpr ().get ());
+	std::vector <Value *> members;
+	if (tuple) {
+		for (const ASTnode & node : tuple->getElements ()) {
+			node->accept (*this);
+			if (!stack.empty ()) {
+				members.push_back (stack.top ());
+			} else {
+				return;
+			}
+		}
+		stack.top () = builder.CreateAggregateRet (members.data (), members.size ());
+	} else {
+		exp.getExpr ()->accept (*this);
+		if (stack.size ()) {
+			
+			members.push_back (stack.top ());
+			if (!activeFunctionDecleration->hasTag ("cstyle")) {
+				stack.top () = builder.CreateAggregateRet (members.data (), 1);
+			} else {
+				stack.top () = builder.CreateRet (stack.top ());
+			}
 		}
 	}
-	
 }
 
 void BodyGenerator::visit (ASTreturnvoid & exp) {
@@ -452,6 +465,33 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 		++lhsParam;
 		++rhsParam;
 	}
+	
+}
+
+void BodyGenerator::visit (const Module & nbtMod) {
+	
+	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod.getFunctions ()) {
+		registerFunction (func.second.get ());
+	}
+	
+	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod.getFunctions ()) {
+		activeFunctionDecleration = func.second.get ();
+		activeFunction = functions [activeFunctionDecleration];
+		ASTnode body = func.second->getBody ();
+		if (body) {
+			builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
+			for (const ASTnode & node : func.second->getArgs ()) {
+				node->accept (*this);
+			}
+			body->accept (*this);
+			activeFunction->dump ();
+			verifyFunction (*activeFunction);
+			if (fpm)
+				fpm->run (*activeFunction);
+		}
+	}
+	
+	module->dump ();
 	
 }
 

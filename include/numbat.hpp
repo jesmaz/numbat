@@ -3,9 +3,10 @@
 
 #include <fstream>
 
-#include "visitor.hpp"
 #include "ast.hpp"
+#include "module.hpp"
 #include "generator.hpp"
+#include "visitor.hpp"
 
 namespace numbat {
 
@@ -59,6 +60,7 @@ class Numbat {
 		void dump () {module->dump ();}
 		void loadFromCode (const std::string & code);
 		void loadFromFile (const std::string & file);
+		void loadFromModule (const parser::Module & mod);
 		void loadFromStream (std::istream & is);
 		void loadFromTokenStr (const tkstring & tkns);
 		

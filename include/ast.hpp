@@ -57,6 +57,7 @@ struct AbstractSyntaxTree {
 		const bool buildSuccessfull () const {return !buildFail;}
 		const std::map <string, shared_ptr <NumbatType>> & getTypes () const {return types;}
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
+		const std::map <string, shared_ptr <OperatorDecleration>> & getOperators () const {return operators;}
 		string toString (const string & indent = "") const {
 			string str="";
 			for (auto & itt : types) {

@@ -33,4 +33,4 @@ class ASTvariable : public ASTbase {
 }
 
 
-#endif /*ASTSTRUCTINDEX_HPP*/
+#endif /*ASTVARIABLE_HPP*/
