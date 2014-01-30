@@ -1115,7 +1115,11 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 
 void AbstractSyntaxTree::parseImport(tkitt end) {
 	nextToken (end);//eat 'import' token
-	
+	if (itt->type == TOKEN::chararrayliteral) {
+		dependencies.insert (Module::importLocal ("", itt->iden));
+		nextToken (end);
+	}
+	eatSemicolon (end);
 }
 
 void AbstractSyntaxTree::parseOperatorDecleration (tkitt end) {

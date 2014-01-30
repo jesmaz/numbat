@@ -5,7 +5,7 @@ project(numbat)
 
 execute_process(COMMAND llvm-config --includedir OUTPUT_VARIABLE LLVM_INCLUDE_DIRS OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND llvm-config --libdir OUTPUT_VARIABLE LLVM_LIBRARY_DIRS OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND llvm-config --libs core jit native analysis ipo systemz OUTPUT_VARIABLE REQ_LLVM_LIBRARIES OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config --libs all-targets core jit native analysis ipo systemz OUTPUT_VARIABLE REQ_LLVM_LIBRARIES OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND llvm-config --ldflags OUTPUT_VARIABLE LLVM_LINKER_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 #We only care about preprocessor flags
@@ -29,6 +29,7 @@ set(sources ${sources} src/ast/numbatrawtype.cpp)
 set(sources ${sources} src/ast/numbattype.cpp)
 set(sources ${sources} src/ast/operatordecleration.cpp)
 set(sources ${sources} src/lexer.cpp)
+set(sources ${sources} src/module.cpp)
 set(sources ${sources} src/numbat.cpp)
 set(sources ${sources} src/generator.cpp)
 add_library(numbat-static STATIC ${sources})

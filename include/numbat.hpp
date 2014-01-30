@@ -60,7 +60,7 @@ class Numbat {
 		void dump () {module->dump ();}
 		void loadFromCode (const std::string & code);
 		void loadFromFile (const std::string & file);
-		void loadFromModule (const parser::Module & mod);
+		void loadFromModule (const shared_ptr <parser::Module> & mod);
 		void loadFromStream (std::istream & is);
 		void loadFromTokenStr (const tkstring & tkns);
 		
@@ -68,6 +68,7 @@ class Numbat {
 		void registerFunction (FunctionType * ft, const std::string & name, T funcPtr) {engine->addGlobalMapping (Function::Create (ft, Function::ExternalLinkage, name, module), reinterpret_cast <void *> (funcPtr));}
 		//template <typename T, typename Ret, typename ... Args>
 		//void registerFunction (const std::string & name, T funcPtr);
+		Module * getModule () {return module;}
 		
 		Numbat ();
 		//Numbat (const Numbat & other);

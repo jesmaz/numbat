@@ -58,6 +58,7 @@ struct AbstractSyntaxTree {
 		const std::map <string, shared_ptr <NumbatType>> & getTypes () const {return types;}
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
 		const std::map <string, shared_ptr <OperatorDecleration>> & getOperators () const {return operators;}
+		const std::set <shared_ptr <Module>> & getDependencies () const {return dependencies;}
 		string toString (const string & indent = "") const {
 			string str="";
 			for (auto & itt : types) {
@@ -147,6 +148,7 @@ struct AbstractSyntaxTree {
 		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
 		std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
 		
+		std::set <shared_ptr <Module>> dependencies;
 		std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
 		
 		std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;

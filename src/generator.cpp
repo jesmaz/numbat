@@ -468,13 +468,20 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	
 }
 
-void BodyGenerator::visit (const Module & nbtMod) {
+void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
-	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod.getFunctions ()) {
+	auto itt = builtModules.find (nbtMod.get ());
+	if (itt != builtModules.end ()) return;
+	
+	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod->getFunctions ()) {
 		registerFunction (func.second.get ());
 	}
 	
-	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod.getFunctions ()) {
+	for (const shared_ptr <Module> & mod : nbtMod->getDependencies ()) {
+		visit (mod);
+	}
+	
+	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod->getFunctions ()) {
 		activeFunctionDecleration = func.second.get ();
 		activeFunction = functions [activeFunctionDecleration];
 		ASTnode body = func.second->getBody ();

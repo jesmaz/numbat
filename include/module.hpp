@@ -22,24 +22,26 @@ struct Module {
 	public:
 		
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
+		const std::set <shared_ptr <Module>> & getDependencies () const {return dependencies;}
 		
-		static const Module & createFromFile (const string & file);
-		static const Module & createFromFile (const string & dir, const string & file);
-		static const Module & import (const string & file);
-		static const Module & importLocal (const string & dir, const string & file);
+		static const shared_ptr <Module> createFromFile (const string & file);
+		static const shared_ptr <Module> createFromFile (const string & dir, const string & file);
+		static const shared_ptr <Module> import (const string & file);
+		static const shared_ptr <Module> importLocal (const string & dir, const string & file);
 		
 	protected:
 	private:
 		
 		Module () {}
-		Module (const std::map <string, shared_ptr <NumbatType>> & types, const std::multimap <string, shared_ptr <FunctionDecleration>> & functions, const std::map <string, shared_ptr <OperatorDecleration>> & operators) : types (types), functions (functions), operators (operators) {}
+		Module (const std::map <string, shared_ptr <NumbatType>> & types, const std::multimap <string, shared_ptr <FunctionDecleration>> & functions, const std::map <string, shared_ptr <OperatorDecleration>> & operators, const std::set <shared_ptr <Module>> & dependencies) : types (types), functions (functions), operators (operators), dependencies (dependencies) {}
 		
 		
 		std::map <string, shared_ptr <NumbatType>> types;
 		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
 		std::map <string, shared_ptr <OperatorDecleration>> operators;
+		std::set <shared_ptr <Module>> dependencies;
 		
-		static std::map <string, Module> allModules;
+		static std::map <string, shared_ptr <Module>> allModules;
 		static std::set <string> includeDirs;
 		
 };

@@ -1,4 +1,4 @@
-import 'locallib'
+import 'locallib/math.nbt'
 
 
 operator ' :: ' : 100 ltr

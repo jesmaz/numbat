@@ -16,7 +16,7 @@ void Numbat::loadFromFile (const std::string & file) {
 	}
 }
 
-void Numbat::loadFromModule (const parser::Module & mod) {
+void Numbat::loadFromModule (const shared_ptr <parser::Module> & mod) {
 	FunctionPassManager fpm (module);
 	fpm.add (new DataLayout(*engine->getDataLayout()));
 	fpm.add (createBasicAliasAnalysisPass ());

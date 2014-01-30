@@ -24,6 +24,103 @@ struct testStruct {
 };
 
 int main (int argl, char ** args) {
+	
+	InitializeAllTargets ();
+	InitializeAllTargetMCs();
+	InitializeAllAsmPrinters();
+	InitializeAllAsmParsers();
+	
+	string outfile = "a.out";
+	bool link=true;
+	std::set <string> files;
+	for (int i=1; i<argl; ++i) {
+		char * str = args [i];
+		//int len = strlen (str);
+		if (str [0] == '-') {
+			if (str [1] == '-') {
+				//TODO: handle options
+			} else {
+				for (int j=1; str [j]; ++j) {
+					switch (str[j]) {
+						case 'c':
+							link = false;
+							break;
+						case 'o':
+							if (i+1<argl) {
+								outfile = args [i+1];
+								++i;
+							} else {
+								//TODO: handle invalid options
+							}
+							break;
+						default:
+							//TODO: handle invalid options
+							break;
+					}
+				}
+			}
+		} else {
+			files.insert (str);
+		}
+	}
+	
+	Numbat numbat;
+	for (const string & file : files) {
+		numbat.loadFromModule (parser::Module::createFromFile (file));
+	}
+	
+	Module * mod = numbat.getModule ();
+	Triple theTriple (mod->getTargetTriple ());
+	
+	string error;
+	const Target * target = TargetRegistry::lookupTarget ("x86-64", theTriple, error);
+	if (!target) {
+		std::cerr << error << std::endl;
+		return 1;
+	}
+	SubtargetFeatures features;
+	features.AddFeature ("64bit", true);
+	
+	TargetOptions options;
+	
+	OwningPtr <TargetMachine> mchPtr (target->createTargetMachine (theTriple.getTriple (), "generic", features.getString (), options));
+	if (!mchPtr.get ()) {
+		std::cerr << "Could not allocate the target machine" << std::endl;
+		return 1;
+	}
+	TargetMachine * machine = mchPtr.get ();
+	
+	machine->setAsmVerbosityDefault (true);
+	
+	PassManager PM;
+	PM.add (new TargetLibraryInfo (theTriple));
+	machine->addAnalysisPasses (PM);
+	PM.add (new DataLayout (*machine->getDataLayout ()));
+	
+	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error, raw_fd_ostream::F_Binary));
+	if (!error.empty ()) {
+		std::cerr << error << std::endl;
+		return 1;
+	}
+	{
+		formatted_raw_ostream fos (out->os ());
+		if (machine->addPassesToEmitFile (PM, fos, TargetMachine::CGFT_ObjectFile)) {
+			std::cerr << "The target does not suport the generaton of this file type" << std::endl;
+			return 1;
+		}
+	
+		PM.run (*mod);
+	}
+	
+	out->keep ();
+	
+	/*if (link) {
+		
+	} else {
+		
+	}*/
+	
+	
 	/*std::string file = loadFromFile ("test.nbt");
 	lexer::tkstring test = lexer::lexFile (file);
 	parser::AbstractSyntaxTree ast (test.begin (), lexer::findEOF (test.begin (), test.end ()));
@@ -44,12 +141,13 @@ int main (int argl, char ** args) {
 		parser::BodyGenerator generator (module, &fpm);
 		generator.visit (ast);
 	}*/
-	Numbat numbat;
-	numbat.loadFromFile ("test.nbt");
-	uint64_t t;
+	//Numbat numbat;
+	//numbat.loadFromFile ("test.nbt");
+	//numbat.loadFromModule (parser::Module::createFromFile ("test.nbt"));
+	//uint64_t t;
 	//numbat.getFunction <void, uint64_t *> ("tfunc") (&t);
 	//std::cout << t << std::endl;
-	std::cout << (numbat.getFunction <int64_t> ("cCallbackTest") ()) << std::endl;
+	//std::cout << (numbat.getFunction <int64_t> ("cCallbackTest") ()) << std::endl;
 	return 0;
 }
 

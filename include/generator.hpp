@@ -55,7 +55,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		virtual void visit (ASTtuplecall & exp);
 		virtual void visit (ASTtype & exp) {}
 		virtual void visit (ASTvariable & exp);
-		void visit (const Module & module);
+		void visit (const shared_ptr <Module> & module);
 		//std::vector <Value *> operator () (AbstractSyntaxTree & ast) {tree = &ast; ast.getBody ().accept (*this); return body;}
 		BodyGenerator (llvm::Module * mod, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), activeFunction (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
 	protected:
@@ -93,6 +93,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		std::map <const NumbatType *, Type *> structures;
 		std::map <const NumbatVariable *, Value *> namedValues;
 		//std::stack <stackVal> stack;
+		std::set <Module *> builtModules;
 		std::stack <Value *> stack;
 		std::vector <Value *> body;
 		//CallMeta callmeta;
