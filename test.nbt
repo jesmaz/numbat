@@ -78,6 +78,9 @@ def testFunc (int8 lhs, int8 rhs): {int8}
 	int8 a = 12
 	a = ts.I
 	a = rhs * (a + 32)
+	int8 i = 10
+	while i:
+		i = i + 1
 	int8 b
 	int64 c
 	c = b

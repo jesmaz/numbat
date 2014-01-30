@@ -468,6 +468,28 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	
 }
 
+void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
+	
+	Function * func = builder.GetInsertBlock ()->getParent ();
+	
+	continueBlock = BasicBlock::Create (context, "condition", func);
+	BasicBlock * loopBlock = BasicBlock::Create (context, "loop", func);
+	breakBlock = BasicBlock::Create (context, "break", func);
+	builder.CreateBr (continueBlock);
+	
+	builder.SetInsertPoint (continueBlock);
+	makeCompare (exp.getCondition ());
+	Value * cond = stack.top (); stack.pop ();
+	builder.CreateCondBr (cond, loopBlock, breakBlock);
+	
+	builder.SetInsertPoint (loopBlock);
+	exp.getBody ()->accept (*this);
+	builder.CreateBr (continueBlock);
+	
+	builder.SetInsertPoint (breakBlock);
+	
+}
+
 void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
 	auto itt = builtModules.find (nbtMod.get ());

@@ -18,6 +18,7 @@
 #include "ast/asttuplecall.hpp"
 #include "ast/asttype.hpp"
 #include "ast/astvariable.hpp"
+#include "ast/astwhileloop.hpp"
 #include "ast/functiondecleration.hpp"
 #include "ast/numbatrawtype.hpp"
 #include "ast/numbattype.hpp"

@@ -294,11 +294,48 @@ ASTnode AbstractSyntaxTree::parseBody (tkitt end) {
 	end = findIndent (level, end);
 	tkitt scolon;
 	std::vector <ASTnode> exprs;
-	while ((scolon = findToken (";", end)) != end) {
+	/*while ((scolon = findToken (";", end)) != end) {
 		ASTnode node = parseStatment (scolon);
 		eatSemicolon (end);
 		if (node) {
 			exprs.push_back (node);
+		}
+	}*/
+	while (itt != end) {
+		switch (itt->type) {
+			case TOKEN::whiletkn:
+				{
+					tkitt colon;
+					if ((colon = findToken (":", end)) != end) {
+						nextToken (end);
+						ASTnode node = nullptr;
+						if (itt != colon) {
+							node = parseStatment (colon);
+						}
+						if (!node) {
+							//TODO: handle a lack of a condition (infinite loop?)
+							break;
+						}
+						nextToken (end);
+						exprs.push_back (ASTnode (new ASTwhileloop (node, parseBody (end))));
+					} else {
+						itt = end;
+					}
+				}
+				break;
+			default:
+				{
+					if ((scolon = findToken (";", end)) != end) {
+						ASTnode node = parseStatment (scolon);
+						eatSemicolon (end);
+						if (node) {
+							exprs.push_back (node);
+						}
+					} else {
+						itt = end;
+					}
+				}
+				break;
 		}
 	}
 	variables = oldVariables;
