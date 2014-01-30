@@ -8,6 +8,7 @@
 #include "ast/astconstantint.hpp"
 #include "ast/asterror.hpp"
 #include "ast/astfunctionpointer.hpp"
+#include "ast/astnil.hpp"
 #include "ast/astnumbatinstr.hpp"
 #include "ast/astparamater.hpp"
 #include "ast/astrawdata.hpp"

@@ -507,6 +507,9 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 		//TODO: return string ASTnode
 		nextToken (end);
 		return ASTnode (new ASTerror ("NYI"));
+	} else if (itt->type == TOKEN::nil) {
+		nextToken (end);
+		return ASTnode (new ASTnil ());
 	}
 	
 	if (itt->type == TOKEN::raw or itt->type == TOKEN::typemodifier or types.find (itt->iden) != types.end ()) {

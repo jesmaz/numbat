@@ -24,6 +24,7 @@ enum class TOKEN {
 	iftkn,
 	import,
 	indent,
+	nil,
 	numericliteral,
 	operatortkn,
 	ret,
