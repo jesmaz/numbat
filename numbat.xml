@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!-- Numbat syntax highlighting v1.0 by Jesse Mazis -->
+
+<language name="Numbat" version="1.0" style="python" kateversion="2.4" section="Sources" extensions="*.nbt;*.numbat" casesensitive="1" author="Jesse Mazis" license="">
+
+	<highlighting>
+
+		<list name="defs">
+			<item> def </item>
+			<item> operator </item>
+			<item> struct </item>
+			<item> typedef </item>
+		</list>
+
+		<list name="flow">
+			<item> asm </item>
+			<item> return </item>
+		</list>
+
+		<contexts>
+
+			<context name="Normal Text" attribute="Normal Text" lineEndContext="#stay">
+				<keyword attribute="Definition Keyword" String="defs" context="#stay"/>
+				<keyword attribute="Flow Keyword" String="flow" context="#stay"/>
+				<Float attribute="Float" context="#stay" />
+				<HlCHex attribute="Hex" context="#stay"/>
+				<HlCOct attribute="Octal" context="#stay"/>
+				<Int attribute="Int" context="#stay"/>
+
+				<IncludeRules context="CommentVariants" />
+				<IncludeRules context="StringVariants" />
+
+				<DetectChar attribute="Meta Tag" char="@" context="Meta Tag"/>
+			</context>
+
+			<context name="CommentVariants" attribute="Normal Text" lineEndContext="#stay">
+				<DetectSpaces/>
+				<DetectChar attribute="Comment" char="#" context="Hash comment"/>
+			</context>
+
+			<context name="StringVariants" attribute="Normal Text" lineEndContext="#stay">
+				<!-- ' -->
+				<DetectChar attribute="String" char="'" context="Single A-string"/>
+			</context>
+
+			<context name="Hash comment" attribute="Comment" lineEndContext="#pop">
+				<IncludeRules context="##Alerts" />
+				<IncludeRules context="##Modelines" />
+			</context>
+
+			<context name="Single A-string" attribute="String" lineEndContext="#stay">
+				<HlCStringChar attribute="String Char" context="#stay"/>
+				<DetectChar attribute="String" char="'" context="#pop"/>
+			</context>
+
+			<context name="Meta Tag" attribute="Meta Tag" lineEndContext="#stay">
+				<DetectIdentifier attribute="Meta Tag" context="#pop"/>
+				<DetectSpaces context="#pop"/>
+			</context>
+
+		</contexts>
+
+		<itemDatas>
+			<itemData name="Normal Text" defStyleNum="dsNormal"/>
+			<itemData name="Definition Keyword" defStyleNum="dsKeyword" spellChecking="false"/>
+			<itemData name="Flow Keyword" defStyleNum="flow" spellChecking="false"/>
+			<itemData name="Meta Tag" defStyleNum="metaTag" spellChecking="false"/>
+			<itemData name="String Char" defStyleNum="dsChar" spellChecking="false"/>
+			<itemData name="Float" defStyleNum="dsFloat" spellChecking="false"/>
+			<itemData name="Int" defStyleNum="dsDecVal" spellChecking="false"/>
+			<itemData name="Hex" defStyleNum="dsBaseN" spellChecking="false"/>
+			<itemData name="Octal" defStyleNum="dsBaseN" spellChecking="false"/>
+			<itemData name="Comment" defStyleNum="dsComment"/>
+			<itemData name="String" defStyleNum="dsString"/>
+		</itemDatas>
+
+	</highlighting>
+
+</language>
