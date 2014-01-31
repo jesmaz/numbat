@@ -1,5 +1,3 @@
-operator ' :: ' : 100 ltr
-
 operator ' ++' : 200 ltr
 operator ' --' : 200 ltr
 operator ' ( )' : 200 ltr

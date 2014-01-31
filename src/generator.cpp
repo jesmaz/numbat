@@ -110,13 +110,17 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 void BodyGenerator::makeCompare (const ASTnode & exp) {
 	exp->accept (*this);
 	Value * v = stack.top ();
-	if (v->getType()->getIntegerBitWidth () != 1) {
-		if (v->getType ()->isFloatingPointTy ()) {
-			v = builder.CreateFCmpONE (v, ConstantFP::get (v->getType (), 0.0));
-		} else {
-			v = builder.CreateICmpNE (v, ConstantInt::get (v->getType (), APInt (v->getType ()->getIntegerBitWidth (), 0))); // compare with zero
+	if (v->getType ()->isIntegerTy ()) {
+		if (v->getType()->getIntegerBitWidth () != 1) {
+			if (v->getType ()->isFloatingPointTy ()) {
+				v = builder.CreateFCmpONE (v, ConstantFP::get (v->getType (), 0.0));
+			} else {
+				v = builder.CreateICmpNE (v, ConstantInt::get (v->getType (), APInt (v->getType ()->getIntegerBitWidth (), 0))); // compare with zero
+			}
+			stack.top () = v;
 		}
-		stack.top () = v;
+	} else {
+		std::cerr << "Invalid type" << std::endl;
 	}
 }
 
@@ -324,6 +328,12 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		val = builder.CreateAdd (args [0], args [1], instr);
 	} else if (instr == "and") {
 		val = builder.CreateAnd (args [0], args [1], instr);
+	} else if (instr == "cmplt") {
+		if (exp.getArgs () [0]->getType ()->isSigned ()) {
+			val = builder.CreateICmpSLT (args [0], args [1], instr);
+		} else {
+			val = builder.CreateICmpULT (args [0], args [1], instr);
+		}
 	} else if (instr == "div") {
 		if (exp.getArgs () [0]->getType ()->isSigned ()) {
 			val = builder.CreateSDiv (args [0], args [1], instr);
@@ -484,7 +494,8 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 	
 	builder.SetInsertPoint (loopBlock);
 	exp.getBody ()->accept (*this);
-	builder.CreateBr (continueBlock);
+	if (!loopBlock->getTerminator())
+		builder.CreateBr (continueBlock);
 	
 	builder.SetInsertPoint (breakBlock);
 	

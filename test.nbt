@@ -1,7 +1,6 @@
 import 'locallib/math.nbt'
 
 
-operator ' :: ' : 100 ltr
  operator ' ( )' : 200 ltr
 #operator '_(_)' : 200 ltr
  operator ' . ' : 200 ltr
@@ -13,9 +12,11 @@ operator ' , ' : 400 ltr
 operator ' * ' : 500 ltr
 operator ' / ' : 500 ltr
 operator ' + ' : 600 ltr
+operator ' < ' : 1100 ltr
 operator ' = ' : 1600 rtl
 
 
+typedef raw 1 @uint : bool
 
 typedef raw 8 @sint : int8
 typedef raw 64 @sint : int64
@@ -33,6 +34,10 @@ struct testStruct {int64 i, double d}
 #	return i * i + j * j
 
 extern def sin @cstyle (double d) : {double}
+
+def ' = ' (alias bool lhs, bool rhs) : {bool}
+	asm 'numbat' : 'mov lhs, rhs'
+	return lhs
 
 def ' = ' (alias int8 lhs, int8 rhs) : {int8}
 	asm 'numbat' : 'mov lhs, rhs'
@@ -53,6 +58,9 @@ def ' = ' (alias double lhs, double rhs) : {double}
 def ' * ' (int8 lhs, int8 rhs) : {int8}
 	return asm 'numbat' : 'mul lhs, rhs'
 
+def ' < ' @cstyle (int8 lhs, int8 rhs) : {bool}
+	return asm 'numbat' : 'cmplt lhs, rhs'
+
 def ' + ' (int8 lhs, int8 rhs) : {int8}
 	return asm 'numbat' : 'add lhs, rhs'
 
@@ -63,6 +71,9 @@ def func (int8 num): {int8}
 	return num
 
 def max (int8 a, int8 b) : {int8}
+	bool cond = a < b
+	while cond:
+		return b
 	return a
 
 def test () : {int8}
