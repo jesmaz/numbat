@@ -31,6 +31,7 @@ int main (int argl, char ** args) {
 	InitializeAllAsmParsers();
 	
 	string outfile = "a.out";
+	bool emitAssembly=false;
 	bool link=true;
 	std::set <string> files;
 	for (int i=1; i<argl; ++i) {
@@ -52,6 +53,9 @@ int main (int argl, char ** args) {
 							} else {
 								//TODO: handle invalid options
 							}
+							break;
+						case 's':
+							emitAssembly = true;
 							break;
 						default:
 							//TODO: handle invalid options
@@ -97,14 +101,21 @@ int main (int argl, char ** args) {
 	machine->addAnalysisPasses (PM);
 	PM.add (new DataLayout (*machine->getDataLayout ()));
 	
-	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error, raw_fd_ostream::F_Binary));
+	TargetMachine::CodeGenFileType fileType = TargetMachine::CGFT_ObjectFile;
+	int flags = 0;
+	if (!emitAssembly) {
+		flags = raw_fd_ostream::F_Binary;
+	} else {
+		fileType = TargetMachine::CGFT_AssemblyFile;
+	}
+	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error, flags));
 	if (!error.empty ()) {
 		std::cerr << error << std::endl;
 		return 1;
 	}
 	{
 		formatted_raw_ostream fos (out->os ());
-		if (machine->addPassesToEmitFile (PM, fos, TargetMachine::CGFT_ObjectFile)) {
+		if (machine->addPassesToEmitFile (PM, fos, fileType)) {
 			std::cerr << "The target does not suport the generaton of this file type" << std::endl;
 			return 1;
 		}
