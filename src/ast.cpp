@@ -176,6 +176,8 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		
 	} else {
 		
+		if (!lhs->isValid () or !rhs->isValid ()) return ASTnode (new ASTerror ("Invalid expression"));
+		
 		std::vector <ASTnode> args (2);
 		args [0] = lhs;
 		args [1] = rhs;
@@ -316,6 +318,10 @@ ASTnode AbstractSyntaxTree::parseBody (tkitt end) {
 							//TODO: handle a lack of a condition (infinite loop?)
 							break;
 						}
+						if (node->isCallable ()) {
+							shared_ptr <ASTcallable> call = std::dynamic_pointer_cast <ASTcallable> (node);
+							node = ASTnode (new ASTcallindex (call, 0));
+						}
 						nextToken (end);
 						exprs.push_back (ASTnode (new ASTwhileloop (node, parseBody (end))));
 					} else {
@@ -352,6 +358,11 @@ ASTnode AbstractSyntaxTree::parseExpression (tkitt end) {
 	if (itt->type == TOKEN::whitespace) nextToken (end);
 	
 	auto matches = generateOperatorMatches (end);
+	std::cerr << line << ": ";
+	for (auto m : matches) {
+		std::cerr << "'" << m.opp->getPattern () << "' ";
+	}
+	std::cerr << std::endl;
 	return parseExpression (matches, end);
 	
 }
@@ -602,6 +613,7 @@ ASTnode AbstractSyntaxTree::parseStatment (tkitt end) {
 	token tkn;
 	while (beg != end) {
 		
+		//std::cerr << "'" << beg->iden << "' " << oppTokens.count (beg->iden) << std::endl;
 		if (tkn.iden == "") {
 			if (beg->type == TOKEN::whitespace) {
 			} else if (oppTokens.count (beg->iden) == 0) {
@@ -620,6 +632,13 @@ ASTnode AbstractSyntaxTree::parseStatment (tkitt end) {
 		++beg;
 	}
 	if (tkn.iden != "") reParse += tkn;
+	
+	/*tkitt tk = reParse.begin ();
+	tkitt tkend = reParse.end ();
+	for (; tk != tkend; ++tk) {
+		std::cerr << "'" << tk->iden << "' ";
+	}
+	std::cerr << std::endl;*/
 	
 	itt = reParse.begin ();
 	ASTnode node;
@@ -904,27 +923,58 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 	
 	std::list <OperatorDecleration::OperatorMatch> matches;
 	int brace = 0;
+	bool skip = false;
 	
 	for (tkitt tkn=itt, prev=itt, next=itt+1; tkn!=end; tkn=next, prev=tkn, ++next) {
 		
-		if (brace == 0) {
+		if (brace == 0 and !skip) {
 			
 			auto oppBeg = operatorsByFirstToken.lower_bound (tkn->iden);
 			auto oppEnd = operatorsByFirstToken.upper_bound (tkn->iden);
 			
 			while (oppBeg != oppEnd) {
+				
+				size_t beg = oppBeg->second->getPattern ().find_first_not_of (" ");
+				string nospace = oppBeg->second->getPattern ().substr (beg);
+				size_t end = nospace.find_last_not_of (" ");
+				nospace = nospace.substr (0, end+1);
 			
-				//bool valid=true;
-				OperatorDecleration::OperatorMatch match;
-				match.opp = oppBeg->second;
-				match.ptr = tkn;
-				matches.push_back (match);
+				bool valid = true;
+				
+				size_t nolen = nospace.size ();
+				size_t l = tkn->iden.size ();
+				size_t i = 0;
+				if (nolen >= l) {
+					for (; i<l; ++i) {
+						if (nospace [i] != tkn->iden [i]) valid = false;
+					}
+					if (nolen > i) {
+						if (nospace [i] != ' ') valid = false;
+					}
+				} else {
+					valid = false;
+				}
+				
+				/*if (tkn->iden != nospace) {
+					std::cerr << "'" << tkn->iden << "' + '" << next->iden << "' : '" << nospace << "'" << std::endl;
+					valid = nospace == tkn->iden + next->iden;
+					if (valid) skip = true;
+				}*/
+				
+				if (valid) {
+					OperatorDecleration::OperatorMatch match;
+					match.opp = oppBeg->second;
+					match.ptr = tkn;
+					matches.push_back (match);
+				}
 				++oppBeg;
 			
 			}
 			
 		} else if (brace < 0) {
 			break;
+		} else {
+			skip = false;
 		}
 		
 		if (tkn->type == TOKEN::symbol) {
@@ -1146,10 +1196,17 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 	
 	for (const string & s : opp->getSymbols ()) {
 		if (s != " ") {
-			oppTokens.insert (s);
 			operatorsByFirstToken.insert (std::make_pair (s, opp));
+			break;
 		}
 	}
+	
+	string nakedPattern = "";
+	for (char c : pattern) {
+		if (c != ' ') nakedPattern += c;
+	}
+	oppTokens.insert (nakedPattern);
+	operatorsByFirstToken.insert(std::make_pair (nakedPattern, opp));
 	
 }
 

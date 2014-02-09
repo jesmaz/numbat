@@ -8,6 +8,8 @@
 
 		<list name="defs">
 			<item> def </item>
+			<item> extern </item>
+			<item> import </item>
 			<item> operator </item>
 			<item> struct </item>
 			<item> typedef </item>
@@ -16,6 +18,7 @@
 		<list name="flow">
 			<item> asm </item>
 			<item> return </item>
+			<item> while </item>
 		</list>
 
 		<contexts>
@@ -64,8 +67,8 @@
 		<itemDatas>
 			<itemData name="Normal Text" defStyleNum="dsNormal"/>
 			<itemData name="Definition Keyword" defStyleNum="dsKeyword" spellChecking="false"/>
-			<itemData name="Flow Keyword" defStyleNum="flow" spellChecking="false"/>
-			<itemData name="Meta Tag" defStyleNum="metaTag" spellChecking="false"/>
+			<itemData name="Flow Keyword" defStyleNum="dsFunction" spellChecking="false"/>
+			<itemData name="Meta Tag" defStyleNum="dsOther" spellChecking="false"/>
 			<itemData name="String Char" defStyleNum="dsChar" spellChecking="false"/>
 			<itemData name="Float" defStyleNum="dsFloat" spellChecking="false"/>
 			<itemData name="Int" defStyleNum="dsDecVal" spellChecking="false"/>

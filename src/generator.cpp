@@ -227,11 +227,11 @@ void BodyGenerator::visit (ASTcall & exp) {
 	for (; param != paramEnd and argItt != argEnd; ++argItt, ++param) {
 		alias = param->getType ()->isPointerTy ();
 		(*argItt)->accept (*this);
-		args.push_back (stack.top ()); stack.top ()->getType ()->dump (); stack.pop ();
-		param->getType ()->dump ();
+		args.push_back (stack.top ()); stack.pop ();
 	}
 	alias = oldAlias;
 	
+	std::cerr << exp.toString () << std::endl;
 	stack.push (builder.CreateCall (func, args));
 	
 }
@@ -289,7 +289,7 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 					stack.push (builder.CreateFPTrunc (arg, type));
 				}
 			} else {
-				if (exp.getArgs () [0]->getType ()->isSigned ()) {
+				if (exp.getArgs () [1]->getType ()->isSigned ()) {
 					stack.push (builder.CreateFPToSI (arg, type));
 				} else {
 					stack.push (builder.CreateFPToUI (arg, type));
@@ -297,15 +297,50 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 			}
 		} else {
 			if (type->isFloatingPointTy ()) {
-				if (exp.getArgs () [1]->getType ()->isSigned ()) {
+				if (exp.getArgs () [0]->getType ()->isSigned ()) {
 					stack.push (builder.CreateSIToFP (arg, type));
 				} else {
 					stack.push (builder.CreateUIToFP (arg, type));
 				}
 			} else {
-				stack.push (builder.CreateSExtOrTrunc (arg, type));
+				bool argSinged = exp.getArgs () [0]->getType ()->isSigned ();
+				if (argSinged) {
+					if (arg->getType ()->getPrimitiveSizeInBits () != type->getPrimitiveSizeInBits ()) {
+						stack.push (builder.CreateSExtOrTrunc (arg, type));
+					} else {
+						stack.push (arg);
+					}
+				} else {
+					if (arg->getType ()->getPrimitiveSizeInBits () != type->getPrimitiveSizeInBits ()) {
+						stack.push (builder.CreateZExtOrTrunc (arg, type));
+					} else {
+						stack.push (arg);
+					}
+				}
+				
 			}
 		}
+		return;
+	} else if (instr == "gep") {
+		bool oldAlias = alias;
+		alias = true;
+		exp.getArgs () [0]->accept (*this);
+		alias = oldAlias;
+		Value * lhs = stack.top (); stack.pop ();
+		int l = exp.getArgs().size ();
+		for (int i=1; i<l; ++i) {
+			exp.getArgs () [i]->accept (*this);
+			Value * v = stack.top (); stack.pop ();
+			if (v->getType ()->isIntegerTy ()) {
+				if (v->getType ()->getPrimitiveSizeInBits () != 64) {
+					v = builder.CreateZExtOrTrunc (v, Type::getInt64Ty (context));
+				}
+				args.push_back (v);
+			} else {
+				//TODO: throw an error
+			}
+		}
+		stack.push (builder.CreateGEP (lhs, args));
 		return;
 	} else if (instr == "mov") {
 		bool oldAlias = alias;

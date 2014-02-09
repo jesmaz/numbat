@@ -24,9 +24,10 @@ typedef raw 64 @sint : int64
 typedef raw 32 @fint : float
 typedef raw 64 @fint : double
 
-#struct vec2 $<type T> {T i, T j}
+#struct vec2 $[type T] {T i, T j}
 
 struct testStruct {int64 i, double d}
+#struct mn {alias int64 t}
 
 #def Scale (alias vec2int8 vec): {int8}
 #	int8 i = vec.i

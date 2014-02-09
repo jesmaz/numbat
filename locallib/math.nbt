@@ -10,7 +10,7 @@ operator '+ ' : 300 rtl
 operator '- ' : 300 rtl
 operator '! ' : 300 rtl
 operator 'not ' : 300 rtl
-operator ' ~' : 300 rtl
+operator '~ ' : 300 rtl
 
 operator ' * ' : 500 ltr
 operator ' / ' : 500 ltr
@@ -53,6 +53,12 @@ operator ' >>= ' : 1600 rtl
 operator ' &= ' : 1600 rtl
 operator ' ^= ' : 1600 rtl
 operator ' |= ' : 1600 rtl
+#operator ' ~= ' : 1600 rtl
+#operator ' =& ' : 1600 rtl
+#operator ' $= ' : 1600 rtl
+#operator ' @= ' : 1600 rtl
+#operator ' =* ' : 1600 rtl
+operator ' => ' : 1600 rtl
 
 
 
@@ -72,3 +78,21 @@ typedef raw 16 @fint : half
 typedef raw 32 @fint : float
 typedef raw 64 @fint : double
 typedef raw 128 @fint : quad
+
+
+def '++ ' (alias uint64 arg) : {uint64}
+	arg += 1
+	return arg
+
+
+def ' + ' (uint64 lhs, uint64 rhs) : {uint64}
+	return asm 'numbat' : 'add lhs, rhs'
+
+
+def ' = ' (alias uint64 lhs, uint64 rhs) : {uint64}
+	asm 'numbat' : 'mov lhs, rhs'
+	return lhs
+
+def ' += ' (alias uint64 lhs, uint64 rhs) : {uint64}
+	lhs = (lhs + rhs)
+	return lhs
