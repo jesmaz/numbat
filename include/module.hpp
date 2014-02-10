@@ -21,6 +21,7 @@ struct Module {
 	
 	public:
 		
+		const std::map <string, shared_ptr <OperatorDecleration>> & getOperators () const {return operators;}
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
 		const std::set <shared_ptr <Module>> & getDependencies () const {return dependencies;}
 		

@@ -352,6 +352,17 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		Value * rhs = stack.top (); stack.pop ();
 		stack.push (builder.CreateStore (rhs, lhs));
 		return;
+	} else if (instr == "redir") {
+		bool oldAlias = alias;
+		alias = true;
+		exp.getArgs () [0]->accept (*this);
+		Value * lhs = stack.top (); stack.pop ();
+		exp.getArgs () [1]->accept (*this);
+		Value * rhs = stack.top (); stack.pop ();
+		alias = oldAlias;
+		lhs->getType ()->dump (); std::cerr << std::endl;
+		rhs->getType ()->dump (); std::cerr << std::endl;
+		stack.push (builder.CreateStore (rhs, lhs));
 	}
 	
 	for (const ASTnode & arg : exp.getArgs ()) {
@@ -464,10 +475,20 @@ void BodyGenerator::visit (ASTreturnvoid & exp) {
 void BodyGenerator::visit (ASTstructIndex & exp) {
 	exp.getExpr ()->accept (*this);
 	Value * val = stack.top (); stack.pop ();
-	if (val->getType ()->isPointerTy ()) {
-		val = builder.CreateGEP (val, 0);
+	/*if (val->getType ()->isPointerTy ()) {
+		std::vector <Value *> indicies (1);
+		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
+		val = builder.CreateGEP (val, indicies);
+	}*/
+	if (alias) {
+		std::vector <Value *> indicies (2);
+		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
+		indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
+		val = builder.CreateGEP (val, indicies);
+		stack.push (val);
+	} else {
+		stack.push (builder.CreateExtractValue (val, exp.getIndex ()));
 	}
-	stack.push (builder.CreateExtractValue (val, exp.getIndex ()));
 }
 
 void BodyGenerator::visit (ASTvariable & exp) {

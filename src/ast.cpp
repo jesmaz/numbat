@@ -463,7 +463,11 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 					}
 				} else if (opp.getPattern () == " , ") {
 					return createTuple (args [0], parseExpression (matches, end));
+				} else if (opp.getPattern () == " => ") {
+					args.push_back (parseExpression (matches, end));
+					return ASTnode (new ASTnumbatInstr ("redir", args));
 				} else {
+					std::cerr << opp.getPattern () << std::endl;
 					return createBinaryCall (opp.getPattern (), args [0], parseExpression (matches, end), end);
 				}
 			}
@@ -1213,7 +1217,11 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 void AbstractSyntaxTree::parseImport(tkitt end) {
 	nextToken (end);//eat 'import' token
 	if (itt->type == TOKEN::chararrayliteral) {
-		dependencies.insert (Module::importLocal ("", itt->iden));
+		shared_ptr <Module> module = Module::importLocal ("", itt->iden);
+		dependencies.insert (module);
+		for (auto opp : module->getOperators ()) {
+			addOperator (opp.first, *opp.second.get ());
+		}
 		nextToken (end);
 	}
 	eatSemicolon (end);
