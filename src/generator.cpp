@@ -406,6 +406,10 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		val = builder.CreateFRem (args [0], args [1], instr);
 	} else if (instr == "fsub") {
 		val = builder.CreateFSub (args [0], args [1], instr);
+	} else if (instr == "load") {
+		val = args [0];
+		if (val->getType ()->isPointerTy ())
+			val = builder.CreateLoad (val);
 	} else if (instr == "mul") {
 		val = builder.CreateMul (args [0], args [1], instr);
 	} else if (instr == "neg") {
