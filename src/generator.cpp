@@ -110,6 +110,14 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 void BodyGenerator::makeCompare (const ASTnode & exp) {
 	exp->accept (*this);
 	Value * v = stack.top ();
+	v->dump ();
+	if (v->getType ()->isStructTy () and v->getType ()->getStructNumElements () == 1) {
+		v = builder.CreateExtractValue (v, 0);
+		v->dump ();
+	}
+	if (v->getType ()->isPointerTy ()) {
+		v = builder.CreateLoad (v);
+	}
 	if (v->getType ()->isIntegerTy ()) {
 		if (v->getType()->getIntegerBitWidth () != 1) {
 			if (v->getType ()->isFloatingPointTy ()) {
