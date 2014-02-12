@@ -188,7 +188,7 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 }
 
 ASTnode AbstractSyntaxTree::createCallNode (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args) {
-	if (!callee->isValid ()) return ASTnode (callee);
+	if (!callee or !callee->isValid ()) return ASTnode (callee);
 	ASTnode node (new ASTcall (callee, createStaticCast (args, callee->getFunction ()->getArgs (), 1)));
 	if (!node->isValid ()) buildFail = true;
 	return node;
