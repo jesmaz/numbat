@@ -370,7 +370,14 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		alias = oldAlias;
 		lhs->getType ()->dump (); std::cerr << std::endl;
 		rhs->getType ()->dump (); std::cerr << std::endl;
-		stack.push (builder.CreateStore (rhs, lhs));
+		if (rhs->getType ()->getPointerElementType ()->isPointerTy ()) {
+			rhs = builder.CreateLoad (rhs);
+		}
+		if (lhs->getType ()->getPointerElementType ()->isPointerTy ()) {
+			stack.push (builder.CreateStore (rhs, lhs));
+		} else if (shared_ptr <ASTvariable> var = std::dynamic_pointer_cast <ASTvariable> (exp.getArgs () [0])) {
+			stack.push (namedValues [var->getVariable ().get ()] = rhs);
+		}
 	}
 	
 	for (const ASTnode & arg : exp.getArgs ()) {
