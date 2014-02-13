@@ -1,13 +1,4 @@
-import 'locallib/math.nbt'
-
-
-typedef raw 1 @uint : bool
-
-typedef raw 8 @sint : int8
-typedef raw 64 @sint : int64
-
-typedef raw 32 @fint : float
-typedef raw 64 @fint : double
+import 'locallib/string.nbt'
 
 #struct vec2 $[type T] {T i, T j}
 
