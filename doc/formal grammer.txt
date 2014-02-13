@@ -1,0 +1,93 @@
+Arguments			=>	'(' [ExpressionList] ')'
+
+Associativity		=>	'ltr'
+					|	'rtl'
+
+BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'or' | ',' | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
+
+Block				=>	(<indent> TopLevelExpression ; [TopLevelExpression ;]*)*
+
+Call				=>	Arguments
+					|	Lvalue [Template] Arguments
+					|	PrefixUnaryOp Expression
+					|	Expression PostfixUnaryOp
+					|	Expression BinaryOp Expression
+					|	Expression TernaryOp Expression
+
+CharArrayLiteral	=>	<string single quotes>
+
+Decl				=>	ExternDecl
+					|	FunctionDecl
+					|	OperatorDecl
+					|	StructDecl
+					|	VariableDecl
+
+Expression			=>	Call
+					|	VariableDecl
+					|	Literal
+					|	Identifier
+					|	'(' Expression ')'
+
+ExpressionList		=>	Expression [',' Expression]*
+
+ExternDecl			=>	'extern' FunctionDecl
+
+FunctionDecl		=>	'def' FunctionID MetaTag* [Template] Paramaters [TypeParamaters] ':' Block
+
+FunctionID			=>	Identifier
+					|	CharArrayLiteral
+
+Identifier			=>	ID_start [ID_continue]*
+
+ID_start			=>	<letters>
+					|	'_'
+
+ID_continue			=>	ID_start
+					|	<numbers>
+
+Literal				=>	CharArrayLiteral
+					|	FloatLiteral
+					|	IntLiteral
+					|	StringLiteral
+
+Lvalue				=>	Identifier
+					|	Call
+
+MetaTag				=>	'@'Identifier
+
+OperatorDecl		=>	'operator' CharArrayLiteral ':' IntLiteral Associativity
+
+Paramaters			=>	'(' [TypedArgsList] ')'
+
+PostfixUnaryOp		=>	'++' | '--'
+
+PrefixUnaryOp		=>	'++' | '--' | '+' | '-' | '!' | 'not' | '~'
+
+TopLevelExpression	=>	Expression
+					|	ReturnExpression
+
+Program				=>	Decl+
+
+ReturnExpression	=>	'return' [Expression]
+
+StringLiteral		=>	<string double quotes>
+
+StructDecl			=>	struct Identifier MetaTag* [Template] TypeParamaters ;
+
+Template			=>	'['[TypedArgsList]']'
+
+Type				=>	Identifier [Template]
+					|	'raw' MetaTag* IntLiteral
+					|	'raw' MetaTag* Identifier
+					|	'type'
+					|	TypeModifier Type
+
+TypedArgsList		=>	VariableDecl (',' VariableDecl)*
+
+TypeModifier		=>	'alias'
+					|	'atomic'
+					|	'const'
+
+TypeParamaters		=>	'{' [TypedArgsList] '}'
+
+VariableDecl		=>	Type Identifier
