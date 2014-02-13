@@ -197,6 +197,9 @@ ASTnode AbstractSyntaxTree::createCallNode (const shared_ptr <ASTcallable> & cal
 ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth) {
 	
 	if (arg->getType () == type->getType ()) {
+		if (arg->isAlias () and !type->isAlias ()) {
+			return ASTnode (new ASTnumbatInstr ("load", std::vector <ASTnode> (1, arg)));
+		}
 		//TODO: type modifier considerations
 		return arg;
 	}
@@ -387,6 +390,12 @@ ASTnode AbstractSyntaxTree::parseExpression (std::list <OperatorDecleration::Ope
 		return parseAssembly (type, code);
 	}
 	
+	if (args) {
+		for (auto arg : *args) {
+			if (!arg->isValid ()) return ASTnode (new ASTerror ("Bad arguments"));
+		}
+	}
+	
 	if (matches.size () == 0) return parsePrimaryExpression (end, args);
 	
 	matches.sort (&OperatorDecleration::OperatorMatch::treeOrder);
@@ -479,7 +488,17 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 				itt = oppLoc [0] + 1;
 				args = parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 				itt = tmpItt;
-				callee = parseExpression (matches, oppLoc [0], &args);
+				if (opp.getPattern () == " ( )") {
+					callee = parseExpression (matches, oppLoc [0], &args);
+				} else {
+					auto oldArgs = args;
+					args.push_back (nullptr);
+					args [0] = parseExpression (matches, oppLoc [0]);
+					size_t i=0;
+					for (auto arg : oldArgs) {
+						args [++i] = arg;
+					}
+				}
 				itt = oppLoc [1];
 			}
 			break;
@@ -541,7 +560,9 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 	
 	if (itt->type == TOKEN::symbol and itt->iden == "(") {
 		nextToken (end);
-		return parseExpression (findToken (")", end));
+		auto ret = parseExpression (findToken (")", end));
+		itt = end;
+		return ret;
 	}
 	
 	if (itt->type == TOKEN::chararrayliteral) {
@@ -1069,7 +1090,7 @@ string AbstractSyntaxTree::parseStructDecleration (tkitt end) {
 	}
 	//TODO: parse meta tags
 	
-	if (functions.find (iden) != functions.end ()) {
+	if (types.find (iden) != types.end ()) {
 		error ("Struct already declared", end);
 	} else {
 		types [iden] = unique_ptr <NumbatType> (new NumbatType (iden));
@@ -1221,6 +1242,12 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 		dependencies.insert (module);
 		for (auto opp : module->getOperators ()) {
 			addOperator (opp.first, *opp.second.get ());
+		}
+		for (auto func : module->getFunctions ()) {
+			functions.insert (func);
+		}
+		for (auto type : module->getTypes ()) {
+			types [type.first] = type.second;
 		}
 		nextToken (end);
 	}
