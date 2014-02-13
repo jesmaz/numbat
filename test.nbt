@@ -1,32 +1,9 @@
-import 'locallib/math.nbt'
+import 'locallib/string.nbt'
 
-
- operator ' ( )' : 200 ltr
-#operator '_(_)' : 200 ltr
- operator ' . ' : 200 ltr
-#operator '_._' : 200 ltr
- operator ' ~' : 300 rtl
-#operator '~'arg : 300 rtl
-operator '! ' : 300 rtl
-operator ' , ' : 400 ltr
-operator ' * ' : 500 ltr
-operator ' / ' : 500 ltr
-operator ' + ' : 600 ltr
-operator ' < ' : 1100 ltr
-operator ' = ' : 1600 rtl
-
-
-typedef raw 1 @uint : bool
-
-typedef raw 8 @sint : int8
-typedef raw 64 @sint : int64
-
-typedef raw 32 @fint : float
-typedef raw 64 @fint : double
-
-#struct vec2 $<type T> {T i, T j}
+#struct vec2 $[type T] {T i, T j}
 
 struct testStruct {int64 i, double d}
+struct mn {alias int64 t}
 
 #def Scale (alias vec2int8 vec): {int8}
 #	int8 i = vec.i
@@ -66,6 +43,10 @@ def ' + ' (int8 lhs, int8 rhs) : {int8}
 
 def ' + ' (double lhs, double rhs) : {double}
 	return asm 'numbat' : 'fadd lhs, rhs'
+
+def redir (alias mn a, alias int64 t) : {}
+	a.t => t
+	return
 
 def func (int8 num): {int8}
 	return num

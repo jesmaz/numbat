@@ -176,6 +176,8 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		
 	} else {
 		
+		if (!lhs->isValid () or !rhs->isValid ()) return ASTnode (new ASTerror ("Invalid expression"));
+		
 		std::vector <ASTnode> args (2);
 		args [0] = lhs;
 		args [1] = rhs;
@@ -186,7 +188,7 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 }
 
 ASTnode AbstractSyntaxTree::createCallNode (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args) {
-	if (!callee->isValid ()) return ASTnode (callee);
+	if (!callee or !callee->isValid ()) return ASTnode (callee);
 	ASTnode node (new ASTcall (callee, createStaticCast (args, callee->getFunction ()->getArgs (), 1)));
 	if (!node->isValid ()) buildFail = true;
 	return node;
@@ -195,6 +197,9 @@ ASTnode AbstractSyntaxTree::createCallNode (const shared_ptr <ASTcallable> & cal
 ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth) {
 	
 	if (arg->getType () == type->getType ()) {
+		if (arg->isAlias () and !type->isAlias ()) {
+			return ASTnode (new ASTnumbatInstr ("load", std::vector <ASTnode> (1, arg)));
+		}
 		//TODO: type modifier considerations
 		return arg;
 	}
@@ -316,6 +321,10 @@ ASTnode AbstractSyntaxTree::parseBody (tkitt end) {
 							//TODO: handle a lack of a condition (infinite loop?)
 							break;
 						}
+						if (node->isCallable ()) {
+							shared_ptr <ASTcallable> call = std::dynamic_pointer_cast <ASTcallable> (node);
+							node = ASTnode (new ASTcallindex (call, 0));
+						}
 						nextToken (end);
 						exprs.push_back (ASTnode (new ASTwhileloop (node, parseBody (end))));
 					} else {
@@ -352,6 +361,11 @@ ASTnode AbstractSyntaxTree::parseExpression (tkitt end) {
 	if (itt->type == TOKEN::whitespace) nextToken (end);
 	
 	auto matches = generateOperatorMatches (end);
+	std::cerr << line << ": ";
+	for (auto m : matches) {
+		std::cerr << "'" << m.opp->getPattern () << "' ";
+	}
+	std::cerr << std::endl;
 	return parseExpression (matches, end);
 	
 }
@@ -374,6 +388,12 @@ ASTnode AbstractSyntaxTree::parseExpression (std::list <OperatorDecleration::Ope
 			nextToken (end);
 		}*/
 		return parseAssembly (type, code);
+	}
+	
+	if (args) {
+		for (auto arg : *args) {
+			if (!arg->isValid ()) return ASTnode (new ASTerror ("Bad arguments"));
+		}
 	}
 	
 	if (matches.size () == 0) return parsePrimaryExpression (end, args);
@@ -452,7 +472,11 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 					}
 				} else if (opp.getPattern () == " , ") {
 					return createTuple (args [0], parseExpression (matches, end));
+				} else if (opp.getPattern () == " => ") {
+					args.push_back (parseExpression (matches, end));
+					return ASTnode (new ASTnumbatInstr ("redir", args));
 				} else {
+					std::cerr << opp.getPattern () << std::endl;
 					return createBinaryCall (opp.getPattern (), args [0], parseExpression (matches, end), end);
 				}
 			}
@@ -464,7 +488,17 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 				itt = oppLoc [0] + 1;
 				args = parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 				itt = tmpItt;
-				callee = parseExpression (matches, oppLoc [0], &args);
+				if (opp.getPattern () == " ( )") {
+					callee = parseExpression (matches, oppLoc [0], &args);
+				} else {
+					auto oldArgs = args;
+					args.push_back (nullptr);
+					args [0] = parseExpression (matches, oppLoc [0]);
+					size_t i=0;
+					for (auto arg : oldArgs) {
+						args [++i] = arg;
+					}
+				}
 				itt = oppLoc [1];
 			}
 			break;
@@ -526,7 +560,9 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 	
 	if (itt->type == TOKEN::symbol and itt->iden == "(") {
 		nextToken (end);
-		return parseExpression (findToken (")", end));
+		auto ret = parseExpression (findToken (")", end));
+		itt = end;
+		return ret;
 	}
 	
 	if (itt->type == TOKEN::chararrayliteral) {
@@ -602,6 +638,7 @@ ASTnode AbstractSyntaxTree::parseStatment (tkitt end) {
 	token tkn;
 	while (beg != end) {
 		
+		//std::cerr << "'" << beg->iden << "' " << oppTokens.count (beg->iden) << std::endl;
 		if (tkn.iden == "") {
 			if (beg->type == TOKEN::whitespace) {
 			} else if (oppTokens.count (beg->iden) == 0) {
@@ -620,6 +657,13 @@ ASTnode AbstractSyntaxTree::parseStatment (tkitt end) {
 		++beg;
 	}
 	if (tkn.iden != "") reParse += tkn;
+	
+	/*tkitt tk = reParse.begin ();
+	tkitt tkend = reParse.end ();
+	for (; tk != tkend; ++tk) {
+		std::cerr << "'" << tk->iden << "' ";
+	}
+	std::cerr << std::endl;*/
 	
 	itt = reParse.begin ();
 	ASTnode node;
@@ -904,27 +948,58 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 	
 	std::list <OperatorDecleration::OperatorMatch> matches;
 	int brace = 0;
+	bool skip = false;
 	
 	for (tkitt tkn=itt, prev=itt, next=itt+1; tkn!=end; tkn=next, prev=tkn, ++next) {
 		
-		if (brace == 0) {
+		if (brace == 0 and !skip) {
 			
 			auto oppBeg = operatorsByFirstToken.lower_bound (tkn->iden);
 			auto oppEnd = operatorsByFirstToken.upper_bound (tkn->iden);
 			
 			while (oppBeg != oppEnd) {
+				
+				size_t beg = oppBeg->second->getPattern ().find_first_not_of (" ");
+				string nospace = oppBeg->second->getPattern ().substr (beg);
+				size_t end = nospace.find_last_not_of (" ");
+				nospace = nospace.substr (0, end+1);
 			
-				//bool valid=true;
-				OperatorDecleration::OperatorMatch match;
-				match.opp = oppBeg->second;
-				match.ptr = tkn;
-				matches.push_back (match);
+				bool valid = true;
+				
+				size_t nolen = nospace.size ();
+				size_t l = tkn->iden.size ();
+				size_t i = 0;
+				if (nolen >= l) {
+					for (; i<l; ++i) {
+						if (nospace [i] != tkn->iden [i]) valid = false;
+					}
+					if (nolen > i) {
+						if (nospace [i] != ' ') valid = false;
+					}
+				} else {
+					valid = false;
+				}
+				
+				/*if (tkn->iden != nospace) {
+					std::cerr << "'" << tkn->iden << "' + '" << next->iden << "' : '" << nospace << "'" << std::endl;
+					valid = nospace == tkn->iden + next->iden;
+					if (valid) skip = true;
+				}*/
+				
+				if (valid) {
+					OperatorDecleration::OperatorMatch match;
+					match.opp = oppBeg->second;
+					match.ptr = tkn;
+					matches.push_back (match);
+				}
 				++oppBeg;
 			
 			}
 			
 		} else if (brace < 0) {
 			break;
+		} else {
+			skip = false;
 		}
 		
 		if (tkn->type == TOKEN::symbol) {
@@ -1015,7 +1090,7 @@ string AbstractSyntaxTree::parseStructDecleration (tkitt end) {
 	}
 	//TODO: parse meta tags
 	
-	if (functions.find (iden) != functions.end ()) {
+	if (types.find (iden) != types.end ()) {
 		error ("Struct already declared", end);
 	} else {
 		types [iden] = unique_ptr <NumbatType> (new NumbatType (iden));
@@ -1146,17 +1221,34 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 	
 	for (const string & s : opp->getSymbols ()) {
 		if (s != " ") {
-			oppTokens.insert (s);
 			operatorsByFirstToken.insert (std::make_pair (s, opp));
+			break;
 		}
 	}
+	
+	string nakedPattern = "";
+	for (char c : pattern) {
+		if (c != ' ') nakedPattern += c;
+	}
+	oppTokens.insert (nakedPattern);
+	operatorsByFirstToken.insert(std::make_pair (nakedPattern, opp));
 	
 }
 
 void AbstractSyntaxTree::parseImport(tkitt end) {
 	nextToken (end);//eat 'import' token
 	if (itt->type == TOKEN::chararrayliteral) {
-		dependencies.insert (Module::importLocal ("", itt->iden));
+		shared_ptr <Module> module = Module::importLocal ("", itt->iden);
+		dependencies.insert (module);
+		for (auto opp : module->getOperators ()) {
+			addOperator (opp.first, *opp.second.get ());
+		}
+		for (auto func : module->getFunctions ()) {
+			functions.insert (func);
+		}
+		for (auto type : module->getTypes ()) {
+			types [type.first] = type.second;
+		}
 		nextToken (end);
 	}
 	eatSemicolon (end);

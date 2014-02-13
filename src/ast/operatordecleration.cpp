@@ -48,7 +48,7 @@ OperatorDecleration::TYPE OperatorDecleration::calculateOperatorType (const stri
 }
 
 OperatorDecleration::OperatorDecleration (int precidance, bool ltr, const string & pattern) : precidance (precidance), ltr (ltr), pattern (pattern), type (calculateOperatorType (pattern)) {
-	string buffer = " ";
+	string buffer = "";
 	for (char c : pattern) {
 		if (buffer == "") {
 			buffer += c;

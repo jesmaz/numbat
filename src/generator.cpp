@@ -110,6 +110,14 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 void BodyGenerator::makeCompare (const ASTnode & exp) {
 	exp->accept (*this);
 	Value * v = stack.top ();
+	v->dump ();
+	if (v->getType ()->isStructTy () and v->getType ()->getStructNumElements () == 1) {
+		v = builder.CreateExtractValue (v, 0);
+		v->dump ();
+	}
+	if (v->getType ()->isPointerTy ()) {
+		v = builder.CreateLoad (v);
+	}
 	if (v->getType ()->isIntegerTy ()) {
 		if (v->getType()->getIntegerBitWidth () != 1) {
 			if (v->getType ()->isFloatingPointTy ()) {
@@ -227,11 +235,11 @@ void BodyGenerator::visit (ASTcall & exp) {
 	for (; param != paramEnd and argItt != argEnd; ++argItt, ++param) {
 		alias = param->getType ()->isPointerTy ();
 		(*argItt)->accept (*this);
-		args.push_back (stack.top ()); stack.top ()->getType ()->dump (); stack.pop ();
-		param->getType ()->dump ();
+		args.push_back (stack.top ()); stack.pop ();
 	}
 	alias = oldAlias;
 	
+	std::cerr << exp.toString () << std::endl;
 	stack.push (builder.CreateCall (func, args));
 	
 }
@@ -289,7 +297,7 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 					stack.push (builder.CreateFPTrunc (arg, type));
 				}
 			} else {
-				if (exp.getArgs () [0]->getType ()->isSigned ()) {
+				if (exp.getArgs () [1]->getType ()->isSigned ()) {
 					stack.push (builder.CreateFPToSI (arg, type));
 				} else {
 					stack.push (builder.CreateFPToUI (arg, type));
@@ -297,15 +305,50 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 			}
 		} else {
 			if (type->isFloatingPointTy ()) {
-				if (exp.getArgs () [1]->getType ()->isSigned ()) {
+				if (exp.getArgs () [0]->getType ()->isSigned ()) {
 					stack.push (builder.CreateSIToFP (arg, type));
 				} else {
 					stack.push (builder.CreateUIToFP (arg, type));
 				}
 			} else {
-				stack.push (builder.CreateSExtOrTrunc (arg, type));
+				bool argSinged = exp.getArgs () [0]->getType ()->isSigned ();
+				if (argSinged) {
+					if (arg->getType ()->getPrimitiveSizeInBits () != type->getPrimitiveSizeInBits ()) {
+						stack.push (builder.CreateSExtOrTrunc (arg, type));
+					} else {
+						stack.push (arg);
+					}
+				} else {
+					if (arg->getType ()->getPrimitiveSizeInBits () != type->getPrimitiveSizeInBits ()) {
+						stack.push (builder.CreateZExtOrTrunc (arg, type));
+					} else {
+						stack.push (arg);
+					}
+				}
+				
 			}
 		}
+		return;
+	} else if (instr == "gep") {
+		bool oldAlias = alias;
+		alias = true;
+		exp.getArgs () [0]->accept (*this);
+		alias = oldAlias;
+		Value * lhs = stack.top (); stack.pop ();
+		int l = exp.getArgs().size ();
+		for (int i=1; i<l; ++i) {
+			exp.getArgs () [i]->accept (*this);
+			Value * v = stack.top (); stack.pop ();
+			if (v->getType ()->isIntegerTy ()) {
+				if (v->getType ()->getPrimitiveSizeInBits () != 64) {
+					v = builder.CreateZExtOrTrunc (v, Type::getInt64Ty (context));
+				}
+				args.push_back (v);
+			} else {
+				//TODO: throw an error
+			}
+		}
+		stack.push (builder.CreateGEP (lhs, args));
 		return;
 	} else if (instr == "mov") {
 		bool oldAlias = alias;
@@ -317,6 +360,24 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		Value * rhs = stack.top (); stack.pop ();
 		stack.push (builder.CreateStore (rhs, lhs));
 		return;
+	} else if (instr == "redir") {
+		bool oldAlias = alias;
+		alias = true;
+		exp.getArgs () [0]->accept (*this);
+		Value * lhs = stack.top (); stack.pop ();
+		exp.getArgs () [1]->accept (*this);
+		Value * rhs = stack.top (); stack.pop ();
+		alias = oldAlias;
+		lhs->getType ()->dump (); std::cerr << std::endl;
+		rhs->getType ()->dump (); std::cerr << std::endl;
+		if (rhs->getType ()->getPointerElementType ()->isPointerTy ()) {
+			rhs = builder.CreateLoad (rhs);
+		}
+		if (lhs->getType ()->getPointerElementType ()->isPointerTy ()) {
+			stack.push (builder.CreateStore (rhs, lhs));
+		} else if (shared_ptr <ASTvariable> var = std::dynamic_pointer_cast <ASTvariable> (exp.getArgs () [0])) {
+			stack.push (namedValues [var->getVariable ().get ()] = rhs);
+		}
 	}
 	
 	for (const ASTnode & arg : exp.getArgs ()) {
@@ -352,6 +413,10 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		val = builder.CreateFRem (args [0], args [1], instr);
 	} else if (instr == "fsub") {
 		val = builder.CreateFSub (args [0], args [1], instr);
+	} else if (instr == "load") {
+		val = args [0];
+		if (val->getType ()->isPointerTy ())
+			val = builder.CreateLoad (val);
 	} else if (instr == "mul") {
 		val = builder.CreateMul (args [0], args [1], instr);
 	} else if (instr == "neg") {
@@ -429,10 +494,20 @@ void BodyGenerator::visit (ASTreturnvoid & exp) {
 void BodyGenerator::visit (ASTstructIndex & exp) {
 	exp.getExpr ()->accept (*this);
 	Value * val = stack.top (); stack.pop ();
-	if (val->getType ()->isPointerTy ()) {
-		val = builder.CreateGEP (val, 0);
+	/*if (val->getType ()->isPointerTy ()) {
+		std::vector <Value *> indicies (1);
+		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
+		val = builder.CreateGEP (val, indicies);
+	}*/
+	if (alias) {
+		std::vector <Value *> indicies (2);
+		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
+		indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
+		val = builder.CreateGEP (val, indicies);
+		stack.push (val);
+	} else {
+		stack.push (builder.CreateExtractValue (val, exp.getIndex ()));
 	}
-	stack.push (builder.CreateExtractValue (val, exp.getIndex ()));
 }
 
 void BodyGenerator::visit (ASTvariable & exp) {
