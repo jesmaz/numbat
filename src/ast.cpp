@@ -836,7 +836,6 @@ FunctionDecleration * AbstractSyntaxTree::parseFunctionDecleration (tkitt end) {
 	}
 	
 	if (success) {
-		nextToken (end); // eat ':' token
 		
 		if (itt->iden == "{") {
 			nextToken (end); // eat '{' token
@@ -852,6 +851,12 @@ FunctionDecleration * AbstractSyntaxTree::parseFunctionDecleration (tkitt end) {
 		
 		decl = new FunctionDecleration (iden, args, type, metaTags);
 		functions.insert (std::make_pair (iden, unique_ptr <FunctionDecleration> (decl)));
+	}
+	
+	if (itt->iden != ":") {
+		error ("Exppected ':' after function decleration", end);
+	} else {
+		nextToken (end); // eat ':' token
 	}
 	
 	return decl;

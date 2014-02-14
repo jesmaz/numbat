@@ -80,23 +80,23 @@ typedef raw 64 @fint : double
 typedef raw 128 @fint : quad
 
 
-def '++ ' (alias uint64 arg) : {uint64}
+def '++ ' (alias uint64 arg) {uint64}:
 	arg += 1
 	return arg
 
 
-def ' + ' (uint64 lhs, uint64 rhs) : {uint64}
+def ' + ' (uint64 lhs, uint64 rhs) {uint64}:
 	return asm 'numbat' : 'add lhs, rhs'
 
 
-def ' = ' (alias uint8 lhs, uint8 rhs) : {uint8}
+def ' = ' (alias uint8 lhs, uint8 rhs) {uint8}:
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-def ' = ' (alias uint64 lhs, uint64 rhs) : {uint64}
+def ' = ' (alias uint64 lhs, uint64 rhs) {uint64}:
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-def ' += ' (alias uint64 lhs, uint64 rhs) : {uint64}
+def ' += ' (alias uint64 lhs, uint64 rhs) {uint64}:
 	lhs = (lhs + rhs)
 	return lhs

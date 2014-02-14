@@ -3,15 +3,15 @@ import 'locallib/math.nbt'
 struct CString {alias uint8 chars}
 
 
-extern def malloc @cstyle (uint64 size) : {alias uint8}
-extern def free @cstyle (alias uint8 ptr) : {}
+extern def malloc @cstyle (uint64 size) {alias uint8}:
+extern def free @cstyle (alias uint8 ptr) {}:
 
 
-def ' [ ]' (alias CString string, uint64 index) : {alias uint8}
+def ' [ ]' (alias CString string, uint64 index) {alias uint8}:
 	alias uint8 chars => string.chars
 	return asm 'numbat' : 'gep chars, index'
 
-def ' + ' (CString lhs, CString rhs) : {CString}
+def ' + ' (CString lhs, CString rhs) {CString}:
 	uint64 length = lhs.length + rhs.length + 1
 	CString res
 	res.chars => malloc (length)
@@ -31,7 +31,7 @@ def ' + ' (CString lhs, CString rhs) : {CString}
 	res [i] = 0
 	return res
 
-def length (alias CString string) : {uint64}
+def length (alias CString string) {uint64}:
 	uint64 count = 0
 	while string [count]:
 		++count
