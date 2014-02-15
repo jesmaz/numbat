@@ -460,7 +460,7 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 			{
 				std::list <OperatorDecleration::OperatorMatch> lhs;
 				splitListAboutTkn (lhs, matches, oppLoc [0]);
-				args.push_back (parseExpression (lhs, oppLoc [0]));
+				ASTnode node = parseExpression (lhs, oppLoc [0]);
 				itt = oppLoc [0] + 1;
 				
 				if (opp.getPattern () == " . ") {
@@ -471,13 +471,14 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 						return expr;
 					}
 				} else if (opp.getPattern () == " , ") {
-					return createTuple (args [0], parseExpression (matches, end));
+					return createTuple (node, parseExpression (matches, end));
 				} else if (opp.getPattern () == " => ") {
+					args.push_back (node);
 					args.push_back (parseExpression (matches, end));
 					return ASTnode (new ASTnumbatInstr ("redir", args));
 				} else {
 					std::cerr << opp.getPattern () << std::endl;
-					return createBinaryCall (opp.getPattern (), args [0], parseExpression (matches, end), end);
+					return createBinaryCall (opp.getPattern (), node, parseExpression (matches, end), end);
 				}
 			}
 			break;
