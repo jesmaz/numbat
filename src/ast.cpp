@@ -929,7 +929,14 @@ shared_ptr <ASTcallable> AbstractSyntaxTree::findFunction (const string & iden, 
 		return shared_ptr <ASTcallable> (new ASTfunctionPointer (found.front ().second));
 	}
 	
-	return shared_ptr <ASTcallable> (new ASTcallerror ("No function found"));
+	string arglist;
+	for (auto arg : args) {
+		if (arglist != "") {
+			arglist += ", ";
+		}
+		arglist += arg->getType ()->getIden ();
+	}
+	return shared_ptr <ASTcallable> (new ASTcallerror ("No sutible conversion for function: '" + iden + "' (" + arglist + ")"));
 	
 }
 
