@@ -913,7 +913,7 @@ shared_ptr <ASTcallable> AbstractSyntaxTree::findFunction (const string & iden, 
 					} else if (findFunction ((*funcBegin)->getType ()->getIden (), std::vector <ASTnode> (1, *argBegin), convert - 1)->isValid ()) {
 						score += 10000 - count;
 					} else {
-						//fail = true;
+						fail = true;
 					}
 				}
 			}
