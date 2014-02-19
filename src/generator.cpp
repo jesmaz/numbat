@@ -378,6 +378,7 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		} else if (shared_ptr <ASTvariable> var = std::dynamic_pointer_cast <ASTvariable> (exp.getArgs () [0])) {
 			stack.push (namedValues [var->getVariable ().get ()] = rhs);
 		}
+		return;
 	}
 	
 	for (const ASTnode & arg : exp.getArgs ()) {
