@@ -464,6 +464,7 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 				itt = oppLoc [0] + 1;
 				
 				if (opp.getPattern () == " . ") {
+					args.push_back (node);
 					ASTnode expr = parseExpression (matches, end, &args);
 					if (expr->isCallable ()) {
 						callee = expr;
