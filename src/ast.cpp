@@ -236,7 +236,7 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 		
 	}
 	
-	return ASTnode (new ASTerror ("No sutible conversion found."));
+	return ASTnode (new ASTerror ("No sutible conversion found '" + type->getType ()->getIden () + "' required, found '" + arg->getType ()->getIden () + "'"));
 	
 }
 
