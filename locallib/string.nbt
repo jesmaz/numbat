@@ -12,7 +12,7 @@ def ' [ ]' (alias CString string, uint64 index) : {alias uint8}
 	return asm 'numbat' : 'gep chars, index'
 
 def ' + ' (CString lhs, CString rhs) : {CString}
-	uint64 length = lhs.length + rhs.length + 1
+	uint64 length = length(lhs) + length(rhs) + 1
 	CString res
 	res.chars => malloc (length)
 	uint64 count = 0
