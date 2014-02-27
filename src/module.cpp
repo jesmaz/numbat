@@ -59,7 +59,7 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	tkstring tks = loadFromFile (file);
 	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()));
 	std::cerr << ast.toString () << std::endl;
-	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies ()));
+	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ()));
 	
 }
 

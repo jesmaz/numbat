@@ -1258,6 +1258,9 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 		for (auto type : module->getTypes ()) {
 			types [type.first] = type.second;
 		}
+		for (auto stmt : module->getStatmentParsers()) {
+			statementParsers [stmt.first] = stmt.second;
+		}
 		nextToken (end);
 	}
 	eatSemicolon (end);
