@@ -13,6 +13,12 @@ namespace parser {
 
 AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 	
+	shared_ptr <Module> core = Module::createEmpty ("numbat core");
+	functions = core->getFunctions ();
+	operators = core->getOperators ();
+	types = core->getTypes ();
+	statementParsers = core->getStatmentParsers ();
+	
 	std::vector <std::pair <FunctionDecleration *, std::pair <size_t, tkitt>>> funcReparse;
 	std::vector <std::pair <string, tkitt>> typeReparse;
 	
