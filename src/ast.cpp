@@ -13,6 +13,12 @@ namespace parser {
 
 AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 	
+	shared_ptr <Module> core = Module::createEmpty ("numbat core");
+	functions = core->getFunctions ();
+	operators = core->getOperators ();
+	types = core->getTypes ();
+	statementParsers = core->getStatmentParsers ();
+	
 	std::vector <std::pair <FunctionDecleration *, std::pair <size_t, tkitt>>> funcReparse;
 	std::vector <std::pair <string, tkitt>> typeReparse;
 	
@@ -236,7 +242,7 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 		
 	}
 	
-	return ASTnode (new ASTerror ("No sutible conversion found."));
+	return ASTnode (new ASTerror ("No sutible conversion found '" + type->getType ()->getIden () + "' required, found '" + arg->getType ()->getIden () + "'"));
 	
 }
 
@@ -460,10 +466,11 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 			{
 				std::list <OperatorDecleration::OperatorMatch> lhs;
 				splitListAboutTkn (lhs, matches, oppLoc [0]);
-				args.push_back (parseExpression (lhs, oppLoc [0]));
+				ASTnode node = parseExpression (lhs, oppLoc [0]);
 				itt = oppLoc [0] + 1;
 				
 				if (opp.getPattern () == " . ") {
+					args.push_back (node);
 					ASTnode expr = parseExpression (matches, end, &args);
 					if (expr->isCallable ()) {
 						callee = expr;
@@ -471,13 +478,14 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 						return expr;
 					}
 				} else if (opp.getPattern () == " , ") {
-					return createTuple (args [0], parseExpression (matches, end));
+					return createTuple (node, parseExpression (matches, end));
 				} else if (opp.getPattern () == " => ") {
+					args.push_back (node);
 					args.push_back (parseExpression (matches, end));
 					return ASTnode (new ASTnumbatInstr ("redir", args));
 				} else {
 					std::cerr << opp.getPattern () << std::endl;
-					return createBinaryCall (opp.getPattern (), args [0], parseExpression (matches, end), end);
+					return createBinaryCall (opp.getPattern (), node, parseExpression (matches, end), end);
 				}
 			}
 			break;
@@ -917,7 +925,7 @@ shared_ptr <ASTcallable> AbstractSyntaxTree::findFunction (const string & iden, 
 					} else if (findFunction ((*funcBegin)->getType ()->getIden (), std::vector <ASTnode> (1, *argBegin), convert - 1)->isValid ()) {
 						score += 10000 - count;
 					} else {
-						//fail = true;
+						fail = true;
 					}
 				}
 			}
@@ -934,7 +942,14 @@ shared_ptr <ASTcallable> AbstractSyntaxTree::findFunction (const string & iden, 
 		return shared_ptr <ASTcallable> (new ASTfunctionPointer (found.front ().second));
 	}
 	
-	return shared_ptr <ASTcallable> (new ASTcallerror ("No function found"));
+	string arglist;
+	for (auto arg : args) {
+		if (arglist != "") {
+			arglist += ", ";
+		}
+		arglist += arg->getType ()->getIden ();
+	}
+	return shared_ptr <ASTcallable> (new ASTcallerror ("No sutible conversion for function: '" + iden + "' (" + arglist + ")"));
 	
 }
 
@@ -1253,6 +1268,9 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 		}
 		for (auto type : module->getTypes ()) {
 			types [type.first] = type.second;
+		}
+		for (auto stmt : module->getStatmentParsers()) {
+			statementParsers [stmt.first] = stmt.second;
 		}
 		nextToken (end);
 	}

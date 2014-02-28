@@ -50,6 +50,16 @@ string joinPaths (const string & lhs, const string & rhs) {
 }
 
 
+const shared_ptr <Module> Module::createEmpty (const string & id) {
+	
+	auto itt = allModules.find (id);
+	if (itt != allModules.end ()) {
+		return itt->second;
+	}
+	return allModules [id] = shared_ptr <Module> (new Module);
+	
+}
+
 const shared_ptr <Module> Module::createFromFile (const string & file) {
 	
 	auto itt = allModules.find (file);
@@ -59,7 +69,7 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	tkstring tks = loadFromFile (file);
 	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()));
 	std::cerr << ast.toString () << std::endl;
-	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies ()));
+	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ()));
 	
 }
 
