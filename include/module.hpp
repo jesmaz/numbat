@@ -29,6 +29,7 @@ struct Module {
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
 		const std::set <shared_ptr <Module>> & getDependencies () const {return dependencies;}
 		
+		static const shared_ptr <Module> createEmpty (const string & id);
 		static const shared_ptr <Module> createFromFile (const string & file);
 		static const shared_ptr <Module> createFromFile (const string & dir, const string & file);
 		static const shared_ptr <Module> import (const string & file);

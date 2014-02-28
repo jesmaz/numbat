@@ -50,6 +50,16 @@ string joinPaths (const string & lhs, const string & rhs) {
 }
 
 
+const shared_ptr <Module> Module::createEmpty (const string & id) {
+	
+	auto itt = allModules.find (id);
+	if (itt != allModules.end ()) {
+		return itt->second;
+	}
+	return allModules [id] = shared_ptr <Module> (new Module);
+	
+}
+
 const shared_ptr <Module> Module::createFromFile (const string & file) {
 	
 	auto itt = allModules.find (file);
