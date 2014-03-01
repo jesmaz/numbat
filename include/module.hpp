@@ -29,6 +29,12 @@ struct Module {
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
 		const std::set <shared_ptr <Module>> & getDependencies () const {return dependencies;}
 		
+		void insertType (const string & iden, const shared_ptr <NumbatType> & type) {types [iden] = type;}
+		void insertOperator (const string & iden, const shared_ptr <OperatorDecleration> & opp) {operators [iden] = opp;}
+		void insertStatmentParser (const string & iden, ASTnode(*parser)(AbstractSyntaxTree *, tkitt)) {statementParsers [iden] = parser;}
+		void insertFunction (const string & iden, const shared_ptr <FunctionDecleration> & func) {functions.insert (std::make_pair (iden, func));}
+		void insertDependency (const shared_ptr <Module> & module) {dependencies.insert (module);}
+		
 		static const shared_ptr <Module> createEmpty (const string & id);
 		static const shared_ptr <Module> createFromFile (const string & file);
 		static const shared_ptr <Module> createFromFile (const string & dir, const string & file);
