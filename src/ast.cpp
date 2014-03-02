@@ -318,7 +318,7 @@ ASTnode AbstractSyntaxTree::parseBody (tkitt end) {
 				{
 					tkitt colon;
 					if ((colon = findToken (":", end)) != end) {
-						nextToken (end);
+						nextToken (colon);
 						ASTnode node = nullptr;
 						if (itt != colon) {
 							node = parseStatment (colon);
