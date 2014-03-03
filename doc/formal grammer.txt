@@ -84,7 +84,7 @@ Type				=>	Identifier [Template]
 
 TypedArgsList		=>	VariableDecl (',' VariableDecl)*
 
-TypeModifier		=>	'alias'
+TypeModifier		=>	'ref'
 					|	'atomic'
 					|	'const'
 

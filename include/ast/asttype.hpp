@@ -12,7 +12,7 @@ namespace parser {
 class ASTtype : public ASTbase {
 	VISITABLE
 	public:
-		virtual bool isAlias () const {return alias;}
+		virtual bool isAlias () const {return ref;}
 		virtual bool isConst () const {return constType;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
@@ -23,9 +23,9 @@ class ASTtype : public ASTbase {
 		}
 		
 		ASTtype () {}
-		ASTtype (const bool alias, const bool constType, const shared_ptr <NumbatType> & type) : alias (alias), constType (constType), type (type) {}
+		ASTtype (const bool ref, const bool constType, const shared_ptr <NumbatType> & type) : ref (ref), constType (constType), type (type) {}
 	private:
-		bool alias, constType;
+		bool ref, constType;
 		shared_ptr <NumbatType> type;
 };
 

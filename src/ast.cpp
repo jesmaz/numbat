@@ -693,10 +693,10 @@ ASTnode AbstractSyntaxTree::parseStatment (tkitt end) {
 
 ASTnode AbstractSyntaxTree::parseType (tkitt end) {
 	
-	bool constTkn=false, alias=false;
+	bool constTkn=false, ref=false;
 	while (itt->type == TOKEN::typemodifier) {
-		if (itt->iden == "alias") {
-			alias = true;
+		if (itt->iden == "ref") {
+			ref = true;
 		} else if (itt->iden == "const") {
 			constTkn = true;
 		}
@@ -714,7 +714,7 @@ ASTnode AbstractSyntaxTree::parseType (tkitt end) {
 			//TODO: handle variable sized raw data
 		}
 		std::set <string> metaTags = parseMetaTags (end);
-		return ASTnode (new ASTrawdata (alias, constTkn, generateRawType (key, size, metaTags), metaTags));
+		return ASTnode (new ASTrawdata (ref, constTkn, generateRawType (key, size, metaTags), metaTags));
 		
 	} else if (itt->type == TOKEN::identifier) {
 		nextToken (end); // eat identifier
@@ -727,7 +727,7 @@ ASTnode AbstractSyntaxTree::parseType (tkitt end) {
 			error ("'" + iden + "' is not a type", end);
 			return ASTnode (new ASTerror ("Invalid type"));
 		}
-		return ASTnode (new ASTtype (alias, constTkn, itt->second));
+		return ASTnode (new ASTtype (ref, constTkn, itt->second));
 		
 	} else {
 		error ("Expected type", end);

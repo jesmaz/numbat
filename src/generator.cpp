@@ -100,7 +100,7 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 		
 	}
 	
-	if (!alias)
+	if (!ref)
 		hand = builder.CreateLoad (hand, var->getIden ());
 	
 	return hand;
@@ -229,15 +229,15 @@ void BodyGenerator::visit (ASTcall & exp) {
 	Function * func = functions [exp.getFunction ().get ()];
 	std::vector <Value *> args;// (exp.getArgs ().size ());
 	
-	bool oldAlias = alias;
+	bool oldAlias = ref;
 	auto argItt = exp.getArgs ().begin (), argEnd = exp.getArgs ().end ();
 	auto param = func->arg_begin (), paramEnd = func->arg_end ();
 	for (; param != paramEnd and argItt != argEnd; ++argItt, ++param) {
-		alias = param->getType ()->isPointerTy ();
+		ref = param->getType ()->isPointerTy ();
 		(*argItt)->accept (*this);
 		args.push_back (stack.top ()); stack.pop ();
 	}
-	alias = oldAlias;
+	ref = oldAlias;
 	
 	std::cerr << exp.toString () << std::endl;
 	stack.push (builder.CreateCall (func, args));
@@ -330,10 +330,10 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		}
 		return;
 	} else if (instr == "gep") {
-		bool oldAlias = alias;
-		alias = true;
+		bool oldAlias = ref;
+		ref = true;
 		exp.getArgs () [0]->accept (*this);
-		alias = oldAlias;
+		ref = oldAlias;
 		Value * lhs = stack.top (); stack.pop ();
 		int l = exp.getArgs().size ();
 		for (int i=1; i<l; ++i) {
@@ -351,23 +351,23 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		stack.push (builder.CreateGEP (lhs, args));
 		return;
 	} else if (instr == "mov") {
-		bool oldAlias = alias;
-		alias = true;
+		bool oldAlias = ref;
+		ref = true;
 		exp.getArgs () [0]->accept (*this);
-		alias = oldAlias;
+		ref = oldAlias;
 		Value * lhs = stack.top (); stack.pop ();
 		exp.getArgs () [1]->accept (*this);
 		Value * rhs = stack.top (); stack.pop ();
 		stack.push (builder.CreateStore (rhs, lhs));
 		return;
 	} else if (instr == "redir") {
-		bool oldAlias = alias;
-		alias = true;
+		bool oldAlias = ref;
+		ref = true;
 		exp.getArgs () [0]->accept (*this);
 		Value * lhs = stack.top (); stack.pop ();
 		exp.getArgs () [1]->accept (*this);
 		Value * rhs = stack.top (); stack.pop ();
-		alias = oldAlias;
+		ref = oldAlias;
 		lhs->getType ()->dump (); std::cerr << std::endl;
 		rhs->getType ()->dump (); std::cerr << std::endl;
 		if (rhs->getType ()->getPointerElementType ()->isPointerTy ()) {
@@ -449,9 +449,9 @@ void BodyGenerator::visit (ASTparamater & exp) {
 			if (exp.isAlias ()) {
 				namedValues [exp.getVariable ().get ()] = ai;
 			} else {
-				alias = true;
+				ref = true;
 				Value * v = getVariableHandle (exp.getVariable ().get ());
-				alias = false;
+				ref = false;
 				builder.CreateStore (ai, v);
 			}
 			return;
@@ -500,7 +500,7 @@ void BodyGenerator::visit (ASTstructIndex & exp) {
 		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
 		val = builder.CreateGEP (val, indicies);
 	}*/
-	if (alias) {
+	if (ref) {
 		std::vector <Value *> indicies (2);
 		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
 		indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
@@ -524,21 +524,21 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	auto rhsItt = exp.getRhsArgs ().begin ();
 	std::list <Value *> lhsArgs, rhsArgs;
 	
-	bool oldAlias = alias;
+	bool oldAlias = ref;
 	for (const shared_ptr <ASTcallable> & call : exp.getCalls ()) {
 		Function * func = functions [call->getFunction ().get ()];
 		auto param = func->arg_begin ();
-		alias = param->getType ()->isPointerTy ();
+		ref = param->getType ()->isPointerTy ();
 		(*lhsItt)->accept (*this);
 		lhsArgs.push_back (stack.top ()); stack.pop ();
 		++lhsItt;
 		++param;
-		alias = param->getType ()->isPointerTy ();
+		ref = param->getType ()->isPointerTy ();
 		(*rhsItt)->accept (*this);
 		rhsArgs.push_back (stack.top ()); stack.pop ();
 		++rhsItt;
 	}
-	alias = oldAlias;
+	ref = oldAlias;
 	
 	auto lhsParam = lhsArgs.begin ();
 	auto rhsParam = rhsArgs.begin ();

@@ -98,7 +98,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		std::stack <Value *> stack;
 		std::vector <Value *> body;
 		//CallMeta callmeta;
-		bool alias = false;
+		bool ref = false;
 };
 
 

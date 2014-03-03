@@ -3,32 +3,32 @@ import 'locallib/string.nbt'
 #struct vec2 $[type T] {T i, T j}
 
 struct testStruct {int64 i, double d}
-struct mn {alias int64 t}
+struct mn {ref int64 t}
 
-#def Scale (alias vec2int8 vec): {int8}
+#def Scale (ref vec2int8 vec): {int8}
 #	int8 i = vec.i
 #	int8 j = vec.j
 #	return i * i + j * j
 
 extern def sin @cstyle (double d) {double}:
 
-def ' = ' (alias bool lhs, bool rhs) {bool}:
+def ' = ' (ref bool lhs, bool rhs) {bool}:
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-def ' = ' (alias int8 lhs, int8 rhs) {int8}:
+def ' = ' (ref int8 lhs, int8 rhs) {int8}:
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-def ' = ' (alias int64 lhs, int64 rhs) {int64}:
+def ' = ' (ref int64 lhs, int64 rhs) {int64}:
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-def ' = ' (alias double lhs, double rhs) {double}:
+def ' = ' (ref double lhs, double rhs) {double}:
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-#def ' = ' $<type T> (alias T lhs, T rhs) : {T}
+#def ' = ' $<type T> (ref T lhs, T rhs) : {T}
 #	asm 'numbat' : 'mov lhs, rhs'
 #	return lhs
 
@@ -44,7 +44,7 @@ def ' + ' (int8 lhs, int8 rhs) {int8}:
 def ' + ' (double lhs, double rhs) {double}:
 	return asm 'numbat' : 'fadd lhs, rhs'
 
-def redir (alias mn a, alias int64 t) {}:
+def redir (ref mn a, ref int64 t) {}:
 	a.t => t
 	return
 
@@ -87,15 +87,15 @@ def tupletest () {}:
 	a, b = swap (a, b)
 	return
 
-def tfunc (alias int64 t) {}:
+def tfunc (ref int64 t) {}:
 	t = 40
 	return
 
-def tfunc (alias double t) {}:
+def tfunc (ref double t) {}:
 	t = sin (40)
 	return
 
-def I (alias testStruct ts) {int64}:
+def I (ref testStruct ts) {int64}:
 	return ts.i
 
 def cCallbackTest @cstyle () {int64}:

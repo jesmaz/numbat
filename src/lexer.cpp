@@ -106,7 +106,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 				t.type = TOKEN::stringliteral;
 			} else if (buffer == "@") {
 				t.type = TOKEN::atsym;
-			} else if (buffer == "alias") {
+			} else if (buffer == "ref") {
 				t.type = TOKEN::typemodifier;
 			} else if (buffer == "asm") {
 				t.type = TOKEN::assembly;
