@@ -20,12 +20,31 @@
 			<item> return </item>
 			<item> while </item>
 		</list>
+		
+		<list name="types">
+			<item> bool </item>
+			<item> const </item>
+			<item> double </item>
+			<item> float </item>
+			<item> half </item>
+			<item> int8 </item>
+			<item> int16 </item>
+			<item> int32 </item>
+			<item> int64 </item>
+			<item> quad </item>
+			<item> ref </item>
+			<item> uint8 </item>
+			<item> uint16 </item>
+			<item> uint32 </item>
+			<item> uint64 </item>
+		</list>
 
 		<contexts>
 
 			<context name="Normal Text" attribute="Normal Text" lineEndContext="#stay">
 				<keyword attribute="Definition Keyword" String="defs" context="#stay"/>
 				<keyword attribute="Flow Keyword" String="flow" context="#stay"/>
+				<keyword attribute="Data Type" String="types" context="#stay"/>
 				<Float attribute="Float" context="#stay" />
 				<HlCHex attribute="Hex" context="#stay"/>
 				<HlCOct attribute="Octal" context="#stay"/>
@@ -67,6 +86,7 @@
 		<itemDatas>
 			<itemData name="Normal Text" defStyleNum="dsNormal"/>
 			<itemData name="Definition Keyword" defStyleNum="dsKeyword" spellChecking="false"/>
+			<itemData name="Data Type" defStyleNum="dsDataType" spellChecking="false"/>
 			<itemData name="Flow Keyword" defStyleNum="dsFunction" spellChecking="false"/>
 			<itemData name="Meta Tag" defStyleNum="dsOther" spellChecking="false"/>
 			<itemData name="String Char" defStyleNum="dsChar" spellChecking="false"/>
