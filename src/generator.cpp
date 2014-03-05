@@ -279,6 +279,12 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTconstantCString & exp) {
+	
+	stack.push (builder.CreateGlobalStringPtr (exp.getValue ()));
+	
+}
+
 void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	
 	Value * val = nullptr;

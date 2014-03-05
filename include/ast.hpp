@@ -6,6 +6,7 @@
 #include "ast/astcallerror.hpp"
 #include "ast/astcallindex.hpp"
 #include "ast/astconstantint.hpp"
+#include "ast/astconstantcstring.hpp"
 #include "ast/asterror.hpp"
 #include "ast/astfunctionpointer.hpp"
 #include "ast/astnil.hpp"

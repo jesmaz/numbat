@@ -10,6 +10,7 @@ struct mn {ref int64 t}
 #	int8 j = vec.j
 #	return i * i + j * j
 
+extern def strlen @cstyle (ref int8 str) {int32}:
 extern def sin @cstyle (double d) {double}:
 
 def ' = ' (ref bool lhs, bool rhs) {bool}:
@@ -79,6 +80,8 @@ def testFunc (int8 lhs, int8 rhs) {int8}:
 	b = func ((a + b) * lhs + rhs * 2)
 	a = max (a, b)
 	a, b, c = b, c, a
+	strlen ("string")
+	strlen ("Another String")
 	return a
 
 def tupletest () {}:

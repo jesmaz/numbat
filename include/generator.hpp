@@ -38,13 +38,14 @@ using namespace llvm;
 using visitor::Visitor;
 
 
-class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconstantInt>, public Visitor <ASTfunctionPointer>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop> {
+class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop> {
 	public:
 		virtual void visit (AbstractSyntaxTree & exp);
 		virtual void visit (ASTbody & exp);
 		virtual void visit (ASTcall & exp);
 		virtual void visit (ASTcallindex & exp);
 		virtual void visit (ASTconstantInt & exp);
+		virtual void visit (ASTconstantCString & exp);
 		virtual void visit (ASTfunctionPointer & exp) {}
 		virtual void visit (ASTnumbatInstr & exp);
 		virtual void visit (ASTparamater & exp);
