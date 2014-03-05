@@ -17,21 +17,7 @@ link_directories(${LLVM_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3 ${LLVM_FLAGS}")
 
 
-
-set(sources ${sources} src/ast.cpp)
-set(sources ${sources} src/ast/astbody.cpp)
-set(sources ${sources} src/ast/astcall.cpp)
-set(sources ${sources} src/ast/astnumbatinstr.cpp)
-set(sources ${sources} src/ast/asttuple.cpp)
-set(sources ${sources} src/ast/asttuplecall.cpp)
-set(sources ${sources} src/ast/functiondecleration.cpp)
-set(sources ${sources} src/ast/numbatrawtype.cpp)
-set(sources ${sources} src/ast/numbattype.cpp)
-set(sources ${sources} src/ast/operatordecleration.cpp)
-set(sources ${sources} src/lexer.cpp)
-set(sources ${sources} src/module.cpp)
-set(sources ${sources} src/numbat.cpp)
-set(sources ${sources} src/generator.cpp)
+FILE(GLOB_RECURSE sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 add_library(numbat-static STATIC ${sources})
 
 set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static)
