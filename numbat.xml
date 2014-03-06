@@ -63,7 +63,8 @@
 
 			<context name="StringVariants" attribute="Normal Text" lineEndContext="#stay">
 				<!-- ' -->
-				<DetectChar attribute="String" char="'" context="Single A-string"/>
+				<DetectChar attribute="CharString" char="'" context="Single A-string"/>
+				<DetectChar attribute="String" char='"' context="Single Q-string"/>
 			</context>
 
 			<context name="Hash comment" attribute="Comment" lineEndContext="#pop">
@@ -71,9 +72,14 @@
 				<IncludeRules context="##Modelines" />
 			</context>
 
-			<context name="Single A-string" attribute="String" lineEndContext="#stay">
-				<HlCStringChar attribute="String Char" context="#stay"/>
-				<DetectChar attribute="String" char="'" context="#pop"/>
+			<context name="Single A-string" attribute="CharString" lineEndContext="#stay">
+				<HlCStringChar attribute="Special Char" context="#stay"/>
+				<DetectChar attribute="CharString" char="'" context="#pop"/>
+			</context>
+			
+			<context name="Single Q-string" attribute="String" lineEndContext="#stay">
+				<HlCStringChar attribute="Special Char" context="#stay"/>
+				<DetectChar attribute="String" char='"' context="#pop"/>
 			</context>
 
 			<context name="Meta Tag" attribute="Meta Tag" lineEndContext="#stay">
@@ -89,12 +95,13 @@
 			<itemData name="Data Type" defStyleNum="dsDataType" spellChecking="false"/>
 			<itemData name="Flow Keyword" defStyleNum="dsFunction" spellChecking="false"/>
 			<itemData name="Meta Tag" defStyleNum="dsOther" spellChecking="false"/>
-			<itemData name="String Char" defStyleNum="dsChar" spellChecking="false"/>
+			<itemData name="Special Char" defStyleNum="dsOther" spellChecking="false"/>
 			<itemData name="Float" defStyleNum="dsFloat" spellChecking="false"/>
 			<itemData name="Int" defStyleNum="dsDecVal" spellChecking="false"/>
 			<itemData name="Hex" defStyleNum="dsBaseN" spellChecking="false"/>
 			<itemData name="Octal" defStyleNum="dsBaseN" spellChecking="false"/>
 			<itemData name="Comment" defStyleNum="dsComment"/>
+			<itemData name="CharString" defStyleNum="dsChar"/>
 			<itemData name="String" defStyleNum="dsString"/>
 		</itemDatas>
 
