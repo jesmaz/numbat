@@ -1,0 +1,3 @@
+The purpose of this reference manual is to describe the Numbat programming language, it is not intended as a tutorial.
+
+Numbat is a general-purpose procedural programming language designed with programmer and resource efficiency in mind. It is staticly typed without garbage collection.
