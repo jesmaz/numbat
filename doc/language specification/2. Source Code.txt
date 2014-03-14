@@ -1,0 +1,3 @@
+Numbat source code may be either encoded in ASCII or UTF-8. Please note that in UTF-8 format only the shortest possible representation of a character is considered valid. Each code point is distinct and considered separately, code points will never be combined and Numbat is case-sensitive.
+
+All non-ASCII characters are considered to be letters.
