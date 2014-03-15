@@ -1,0 +1,92 @@
+3.1: Semicolons
+
+Numbat's formal grammar used semicolons ';' as terminators. Semicolons are automatically inserted at the end of a line under the following conditions:
+ - The final token is an identifier (alphanumeric operators are considered to be identifiers)
+ - The final token is a numeric literal
+ - The final token is a string literal and the first token of the next line is not a string literal
+ - Same as above for character array literals
+ - The final token is the 'break', 'continue', or 'return' keyword
+ - The final token is one of the following symbols: ')', ']', '}'
+
+3.2: Comments
+
+Numbat has two forms for comments:
+ - Line comments start with a '#' and terminate at end of the line
+ - General comments start with a '#|' and end with a '|#'
+
+Comments can nest.
+
+3.3: Indentation
+
+The indentation of each line is calculated by the number of leading space and tab characters. Flow control in Numbat uses indentation to calculate code blocks. Indentation is only relevant when calculating blocks of code, it is ignored for most parsing.
+
+An example of using indents in Numbat:
+<code language="numbat">
+struct vector {double x, y, z}
+
+def scale (const ref vector vec) {double scale}:
+	double sum = vec.a*vec.a + vec.b*vec.b + vec.c*vec.c
+	double scale = Math.sqrt (sum)
+	return scale
+
+def 
+</code>
+
+3.4: Identifiers
+
+Identifiers name program entities such as structures, functions, variables, and interfaces. The leading character in an identifier must be a letter or an underscore.
+
+3.4: Keywords
+
+Numbat has a number of identifiers reserved as keywords, they are as follows:
+<grammar>
+and  case const  def       else   extern  false
+for  if   import interface nil    not     or
+true ref  return struct    switch typedef while
+</grammar>
+
+3.5: Numeric literals
+
+Two kinds of numeric literals are supported, integers and floating point numbers. There are no imaginary or complex literals.
+
+Integer literals are described as follows:
+<grammar>
+<IntLiteral/>
+</grammar>
+
+Integer examples:
+<grammar>
+7
+39
+120
+0x3f
+0o70
+0b0101
+</grammar>
+
+Floating pint literals are defined as follows:
+<grammar>
+<FloatLiteral/>
+</grammar>
+
+Float examples:
+<grammar>
+3.14
+0.46
+0.6e10
+0.5622E-20
+40.3f
+30.1h
+60.0q
+</grammar>
+
+3.6: Operators and delimiters:
+
+The following tokens are operators and delimiters:
+<grammar>
+++ -- ( ) [ ] { } . + - ! not ~  *  /  %  +  -  <<  >>  &  ^  |  <  <=  >  >=  ==  !=  and  or  ,  =  += -= *= /= %= <<= >>= &= ^= |= =>
+</grammar>
+
+3.7: String literals
+
+3.8: Character array literals
