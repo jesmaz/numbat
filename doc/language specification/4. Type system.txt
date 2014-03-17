@@ -1,0 +1,57 @@
+3.1: Built in types
+
+The following types are predefined:
+
+<code language="numbat">
+bool    # logical true/false
+
+int8    # 8-bit signed integer
+int16   # 16-bit signed integer
+int32   # 32-bit signed integer
+int64   # 64-bit signed integer
+int128  # 128-bit signed integer
+
+uint8   # 8-bit unsigned integer
+uint16  # 16-bit unsigned integer
+uint32  # 32-bit unsigned integer
+uint64  # 64-bit unsigned integer
+uint128 # 128-bit unsigned integer
+
+half    # 16-bit floating point number
+float   # 32-bit floating point number
+double  # 64-bit floating point number
+quad    # 128-bit floating point number
+</code>
+
+Integers use two's complement arithmetic. Floating point numbers are IEEE-754 compliant.
+
+3.2: Struct types
+
+A struct is a sequence of named variables called fields. Anonymous fields are allowed and treated as padding. Field names within a struct must be unique.
+
+<code language="numbat">
+struct A {int m, floar n}
+
+struct B {
+	int r,
+	int,
+	double t
+}
+</code>
+
+3.3: Array types
+
+Arrays will be added in a later revision.
+
+3.4: Interface types
+
+Interfaces will be added in a later revision.
+
+3.5: Typedefs
+
+The 'typedef' keyword is used to create aliases for types.
+
+In this example 'int' is defined to be an alias of int32.
+<code language="numbat">
+typedef int32 : int
+</code>
