@@ -43,11 +43,7 @@ struct B {
 
 Arrays will be added in a later revision.
 
-3.4: Interface types
-
-Interfaces will be added in a later revision.
-
-3.5: Typedefs
+3.4: Typedefs
 
 The 'typedef' keyword is used to create aliases for types.
 
@@ -55,3 +51,7 @@ In this example 'int' is defined to be an alias of int32.
 <code language="numbat">
 typedef int32 : int
 </code>
+
+3.5: Interface types
+
+An interface is a set of methods and attributes. Interfaces are not permitted to contain any fields. Default implementations of an interface's methods and attributes are permitted. 

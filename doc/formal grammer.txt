@@ -1,5 +1,7 @@
 Arguments			=>	'(' [ExpressionList] ')'
 
+Array				=>	'[' [Expression] [ ',' [expression] ] ']'
+
 Associativity		=>	'ltr'
 					|	'rtl'
 
@@ -81,11 +83,11 @@ StringLiteral		=>	<string double quotes>
 
 StructDecl			=>	struct Identifier MetaTag* [Template] TypeParamaters ;
 
-Template			=>	'['[TypedArgsList]']'
+Template			=>	'${' [ TypedArgsList ] '}'
 
-Type				=>	Identifier [Template]
-					|	'raw' MetaTag* IntLiteral
-					|	'raw' MetaTag* Identifier
+Type				=>	Type ['Array] [Template]
+					|	Identifier
+					|	'{' TypedArgsList '}'
 					|	'type'
 					|	TypeModifier Type
 
