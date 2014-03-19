@@ -9,6 +9,7 @@
 #include <llvm/Target/TargetLibraryInfo.h>
 
 #include "ast.hpp"
+#include "core.hpp"
 #include "numbat.hpp"
 #include "module.hpp"
 #include "generator.hpp"

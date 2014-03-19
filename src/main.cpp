@@ -69,6 +69,7 @@ int main (int argl, char ** args) {
 	}
 	
 	shared_ptr <parser::Module> core = parser::Module::createEmpty ("numbat core");
+	core->insertStatmentParser ("while", &numbat::parser::parseWhileLoop);
 	Numbat numbat;
 	for (const string & file : files) {
 		numbat.loadFromModule (parser::Module::createFromFile (file));
