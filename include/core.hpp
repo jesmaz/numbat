@@ -10,6 +10,8 @@ namespace parser {
 ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt);
 ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt);
 
+ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end);
+
 
 };
 };

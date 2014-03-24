@@ -54,4 +54,4 @@ typedef int32 : int
 
 3.5: Interface types
 
-An interface is a set of methods and attributes. Interfaces are not permitted to contain any fields. Default implementations of an interface's methods and attributes are permitted. 
+An interface is a set of methods and attributes. Interfaces are not permitted to contain any fields. Default implementations of an interface's methods and attributes are permitted.

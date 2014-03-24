@@ -1,5 +1,5 @@
-
 #include "../include/ast.hpp"
+#include "../include/core.hpp"
 
 namespace numbat {
 using namespace lexer;
@@ -313,45 +313,14 @@ ASTnode AbstractSyntaxTree::parseBody (tkitt end) {
 		}
 	}*/
 	while (itt != end) {
-		switch (itt->type) {
-			case TOKEN::whiletkn:
-				{
-					tkitt colon;
-					if ((colon = findToken (":", end)) != end) {
-						nextToken (colon);
-						ASTnode node = nullptr;
-						if (itt != colon) {
-							node = parseStatment (colon);
-						}
-						if (!node) {
-							//TODO: handle a lack of a condition (infinite loop?)
-							break;
-						}
-						if (node->isCallable ()) {
-							shared_ptr <ASTcallable> call = std::dynamic_pointer_cast <ASTcallable> (node);
-							node = ASTnode (new ASTcallindex (call, 0));
-						}
-						nextToken (end);
-						exprs.push_back (ASTnode (new ASTwhileloop (node, parseBody (end))));
-					} else {
-						itt = end;
-					}
-				}
-				break;
-			default:
-				{
-					if ((scolon = findToken (";", end)) != end) {
-						ASTnode node = parseStatment (scolon);
-						eatSemicolon (end);
-						if (node) {
-							exprs.push_back (node);
-						}
-					} else {
-						itt = end;
-					}
-				}
-				break;
+		auto func = statementParsers.find (itt->iden);
+		ASTnode exp = nullptr;
+		if (func != statementParsers.end ()) {
+			exp = func->second (this, end);
+		} else {
+			exp = parser::parseExpression (this, end);
 		}
+		exprs.push_back (exp);
 	}
 	variables = oldVariables;
 	return ASTnode (new ASTbody (exprs));

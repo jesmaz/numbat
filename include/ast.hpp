@@ -76,6 +76,11 @@ struct AbstractSyntaxTree {
 			return str;
 		}
 		
+		friend ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt);
+		friend ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt);
+		
+		friend ASTnode parseElementReferenceOperator (AbstractSyntaxTree *, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
+		
 		AbstractSyntaxTree () {}
 		AbstractSyntaxTree (tkitt beg, tkitt end);
 		
