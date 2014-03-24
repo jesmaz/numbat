@@ -41,5 +41,18 @@ ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
 }
 
 
+ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	
+	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
+	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
+	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
+	ast->itt = oppLoc [0];
+	ast->nextToken (end);
+	ASTnode ret = ast->resolveSymbol (ast->itt->iden, lhs);
+	ast->nextToken (end);
+	return ret;
+	
+}
+
 };
 };

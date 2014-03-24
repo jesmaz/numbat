@@ -433,20 +433,23 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 			
 		case OperatorDecleration::TYPE::binary:
 			{
+				if (opp.getPattern () == " . ") {
+					return parser::parseElementReferenceOperator (this, oppLoc, matches, end);
+				}
 				std::list <OperatorDecleration::OperatorMatch> lhs;
 				splitListAboutTkn (lhs, matches, oppLoc [0]);
 				ASTnode node = parseExpression (lhs, oppLoc [0]);
 				itt = oppLoc [0] + 1;
 				
-				if (opp.getPattern () == " . ") {
-					args.push_back (node);
+				
+					/*args.push_back (node);
 					ASTnode expr = parseExpression (matches, end, &args);
 					if (expr->isCallable ()) {
 						callee = expr;
 					} else {
 						return expr;
-					}
-				} else if (opp.getPattern () == " , ") {
+					}*/
+				if (opp.getPattern () == " , ") {
 					return createTuple (node, parseExpression (matches, end));
 				} else if (opp.getPattern () == " => ") {
 					args.push_back (node);
@@ -704,6 +707,43 @@ ASTnode AbstractSyntaxTree::parseType (tkitt end) {
 		return ASTnode (new ASTerror ("Invalid type"));
 		
 	}
+	
+}
+
+ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden, ASTnode parent) {
+	
+	ASTnode ret;
+	if (parent) {
+		
+		if (parent->getType ()) {
+			
+			int index = parent->getType ()->findMember (iden);
+			
+			if (index >= 0) {
+				ret = ASTnode (new ASTstructIndex (index, parent));
+			} else {
+				//TODO: search for apropriate functions
+				ret = ASTnode (new ASTerror ("Member functions are not yet implemented"));
+			}
+			
+		} else {
+			
+			ret = ASTnode (new ASTerror ("Invalid parent"));
+			
+		}
+		
+	} else {
+		
+		auto var = variables.find (iden);
+		if (var != variables.end ()) {
+			ret = ASTnode (new ASTvariable (var->second));
+		} else {
+			//TODO: function search possibly?, perhaps parent should be required
+			ret = ASTnode (new ASTerror ("Function searching is not yet implemented"));
+		}
+		
+	}
+	return ret;
 	
 }
 

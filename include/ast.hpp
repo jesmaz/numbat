@@ -100,6 +100,7 @@ struct AbstractSyntaxTree {
 		ASTnode parsePrimaryExpression (tkitt end, const std::vector <ASTnode> * args);
 		ASTnode parseStatment (tkitt end);
 		ASTnode parseType (tkitt end);
+		ASTnode resolveSymbol (const string & iden, ASTnode parent=nullptr);
 		
 		bool eatSemicolon (tkitt end) {if (itt->type == lexer::TOKEN::semicolon) return nextToken (end); return false;}
 		bool flushLine (tkitt end);
