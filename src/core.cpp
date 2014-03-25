@@ -54,5 +54,17 @@ ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const std::vect
 	
 }
 
+ASTnode parseTupleOperator (AbstractSyntaxTree * ast, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
+	
+	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
+	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
+	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
+	ast->itt = oppLoc [0];
+	ast->nextToken (end);
+	ASTnode rhs = ast->parseExpression (matches, end); 
+	return ast->createTuple (lhs, rhs);
+	
+}
+
 };
 };
