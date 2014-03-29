@@ -79,9 +79,10 @@ struct AbstractSyntaxTree {
 		friend ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt);
 		friend ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt);
 		
-		friend ASTnode parseElementReferenceOperator (AbstractSyntaxTree *, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
-		friend ASTnode parseRedirectOperator (AbstractSyntaxTree *, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
-		friend ASTnode parseTupleOperator (AbstractSyntaxTree *, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
+		friend ASTnode parseElementReferenceOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
+		friend ASTnode parseGenericBinary (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
+		friend ASTnode parseRedirectOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
+		friend ASTnode parseTupleOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		
 		AbstractSyntaxTree () {}
 		AbstractSyntaxTree (tkitt beg, tkitt end);

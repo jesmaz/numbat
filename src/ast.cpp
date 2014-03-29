@@ -434,11 +434,13 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 		case OperatorDecleration::TYPE::binary:
 			{
 				if (opp.getPattern () == " . ") {
-					return parser::parseElementReferenceOperator (this, oppLoc, matches, end);
+					return parser::parseElementReferenceOperator (this, opp.getPattern(), oppLoc, matches, end);
 				} else if (opp.getPattern () == " , ") {
-					return parser::parseTupleOperator (this, oppLoc, matches, end);
+					return parser::parseTupleOperator (this, opp.getPattern(), oppLoc, matches, end);
 				} else if (opp.getPattern () == " => ") {
-					return parser::parseRedirectOperator (this, oppLoc, matches, end);
+					return parser::parseRedirectOperator (this, opp.getPattern(), oppLoc, matches, end);
+				} else {
+					return parser::parseGenericBinary (this, opp.getPattern(), oppLoc, matches, end);
 				}
 				std::list <OperatorDecleration::OperatorMatch> lhs;
 				splitListAboutTkn (lhs, matches, oppLoc [0]);
