@@ -54,6 +54,19 @@ ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const std::vect
 	
 }
 
+ASTnode parseRedirectOperator (AbstractSyntaxTree * ast, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
+	
+	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
+	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
+	std::vector <ASTnode> args (2);
+	args [0] = ast->parseExpression (lhsMatches, oppLoc [0]);
+	ast->itt = oppLoc [0];
+	ast->nextToken (end);
+	args [1] = ast->parseExpression (matches, end);
+	return ASTnode (new ASTnumbatInstr ("redir", args));
+	
+}
+
 ASTnode parseTupleOperator (AbstractSyntaxTree * ast, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
 	
 	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
