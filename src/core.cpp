@@ -66,6 +66,22 @@ ASTnode parseGenericBinary (AbstractSyntaxTree * ast, const string & func, const
 	
 }
 
+ASTnode parseGenericUnaryPrefix (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	
+	ast->itt = oppLoc [0];
+	ast->nextToken (end);
+	std::vector <ASTnode> args (1, ast->parseExpression (matches, end));
+	return ast->createCallNode (ast->findFunction (func, args), args);
+	
+}
+
+ASTnode parseGenericUnaryPostfix (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	
+	std::vector <ASTnode> args (1, ast->parseExpression (matches, oppLoc [0]));
+	return ast->createCallNode (ast->findFunction (func, args), args);
+	
+}
+
 ASTnode parseRedirectOperator (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
 	
 	std::list <OperatorDecleration::OperatorMatch> lhsMatches;

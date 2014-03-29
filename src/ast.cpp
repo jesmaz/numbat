@@ -442,29 +442,6 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 				} else {
 					return parser::parseGenericBinary (this, opp.getPattern(), oppLoc, matches, end);
 				}
-				std::list <OperatorDecleration::OperatorMatch> lhs;
-				splitListAboutTkn (lhs, matches, oppLoc [0]);
-				ASTnode node = parseExpression (lhs, oppLoc [0]);
-				itt = oppLoc [0] + 1;
-				
-				
-					/*args.push_back (node);
-					ASTnode expr = parseExpression (matches, end, &args);
-					if (expr->isCallable ()) {
-						callee = expr;
-					} else {
-						return expr;
-					}*/
-				/*if (opp.getPattern () == " , ") {
-					return createTuple (node, parseExpression (matches, end));
-				} else*/ /*if (opp.getPattern () == " => ") {
-					args.push_back (node);
-					args.push_back (parseExpression (matches, end));
-					return ASTnode (new ASTnumbatInstr ("redir", args));
-				} else */{
-					std::cerr << opp.getPattern () << std::endl;
-					return createBinaryCall (opp.getPattern (), node, parseExpression (matches, end), end);
-				}
 			}
 			break;
 			
@@ -503,12 +480,11 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 			break;
 			
 		case OperatorDecleration::TYPE::unarypostfix:
-			args.push_back (parseExpression (matches, oppLoc [0]));
+			return parser::parseGenericUnaryPostfix (this, opp.getPattern(), oppLoc, matches, end);
 			break;
 			
 		case OperatorDecleration::TYPE::unaryprefix:
-			itt = oppLoc [0] + 1;
-			args.push_back (parseExpression (matches, end));
+			return parser::parseGenericUnaryPrefix (this, opp.getPattern(), oppLoc, matches, end);
 			break;
 			
 		default:
