@@ -8,6 +8,7 @@
 #include "ast/astconstantint.hpp"
 #include "ast/astconstantcstring.hpp"
 #include "ast/asterror.hpp"
+#include "ast/astfunctionlist.hpp"
 #include "ast/astfunctionpointer.hpp"
 #include "ast/astnil.hpp"
 #include "ast/astnumbatinstr.hpp"
@@ -80,6 +81,7 @@ struct AbstractSyntaxTree {
 		friend ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt);
 		
 		friend ASTnode parseElementReferenceOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
+		friend ASTnode parseFunctionCall (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseGenericBinary (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseGenericIndexCall (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseGenericUnaryPrefix (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);

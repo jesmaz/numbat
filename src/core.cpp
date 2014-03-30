@@ -54,6 +54,55 @@ ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & 
 	
 }
 
+ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	
+	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
+	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
+	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
+	ast->itt = oppLoc [0];
+	ast->nextToken (oppLoc [1]);
+	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
+	ast->itt = oppLoc [1];
+	shared_ptr <ASTfunctionlist> flist = std::dynamic_pointer_cast <ASTfunctionlist> (lhs);
+	ASTnode ret;
+	
+	if (flist) {
+		
+		for (auto & fdef : flist->getElements ()) {
+			
+			if (fdef->getArgs ().size () == params.size ()) {
+				
+				std::vector <ASTnode> cast = ast->createStaticCast (params, fdef->getArgs ());
+				
+				bool fail = false;
+				for (auto & arg : cast) {
+					fail |= arg->isValid ();
+				}
+				
+				//TODO: Prioritize function conversions
+				if (!fail) {
+					ret = ASTnode (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (fdef)), cast));
+					break;
+				}
+				
+			}
+			
+		}
+		
+		if (!ret) {
+			ret = ASTnode (new ASTerror ("No sutible function found"));
+		}
+		
+	} else {
+		//function object
+		//TODO: function objects
+		ret = ASTnode (new ASTerror ("Function objects are not yet implemented"));
+	}
+	
+	return ret;
+	
+}
+
 ASTnode parseGenericBinary (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
 	
 	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
@@ -68,7 +117,9 @@ ASTnode parseGenericBinary (AbstractSyntaxTree * ast, const string & func, const
 
 ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
 	
-	std::vector <ASTnode> args (1, ast->parseExpression (matches, oppLoc [0]));
+	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
+	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
+	std::vector <ASTnode> args (1, ast->parseExpression (lhsMatches, oppLoc [0]));
 	ast->itt = oppLoc [0];
 	ast->nextToken (oppLoc [1]);
 	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);

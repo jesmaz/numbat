@@ -720,8 +720,18 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden, ASTnode parent) 
 		if (var != variables.end ()) {
 			ret = ASTnode (new ASTvariable (var->second));
 		} else {
-			//TODO: function search possibly?, perhaps parent should be required
-			ret = ASTnode (new ASTerror ("Function searching is not yet implemented"));
+			auto func_beg = functions.lower_bound (iden);
+			auto func_end = functions.upper_bound (iden);
+			if (func_beg != func_end) {
+				std::vector <shared_ptr <FunctionDecleration>> funcs;
+				while (func_beg != func_end) {
+					funcs.push_back (func_beg->second);
+					++func_beg;
+				}
+				ret = ASTnode (new ASTfunctionlist (iden, funcs));
+			} else {
+				ret = ASTnode (new ASTerror ("'" + iden + "' is undefined"));
+			}
 		}
 		
 	}
