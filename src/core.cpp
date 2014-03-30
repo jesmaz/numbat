@@ -65,22 +65,25 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 	ast->itt = oppLoc [1];
 	shared_ptr <ASTfunctionlist> flist = std::dynamic_pointer_cast <ASTfunctionlist> (lhs);
 	ASTnode ret;
+	std::cerr << "'" << lhs->getIden () << "'" << std::endl;
 	
 	if (flist) {
 		
+		std::cerr << flist->getElements ().size () << " matches" << std::endl;
 		for (auto & fdef : flist->getElements ()) {
 			
+			std::cerr << fdef->getIden () << " (" << fdef->getArgs ().size () << ")" << std::endl;
 			if (fdef->getArgs ().size () == params.size ()) {
 				
 				std::vector <ASTnode> cast = ast->createStaticCast (params, fdef->getArgs ());
 				
-				bool fail = false;
+				bool success = true;
 				for (auto & arg : cast) {
-					fail |= arg->isValid ();
+					success &= arg->isValid ();
 				}
 				
 				//TODO: Prioritize function conversions
-				if (!fail) {
+				if (success) {
 					ret = ASTnode (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (fdef)), cast));
 					break;
 				}
@@ -91,12 +94,14 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 		
 		if (!ret) {
 			ret = ASTnode (new ASTerror ("No sutible function found"));
+			ast->error ("No sutible function found", end);
 		}
 		
 	} else {
 		//function object
 		//TODO: function objects
 		ret = ASTnode (new ASTerror ("Function objects are not yet implemented"));
+		ast->error ("Function objects are not yet implemented", end);
 	}
 	
 	return ret;

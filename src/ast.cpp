@@ -447,22 +447,11 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 			
 		case OperatorDecleration::TYPE::index_call:
 			{
-				tkitt tmpItt = itt;
-				itt = oppLoc [0] + 1;
-				args = parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
-				itt = tmpItt;
 				if (opp.getPattern () == " ( )") {
-					callee = parseExpression (matches, oppLoc [0], &args);
+					return parser::parseFunctionCall (this, opp.getPattern(), oppLoc, matches, end);
 				} else {
-					auto oldArgs = args;
-					args.push_back (nullptr);
-					args [0] = parseExpression (matches, oppLoc [0]);
-					size_t i=0;
-					for (auto arg : oldArgs) {
-						args [++i] = arg;
-					}
+					return parser::parseGenericIndexCall (this, opp.getPattern(), oppLoc, matches, end);
 				}
-				itt = oppLoc [1];
 			}
 			break;
 			
@@ -553,7 +542,11 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 		return ASTnode (new ASTvariable (variables [itt->iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden))));
 	}
 	
-	if (args and args->size () == 1 and args->front ()->getType ()) {
+	const string & iden = itt->iden;
+	nextToken (end);
+	return resolveSymbol (iden, nullptr);
+	
+	/*if (args and args->size () == 1 and args->front ()->getType ()) {
 		std::cerr << args->front ()->toString (" --> ") << std::endl;
 		std::cerr << args->front ()->getType ()->toString (" --> ") << std::endl;
 		int index = args->front ()->getType ()->findMember (itt->iden);
@@ -588,7 +581,7 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 	
 	error ("undefined variable '" + itt->iden + "'", end);
 	nextToken (end);
-	return ASTnode (new ASTerror ("NYI"));
+	return ASTnode (new ASTerror ("NYI"));*/
 	
 }
 
