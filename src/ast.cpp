@@ -427,8 +427,7 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 	
 	switch (opp.getType ()) {
 		case OperatorDecleration::TYPE::array:
-			itt = oppLoc [0] + 1;
-			args = parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
+			return parser::parseGenericIndexCall (this, opp.getPattern(), oppLoc, matches, end);
 			break;
 			
 		case OperatorDecleration::TYPE::binary:
@@ -545,43 +544,6 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 	const string & iden = itt->iden;
 	nextToken (end);
 	return resolveSymbol (iden, nullptr);
-	
-	/*if (args and args->size () == 1 and args->front ()->getType ()) {
-		std::cerr << args->front ()->toString (" --> ") << std::endl;
-		std::cerr << args->front ()->getType ()->toString (" --> ") << std::endl;
-		int index = args->front ()->getType ()->findMember (itt->iden);
-		if (index >= 0) {
-			nextToken (end);
-			return ASTnode (new ASTstructIndex (index, args->front ()));
-		}
-	}
-	
-	if (args and args->size () and args->front ()->getType ()) {
-		ASTnode node = findFunction (itt->iden, *args);
-		if (node->isValid ()) {
-			nextToken (end);
-			return node;
-		}
-	}
-	
-	auto var = variables.find (itt->iden);
-	if (var != variables.end ()) {
-		nextToken (end);
-		return ASTnode (new ASTvariable (var->second));
-	}
-	
-	if (args) {
-		ASTnode node = findFunction (itt->iden, *args);
-		if (!node->isValid ()) {
-			error (node->toString (), end);
-		}
-		nextToken (end);
-		return node;
-	}
-	
-	error ("undefined variable '" + itt->iden + "'", end);
-	nextToken (end);
-	return ASTnode (new ASTerror ("NYI"));*/
 	
 }
 

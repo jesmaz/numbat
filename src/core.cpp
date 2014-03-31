@@ -108,6 +108,15 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 	
 }
 
+ASTnode parseGenericArray (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
+	
+	ast->itt = oppLoc [0];
+	ast->nextToken (oppLoc [1]);
+	auto args = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
+	return ast->createCallNode (ast->findFunction (func, args), args);
+	
+}
+
 ASTnode parseGenericBinary (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
 	
 	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
