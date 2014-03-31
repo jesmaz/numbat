@@ -143,6 +143,23 @@ ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, co
 	
 }
 
+ASTnode parseGenericTernary (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end){
+	
+	std::vector <ASTnode> args (3);
+	std::list <OperatorDecleration::OperatorMatch> lhs, mid;
+	splitListAboutTkn (lhs, matches, oppLoc [0]);
+	args [0] = ast->parseExpression (lhs, oppLoc [0]);
+	ast->itt = oppLoc [0];
+	ast->nextToken (end);
+	splitListAboutTkn (mid, matches, oppLoc [1]);
+	args [1] = ast->parseExpression (mid, oppLoc [1]);
+	ast->itt = oppLoc [1];
+	ast->nextToken (end);
+	args [2] = ast->parseExpression (matches, end);
+	return ast->createCallNode (ast->findFunction (func, args), args);
+	
+}
+
 ASTnode parseGenericUnaryPrefix (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
 	
 	ast->itt = oppLoc [0];

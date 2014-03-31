@@ -456,14 +456,7 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 			
 		case OperatorDecleration::TYPE::ternary:
 			{
-				std::list <OperatorDecleration::OperatorMatch> lhs, mid;
-				splitListAboutTkn (lhs, matches, oppLoc [0]);
-				args.push_back (parseExpression (lhs, oppLoc [0]));
-				itt = oppLoc [0] + 1;
-				splitListAboutTkn (mid, matches, oppLoc [1]);
-				args.push_back (parseExpression (mid, oppLoc [1]));
-				itt = oppLoc [1] + 1;
-				args.push_back (parseExpression (matches, oppLoc [2]));
+				return parser::parseGenericTernary (this, opp.getPattern (), oppLoc, matches, end);
 			}
 			break;
 			
