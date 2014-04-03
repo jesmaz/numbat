@@ -1229,62 +1229,8 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 
 void AbstractSyntaxTree::parseOperatorDecleration (tkitt end) {
 	
-	int precidence;
-	bool ltr = false, neg = false;
-	std::string pattern;
-	tkitt decEnd = findToken (":", end);
-	
-	while (nextToken (decEnd)) {
-		switch (itt->type) {
-			case TOKEN::identifier:
-				pattern += " ";
-				break;
-			case TOKEN::chararrayliteral:
-				pattern += itt->iden;
-				break;
-			default:
-				error ("Unexpected token: '" + itt->iden + "', expected char array or identifier", decEnd);
-		}
-	}
-	
-	nextToken (end); // eat ':' token
-	
-	if (itt->iden == "-") {
-		neg = true;
-		nextToken (end); // eat '-' token
-	}
-	
-	if (itt->type != TOKEN::numericliteral) {
-		error ("Expected integer", end);
-		return;
-	}
-	
-	precidence = parseIntLiteral (end);
-	
-	if (neg) precidence = -precidence;
-	
-	if (itt->iden == "ltr") {
-		ltr = true;
-	} else if (itt->iden == "rtl") {
-		ltr = false;
-	} else {
-		error ("Expected an associativity (either 'ltr' or 'rtl')", end);
-		return;
-	}
-	
-	nextToken (end); // eat associativity
-	OperatorDecleration oppdec (precidence, ltr, pattern);
-	
-	if (oppdec.getType () == OperatorDecleration::TYPE::INVALID) {
-		error ("Malformed operator", end);
-		return;
-	}
-	
-	if (operators.find (pattern) != operators.end ()) {
-		error ("Operator aready defined", end);
-		return;
-	}
-	addOperator (pattern, oppdec);
+	error ("Operator declerations are no longer supported", end);
+	return;
 	
 }
 

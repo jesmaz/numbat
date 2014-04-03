@@ -64,6 +64,7 @@ Lvalue				=>	Identifier
 
 MetaTag				=>	'@'Identifier
 
+##DEPRECATED##
 OperatorDecl		=>	'operator' CharArrayLiteral ':' IntLiteral Associativity
 
 Paramaters			=>	'(' [TypedArgsList] ')'

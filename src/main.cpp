@@ -70,6 +70,62 @@ int main (int argl, char ** args) {
 	
 	shared_ptr <parser::Module> core = parser::Module::createEmpty ("numbat core");
 	core->insertStatmentParser ("while", &numbat::parser::parseWhileLoop);
+	
+	core->insertOperator (200, true, " ( )");
+	core->insertOperator (200, true, " [ ]");
+	core->insertOperator (200, true, " . ");
+	
+	core->insertOperator (300, false, "++ ");
+	core->insertOperator (300, false, "-- ");
+	core->insertOperator (300, false, "+ ");
+	core->insertOperator (300, false, "- ");
+	core->insertOperator (300, false, "! ");
+	core->insertOperator (300, false, "not ");
+	core->insertOperator (300, false, "~ ");
+	
+	core->insertOperator (500, true, " * ");
+	core->insertOperator (500, true, " / ");
+	core->insertOperator (500, true, " % ");
+	
+	core->insertOperator (600, true, " + ");
+	core->insertOperator (600, true, " - ");
+	
+	core->insertOperator (700, true, " << ");
+	core->insertOperator (700, true, " >> ");
+	
+	core->insertOperator (800, true, " & ");
+	
+	core->insertOperator (900, true, " ^ ");
+	
+	core->insertOperator (1000, true, " | ");
+	
+	core->insertOperator (1100, true, " < ");
+	core->insertOperator (1100, true, " <= ");
+	core->insertOperator (1100, true, " > ");
+	core->insertOperator (1100, true, " >= ");
+	
+	core->insertOperator (1200, true, " == ");
+	core->insertOperator (1200, true, " != ");
+	
+	core->insertOperator (1300, true, " and ");
+	
+	core->insertOperator (1400, true, " or ");
+	
+	core->insertOperator (1500, true, " , ");
+	
+	core->insertOperator (1600, false, " = ");
+	core->insertOperator (1600, false, " += ");
+	core->insertOperator (1600, false, " -= ");
+	core->insertOperator (1600, false, " *= ");
+	core->insertOperator (1600, false, " /= ");
+	core->insertOperator (1600, false, " %= ");
+	core->insertOperator (1600, false, " <<= ");
+	core->insertOperator (1600, false, " >>= ");
+	core->insertOperator (1600, false, " &= ");
+	core->insertOperator (1600, false, " ^= ");
+	core->insertOperator (1600, false, " |= ");
+	core->insertOperator (1600, false, " => ");
+	
 	Numbat numbat;
 	for (const string & file : files) {
 		numbat.loadFromModule (parser::Module::createFromFile (file));

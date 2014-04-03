@@ -31,6 +31,7 @@ struct Module {
 		
 		void insertType (const string & iden, const shared_ptr <NumbatType> & type) {types [iden] = type;}
 		void insertOperator (const string & iden, const shared_ptr <OperatorDecleration> & opp) {operators [iden] = opp;}
+		void insertOperator (const int prec, const bool ltr, const string & iden) {operators [iden] = std::shared_ptr <numbat::parser::OperatorDecleration> (new numbat::parser::OperatorDecleration (prec, ltr, iden));}
 		void insertStatmentParser (const string & iden, ASTnode(*parser)(AbstractSyntaxTree *, tkitt)) {statementParsers [iden] = parser;}
 		void insertFunction (const string & iden, const shared_ptr <FunctionDecleration> & func) {functions.insert (std::make_pair (iden, func));}
 		void insertDependency (const shared_ptr <Module> & module) {dependencies.insert (module);}
