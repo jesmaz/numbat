@@ -47,7 +47,7 @@ OperatorDecleration::TYPE OperatorDecleration::calculateOperatorType (const stri
 	return type;
 }
 
-OperatorDecleration::OperatorDecleration (int precidance, bool ltr, const string & pattern) : precidance (precidance), ltr (ltr), pattern (pattern), type (calculateOperatorType (pattern)) {
+OperatorDecleration::OperatorDecleration (int precidance, bool ltr, const string & pattern, ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt)) : precidance (precidance), ltr (ltr), pattern (pattern), type (calculateOperatorType (pattern)), parser (parser) {
 	string buffer = "";
 	for (char c : pattern) {
 		if (buffer == "") {

@@ -419,70 +419,8 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 	}
 	
 	matches.sort (&OperatorDecleration::OperatorMatch::parseOrder);
-	ASTnode callee = nullptr;
-	std::vector <ASTnode> args;
 	
-	if (prevArgs)
-		args = *prevArgs;
-	
-	switch (opp.getType ()) {
-		case OperatorDecleration::TYPE::array:
-			return parser::parseGenericIndexCall (this, opp.getPattern(), oppLoc, matches, end);
-			break;
-			
-		case OperatorDecleration::TYPE::binary:
-			{
-				if (opp.getPattern () == " . ") {
-					return parser::parseElementReferenceOperator (this, opp.getPattern(), oppLoc, matches, end);
-				} else if (opp.getPattern () == " , ") {
-					return parser::parseTupleOperator (this, opp.getPattern(), oppLoc, matches, end);
-				} else if (opp.getPattern () == " => ") {
-					return parser::parseRedirectOperator (this, opp.getPattern(), oppLoc, matches, end);
-				} else {
-					return parser::parseGenericBinary (this, opp.getPattern(), oppLoc, matches, end);
-				}
-			}
-			break;
-			
-		case OperatorDecleration::TYPE::index_call:
-			{
-				if (opp.getPattern () == " ( )") {
-					return parser::parseFunctionCall (this, opp.getPattern(), oppLoc, matches, end);
-				} else {
-					return parser::parseGenericIndexCall (this, opp.getPattern(), oppLoc, matches, end);
-				}
-			}
-			break;
-			
-		case OperatorDecleration::TYPE::ternary:
-			{
-				return parser::parseGenericTernary (this, opp.getPattern (), oppLoc, matches, end);
-			}
-			break;
-			
-		case OperatorDecleration::TYPE::unarypostfix:
-			return parser::parseGenericUnaryPostfix (this, opp.getPattern(), oppLoc, matches, end);
-			break;
-			
-		case OperatorDecleration::TYPE::unaryprefix:
-			return parser::parseGenericUnaryPrefix (this, opp.getPattern(), oppLoc, matches, end);
-			break;
-			
-		default:
-			error ("Invalid operator type", end);
-			
-	}
-	
-	
-	shared_ptr <ASTcallable> callable;
-	
-	if (!callee) {
-		callable = findFunction (opp.getPattern (), args);
-	} else {
-		callable = std::dynamic_pointer_cast <ASTcallable> (callee);
-	}
-	
-	return createCallNode (callable, args);
+	return opp.parse (this, oppLoc, matches, end);
 	
 }
 
