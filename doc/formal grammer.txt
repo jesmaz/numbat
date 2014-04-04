@@ -86,7 +86,7 @@ StructDecl			=>	struct Identifier MetaTag* [Template] TypeParamaters ;
 
 Template			=>	'${' [ TypedArgsList ] '}'
 
-Type				=>	Type ['Array] [Template]
+Type				=>	Type [Array] [Template]
 					|	Identifier
 					|	'{' TypedArgsList '}'
 					|	'type'
