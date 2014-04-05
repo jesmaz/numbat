@@ -63,6 +63,12 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 	ast->nextToken (oppLoc [1]);
 	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 	ast->itt = oppLoc [1];
+	ast->nextToken (end);
+	
+	if (ast->itt != end) {
+		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
+	}
+	
 	shared_ptr <ASTfunctionlist> flist = std::dynamic_pointer_cast <ASTfunctionlist> (lhs);
 	ASTnode ret;
 	std::cerr << "'" << lhs->getIden () << "'" << std::endl;
@@ -138,8 +144,13 @@ ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, co
 	ast->nextToken (oppLoc [1]);
 	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 	ast->itt = oppLoc [1];
+	ast->nextToken (end);
 	args.insert (args.end (), params.begin (), params.end ());
-	return ast->createCallNode (ast->findFunction (func, args), args);
+	if (ast->itt != end) {
+		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
+	} else {
+		return ast->createCallNode (ast->findFunction (func, args), args);
+	}
 	
 }
 
