@@ -49,6 +49,9 @@ ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & 
 	ast->itt = oppLoc [0];
 	ast->nextToken (end);
 	ASTnode ret = ast->resolveSymbol (ast->itt->iden, lhs);
+	if (!ret->isValid ()) {
+		ast->error (ast->toString (), end);
+	}
 	ast->nextToken (end);
 	return ret;
 	
