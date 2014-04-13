@@ -858,56 +858,60 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 	int brace = 0;
 	bool skip = false;
 	
+	std::list <std::pair <OperatorDecleration::OperatorMatch, size_t>> candidates, remove;
+	
 	for (tkitt tkn=itt, prev=itt, next=itt+1; tkn!=end; tkn=next, prev=tkn, ++next) {
 		
-		if (brace == 0 and !skip) {
+		if (!brace) {
 			
+			std::cerr << "Matches: ";
 			auto oppBeg = operatorsByFirstToken.lower_bound (tkn->iden);
 			auto oppEnd = operatorsByFirstToken.upper_bound (tkn->iden);
+			for (; oppBeg != oppEnd; ++oppBeg) {
+				OperatorDecleration::OperatorMatch match;
+				match.opp = oppBeg->second;
+				match.ptr = tkn;
+				candidates.push_back (std::make_pair (match, oppBeg->second->getPattern ().find_first_not_of (" ")));
+				std::cerr << "'" << oppBeg->second->getPattern () << "' ";
+			}
+			std::cerr << '\n';
 			
-			while (oppBeg != oppEnd) {
+			for (auto & cand : candidates) {
 				
-				size_t beg = oppBeg->second->getPattern ().find_first_not_of (" ");
-				string nospace = oppBeg->second->getPattern ().substr (beg);
-				size_t end = nospace.find_last_not_of (" ");
-				nospace = nospace.substr (0, end+1);
-			
-				bool valid = true;
+				const string & ptn = cand.first.opp->getPattern ();
+				const string & sym = tkn->iden;
 				
-				size_t nolen = nospace.size ();
-				size_t l = tkn->iden.size ();
-				size_t i = 0;
-				if (nolen >= l) {
-					for (; i<l; ++i) {
-						if (nospace [i] != tkn->iden [i]) valid = false;
-					}
-					if (nolen > i) {
-						if (nospace [i] != ' ') valid = false;
+				if (ptn [cand.second] == ' ') {
+					size_t len = std::min (ptn.size () - cand.second - 1, sym.size ());
+					int cmp = sym.compare (0, len, ptn, cand.second + 1,  len);
+					if (!cmp) {
+						cand.second += len + 1;
 					}
 				} else {
-					valid = false;
+					size_t len = std::min (ptn.size () - cand.second, sym.size ());
+					int cmp = sym.compare (0, len, ptn, cand.second, len);
+					if (cmp) {
+						remove.push_back (cand);
+						continue;
+					} else {
+						cand.second += len;
+					}
+				}
+				if (cand.second >= ptn.size () or (cand.second + 1 >= ptn.size () and ptn.back () == ' ')) {
+					matches.push_back (cand.first);
+					remove.push_back (cand);
 				}
 				
-				/*if (tkn->iden != nospace) {
-					std::cerr << "'" << tkn->iden << "' + '" << next->iden << "' : '" << nospace << "'" << std::endl;
-					valid = nospace == tkn->iden + next->iden;
-					if (valid) skip = true;
-				}*/
-				
-				if (valid) {
-					OperatorDecleration::OperatorMatch match;
-					match.opp = oppBeg->second;
-					match.ptr = tkn;
-					matches.push_back (match);
-				}
-				++oppBeg;
-			
 			}
+			for (auto & r : remove)
+				candidates.remove (r);
 			
-		} else if (brace < 0) {
-			break;
+			remove.clear ();
+			
+			
 		} else {
-			skip = false;
+			if (!candidates.empty ())
+				candidates.clear ();
 		}
 		
 		if (tkn->type == TOKEN::symbol) {
@@ -915,6 +919,7 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 				++brace;
 			else if (tkn->iden == ")" or tkn->iden == "]" or tkn->iden == "}")
 				--brace;
+			if (0 > brace) break;
 		}
 		
 	}
@@ -1139,7 +1144,6 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 		if (c != ' ') nakedPattern += c;
 	}
 	oppTokens.insert (nakedPattern);
-	operatorsByFirstToken.insert(std::make_pair (nakedPattern, opp));
 	
 }
 
