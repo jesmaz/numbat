@@ -410,12 +410,17 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 		if (found == matchPtr) return nullptr;
 	}
 	oppLoc.push_back (matchPtr);
-	auto found = matchPtr;
+	auto found = matchPtr+1;
 	for (++sItt; sItt < sEnd; ++sItt) {
 		found = findToken (*sItt, found, end);
 		if (*sItt != " ")
 			oppLoc.push_back (found);
 		if (found == end) return nullptr;
+		++found;
+	}
+	
+	if (symb.back () != " ") {
+		if (findToken (" ", oppLoc.back () + 1, end) < end) return nullptr;
 	}
 	
 	matches.sort (&OperatorDecleration::OperatorMatch::parseOrder);
