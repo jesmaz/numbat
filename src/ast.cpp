@@ -606,14 +606,8 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden, ASTnode parent) 
 		if (var != variables.end ()) {
 			ret = ASTnode (new ASTvariable (var->second));
 		} else {
-			auto func_beg = functions.lower_bound (iden);
-			auto func_end = functions.upper_bound (iden);
-			if (func_beg != func_end) {
-				std::vector <shared_ptr <FunctionDecleration>> funcs;
-				while (func_beg != func_end) {
-					funcs.push_back (func_beg->second);
-					++func_beg;
-				}
+			std::vector <shared_ptr <FunctionDecleration>> funcs = getFunctionList (iden);
+			if (!funcs.empty ()) {
 				ret = ASTnode (new ASTfunctionlist (iden, funcs));
 			} else {
 				ret = ASTnode (new ASTerror ("'" + iden + "' is undefined"));
@@ -862,6 +856,12 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 	
 	for (tkitt tkn=itt, prev=itt, next=itt+1; tkn!=end; tkn=next, prev=tkn, ++next) {
 		
+		if (tkn->type == TOKEN::symbol) {
+			if (tkn->iden == ")" or tkn->iden == "]" or tkn->iden == "}")
+				--brace;
+			if (0 > brace) break;
+		}
+		
 		if (!brace) {
 			
 			std::cerr << "Matches: ";
@@ -910,16 +910,13 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 			
 			
 		} else {
-			if (!candidates.empty ())
-				candidates.clear ();
+			//if (!candidates.empty ())
+			//	candidates.clear ();
 		}
 		
 		if (tkn->type == TOKEN::symbol) {
 			if (tkn->iden == "(" or tkn->iden == "[" or tkn->iden == "{")
 				++brace;
-			else if (tkn->iden == ")" or tkn->iden == "]" or tkn->iden == "}")
-				--brace;
-			if (0 > brace) break;
 		}
 		
 	}
@@ -983,6 +980,17 @@ std::vector <ASTnode> AbstractSyntaxTree::parseTemplateArgs (tkitt end) {
 		nextToken (end);
 	}
 	return args;
+}
+
+std::vector <shared_ptr <FunctionDecleration>> AbstractSyntaxTree::getFunctionList (const string & iden) {
+	auto func_beg = functions.lower_bound (iden);
+	auto func_end = functions.upper_bound (iden);
+	std::vector <shared_ptr <FunctionDecleration>> funcs;
+	while (func_beg != func_end) {
+		funcs.push_back (func_beg->second);
+		++func_beg;
+	}
+	return funcs;
 }
 
 string AbstractSyntaxTree::parseStructDecleration (tkitt end) {

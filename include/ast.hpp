@@ -136,6 +136,8 @@ struct AbstractSyntaxTree {
 		std::vector <ASTnode> parseArgs (ASTnode (AbstractSyntaxTree::*arg)(tkitt), tkitt end);
 		std::vector <ASTnode> parseTemplateArgs (tkitt end);
 		
+		std::vector <shared_ptr <FunctionDecleration>> getFunctionList (const string & iden);
+		
 		string parseStructDecleration (tkitt end);
 		
 		tkitt findIndent (const int level, tkitt end);
