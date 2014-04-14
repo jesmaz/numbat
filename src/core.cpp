@@ -40,6 +40,9 @@ ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
 	return node;
 }
 
+ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	return ASTnode (new ASTerror ("Arrays are NYI"));
+}
 
 ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
 	

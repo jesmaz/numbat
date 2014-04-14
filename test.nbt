@@ -67,6 +67,7 @@ def swap (int8 lhs, int8 rhs) {int8, int8}:
 
 def testFunc (int8 lhs, int8 rhs) {int8}:
 	#vec2 $<int8> vec
+	int8 [0] array
 	testStruct ts
 	int8 a = 12
 	a = ts.i

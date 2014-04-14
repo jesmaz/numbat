@@ -71,6 +71,8 @@ int main (int argl, char ** args) {
 	shared_ptr <parser::Module> core = parser::Module::createEmpty ("numbat core");
 	core->insertStatmentParser ("while", &numbat::parser::parseWhileLoop);
 	
+	core->insertOperator (100, true, " [ ] ", parser::parseArrayDecleration);
+	
 	core->insertOperator (200, true, " ( )", parser::parseFunctionCall);
 	core->insertOperator (200, true, " [ ]", parser::parseGenericIndexCall);
 	core->insertOperator (200, true, " . ", parser::parseElementReferenceOperator);
