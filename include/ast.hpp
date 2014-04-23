@@ -22,6 +22,7 @@
 #include "ast/astvariable.hpp"
 #include "ast/astwhileloop.hpp"
 #include "ast/functiondecleration.hpp"
+#include "ast/numbatpointertype.hpp"
 #include "ast/numbatrawtype.hpp"
 #include "ast/numbattype.hpp"
 #include "ast/numbatvariable.hpp"
@@ -80,6 +81,7 @@ struct AbstractSyntaxTree {
 		friend ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt);
 		friend ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt);
 		
+		friend ASTnode parseArrayDecleration (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseElementReferenceOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseFunctionCall (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseGenericArray (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);

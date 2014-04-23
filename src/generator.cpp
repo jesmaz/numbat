@@ -31,14 +31,9 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 	
 	if (!type) {
 		s = Type::getVoidTy (context);
-	} else if (type->getMembers ().size ()) {
-		std::vector <Type *> members;
-		for (const ASTnode & node : type->getMembers ()) {
-			members.push_back (getType (node));
-		}
-		s = StructType::get (context, members);
 	} else {
 		const NumbatRawType * rawType = dynamic_cast <const NumbatRawType *> (type);
+		const NumbatPointerType * pointerType = dynamic_cast <const NumbatPointerType *> (type);
 		if (rawType) {
 			switch (rawType->getRawType ()) {
 				case NumbatRawType::FLOAT:
@@ -66,6 +61,14 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 				default:
 					s = Type::getIntNTy (context, type->getSize ());
 			}
+		} else if (pointerType) {
+			s = getType (pointerType->getDataType ())->getPointerTo ();
+		} else if (type->getMembers ().size ()) {
+			std::vector <Type *> members;
+			for (const ASTnode & node : type->getMembers ()) {
+				members.push_back (getType (node));
+			}
+			s = StructType::get (context, members);
 		} else {
 			s = Type::getVoidTy (context);
 		}
