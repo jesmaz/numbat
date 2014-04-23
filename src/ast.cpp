@@ -434,7 +434,7 @@ ASTnode AbstractSyntaxTree::parseParameter (tkitt end) {
 	string iden = itt->iden;
 	if (itt->type != TOKEN::identifier) {
 		error ("Expected identifier", end);
-		return nullptr;
+		return ASTnode (new ASTerror ("Expected identifier"));
 	}
 	nextToken (end); // eat identifier
 	return ASTnode (new ASTparamater (variables [iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, iden))));
