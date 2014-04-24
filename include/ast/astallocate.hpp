@@ -19,14 +19,14 @@ class ASTallocate : public ASTbase {
 		virtual size_t getSize () const {return 64;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {
-			std::ostringstream ss; ss << indent << "allcate " << amount << " bytes as " << type->getIden ();
+			std::ostringstream ss; ss << indent << "allcate (" << amount->toString () << ") bytes as " << type->getIden ();
 			return ss.str ();
 		}
 		
 		ASTallocate () {}
-		ASTallocate (size_t amount, const shared_ptr <NumbatType> & type) : amount (amount), type (type) {}
+		ASTallocate (const ASTnode & amount, const shared_ptr <NumbatType> & type) : amount (amount), type (type) {}
 	private:
-		size_t amount=0;
+		ASTnode amount;
 		shared_ptr <NumbatType> type;
 };
 

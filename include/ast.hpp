@@ -1,6 +1,7 @@
 #ifndef ABSTRACT_SYNTAX_TREE_HPP
 #define ABSTRACT_SYNTAX_TREE_HPP
 
+#include "ast/astallocate.hpp"
 #include "ast/astbody.hpp"
 #include "ast/astcall.hpp"
 #include "ast/astcallerror.hpp"
