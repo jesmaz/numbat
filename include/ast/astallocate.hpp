@@ -12,6 +12,8 @@ namespace parser {
 class ASTallocate : public ASTbase {
 	VISITABLE
 	public:
+		const ASTnode & getAmount () const {return amount;}
+		const shared_ptr <NumbatType> & getType () const {return type;}
 		virtual bool isAlias () const {return true;}
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return true;}
