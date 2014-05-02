@@ -25,7 +25,7 @@ void Numbat::loadFromModule (const shared_ptr <parser::Module> & mod) {
 	fpm.add (createCFGSimplificationPass ());
 	fpm.add (createInstructionCombiningPass ());
 	fpm.doInitialization ();
-	parser::BodyGenerator generator (module);
+	parser::BodyGenerator generator (module, engine->getDataLayout());
 	generator.visit (mod);
 	PassManager mpm;
 	mpm.add (new DataLayout(*engine->getDataLayout()));
@@ -59,7 +59,7 @@ void Numbat::loadFromTokenStr (const tkstring & tks) {
 	fpm.add (createCFGSimplificationPass ());
 	fpm.add (createInstructionCombiningPass ());
 	fpm.doInitialization ();
-	parser::BodyGenerator generator (module);
+	parser::BodyGenerator generator (module, engine->getDataLayout());
 	generator.visit (ast);
 	PassManager mpm;
 	mpm.add (new DataLayout(*engine->getDataLayout()));
