@@ -37,7 +37,7 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 		if (rawType) {
 			switch (rawType->getRawType ()) {
 				case NumbatRawType::FLOAT:
-					switch (rawType->getSize ()) {
+					switch (rawType->getBitSize ()) {
 						case 16:
 							s = Type::getHalfTy (context);
 							break;
@@ -59,7 +59,7 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 					}
 					break;
 				default:
-					s = Type::getIntNTy (context, type->getSize ());
+					s = Type::getIntNTy (context, type->getBitSize ());
 			}
 		} else if (pointerType) {
 			s = getType (pointerType->getDataType ())->getPointerTo ();

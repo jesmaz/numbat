@@ -19,7 +19,7 @@ class ASTrawdata : public ASTbase {
 		virtual bool isRaw () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
-		virtual size_t getBitSize () const {return type->getSize ();}
+		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {
 			return indent + type->getIden ();
