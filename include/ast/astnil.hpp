@@ -15,7 +15,7 @@ class ASTnil : public ASTbase {
 		virtual bool isConst () const {return false;}
 		virtual bool isNil () const {return true;}
 		virtual bool isValid () const {return true;}
-		virtual size_t getSize () const {return 0;}
+		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "nil";}
 		virtual string toString (const string & indent = "") const {return indent + "nil";}
 		

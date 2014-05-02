@@ -276,7 +276,7 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 	
 	Type * type = getType (exp.getType ().get ());
 	if (type->isIntegerTy ())
-		stack.push (ConstantInt::get (type, APInt (exp.getSize (), exp.getValue ())));
+		stack.push (ConstantInt::get (type, APInt (exp.getBitSize (), exp.getValue ())));
 	else
 		stack.push ((Value *)nullptr);
 	

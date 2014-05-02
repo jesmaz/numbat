@@ -7,7 +7,7 @@ namespace parser {
 const size_t NumbatType::getSize () const {
 	size_t size=0;
 	for (const ASTnode & mem : members) {
-		size += mem->getSize ();
+		size += mem->getBitSize ();
 	}
 	return size;
 }

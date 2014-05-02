@@ -14,7 +14,7 @@ struct NumbatVariable {
 		bool isAlias () const {return type->isAlias ();}
 		bool isConst () const {return type->isConst ();}
 		shared_ptr <NumbatType> getType () const {return type->getType ();}
-		const size_t getSize () const {return type->getSize ();}
+		const size_t getSize () const {return type->getBitSize ();}
 		const string & getIden () const {return iden;}
 		
 		NumbatVariable () {}

@@ -13,15 +13,14 @@ class ASTallocate : public ASTbase {
 	VISITABLE
 	public:
 		const ASTnode & getAmount () const {return amount;}
-		const shared_ptr <NumbatType> & getType () const {return type;}
 		virtual bool isAlias () const {return true;}
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
-		virtual size_t getSize () const {return 64;}
+		virtual size_t getBitSize () const {return 64;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {
-			std::ostringstream ss; ss << indent << "allcate (" << amount->toString () << ") bytes as " << type->getIden ();
+			std::ostringstream ss; ss << indent << "allocate (" << amount->toString () << ") bytes as " << type->getIden ();
 			return ss.str ();
 		}
 		

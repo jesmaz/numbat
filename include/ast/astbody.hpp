@@ -13,7 +13,7 @@ class ASTbody : public ASTbase {
 	public:
 		const std::vector <ASTnode> & getBody () const {return body;}
 		virtual bool isValid () const;
-		virtual size_t getSize () const {return 0;}
+		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const;
 		

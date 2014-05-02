@@ -11,7 +11,7 @@ class ASTcallerror : public ASTcallable {
 	public:
 		virtual bool isValid () const {return false;}
 		virtual const shared_ptr <FunctionDecleration> & getFunction () const {return func;}
-		virtual size_t getSize () const {return 0;}
+		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + message;}
 		

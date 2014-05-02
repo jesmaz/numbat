@@ -18,7 +18,7 @@ class ASTfunctionlist : public ASTbase {
 		
 		const std::vector <shared_ptr <FunctionDecleration>> & getElements () const {return elements;}
 		virtual bool isValid () const {return true;}
-		virtual size_t getSize () const {return 0;}
+		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + iden;}
 		
