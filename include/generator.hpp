@@ -59,7 +59,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		virtual void visit (ASTwhileloop & exp);
 		void visit (const shared_ptr <Module> & module);
 		//std::vector <Value *> operator () (AbstractSyntaxTree & ast) {tree = &ast; ast.getBody ().accept (*this); return body;}
-		BodyGenerator (llvm::Module * mod, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), activeFunction (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
+		BodyGenerator (llvm::Module * mod, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), activeFunction (nullptr), memalloc (nullptr), memfree (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
 	protected:
 	private:
 		
@@ -84,7 +84,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTbody>,
 		
 		AbstractSyntaxTree * tree;
 		BasicBlock * breakBlock, * continueBlock;
-		Function * activeFunction;
+		Function * activeFunction, * memalloc, * memfree;
 		FunctionDecleration * activeFunctionDecleration;
 		IRBuilder<> builder;
 		LLVMContext & context;

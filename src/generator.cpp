@@ -181,6 +181,16 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 		ai->setName (func->getArgs ()[index]->getIden ());
 	}
 	
+	if (func->hasTag ("malloc") and !memalloc) {
+		//TODO: function type testing
+		memalloc = f;
+	}
+	
+	if (func->hasTag ("free") and !memfree) {
+		//TODO: function type testing
+		memfree = f;
+	}
+	
 	functions [func] = f;
 	
 }
