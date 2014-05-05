@@ -224,6 +224,45 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 	
 }
 
+void BodyGenerator::visit (ASTallocate & exp) {
+	
+	NumbatPointerType * type = dynamic_cast <NumbatPointerType *> (exp.getType ().get ());
+	
+	if (!type) {
+		return;
+	}
+	
+	size_t mdsize=0;
+	for (auto & t : type->getMembers ()) {
+		mdsize += dataLayout->getTypeAllocSize (getType (t));
+	}
+	
+	size_t esize = dataLayout->getTypeAllocSize (getType (type->getDataType ()));
+	
+	exp.getAmount ()->accept (*this);
+	Value * count;
+	if (!stack.empty ()) {
+		count = stack.top (); stack.pop ();
+	} else {
+		return;
+	}
+	
+	Value * mdbytes = ConstantInt::get (Type::getInt64Ty (context), APInt (64, mdsize));
+	Value * bytes;
+	bytes = builder.CreateMul (count, ConstantInt::get (Type::getInt64Ty (context), APInt (64, esize)));
+	bytes = builder.CreateAdd (bytes, mdbytes);
+	
+	Value * call = builder.CreateCall (memalloc, std::vector <Value *> (1, bytes));
+	
+	Value * addressInt = builder.CreateAdd (builder.CreatePtrToInt (call, Type::getInt64Ty (context)), mdbytes);
+	Value * address = builder.CreateIntToPtr (addressInt, call->getType ());
+	
+	Type * ptrt = getType (type);
+	
+	stack.push (builder.CreateBitCast (address, ptrt));
+	
+}
+
 void BodyGenerator::visit (ASTbody & exp) {
 	
 	for (const ASTnode & node : exp.getBody ()) {
