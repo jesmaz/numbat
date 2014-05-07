@@ -5,6 +5,13 @@ import 'locallib/string.nbt'
 struct testStruct {int64 i, double d}
 struct mn {ref int64 t}
 
+#struct ArrayExample {int32 someValue, int8 [,] array}
+
+#def ArrayExample (int32 val, int64 lena, int64 lenb) {ArrayExample self}:
+	#self.someValue = 50
+	
+	#self.array = {{34, 45}, {45, 11}}
+
 #def Scale (ref vec2int8 vec): {int8}
 #	int8 i = vec.i
 #	int8 j = vec.j
@@ -67,7 +74,8 @@ def swap (int8 lhs, int8 rhs) {int8, int8}:
 
 def testFunc (int8 lhs, int8 rhs) {int8}:
 	#vec2 $<int8> vec
-	int8 [0] array
+	int8 [10] array
+	int64 [39] array2
 	testStruct ts
 	int8 a = 12
 	a = ts.i
