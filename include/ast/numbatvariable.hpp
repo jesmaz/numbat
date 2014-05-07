@@ -12,6 +12,7 @@ namespace parser {
 struct NumbatVariable {
 	public:
 		bool isAlias () const {return type->isAlias ();}
+		bool isArray () const {return type->isArray ();}
 		bool isConst () const {return type->isConst ();}
 		shared_ptr <NumbatType> getType () const {return type->getType ();}
 		const size_t getSize () const {return type->getBitSize ();}

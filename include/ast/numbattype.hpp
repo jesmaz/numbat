@@ -12,6 +12,7 @@ namespace parser {
 
 class NumbatType {
 	public:
+		virtual const bool isArray () const {return false;}
 		virtual const bool isFloat () const {return false;}
 		virtual const bool isRaw () const {return false;}
 		virtual const bool isSigned () const {return false;}

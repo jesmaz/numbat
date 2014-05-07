@@ -15,6 +15,7 @@ class ASTvariable : public ASTbase {
 	public:
 		const std::shared_ptr <NumbatVariable> & getVariable () {return variable;}
 		virtual bool isAlias () const {return variable->isAlias ();}
+		virtual bool isArray () const {return variable->isArray ();}
 		virtual bool isConst () const {return variable->isConst ();}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return variable->getType ();}
