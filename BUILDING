@@ -1,0 +1,23 @@
+Build Prerequisites:
+
+	llvm: version 3.3 or newer
+	http://llvm.org/
+
+	cmake: version 2.6 or newer
+	http://www.cmake.org/
+
+
+	llvm-config must be in the path variable (or system equivilent)
+
+
+Build Instrutions (Linux):
+
+	% mkdir build
+	% cd build
+	% cmake ..
+	% make
+	(optional)
+	% make install
+
+
+Jesse H. Mazis	<recursiveowl@gmail.com>
