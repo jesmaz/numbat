@@ -337,6 +337,26 @@ void BodyGenerator::visit (ASTconstantCString & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTgep & exp) {
+	
+	bool oldRef = ref;
+	ref = false;
+	exp.getRef ()->accept (*this);
+	Value * ptr = stack.top ();
+	stack.pop ();
+	exp.getIndex ()->accept (*this);
+	Value * index = stack.top ();
+	stack.pop ();
+	ref = oldRef;
+	
+	Value * gep = builder.CreateGEP (ptr, std::vector <Value *> (1, index));
+	if (!ref) {
+		gep = builder.CreateLoad (gep);
+	}
+	stack.push (gep);
+	
+}
+
 void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	
 	Value * val = nullptr;
