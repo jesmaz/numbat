@@ -13,6 +13,7 @@ class ASTtype : public ASTbase {
 	VISITABLE
 	public:
 		virtual bool isAlias () const {return ref;}
+		virtual bool isArray () const {return type->isArray ();}
 		virtual bool isConst () const {return constType;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
