@@ -10,7 +10,7 @@ string NumbatPointerType::convertDataToString (const void * data, size_t & offse
 }
 
 string NumbatPointerType::toString (const string & indent) const {
-	return "{" + NumbatType::toString () + ", " + dataType->getType ()->toString () + "}";
+	return indent + "{" + NumbatType::toString () + ", " + dataType->getType ()->toString () + "}";
 }
 
 }
