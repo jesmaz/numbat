@@ -188,6 +188,12 @@ ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, co
 	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 	ast->itt = oppLoc [1];
 	ast->nextToken (end);
+	std::cerr << args [0]->getType ()->toString ("====> ") << std::endl;
+	
+	if (args [0]->isArray ()) {
+		return ASTnode (new ASTgep (args [0], params [0]));
+	}
+	
 	args.insert (args.end (), params.begin (), params.end ());
 	if (ast->itt != end) {
 		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));

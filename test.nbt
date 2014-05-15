@@ -76,6 +76,7 @@ def testFunc (int8 lhs, int8 rhs) {int8}:
 	#vec2 $<int8> vec
 	int8 [10] array
 	int64 [39] array2
+	array2 [10] = 70
 	testStruct ts
 	int8 a = 12
 	a = ts.i
