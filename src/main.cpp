@@ -162,13 +162,10 @@ int main (int argl, char ** args) {
 	PM.add (new DataLayout (*machine->getDataLayout ()));
 	
 	TargetMachine::CodeGenFileType fileType = TargetMachine::CGFT_ObjectFile;
-	int flags = 0;
-	if (!emitAssembly) {
-		flags = raw_fd_ostream::F_Binary;
-	} else {
+	if (emitAssembly) {
 		fileType = TargetMachine::CGFT_AssemblyFile;
 	}
-	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error, flags));
+	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error));
 	if (!error.empty ()) {
 		std::cerr << error << std::endl;
 		return 1;
