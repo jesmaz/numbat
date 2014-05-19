@@ -41,7 +41,7 @@ struct B {
 
 3.3: Array types
 
-Arrays will be added in a later revision.
+An array is a linear collection of elements of a single type. Multidimensional arrays are allowed, however they can be passed to any function requiring a single dimensional array. Arrays sharing both dimensionality and element type are considered to be the same type. An array can be appended to another array of the same type, multidimensional arrays will not change their dimensionality.
 
 3.4: Typedefs
 

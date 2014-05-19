@@ -90,3 +90,6 @@ The following tokens are operators and delimiters:
 3.7: String literals
 
 3.8: Character array literals
+
+3.9: Array literals
+
