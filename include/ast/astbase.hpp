@@ -23,6 +23,7 @@ class NumbatType;
 class ASTbase : public visitor::BaseVisitable {
 	public:
 		virtual bool isAlias () const {return false;}
+		virtual bool isArray () const {return false;}
 		virtual bool isCallable () const {return false;}
 		virtual bool isConst () const {return false;}
 		virtual bool isList () const {return false;}
@@ -31,7 +32,8 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual bool isValid () const=0;
 		virtual shared_ptr <NumbatType> getType () const {return nullptr;}
 		virtual size_t calculateWeight () const {return 0;};
-		virtual size_t getSize () const=0;
+		//DEPRECATED
+		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const=0;
 		virtual string toString (const string & indent = "") const=0;
 		ASTbase () {}

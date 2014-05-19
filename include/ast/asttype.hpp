@@ -13,10 +13,11 @@ class ASTtype : public ASTbase {
 	VISITABLE
 	public:
 		virtual bool isAlias () const {return ref;}
+		virtual bool isArray () const {return type->isArray ();}
 		virtual bool isConst () const {return constType;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
-		virtual size_t getSize () const {return type->getSize ();}
+		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {
 			return indent + type->getIden ();

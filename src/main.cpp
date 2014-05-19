@@ -71,6 +71,8 @@ int main (int argl, char ** args) {
 	shared_ptr <parser::Module> core = parser::Module::createEmpty ("numbat core");
 	core->insertStatmentParser ("while", &numbat::parser::parseWhileLoop);
 	
+	core->insertOperator (100, true, " [ ] ", parser::parseArrayDecleration);
+	
 	core->insertOperator (200, true, " ( )", parser::parseFunctionCall);
 	core->insertOperator (200, true, " [ ]", parser::parseGenericIndexCall);
 	core->insertOperator (200, true, " . ", parser::parseElementReferenceOperator);
@@ -160,13 +162,10 @@ int main (int argl, char ** args) {
 	PM.add (new DataLayout (*machine->getDataLayout ()));
 	
 	TargetMachine::CodeGenFileType fileType = TargetMachine::CGFT_ObjectFile;
-	int flags = 0;
-	if (!emitAssembly) {
-		flags = raw_fd_ostream::F_Binary;
-	} else {
+	if (emitAssembly) {
 		fileType = TargetMachine::CGFT_AssemblyFile;
 	}
-	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error, flags));
+	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error));
 	if (!error.empty ()) {
 		std::cerr << error << std::endl;
 		return 1;

@@ -126,6 +126,8 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 				t.type = TOKEN::iftkn;
 			} else if (buffer == "import") {
 				t.type = TOKEN::import;
+			} else if (buffer == "interface") {
+				t.type = TOKEN::interface;
 			} else if (buffer == "nil") {
 				t.type = TOKEN::nil;
 			} else if (buffer == "operator") {

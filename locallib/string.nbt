@@ -3,8 +3,8 @@ import 'locallib/math.nbt'
 struct CString {ref uint8 chars}
 
 
-extern def malloc @cstyle (uint64 size) {ref uint8}:
-extern def free @cstyle (ref uint8 ptr) {}:
+extern def malloc @cstyle @malloc (uint64 size) {ref uint8}:
+extern def free @cstyle @free (ref uint8 ptr) {}:
 
 
 def ' [ ]' (ref CString string, uint64 index) {ref uint8}:

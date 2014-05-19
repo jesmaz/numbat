@@ -18,7 +18,7 @@ class ASTcallindex : public ASTbase {
 		virtual bool isConst () const {return ref->isConst ();}
 		virtual bool isValid () const {return call->isValid ();}
 		virtual shared_ptr <NumbatType> getType () const {return ref->getType ();}
-		virtual size_t getSize () const {return ref->getSize ();}
+		virtual size_t getBitSize () const {return ref->getBitSize ();}
 		virtual string getIden () const {return ref->getIden ();}
 		virtual string toString (const string & indent = "") const {return !index ? call->toString (indent) : ref->toString (indent);}
 		

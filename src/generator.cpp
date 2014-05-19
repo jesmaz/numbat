@@ -31,18 +31,13 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 	
 	if (!type) {
 		s = Type::getVoidTy (context);
-	} else if (type->getMembers ().size ()) {
-		std::vector <Type *> members;
-		for (const ASTnode & node : type->getMembers ()) {
-			members.push_back (getType (node));
-		}
-		s = StructType::get (context, members);
 	} else {
 		const NumbatRawType * rawType = dynamic_cast <const NumbatRawType *> (type);
+		const NumbatPointerType * pointerType = dynamic_cast <const NumbatPointerType *> (type);
 		if (rawType) {
 			switch (rawType->getRawType ()) {
 				case NumbatRawType::FLOAT:
-					switch (rawType->getSize ()) {
+					switch (rawType->getBitSize ()) {
 						case 16:
 							s = Type::getHalfTy (context);
 							break;
@@ -64,8 +59,16 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 					}
 					break;
 				default:
-					s = Type::getIntNTy (context, type->getSize ());
+					s = Type::getIntNTy (context, type->getBitSize ());
 			}
+		} else if (pointerType) {
+			s = getType (pointerType->getDataType ())->getPointerTo ();
+		} else if (type->getMembers ().size ()) {
+			std::vector <Type *> members;
+			for (const ASTnode & node : type->getMembers ()) {
+				members.push_back (getType (node));
+			}
+			s = StructType::get (context, members);
 		} else {
 			s = Type::getVoidTy (context);
 		}
@@ -178,6 +181,16 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 		ai->setName (func->getArgs ()[index]->getIden ());
 	}
 	
+	if (func->hasTag ("malloc") and !memalloc) {
+		//TODO: function type testing
+		memalloc = f;
+	}
+	
+	if (func->hasTag ("free") and !memfree) {
+		//TODO: function type testing
+		memfree = f;
+	}
+	
 	functions [func] = f;
 	
 }
@@ -208,6 +221,45 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 	}
 	
 	module->dump ();
+	
+}
+
+void BodyGenerator::visit (ASTallocate & exp) {
+	
+	NumbatPointerType * type = dynamic_cast <NumbatPointerType *> (exp.getType ().get ());
+	
+	if (!type) {
+		return;
+	}
+	
+	size_t mdsize=0;
+	for (auto & t : type->getMembers ()) {
+		mdsize += dataLayout->getTypeAllocSize (getType (t));
+	}
+	
+	size_t esize = dataLayout->getTypeAllocSize (getType (type->getDataType ()));
+	
+	exp.getAmount ()->accept (*this);
+	Value * count;
+	if (!stack.empty ()) {
+		count = stack.top (); stack.pop ();
+	} else {
+		return;
+	}
+	
+	Value * mdbytes = ConstantInt::get (Type::getInt64Ty (context), APInt (64, mdsize));
+	Value * bytes;
+	bytes = builder.CreateMul (count, ConstantInt::get (Type::getInt64Ty (context), APInt (64, esize)));
+	bytes = builder.CreateAdd (bytes, mdbytes);
+	
+	Value * call = builder.CreateCall (memalloc, std::vector <Value *> (1, bytes));
+	
+	Value * addressInt = builder.CreateAdd (builder.CreatePtrToInt (call, Type::getInt64Ty (context)), mdbytes);
+	Value * address = builder.CreateIntToPtr (addressInt, call->getType ());
+	
+	Type * ptrt = getType (type);
+	
+	stack.push (builder.CreateBitCast (address, ptrt));
 	
 }
 
@@ -273,7 +325,7 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 	
 	Type * type = getType (exp.getType ().get ());
 	if (type->isIntegerTy ())
-		stack.push (ConstantInt::get (type, APInt (exp.getSize (), exp.getValue ())));
+		stack.push (ConstantInt::get (type, APInt (exp.getBitSize (), exp.getValue ())));
 	else
 		stack.push ((Value *)nullptr);
 	
@@ -282,6 +334,26 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 void BodyGenerator::visit (ASTconstantCString & exp) {
 	
 	stack.push (builder.CreateGlobalStringPtr (exp.getValue ()));
+	
+}
+
+void BodyGenerator::visit (ASTgep & exp) {
+	
+	bool oldRef = ref;
+	ref = false;
+	exp.getRef ()->accept (*this);
+	Value * ptr = stack.top ();
+	stack.pop ();
+	exp.getIndex ()->accept (*this);
+	Value * index = stack.top ();
+	stack.pop ();
+	ref = oldRef;
+	
+	Value * gep = builder.CreateGEP (ptr, std::vector <Value *> (1, index));
+	if (!ref) {
+		gep = builder.CreateLoad (gep);
+	}
+	stack.push (gep);
 	
 }
 
@@ -501,12 +573,27 @@ void BodyGenerator::visit (ASTreturnvoid & exp) {
 void BodyGenerator::visit (ASTstructIndex & exp) {
 	exp.getExpr ()->accept (*this);
 	Value * val = stack.top (); stack.pop ();
-	/*if (val->getType ()->isPointerTy ()) {
-		std::vector <Value *> indicies (1);
-		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
-		val = builder.CreateGEP (val, indicies);
-	}*/
-	if (ref) {
+	
+	if (dynamic_cast <NumbatPointerType *> (exp.getExpr ()->getType ().get ())) {
+		if (ref) {
+			val = builder.CreateLoad (val);
+		}
+		size_t offset=0;
+		auto & members = exp.getExpr ()->getType ()->getMembers ();
+		for (size_t i=exp.getIndex (), l=members.size (); i<l; ++i) {
+			offset += dataLayout->getTypeAllocSize (getType (members [exp.getIndex ()]));
+		}
+		Value * oset = ConstantInt::get (Type::getInt64Ty (context), APInt (64, offset));
+		Value * iptr = builder.CreatePtrToInt (val, Type::getInt64Ty (context));
+		Type * type = getType (members [exp.getIndex ()]);
+		Value * dataiptr = builder.CreateSub (iptr, oset);
+		Value * dptr = builder.CreateIntToPtr (dataiptr, type);
+		if (ref) {
+			stack.push (dptr);
+		} else {
+			stack.push (builder.CreateLoad (dptr));
+		}
+	} else if (ref) {
 		std::vector <Value *> indicies (2);
 		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
 		indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));

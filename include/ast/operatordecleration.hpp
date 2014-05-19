@@ -18,6 +18,7 @@ struct OperatorDecleration {
 		enum class TYPE {array, binary, index_call, ternary, unarypostfix, unaryprefix, INVALID};
 		
 		struct OperatorMatch {
+			const bool operator == (const OperatorMatch & rhs) const {return opp == rhs.opp and ptr == rhs.ptr;}
 			const static bool treeOrder (const OperatorMatch & lhs, const OperatorMatch & rhs);
 			const static bool parseOrder (const OperatorMatch & lhs, const OperatorMatch & rhs) {return lhs.ptr < rhs.ptr;}
 			std::shared_ptr <OperatorDecleration> opp;

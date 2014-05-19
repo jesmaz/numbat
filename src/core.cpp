@@ -40,6 +40,46 @@ ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
 	return node;
 }
 
+ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	ASTnode dataType = ast->parseType (oppLoc [0]);
+	ast->itt = oppLoc [0];
+	ast->nextToken (oppLoc [1]);
+	auto dimentions = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
+	if (1 < dimentions.size ()) {
+		return ASTnode (new ASTerror ("Multidimensional arrays are not yet supported"));
+	}
+	ast->itt = oppLoc [1];
+	ast->nextToken (end);
+	const string & iden = ast->itt->iden;
+	ast->nextToken (end);
+	if (ast->itt != end) {
+		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
+	} else {
+		string key = dataType->toString () + " []";
+		shared_ptr <NumbatType> nbtype;
+		auto arrType = ast->types.find (key);
+		if (arrType == ast->types.end ()) {
+			nbtype = ast->types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, dataType));
+			ASTnode type = ASTnode (new ASTtype (false, false, ast->generateRawType ("raw 64", 64, std::set <string> ())));
+			nbtype->buildData (std::vector <ASTnode> (1, type));
+		} else {
+			nbtype = arrType->second;
+		}
+		ASTnode type (new ASTtype (dataType->isAlias (), dataType->isConst (), nbtype));
+		ASTnode var (new ASTvariable (ast->variables [iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, iden))));
+		ASTnode size;
+		if (dimentions.size () == 1) {
+			size = dimentions [0];
+		} else {
+			size = ASTnode (new ASTnumbatInstr ("mul", dimentions));
+		}
+		ASTnode alloc (new ASTallocate (size, type->getType ()));
+		std::vector <ASTnode> movvec (2);
+		movvec [0] = var;
+		movvec [1] = alloc;
+		return ASTnode (new ASTnumbatInstr ("mov", movvec));
+	}
+}
 
 ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
 	
@@ -49,6 +89,9 @@ ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & 
 	ast->itt = oppLoc [0];
 	ast->nextToken (end);
 	ASTnode ret = ast->resolveSymbol (ast->itt->iden, lhs);
+	if (!ret->isValid ()) {
+		ast->error (ast->toString (), end);
+	}
 	ast->nextToken (end);
 	return ret;
 	
@@ -63,6 +106,12 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 	ast->nextToken (oppLoc [1]);
 	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 	ast->itt = oppLoc [1];
+	ast->nextToken (end);
+	
+	if (ast->itt != end) {
+		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
+	}
+	
 	shared_ptr <ASTfunctionlist> flist = std::dynamic_pointer_cast <ASTfunctionlist> (lhs);
 	ASTnode ret;
 	std::cerr << "'" << lhs->getIden () << "'" << std::endl;
@@ -138,8 +187,19 @@ ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, co
 	ast->nextToken (oppLoc [1]);
 	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 	ast->itt = oppLoc [1];
+	ast->nextToken (end);
+	std::cerr << args [0]->getType ()->toString ("====> ") << std::endl;
+	
+	if (args [0]->isArray ()) {
+		return ASTnode (new ASTgep (args [0], params [0]));
+	}
+	
 	args.insert (args.end (), params.begin (), params.end ());
-	return ast->createCallNode (ast->findFunction (func, args), args);
+	if (ast->itt != end) {
+		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
+	} else {
+		return ast->createCallNode (ast->findFunction (func, args), args);
+	}
 	
 }
 

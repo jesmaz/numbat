@@ -1,6 +1,7 @@
 #ifndef ABSTRACT_SYNTAX_TREE_HPP
 #define ABSTRACT_SYNTAX_TREE_HPP
 
+#include "ast/astallocate.hpp"
 #include "ast/astbody.hpp"
 #include "ast/astcall.hpp"
 #include "ast/astcallerror.hpp"
@@ -10,6 +11,7 @@
 #include "ast/asterror.hpp"
 #include "ast/astfunctionlist.hpp"
 #include "ast/astfunctionpointer.hpp"
+#include "ast/astgep.hpp"
 #include "ast/astnil.hpp"
 #include "ast/astnumbatinstr.hpp"
 #include "ast/astparamater.hpp"
@@ -22,6 +24,7 @@
 #include "ast/astvariable.hpp"
 #include "ast/astwhileloop.hpp"
 #include "ast/functiondecleration.hpp"
+#include "ast/numbatpointertype.hpp"
 #include "ast/numbatrawtype.hpp"
 #include "ast/numbattype.hpp"
 #include "ast/numbatvariable.hpp"
@@ -80,6 +83,7 @@ struct AbstractSyntaxTree {
 		friend ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt);
 		friend ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt);
 		
+		friend ASTnode parseArrayDecleration (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseElementReferenceOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseFunctionCall (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseGenericArray (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
@@ -135,6 +139,8 @@ struct AbstractSyntaxTree {
 		std::vector <ASTnode> createStaticCast (const std::vector <ASTnode> & args, const std::vector <ASTnode> & types, int maxDepth=1);
 		std::vector <ASTnode> parseArgs (ASTnode (AbstractSyntaxTree::*arg)(tkitt), tkitt end);
 		std::vector <ASTnode> parseTemplateArgs (tkitt end);
+		
+		std::vector <shared_ptr <FunctionDecleration>> getFunctionList (const string & iden);
 		
 		string parseStructDecleration (tkitt end);
 		

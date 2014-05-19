@@ -4,10 +4,10 @@ namespace numbat {
 namespace parser {
 
 
-const size_t NumbatType::getSize () const {
+const size_t NumbatType::getBitSize () const {
 	size_t size=0;
 	for (const ASTnode & mem : members) {
-		size += mem->getSize ();
+		size += mem->getBitSize ();
 	}
 	return size;
 }
