@@ -91,6 +91,7 @@ Type				=>	Type [Array] [Template]
 					|	'{' TypedArgsList '}'
 					|	'type'
 					|	TypeModifier Type
+					|	TypeParamaters Paramaters
 
 TypedArgsList		=>	VariableDecl (',' VariableDecl)*
 
