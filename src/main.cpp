@@ -163,9 +163,10 @@ int main (int argl, char ** args) {
 	
 	TargetMachine::CodeGenFileType fileType = TargetMachine::CGFT_ObjectFile;
 	if (emitAssembly) {
+		link = false;
 		fileType = TargetMachine::CGFT_AssemblyFile;
 	}
-	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error));
+	OwningPtr <tool_output_file> out (new tool_output_file (".numbat.o", error));
 	if (!error.empty ()) {
 		std::cerr << error << std::endl;
 		return 1;
@@ -182,11 +183,11 @@ int main (int argl, char ** args) {
 	
 	out->keep ();
 	
-	/*if (link) {
-		
+	if (link) {
+		system (("ld .numbat.o -lc -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o " + outfile).c_str ());
 	} else {
-		
-	}*/
+		system (("mv .numbat.o " + outfile).c_str ());
+	}
 	
 	
 	/*std::string file = loadFromFile ("test.nbt");
