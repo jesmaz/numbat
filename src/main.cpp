@@ -60,7 +60,7 @@ int main (int argl, char ** args) {
 								//TODO: handle invalid options
 							}
 							break;
-						case 's':
+						case 'S':
 							emitAssembly = true;
 							break;
 						default:
