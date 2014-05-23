@@ -113,3 +113,11 @@ def I (ref testStruct ts) {int64}:
 
 def cCallbackTest @cstyle () {int64}:
 	return 1273
+
+extern def write @cstyle (int64 file, ref int8 str, int32 length) {}:
+extern def exit @cstyle (int32 e) {}:
+
+def _start () {int32}:
+	write (0, "test\n", 5)
+	exit (0)
+	return 0
