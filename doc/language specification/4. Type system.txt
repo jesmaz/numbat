@@ -55,3 +55,16 @@ typedef int32 : int
 3.5: Interface types
 
 An interface is a set of methods and attributes. Interfaces are not permitted to contain any fields. Default implementations of an interface's methods and attributes are permitted.
+
+<code language="numbat">
+interface Less
+
+# Abstract function
+def ' < ' (ref Less lhs, ref Less rhs) {bool}=0
+
+# Virtual function
+def less (ref Less lhs, ref Less rhs) {bool}:
+	return lhs < rhs
+<code>
+
+Interfaces can not be instantiated.
