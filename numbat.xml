@@ -10,6 +10,7 @@
 			<item> def </item>
 			<item> extern </item>
 			<item> import </item>
+			<item> interface </item>
 			<item> operator </item>
 			<item> struct </item>
 			<item> typedef </item>
@@ -17,6 +18,8 @@
 
 		<list name="flow">
 			<item> asm </item>
+			<item> else </item>
+			<item> if </item>
 			<item> return </item>
 			<item> while </item>
 		</list>
