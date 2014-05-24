@@ -66,3 +66,5 @@ def ' < ' (ref Less lhs, ref Less rhs) {bool}=0
 def less (ref Less lhs, ref Less rhs) {bool}:
 	return lhs < rhs
 <code>
+
+Interfaces can not be instantiated.
