@@ -75,13 +75,6 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 		
 	}
 	
-	if (type) {
-		std::cerr << type->toString () << " : ";
-	} else {
-		std::cerr << "void : ";
-	}
-	s->dump ();
-	std::cerr << std::endl;
 	return structures [type] = s;
 	
 }
@@ -113,10 +106,8 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 void BodyGenerator::makeCompare (const ASTnode & exp) {
 	exp->accept (*this);
 	Value * v = stack.top ();
-	v->dump ();
 	if (v->getType ()->isStructTy () and v->getType ()->getStructNumElements () == 1) {
 		v = builder.CreateExtractValue (v, 0);
-		v->dump ();
 	}
 	if (v->getType ()->isPointerTy ()) {
 		v = builder.CreateLoad (v);
@@ -213,14 +204,11 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 			}
 			body->accept (*this);
 			//TODO: weight calculations for inlining
-			activeFunction->dump ();
 			verifyFunction (*activeFunction);
 			if (fpm)
 				fpm->run (*activeFunction);
 		}
 	}
-	
-	module->dump ();
 	
 }
 
@@ -291,7 +279,6 @@ void BodyGenerator::visit (ASTcall & exp) {
 	}
 	ref = oldAlias;
 	
-	std::cerr << exp.toString () << std::endl;
 	stack.push (builder.CreateCall (func, args));
 	
 }
@@ -446,8 +433,6 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		exp.getArgs () [1]->accept (*this);
 		Value * rhs = stack.top (); stack.pop ();
 		ref = oldAlias;
-		lhs->getType ()->dump (); std::cerr << std::endl;
-		rhs->getType ()->dump (); std::cerr << std::endl;
 		if (rhs->getType ()->getPointerElementType ()->isPointerTy ()) {
 			rhs = builder.CreateLoad (rhs);
 		}
@@ -637,9 +622,6 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	auto rhsParam = rhsArgs.begin ();
 	for (const shared_ptr <ASTcallable> & call : exp.getCalls ()) {
 		Function * func = functions [call->getFunction ().get ()];
-		func->dump ();
-		(*lhsParam)->dump ();
-		(*rhsParam)->dump ();
 		stack.push (builder.CreateCall2 (func, *lhsParam, *rhsParam));
 		++lhsParam;
 		++rhsParam;
@@ -693,14 +675,11 @@ void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 				node->accept (*this);
 			}
 			body->accept (*this);
-			activeFunction->dump ();
 			verifyFunction (*activeFunction);
 			if (fpm)
 				fpm->run (*activeFunction);
 		}
 	}
-	
-	module->dump ();
 	
 }
 

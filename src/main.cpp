@@ -33,6 +33,7 @@ int main (int argl, char ** args) {
 	string outfile = "a.out";
 	bool emitAssembly=false;
 	bool link=true;
+	bool emitLLVM = false;
 	std::set <string> files;
 	for (int i=1; i<argl; ++i) {
 		char * str = args [i];
@@ -41,6 +42,11 @@ int main (int argl, char ** args) {
 			if (str [1] == '-') {
 				//TODO: handle options
 			} else {
+				std::cerr << "'" << str << "'" << std::endl;
+				if (std::strcmp (str, "-emit-llvm") == 0) {
+					emitLLVM = true;
+					continue;
+				}
 				for (int j=1; str [j]; ++j) {
 					switch (str[j]) {
 						case 'c':
@@ -54,7 +60,7 @@ int main (int argl, char ** args) {
 								//TODO: handle invalid options
 							}
 							break;
-						case 's':
+						case 'S':
 							emitAssembly = true;
 							break;
 						default:
@@ -137,6 +143,14 @@ int main (int argl, char ** args) {
 	Triple theTriple (mod->getTargetTriple ());
 	
 	string error;
+	
+	if (emitAssembly and emitLLVM) {
+		OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error));
+		mod->print (out->os (), nullptr);
+		out->keep ();
+		return 0;
+	}
+	
 	const Target * target = TargetRegistry::lookupTarget ("x86-64", theTriple, error);
 	if (!target) {
 		std::cerr << error << std::endl;
@@ -163,9 +177,10 @@ int main (int argl, char ** args) {
 	
 	TargetMachine::CodeGenFileType fileType = TargetMachine::CGFT_ObjectFile;
 	if (emitAssembly) {
+		link = false;
 		fileType = TargetMachine::CGFT_AssemblyFile;
 	}
-	OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error));
+	OwningPtr <tool_output_file> out (new tool_output_file (".numbat.o", error));
 	if (!error.empty ()) {
 		std::cerr << error << std::endl;
 		return 1;
@@ -182,11 +197,11 @@ int main (int argl, char ** args) {
 	
 	out->keep ();
 	
-	/*if (link) {
-		
+	if (link) {
+		system (("ld .numbat.o -lc -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o " + outfile).c_str ());
 	} else {
-		
-	}*/
+		system (("mv .numbat.o " + outfile).c_str ());
+	}
 	
 	
 	/*std::string file = loadFromFile ("test.nbt");
