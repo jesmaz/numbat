@@ -31,13 +31,9 @@ void Numbat::loadFromModule (const shared_ptr <parser::Module> & mod) {
 	mpm.add (new DataLayout(*engine->getDataLayout()));
 	mpm.add (createFunctionInliningPass ());
 	mpm.run (*module);
-	std::cerr << "Post Inline:\n\n\n";
-	module->dump ();
 	for (Function & func : module->getFunctionList ()) {
 		fpm.run (func);
 	}
-	std::cerr << "Second optimise pass:\n\n\n";
-	module->dump ();
 }
 
 void Numbat::loadFromStream (std::istream & is) {
@@ -65,13 +61,9 @@ void Numbat::loadFromTokenStr (const tkstring & tks) {
 	mpm.add (new DataLayout(*engine->getDataLayout()));
 	mpm.add (createFunctionInliningPass ());
 	mpm.run (*module);
-	std::cerr << "Post Inline:\n\n\n";
-	module->dump ();
 	for (Function & func : module->getFunctionList ()) {
 		fpm.run (func);
 	}
-	std::cerr << "Second optimise pass:\n\n\n";
-	module->dump ();
 }
 
 
