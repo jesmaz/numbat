@@ -19,7 +19,8 @@ class ASTmodule : public ASTbase {
 		virtual string getIden () const {return "module";}
 		virtual string toString (const string & indent = "") const {return indent + "module";}
 		
-		ASTnil () {}
+		ASTmodule () {}
+		ASTmodule (const shared_ptr <Module> & module) : module (module) {}
 	private:
 		shared_ptr <Module> module;
 };

@@ -12,6 +12,7 @@
 #include "ast/astfunctionlist.hpp"
 #include "ast/astfunctionpointer.hpp"
 #include "ast/astgep.hpp"
+#include "ast/astmodule.hpp"
 #include "ast/astnil.hpp"
 #include "ast/astnumbatinstr.hpp"
 #include "ast/astparamater.hpp"
