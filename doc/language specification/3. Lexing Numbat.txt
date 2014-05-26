@@ -40,9 +40,9 @@ Identifiers name program entities such as structures, functions, variables, and 
 
 Numbat has a number of identifiers reserved as keywords, they are as follows:
 <grammar>
-and  break case   continue  const     def     else   extern  false
-for  goto  if     import    interface label   nil    not     or
-true ref   return struct    switch    typedef while
+and   as   break  case   continue const     def     else    extern
+false for  goto   if     import   interface label   nil     not
+or    true ref    return struct   switch    typedef while
 </grammar>
 
 3.5: Numeric literals
