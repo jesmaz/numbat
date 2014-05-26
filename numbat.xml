@@ -17,6 +17,7 @@
 		</list>
 
 		<list name="flow">
+			<item> as </item>
 			<item> asm </item>
 			<item> else </item>
 			<item> if </item>
