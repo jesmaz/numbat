@@ -10,6 +10,7 @@ namespace lexer {
 
 enum class TOKEN {
 	atsym,
+	as,
 	assembly,
 	binary,
 	breaktkn,
