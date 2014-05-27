@@ -1170,8 +1170,9 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 
 void AbstractSyntaxTree::parseImport(tkitt end) {
 	nextToken (end);//eat 'import' token
+	shared_ptr <Module> module = nullptr;
 	if (itt->type == TOKEN::chararrayliteral) {
-		shared_ptr <Module> module = Module::importLocal ("", itt->iden);
+		module = Module::importLocal ("", itt->iden);
 		dependencies.insert (module);
 		for (auto opp : module->getOperators ()) {
 			addOperator (opp.first, *opp.second.get ());
@@ -1186,6 +1187,11 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 			statementParsers [stmt.first] = stmt.second;
 		}
 		nextToken (end);
+	}
+	if (module and itt->type == TOKEN::as) {
+		nextToken (end);//eat 'as' token
+		ASTnode type = ASTnode (new ASTmodule (module));
+		variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (itt->iden, type));
 	}
 	eatSemicolon (end);
 }
