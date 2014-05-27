@@ -1191,7 +1191,7 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 	if (module and itt->type == TOKEN::as) {
 		nextToken (end);//eat 'as' token
 		ASTnode type = ASTnode (new ASTmodule (module));
-		variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (itt->iden, type));
+		variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden));
 	}
 	eatSemicolon (end);
 }
