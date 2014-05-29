@@ -19,9 +19,16 @@ namespace parser {
 class ASTfunctionPointer;
 class NumbatType;
 
+class ASTbase;
+
+
+
+typedef shared_ptr <ASTbase> ASTnode;
+
 
 class ASTbase : public visitor::BaseVisitable {
 	public:
+		virtual const ASTnode getASTType () const {return nullptr;}
 		virtual bool isAlias () const {return false;}
 		virtual bool isArray () const {return false;}
 		virtual bool isCallable () const {return false;}
@@ -38,8 +45,6 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual string toString (const string & indent = "") const=0;
 		ASTbase () {}
 };
-
-typedef shared_ptr <ASTbase> ASTnode;
 
 class ASTlistInterface {
 	public:
