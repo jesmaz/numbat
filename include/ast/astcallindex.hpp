@@ -14,6 +14,7 @@ class ASTcallindex : public ASTbase {
 	public:
 		const shared_ptr <ASTcallable> & getCall () const {return call;}
 		const size_t getIndex () const {return index;}
+		virtual const ASTnode getASTType () const {return ref->getASTType ();}
 		virtual bool isAlias () const {return ref->isAlias ();}
 		virtual bool isConst () const {return ref->isConst ();}
 		virtual bool isValid () const {return call->isValid ();}

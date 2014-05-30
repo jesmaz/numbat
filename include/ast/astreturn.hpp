@@ -13,6 +13,7 @@ class ASTreturn : public ASTbase {
 	VISITABLE
 	public:
 		const ASTnode & getExpr () const {return expr;}
+		virtual const ASTnode getASTType () const {return expr->getASTType ();}
 		virtual bool isAlias () const {return expr->isAlias ();}
 		virtual bool isConst () const {return expr->isConst ();}
 		virtual bool isValid () const {return expr->isValid ();}

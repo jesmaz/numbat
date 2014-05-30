@@ -12,6 +12,7 @@ namespace parser {
 template <typename T>
 class ASTconstant : public ASTbase {
 	public:
+		virtual const ASTnode getASTType () const {return type;}
 		virtual bool isAlias () const {return type->isAlias ();}
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return type->isValid ();}

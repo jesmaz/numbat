@@ -14,6 +14,7 @@ class ASTgep : public ASTbase {
 	public:
 		const ASTnode & getIndex () const {return index;}
 		const ASTnode & getRef () const {return ref;}
+		virtual const ASTnode getASTType () const {if (const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (ref->getType ().get ())) {return type->getDataType ();} return nullptr;}
 		virtual bool isAlias () const {return true;}
 		virtual bool isCallable () const {return false;}
 		virtual bool isConst () const {return ref->isConst ();}
