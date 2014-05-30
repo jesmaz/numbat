@@ -8,9 +8,9 @@ namespace parser {
 const bool OperatorDecleration::OperatorMatch::treeOrder (const OperatorMatch & lhs, const OperatorMatch & rhs) {
 	if (lhs.opp->precidance == rhs.opp->precidance) {
 		if (lhs.opp->ltr) {
-			return lhs.ptr < rhs.ptr;
-		} else {
 			return lhs.ptr > rhs.ptr;
+		} else {
+			return lhs.ptr < rhs.ptr;
 		}
 	} else {
 		return lhs.opp->precidance > rhs.opp->precidance;
