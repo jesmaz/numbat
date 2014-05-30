@@ -11,7 +11,7 @@ namespace parser {
 
 struct NumbatVariable {
 	public:
-		const ASTnode & getASTtype () const {return type;}
+		const ASTnode & getASTType () const {return type;}
 		bool isAlias () const {return type->isAlias ();}
 		bool isArray () const {return type->isArray ();}
 		bool isConst () const {return type->isConst ();}
