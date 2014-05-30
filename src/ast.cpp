@@ -596,7 +596,21 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden, ASTnode parent) 
 	ASTnode ret;
 	if (parent) {
 		
-		if (parent->getType ()) {
+		if (const ASTmodule * mod = dynamic_cast <const ASTmodule *> (var->getASTType ().get ())) {
+			
+			std::vector <shared_ptr <FunctionDecleration>> funcs;
+			auto range = mod->getModule ()->getFunctions ().equal_range (iden);
+			for (auto f = range.first; f!=range.second; ++f) {
+				funcs.push_back (f->second);
+				std::cerr << "'" << f->second->getIden () << "'" << f->second->toString () << std::endl;
+			}
+			if (!funcs.empty ()) {
+				ret = ASTnode (new ASTfunctionlist (iden, funcs));
+			} else {
+				ret = ASTnode (new ASTerror ("'" + iden + "' is undefined"));
+			}
+			
+		} else if (bptr->getType ()) {
 			
 			int index = parent->getType ()->findMember (iden);
 			
