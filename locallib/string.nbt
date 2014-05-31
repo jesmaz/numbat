@@ -36,3 +36,6 @@ def length (ref CString string) {uint64}:
 	while string [count]:
 		++count
 	return count
+
+def modtest (int64 a) {int64 k}:
+	return 20

@@ -1,4 +1,4 @@
-import 'locallib/string.nbt'
+import 'locallib/string.nbt' as strlib
 
 #struct vec2 $[type T] {T i, T j}
 
@@ -92,6 +92,7 @@ def testFunc (int8 lhs, int8 rhs) {int8}:
 	a, b, c = b, c, a
 	strlen ("string")
 	strlen ("Another String")
+	strlib.modtest (14)
 	return a
 
 def tupletest () {}:
