@@ -156,6 +156,8 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 		
 	} else {
 		
+		name = "nbt." + name;
+		
 		if (funcType.size () == 1 and funcType.front ()->isVoidTy ()) {
 			retType = funcType.front ();
 		} else if (funcType.size ()) {
