@@ -81,7 +81,13 @@ const shared_ptr <Module> Module::createFromFile (const string & dir, const stri
 
 const shared_ptr <Module> Module::import (const string & file) {
 	
-	return nullptr;
+	shared_ptr <Module> mod = nullptr;
+	if (mod = createFromFile (file + ".nbt")) {
+		return mod;
+	} else {
+		std::cerr << "Could not import '" << file << "'" << std::endl;
+		return nullptr;
+	}
 	
 }
 
