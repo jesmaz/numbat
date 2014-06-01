@@ -128,6 +128,9 @@ void BodyGenerator::makeCompare (const ASTnode & exp) {
 
 void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 	
+	Function * f = functions [func];
+	if (f) return;
+	
 	std::vector <Type *> args;
 	std::string name = func->getIden ();
 	
@@ -164,7 +167,7 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 	}
 	
 	FunctionType * ft = FunctionType::get (retType, args, false);
-	Function * f = Function::Create (ft, Function::ExternalLinkage, name.c_str (), module);
+	f = Function::Create (ft, Function::ExternalLinkage, name.c_str (), module);
 	f->setCallingConv (CallingConv::C);
 	
 	size_t index=0;
