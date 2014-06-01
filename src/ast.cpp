@@ -829,7 +829,7 @@ shared_ptr <ASTcallable> AbstractSyntaxTree::findFunction (const string & iden, 
 			auto argEnd = expandedArgs.end ();
 			for (uint32_t count=0; funcBegin != funcEnd and argBegin != argEnd; ++funcBegin, ++argBegin, ++count) {
 				if (convert > 0 and (*funcBegin)->getType () != (*argBegin)->getType ()) {
-					if ((*funcBegin)->getType ()->isRaw () and (*argBegin)->getType ()->isRaw ()) {
+					if ((*funcBegin)->getType () and (*argBegin)->getType () and (*funcBegin)->getType ()->isRaw () and (*argBegin)->getType ()->isRaw ()) {
 						score += 10000 - count;
 					} else if (findFunction ((*funcBegin)->getType ()->getIden (), std::vector <ASTnode> (1, *argBegin), convert - 1)->isValid ()) {
 						score += 10000 - count;
@@ -856,7 +856,11 @@ shared_ptr <ASTcallable> AbstractSyntaxTree::findFunction (const string & iden, 
 		if (arglist != "") {
 			arglist += ", ";
 		}
-		arglist += arg->getType ()->getIden ();
+		if (arg->getType ()) {
+			arglist += arg->getType ()->getIden ();
+		} else {
+			arglist += "NO TYPE";
+		}
 	}
 	return shared_ptr <ASTcallable> (new ASTcallerror ("No sutible conversion for function: '" + iden + "' (" + arglist + ")"));
 	
