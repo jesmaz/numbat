@@ -151,7 +151,6 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 			retType = funcType.front ();
 		} else {
 			retType = Type::getVoidTy (context);
-			std::cerr << "SEVERE: cstyle function has made it to the generator" << std::endl;
 		}
 		
 	} else {
