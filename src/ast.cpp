@@ -601,8 +601,9 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden, ASTnode parent) 
 			std::vector <shared_ptr <FunctionDecleration>> funcs;
 			auto range = mod->getModule ()->getFunctions ().equal_range (iden);
 			for (auto f = range.first; f!=range.second; ++f) {
-				funcs.push_back (f->second);
-				std::cerr << "'" << f->second->getIden () << "'" << f->second->toString () << std::endl;
+				if (!f->second->hasTag ("local")) {
+					funcs.push_back (f->second);
+				}
 			}
 			if (!funcs.empty ()) {
 				ret = ASTnode (new ASTfunctionlist (iden, funcs));
