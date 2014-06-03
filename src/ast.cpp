@@ -1206,6 +1206,9 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 			statementParsers [stmt.first] = stmt.second;
 		}
 		nextToken (end);
+	} else if (itt->type == TOKEN::identifier) {
+		module = Module::import (itt->iden);
+		dependencies.insert (module);
 	}
 	if (module and itt->type == TOKEN::as) {
 		nextToken (end);//eat 'as' token
