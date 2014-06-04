@@ -1209,6 +1209,7 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 	} else if (itt->type == TOKEN::identifier) {
 		module = Module::import (itt->iden);
 		dependencies.insert (module);
+		nextToken (end);
 	}
 	if (module and itt->type == TOKEN::as) {
 		nextToken (end);//eat 'as' token
