@@ -1188,11 +1188,34 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 }
 
 void AbstractSyntaxTree::parseImport(tkitt end) {
+	
 	nextToken (end);//eat 'import' token
 	shared_ptr <Module> module = nullptr;
+	
 	if (itt->type == TOKEN::chararrayliteral) {
+		
 		module = Module::importLocal ("", itt->iden);
 		dependencies.insert (module);
+		nextToken (end);
+		
+	} else if (itt->type == TOKEN::identifier) {
+		
+		module = Module::import (itt->iden);
+		dependencies.insert (module);
+		nextToken (end);
+		
+	}
+	
+	if (module and itt->type == TOKEN::as) {
+		
+		nextToken (end);//eat 'as' token
+		ASTnode type = ASTnode (new ASTmodule (module));
+		variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden));
+		
+	}
+	
+	if (module) {
+		
 		for (auto opp : module->getOperators ()) {
 			addOperator (opp.first, *opp.second.get ());
 		}
@@ -1205,18 +1228,10 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 		for (auto stmt : module->getStatmentParsers()) {
 			statementParsers [stmt.first] = stmt.second;
 		}
-		nextToken (end);
-	} else if (itt->type == TOKEN::identifier) {
-		module = Module::import (itt->iden);
-		dependencies.insert (module);
-		nextToken (end);
-	}
-	if (module and itt->type == TOKEN::as) {
-		nextToken (end);//eat 'as' token
-		ASTnode type = ASTnode (new ASTmodule (module));
-		variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden));
+		
 	}
 	eatSemicolon (end);
+	
 }
 
 void AbstractSyntaxTree::parseOperatorDecleration (tkitt end) {
