@@ -83,6 +83,16 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 
 ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
 	
+	bool constTkn=false, ref=false;
+	while (ast->itt->type == lexer::TOKEN::typemodifier) {
+		if (ast->itt->iden == "ref") {
+			ref = true;
+		} else if (ast->itt->iden == "const") {
+			constTkn = true;
+		}
+		ast->nextToken (end);
+	}
+	
 	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
 	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
 	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
@@ -93,6 +103,20 @@ ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & 
 		ast->error (ast->toString (), end);
 	}
 	ast->nextToken (end);
+	
+	if (ASTtype * type = dynamic_cast <ASTtype *> (ret.get ())) {
+		*type = ASTtype (ref, constTkn, type->getType ());
+	}
+	
+	if (ast->itt != end) {
+		if (ast->itt->type == lexer::TOKEN::identifier) {
+			ret = ASTnode (new ASTvariable (ast->variables [ast->itt->iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (ret, ast->itt->iden))));
+		} else {
+			ret = ASTnode (new ASTerror ("Identifier expected"));
+		}
+		ast->nextToken (end);
+	}
+	
 	return ret;
 	
 }
