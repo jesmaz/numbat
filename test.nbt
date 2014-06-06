@@ -74,6 +74,8 @@ def swap (int8 lhs, int8 rhs) {int8, int8}:
 
 def testFunc (int8 lhs, int8 rhs) {int8}:
 	#vec2 $<int8> vec
+	strlib.CString strtest
+	#strlib.CString [1] strarrtest
 	int8 [10] array
 	int64 [39] array2
 	array2 [10] = 70
