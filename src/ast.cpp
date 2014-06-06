@@ -598,17 +598,24 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden, ASTnode parent) 
 		
 		if (const ASTmodule * mod = dynamic_cast <const ASTmodule *> (parent->getASTType ().get ())) {
 			
-			std::vector <shared_ptr <FunctionDecleration>> funcs;
-			auto range = mod->getModule ()->getFunctions ().equal_range (iden);
-			for (auto f = range.first; f!=range.second; ++f) {
-				if (!f->second->hasTag ("local")) {
-					funcs.push_back (f->second);
-				}
-			}
-			if (!funcs.empty ()) {
-				ret = ASTnode (new ASTfunctionlist (iden, funcs));
+			auto typ = mod->getModule ()->getTypes ().find (iden);
+			if (typ != mod->getModule ()->getTypes ().end ()) {
+				ret = ASTnode (new ASTtype (false, false, typ->second));
 			} else {
-				ret = ASTnode (new ASTerror ("'" + iden + "' is undefined"));
+			
+				std::vector <shared_ptr <FunctionDecleration>> funcs;
+				auto range = mod->getModule ()->getFunctions ().equal_range (iden);
+				for (auto f = range.first; f!=range.second; ++f) {
+					if (!f->second->hasTag ("local")) {
+						funcs.push_back (f->second);
+					}
+				}
+				if (!funcs.empty ()) {
+					ret = ASTnode (new ASTfunctionlist (iden, funcs));
+				} else {
+					ret = ASTnode (new ASTerror ("'" + iden + "' is undefined"));
+				}
+			
 			}
 			
 		} else if (parent->getType ()) {
@@ -634,11 +641,16 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden, ASTnode parent) 
 		if (var != variables.end ()) {
 			ret = ASTnode (new ASTvariable (var->second));
 		} else {
-			std::vector <shared_ptr <FunctionDecleration>> funcs = getFunctionList (iden);
-			if (!funcs.empty ()) {
-				ret = ASTnode (new ASTfunctionlist (iden, funcs));
+			auto typ = types.find (iden);
+			if (typ != types.end ()) {
+				ret = ASTnode (new ASTtype (false, false, typ->second));
 			} else {
-				ret = ASTnode (new ASTerror ("'" + iden + "' is undefined"));
+				std::vector <shared_ptr <FunctionDecleration>> funcs = getFunctionList (iden);
+				if (!funcs.empty ()) {
+					ret = ASTnode (new ASTfunctionlist (iden, funcs));
+				} else {
+					ret = ASTnode (new ASTerror ("'" + iden + "' is undefined"));
+				}
 			}
 		}
 		
