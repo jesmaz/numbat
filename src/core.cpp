@@ -41,23 +41,34 @@ ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
 }
 
 ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	ASTnode dataType = ast->parseType (oppLoc [0]);
+	
+	ASTnode dataType = ast->parseExpression (oppLoc [0]);
+	if (!dataType->isValid ()) {
+		ast->error (dataType->toString (), end);
+		return dataType;
+	}
+	
 	ast->itt = oppLoc [0];
 	ast->nextToken (oppLoc [1]);
 	auto dimentions = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
+	
 	if (1 < dimentions.size ()) {
 		return ASTnode (new ASTerror ("Multidimensional arrays are not yet supported"));
 	}
+	
 	ast->itt = oppLoc [1];
 	ast->nextToken (end);
 	const string & iden = ast->itt->iden;
 	ast->nextToken (end);
+	
 	if (ast->itt != end) {
 		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
 	} else {
+		
 		string key = dataType->toString () + " []";
 		shared_ptr <NumbatType> nbtype;
 		auto arrType = ast->types.find (key);
+		
 		if (arrType == ast->types.end ()) {
 			nbtype = ast->types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, dataType));
 			ASTnode type = ASTnode (new ASTtype (false, false, ast->generateRawType ("raw 64", 64, std::set <string> ())));
@@ -65,14 +76,17 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 		} else {
 			nbtype = arrType->second;
 		}
+		
 		ASTnode type (new ASTtype (dataType->isAlias (), dataType->isConst (), nbtype));
 		ASTnode var (new ASTvariable (ast->variables [iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, iden))));
 		ASTnode size;
+		
 		if (dimentions.size () == 1) {
 			size = dimentions [0];
 		} else {
 			size = ASTnode (new ASTnumbatInstr ("mul", dimentions));
 		}
+		
 		ASTnode alloc (new ASTallocate (size, type->getType ()));
 		std::vector <ASTnode> movvec (2);
 		movvec [0] = var;
