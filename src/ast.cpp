@@ -1223,6 +1223,7 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 		nextToken (end);//eat 'as' token
 		ASTnode type = ASTnode (new ASTmodule (module));
 		variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden));
+		nextToken (end);
 		
 	}
 	
