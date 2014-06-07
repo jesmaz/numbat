@@ -20,6 +20,7 @@ enum class TOKEN {
 	def,
 	eof,
 	elsetkn,
+	enumtkn,
 	externdef,
 	fortkn,
 	gototkn,
