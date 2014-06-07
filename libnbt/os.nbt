@@ -1,0 +1,40 @@
+# Descriptor containers
+struct filehandle {int32 handle, int32 status}
+struct sockethandle {int32 handle, int32 status}
+
+
+# File handling system functions
+extern def close @cstyle (int32 handle) {}:
+extern def dup @cstyle (int32 handle) {int32 copy}:
+extern def lseek @cstyle (int32 handle, uint64 offset, int32 whence) {int32 copy}:
+extern def open @cstyle (cstring filename, int32 flags) {int32 handle}:
+extern def read @cstyle (int32 handle, ref int8 data, int64 length) {int64 read}:
+extern def write @cstyle (int32 handle, ref int8 data, int64 length) {int64 written}:
+
+
+
+
+# File handling wrapper functions
+def close (ref filehandle handle) {}:
+	close (handle.handle)
+
+def copy (ref filehandle handle) {filehandle copy}:
+	filehandle ret
+	ret.status = handle.status
+	ret.handle = dup (handle.handle)
+	return ret
+
+def lseek (ref filehandle handle, uint64 offset, int32 whence) {uint64 result}:
+	return lseek (handle.handle, offset, whence)
+
+def open (const ref string filename, int32 flags) {filehandle handle}:
+	filehandle hand
+	hand.handle = open (filename.cstr (), int32 (flags))
+	return hand
+
+def read (ref filehandle handle, ref int8 [] data) {int64 read}:
+	return read (handle.handle, data [0], data.length)
+
+def write (ref filehandle handle, ref int8 [] data) {int64 written}:
+	return write (handle.handle, data [0], data.length)
+
