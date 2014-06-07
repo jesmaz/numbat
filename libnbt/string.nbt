@@ -1,0 +1,20 @@
+struct string {int8 [] data}
+struct cstring {ref int8 data}
+
+
+def string (ref int8 [] data) {string}:
+	string str
+	str.data = int8 [data.length + 1]
+	str.data [:] = data [:]
+	str.data [str.data.length] = 0
+	return str
+
+def string (ref string rhs) {string}
+	string str
+	str.data = rhs.data
+	return str
+
+def cstring (ref string rhs) {cstring}
+	cstring cs
+	cs.data = rhs [0]
+	return cs
