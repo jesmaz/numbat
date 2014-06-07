@@ -8,6 +8,7 @@
 
 		<list name="defs">
 			<item> def </item>
+			<item> enum </item>
 			<item> extern </item>
 			<item> import </item>
 			<item> interface </item>
