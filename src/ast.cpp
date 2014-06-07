@@ -54,6 +54,7 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 				
 			case TOKEN::import:
 				parseImport (end);
+				eatSemicolon (end);
 				break;
 				
 			case TOKEN::indent:
