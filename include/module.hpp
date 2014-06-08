@@ -59,7 +59,7 @@ struct Module {
 		
 		static std::map <string, shared_ptr <Module>> allModules;
 		static std::set <string> includeDirs;
-		mutable uint8_t valid = -1;
+		mutable int8_t valid = -1;
 		
 };
 

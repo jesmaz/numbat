@@ -60,16 +60,18 @@ const bool Module::validate () const {
 		}
 		
 		for (auto f : functions) {
-			valid &= f.second->getBody ()->isValid ();
+			if (f.second->getBody ()) {
+				valid &= f.second->getBody ()->isValid ();
+			}
 		}
 		
 		for (auto m : dependencies) {
 			valid &= m->validate ();
 		}
 		
-	} else {
-		return valid > 0;
 	}
+	
+	return valid > 0;
 	
 }
 
