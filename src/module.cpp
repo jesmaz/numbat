@@ -50,6 +50,29 @@ string joinPaths (const string & lhs, const string & rhs) {
 }
 
 
+const bool Module::validate () const {
+	
+	if (0 > valid) {
+		
+		valid = 1;
+		for (auto t : types) {
+			valid &= t.second->isValid ();
+		}
+		
+		for (auto f : functions) {
+			valid &= f.second->getBody ()->isValid ();
+		}
+		
+		for (auto m : dependencies) {
+			valid &= m->validate ();
+		}
+		
+	} else {
+		return valid > 0;
+	}
+	
+}
+
 const shared_ptr <Module> Module::createEmpty (const string & id) {
 	
 	auto itt = allModules.find (id);

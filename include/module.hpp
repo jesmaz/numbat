@@ -23,6 +23,8 @@ struct Module {
 	
 	public:
 		
+		const bool validate () const;
+		
 		const std::map <string, shared_ptr <NumbatType>> & getTypes () const {return types;}
 		const std::map <string, shared_ptr <OperatorDecleration>> & getOperators () const {return operators;}
 		const std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> & getStatmentParsers () const {return statementParsers;}
@@ -57,6 +59,7 @@ struct Module {
 		
 		static std::map <string, shared_ptr <Module>> allModules;
 		static std::set <string> includeDirs;
+		uint8_t valid = -1;
 		
 };
 
