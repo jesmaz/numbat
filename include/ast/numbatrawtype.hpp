@@ -14,6 +14,7 @@ class NumbatRawType : public NumbatType {
 		virtual const bool isFloat () const {return type == FLOAT;}
 		virtual const bool isRaw () const {return true;}
 		virtual const bool isSigned () const {return type == SIGNED;}
+		virtual const bool isValid () const {return true;}
 		virtual const size_t getBitSize () const {return size;}
 		virtual const Type getRawType () const {return type;}
 		virtual string convertDataToString (const void * data) const {size_t offset=0; return convertDataToString (data, offset);}

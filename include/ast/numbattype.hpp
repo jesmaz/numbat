@@ -16,6 +16,7 @@ class NumbatType {
 		virtual const bool isFloat () const {return false;}
 		virtual const bool isRaw () const {return false;}
 		virtual const bool isSigned () const {return false;}
+		virtual const bool isValid () const;
 		virtual const size_t getBitSize () const;
 		virtual const std::vector <ASTnode> & getMembers () const {return members;}
 		virtual const string & getIden () const {return iden;}

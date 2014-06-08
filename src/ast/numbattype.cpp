@@ -4,6 +4,14 @@ namespace numbat {
 namespace parser {
 
 
+const bool NumbatType::isValid () const {
+	bool valid = true;
+	for (auto & m : members) {
+		valid &= m->isValid ();
+	}
+	return valid;
+}
+
 const size_t NumbatType::getBitSize () const {
 	size_t size=0;
 	for (const ASTnode & mem : members) {
