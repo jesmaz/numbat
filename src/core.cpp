@@ -226,6 +226,10 @@ ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, co
 	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
 	ast->itt = oppLoc [1];
 	ast->nextToken (end);
+	
+	if (!args [0]->getType ()) {
+		return ASTnode (new ASTerror ("Invalid type"));
+	}
 	std::cerr << args [0]->getType ()->toString ("====> ") << std::endl;
 	
 	if (args [0]->isArray ()) {
