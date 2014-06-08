@@ -211,6 +211,10 @@ ASTnode AbstractSyntaxTree::createCallNode (const shared_ptr <ASTcallable> & cal
 
 ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth) {
 	
+	if (!arg->getType () or !type->getType ()) {
+		return ASTnode (new ASTerror ("Invalid type"));
+	}
+	
 	if (arg->getType () == type->getType ()) {
 		if (arg->isAlias () and !type->isAlias ()) {
 			return ASTnode (new ASTnumbatInstr ("load", std::vector <ASTnode> (1, arg)));
