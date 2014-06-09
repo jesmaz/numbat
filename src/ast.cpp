@@ -349,11 +349,6 @@ ASTnode AbstractSyntaxTree::parseExpression (tkitt end) {
 	if (itt->type == TOKEN::whitespace) nextToken (end);
 	
 	auto matches = generateOperatorMatches (end);
-	std::cerr << line << ": ";
-	for (auto m : matches) {
-		std::cerr << "'" << m.opp->getPattern () << "' ";
-	}
-	std::cerr << std::endl;
 	return parseExpression (matches, end);
 	
 }
@@ -913,7 +908,6 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 		
 		if (!brace) {
 			
-			std::cerr << "Matches: ";
 			auto oppBeg = operatorsByFirstToken.lower_bound (tkn->iden);
 			auto oppEnd = operatorsByFirstToken.upper_bound (tkn->iden);
 			for (; oppBeg != oppEnd; ++oppBeg) {
@@ -921,9 +915,7 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 				match.opp = oppBeg->second;
 				match.ptr = tkn;
 				candidates.push_back (std::make_pair (match, oppBeg->second->getPattern ().find_first_not_of (" ")));
-				std::cerr << "'" << oppBeg->second->getPattern () << "' ";
 			}
-			std::cerr << '\n';
 			
 			for (auto & cand : candidates) {
 				
