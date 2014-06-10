@@ -482,7 +482,11 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 	
 	if (itt->type == TOKEN::raw or itt->type == TOKEN::typemodifier or types.find (itt->iden) != types.end ()) {
 		ASTnode type = parseType (end);
-		return ASTnode (new ASTvariable (variables [itt->iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden))));
+		if (itt != end) {
+			return ASTnode (new ASTvariable (variables [itt->iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden))));
+		} else {
+			return type;
+		}
 	}
 	
 	const string & iden = itt->iden;
