@@ -136,7 +136,12 @@ int main (int argl, char ** args) {
 	
 	Numbat numbat;
 	for (const string & file : files) {
-		numbat.loadFromModule (parser::Module::createFromFile (file));
+		shared_ptr <parser::Module> mod = parser::Module::createFromFile (file);
+		if (!mod->validate ()) {
+			std::cerr << "Build failed" << std::endl;
+			return 0;
+		}
+		numbat.loadFromModule (mod);
 	}
 	
 	Module * mod = numbat.getModule ();
