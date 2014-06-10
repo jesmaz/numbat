@@ -908,8 +908,8 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 		
 		if (!brace) {
 			
-			auto oppBeg = operatorsByFirstToken.lower_bound (tkn->iden);
-			auto oppEnd = operatorsByFirstToken.upper_bound (tkn->iden);
+			auto oppBeg = operatorsByFirstToken.lower_bound (tkn->iden.substr (0, 1));
+			auto oppEnd = operatorsByFirstToken.upper_bound (tkn->iden.substr (0, 1));
 			for (; oppBeg != oppEnd; ++oppBeg) {
 				OperatorDecleration::OperatorMatch match;
 				match.opp = oppBeg->second;
