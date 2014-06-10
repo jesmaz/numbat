@@ -1163,6 +1163,10 @@ tkitt AbstractSyntaxTree::findToken (const string & token, tkitt tmpitt, tkitt e
 
 void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecleration & oppdec) {
 	
+	if (operators.find (pattern) != operators.end ()) {
+		return;
+	}
+	
 	shared_ptr <OperatorDecleration> opp (new OperatorDecleration (oppdec));
 	
 	operators [pattern] = opp;
