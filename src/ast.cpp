@@ -438,14 +438,32 @@ ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std:
 }
 
 ASTnode AbstractSyntaxTree::parseParameter (tkitt end) {
-	ASTnode type = parseType (end);
-	string iden = itt->iden;
-	if (itt->type != TOKEN::identifier) {
-		error ("Expected identifier", end);
-		return ASTnode (new ASTerror ("Expected identifier"));
+	
+	tkitt assign = findToken ("=", end);
+	ASTnode var = parseStatment (assign);
+	ASTnode value = nullptr;
+	
+	if (assign != end) {
+		itt = assign;
+		nextToken (end);
+		value = parseStatment (end);
 	}
-	nextToken (end); // eat identifier
-	return ASTnode (new ASTparamater (variables [iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, iden))));
+	nextToken (end);
+	
+	if (!var->isValid ()) {
+		error (var->toString (), end);
+		return var;
+	}
+	
+	ASTvariable * avar = dynamic_cast <ASTvariable *> (var.get ());
+	
+	if (avar) {
+		return ASTnode (new ASTparamater (avar->getVariable()));
+	} else {
+		error ("Incomplete parameter", end);
+		return var;
+	}
+	
 }
 
 ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector <ASTnode> * args) {
