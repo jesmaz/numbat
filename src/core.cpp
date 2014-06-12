@@ -81,7 +81,20 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 		ASTnode var (new ASTvariable (ast->variables [iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, iden))));
 		ASTnode size;
 		
-		if (dimentions.size () == 1) {
+		bool zero = false;
+		for (const ASTnode & n : dimentions) {
+			if (ASTconstantInt * ci = dynamic_cast <ASTconstantInt *> (n.get ())) {
+				zero |= !ci->getValue ();
+			}
+		}
+		
+		if (zero) {
+			return var;
+		}
+		
+		if (dimentions.empty ()) {
+			return var;
+		} else if (dimentions.size () == 1) {
 			size = dimentions [0];
 		} else {
 			size = ASTnode (new ASTnumbatInstr ("mul", dimentions));
