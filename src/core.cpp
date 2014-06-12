@@ -127,7 +127,7 @@ ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & 
 	ast->nextToken (end);
 	ASTnode ret = ast->resolveSymbol (ast->itt->iden, lhs);
 	if (!ret->isValid ()) {
-		ast->error (ast->toString (), end);
+		ast->error (ret->toString (), end);
 	}
 	ast->nextToken (end);
 	
