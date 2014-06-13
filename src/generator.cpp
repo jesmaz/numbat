@@ -91,7 +91,12 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 		
 		Type * type = getType (var->getType().get ());
 		//TODO: apply type modifiers
-		hand = createEntryBlockAlloc (activeFunction, type, var->getIden ());
+		
+		if (var->isGlobal()) {
+			hand = new GlobalVariable (*module, type, var->isConst (), GlobalValue::ExternalLinkage, GlobalValue::getNullValue (type), var->getIden ());
+		} else {
+			hand = createEntryBlockAlloc (activeFunction, type, var->getIden ());
+		}
 		namedValues [var] = hand;
 		
 	}
