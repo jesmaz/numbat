@@ -1084,6 +1084,26 @@ string AbstractSyntaxTree::parseStructDecleration (tkitt end) {
 	
 }
 
+tkitt AbstractSyntaxTree::findBlockEnd (tkitt end) {
+	
+	int level=0;
+	thitt tkn = itt;
+	while (tkn != end) {
+		if (tkn->type == TOKEN::end) {
+			if (!level) {
+				break;
+			} else {
+				--level;
+			}
+		} else if (tkn->type == TOKEN::def or statementParsers.find (tkn->iden) != statementParsers.end ()) {
+			++level;
+		}
+		++tkn;
+	}
+	return tkn;
+	
+}
+
 tkitt AbstractSyntaxTree::findIndent (const int level, tkitt end) {
 	auto found = itt;
 	while (indentLevel > level and found != end) {

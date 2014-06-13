@@ -145,6 +145,7 @@ struct AbstractSyntaxTree {
 		
 		string parseStructDecleration (tkitt end);
 		
+		tkitt findBlockEnd (tkitt end);
 		tkitt findIndent (const int level, tkitt end);
 		tkitt findLastToken (const string & token, tkitt end) {return findLastToken (token, itt, end);}
 		tkitt findLastToken (const string & token, tkitt beg, tkitt end);
