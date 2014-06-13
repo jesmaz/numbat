@@ -122,7 +122,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 				t.type = TOKEN::def;
 			} else if (buffer == "else") {
 				t.type = TOKEN::elsetkn;
-			} else if (buffer == "else") {
+			} else if (buffer == "enum") {
 				t.type = TOKEN::enumtkn;
 			} else if (buffer == "extern") {
 				t.type = TOKEN::externdef;
