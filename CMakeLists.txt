@@ -14,7 +14,7 @@ execute_process(COMMAND llvm-config --cppflags OUTPUT_VARIABLE LLVM_FLAGS OUTPUT
 include_directories(${LLVM_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/include")
 link_directories(${LLVM_LIBRARY_DIRS})
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3 ${LLVM_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11 ${LLVM_FLAGS}")
 
 
 FILE(GLOB_RECURSE sources "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")

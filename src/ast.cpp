@@ -1087,7 +1087,7 @@ string AbstractSyntaxTree::parseStructDecleration (tkitt end) {
 tkitt AbstractSyntaxTree::findBlockEnd (tkitt end) {
 	
 	int level=0;
-	thitt tkn = itt;
+	tkitt tkn = itt;
 	while (tkn != end) {
 		if (tkn->type == TOKEN::end) {
 			if (!level) {
