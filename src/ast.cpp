@@ -112,7 +112,7 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 	
 }
 
-ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end, defBinaryImp defImp) {
 	
 	const ASTtuple * tupleLhs = dynamic_cast <const ASTtuple *> (lhs.get ());
 	const ASTtuple * tupleRhs = dynamic_cast <const ASTtuple *> (rhs.get ());

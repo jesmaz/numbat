@@ -57,6 +57,7 @@ namespace parser {
 
 const size_t pointerSize = 8;
 
+typedef ASTnode (*defBinaryImp)(AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end);
 typedef lexer::tkstring::const_iterator tkitt;
 
 
@@ -101,7 +102,7 @@ struct AbstractSyntaxTree {
 		
 	private:
 		
-		ASTnode createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end);
+		ASTnode createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end, defBinaryImp defImp=nullptr);
 		ASTnode createCallNode (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args);
 		ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth=1);
 		ASTnode createTuple (const ASTnode & lhs, const ASTnode & rhs);
