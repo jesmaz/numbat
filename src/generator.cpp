@@ -581,7 +581,7 @@ void BodyGenerator::visit (ASTstructIndex & exp) {
 		Value * iptr = builder.CreatePtrToInt (val, Type::getInt64Ty (context));
 		Type * type = getType (members [exp.getIndex ()]);
 		Value * dataiptr = builder.CreateSub (iptr, oset);
-		Value * dptr = builder.CreateIntToPtr (dataiptr, type);
+		Value * dptr = builder.CreateIntToPtr (dataiptr, type->getPointerTo ());
 		if (ref) {
 			stack.push (dptr);
 		} else {
