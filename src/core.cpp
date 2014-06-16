@@ -4,6 +4,60 @@ namespace numbat {
 namespace parser {
 
 
+ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+	
+	ASTnode trhs = rhs;
+	if (lhs->getType () != rhs->getType ()) {
+		return ASTnode (new ASTerror ("Type mismatch (todo: sutible type conversions)"));
+	}
+	
+	if (lhs->getType ()->isArray ()) {
+		
+		ASTnode length = ASTnode (new ASTstructIndex (0, rhs));
+		ASTnode type = ASTnode (new ASTtype (false, false, length->getType ()));
+		ASTnode index = ASTnode (new ASTvariable (std::shared_ptr <NumbatVariable> (new NumbatVariable (length->getASTType (), "index"))));
+		
+		std::vector <ASTnode> args (2);
+		args [0] = index;
+		args [1] = length;
+		ASTnode cond = ASTnode (new ASTnumbatInstr ("cmplt", args));
+		
+		args [0] = index;
+		args [1] = ASTnode (new ASTconstantInt (type, 1));
+		ASTnode incr = ASTnode (new ASTnumbatInstr ("add", args));
+		
+		args [1] = ASTnode (new ASTconstantInt (type, 0));
+		ASTnode zero = ASTnode (new ASTnumbatInstr ("mov", args));
+		
+		ASTnode geplhs = ASTnode (new ASTgep (lhs, index));
+		ASTnode geprhs = ASTnode (new ASTgep (rhs, index));
+		args [0] = ast->createBinaryCall (func, geplhs, geprhs, end, defAssign);
+		args [1] = incr;
+		ASTnode body = ASTnode (new ASTbody (args));
+		ASTnode loop = ASTnode (new ASTwhileloop (cond, body));
+		
+		args [0] = lhs;
+		args [1] = ASTnode (new ASTallocate (length, geplhs->getType ()));
+		ASTnode alloc = ASTnode (new ASTnumbatInstr ("mov", args));
+		
+		args [0] = alloc;
+		args [1] = zero;
+		args.push_back (loop);
+		return ASTnode (new ASTbody (args));
+		
+	} else if (lhs->getType ()->isRaw ()) {
+		std::vector <ASTnode> args (2);
+		args [0] = lhs;
+		args [1] = trhs;
+		return ASTnode (new ASTnumbatInstr ("mov", args));
+	} else {
+		std::vector <ASTnode> instr;
+		return ASTnode (new ASTerror ("NYI"));
+	}
+	
+}
+
+
 ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt end) {
 	tkitt scolon;
 	ASTnode exp = nullptr;
@@ -106,6 +160,24 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 		movvec [1] = alloc;
 		return ASTnode (new ASTnumbatInstr ("mov", movvec));
 	}
+}
+
+ASTnode parseAssignmentOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	
+	return parseBinary (ast, func, oppLoc, matches, end, defAssign);
+	
+}
+
+ASTnode parseBinary (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end, defBinaryImp defImpl) {
+	
+	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
+	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
+	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
+	ast->itt = oppLoc [0];
+	ast->nextToken (end);
+	ASTnode rhs = ast->parseExpression (matches, end);
+	return ast->createBinaryCall (func, lhs, rhs, end, defImpl);
+	
 }
 
 ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
@@ -219,13 +291,7 @@ ASTnode parseGenericArray (AbstractSyntaxTree * ast, const string & func, const 
 
 ASTnode parseGenericBinary (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
 	
-	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
-	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
-	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
-	ast->itt = oppLoc [0];
-	ast->nextToken (end);
-	ASTnode rhs = ast->parseExpression (matches, end);
-	return ast->createBinaryCall (func, lhs, rhs, end);
+	return parseBinary (ast, func, oppLoc, matches, end, nullptr);
 	
 }
 

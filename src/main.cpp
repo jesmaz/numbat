@@ -121,7 +121,7 @@ int main (int argl, char ** args) {
 	
 	core->insertOperator (1500, true, " , ", parser::parseTupleOperator);
 	
-	core->insertOperator (1600, false, " = ", parser::parseGenericBinary);
+	core->insertOperator (1600, false, " = ", parser::parseAssignmentOperator);
 	core->insertOperator (1600, false, " += ", parser::parseGenericBinary);
 	core->insertOperator (1600, false, " -= ", parser::parseGenericBinary);
 	core->insertOperator (1600, false, " *= ", parser::parseGenericBinary);
