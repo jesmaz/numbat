@@ -37,7 +37,7 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 		ASTnode loop = ASTnode (new ASTwhileloop (cond, body));
 		
 		args [0] = lhs;
-		args [1] = ASTnode (new ASTallocate (length, geplhs->getType ()));
+		args [1] = ASTnode (new ASTallocate (length, lhs->getType ()));
 		ASTnode alloc = ASTnode (new ASTnumbatInstr ("mov", args));
 		
 		args [0] = alloc;
