@@ -116,6 +116,7 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 	
 	const ASTtuple * tupleLhs = dynamic_cast <const ASTtuple *> (lhs.get ());
 	const ASTtuple * tupleRhs = dynamic_cast <const ASTtuple *> (rhs.get ());
+	//TODO: default implementations for tuples
 	
 	if (tupleLhs and tupleRhs) {
 		
@@ -196,7 +197,12 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		std::vector <ASTnode> args (2);
 		args [0] = lhs;
 		args [1] = rhs;
-		return createCallNode (findFunction (func, args), args);
+		shared_ptr <ASTcallable> call = findFunction (func, args);
+		if (!call->isValid () and defImp) {
+			return defImp (this, func, lhs, rhs, end);
+		} else {
+			return createCallNode (call, args);
+		}
 		
 	}
 	
