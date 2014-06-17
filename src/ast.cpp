@@ -223,7 +223,7 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 	
 	if (arg->getType () == type->getType ()) {
 		if (arg->isAlias () and !type->isAlias ()) {
-			return ASTnode (new ASTnumbatInstr ("load", std::vector <ASTnode> (1, arg)));
+			return ASTnode (new ASTnumbatInstr ("load", std::vector <ASTnode> (1, arg), type));
 		}
 		//TODO: type modifier considerations
 		return arg;
@@ -232,7 +232,7 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 	if (arg->getType ()->isRaw () and type->getType ()->isRaw ()) {
 		std::vector <ASTnode> args;
 		args.push_back (arg); args.push_back (type);
-		return ASTnode (new ASTnumbatInstr ("cast", args));
+		return ASTnode (new ASTnumbatInstr ("cast", args, type));
 	}
 	
 	if (maxDepth > 1) {
@@ -286,6 +286,7 @@ ASTnode AbstractSyntaxTree::createTuple (const ASTnode & lhs, const ASTnode & rh
 	
 }
 
+//TODO: remove this feature
 ASTnode AbstractSyntaxTree::parseAssembly (const string & type, const string & code) {
 	
 	tkitt oldItt = itt;
@@ -303,7 +304,7 @@ ASTnode AbstractSyntaxTree::parseAssembly (const string & type, const string & c
 		string instr = itt->iden;
 		nextToken (end);
 		auto args = parseArgs (&AbstractSyntaxTree::parsePrimaryExpression, end);
-		node = ASTnode (new ASTnumbatInstr (instr, args));
+		node = ASTnode (new ASTnumbatInstr (instr, args, args [0]));
 		
 	} else {
 		

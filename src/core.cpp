@@ -20,14 +20,14 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 		std::vector <ASTnode> args (2);
 		args [0] = index;
 		args [1] = length;
-		ASTnode cond = ASTnode (new ASTnumbatInstr ("cmplt", args));
+		ASTnode cond = ASTnode (new ASTnumbatInstr ("cmplt", args, ASTnode (new ASTtype (false, false, ast->generateRawType ("raw 1", 1, std::set <string> ())))));
 		
 		args [0] = index;
 		args [1] = ASTnode (new ASTconstantInt (type, 1));
-		ASTnode incr = ASTnode (new ASTnumbatInstr ("add", args));
+		ASTnode incr = ASTnode (new ASTnumbatInstr ("add", args, index));
 		
 		args [1] = ASTnode (new ASTconstantInt (type, 0));
-		ASTnode zero = ASTnode (new ASTnumbatInstr ("mov", args));
+		ASTnode zero = ASTnode (new ASTnumbatInstr ("mov", args, index));
 		
 		ASTnode geplhs = ASTnode (new ASTgep (lhs, index));
 		ASTnode geprhs = ASTnode (new ASTgep (rhs, index));
@@ -38,7 +38,7 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 		
 		args [0] = lhs;
 		args [1] = ASTnode (new ASTallocate (length, lhs->getType ()));
-		ASTnode alloc = ASTnode (new ASTnumbatInstr ("mov", args));
+		ASTnode alloc = ASTnode (new ASTnumbatInstr ("mov", args, lhs));
 		
 		args [0] = alloc;
 		args [1] = zero;
@@ -49,7 +49,7 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 		std::vector <ASTnode> args (2);
 		args [0] = lhs;
 		args [1] = trhs;
-		return ASTnode (new ASTnumbatInstr ("mov", args));
+		return ASTnode (new ASTnumbatInstr ("mov", args, lhs));
 	} else {
 		std::vector <ASTnode> instr;
 		return ASTnode (new ASTerror ("NYI"));
@@ -152,14 +152,14 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 		} else if (dimentions.size () == 1) {
 			size = dimentions [0];
 		} else {
-			size = ASTnode (new ASTnumbatInstr ("mul", dimentions));
+			size = ASTnode (new ASTnumbatInstr ("mul", dimentions, dimentions [0]));
 		}
 		
 		ASTnode alloc (new ASTallocate (size, type->getType ()));
 		std::vector <ASTnode> movvec (2);
 		movvec [0] = var;
 		movvec [1] = alloc;
-		return ASTnode (new ASTnumbatInstr ("mov", movvec));
+		return ASTnode (new ASTnumbatInstr ("mov", movvec, var));
 	}
 }
 
@@ -367,7 +367,7 @@ ASTnode parseRedirectOperator (AbstractSyntaxTree * ast, const string & func, co
 	ast->itt = oppLoc [0];
 	ast->nextToken (end);
 	args [1] = ast->parseExpression (matches, end);
-	return ASTnode (new ASTnumbatInstr ("redir", args));
+	return ASTnode (new ASTnumbatInstr ("redir", args, args [0]));
 	
 }
 
