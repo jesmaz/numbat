@@ -91,12 +91,12 @@ int main (int argl, char ** args) {
 	core->insertOperator (300, false, "not ", parser::parseGenericUnaryPrefix);
 	core->insertOperator (300, false, "~ ", parser::parseGenericUnaryPrefix);
 	
-	core->insertOperator (500, true, " * ", parser::parseGenericBinary);
-	core->insertOperator (500, true, " / ", parser::parseGenericBinary);
-	core->insertOperator (500, true, " % ", parser::parseGenericBinary);
+	core->insertOperator (500, true, " * ", parser::parseArithmeticOperator);
+	core->insertOperator (500, true, " / ", parser::parseArithmeticOperator);
+	core->insertOperator (500, true, " % ", parser::parseArithmeticOperator);
 	
-	core->insertOperator (600, true, " + ", parser::parseGenericBinary);
-	core->insertOperator (600, true, " - ", parser::parseGenericBinary);
+	core->insertOperator (600, true, " + ", parser::parseArithmeticOperator);
+	core->insertOperator (600, true, " - ", parser::parseArithmeticOperator);
 	
 	core->insertOperator (700, true, " << ", parser::parseGenericBinary);
 	core->insertOperator (700, true, " >> ", parser::parseGenericBinary);

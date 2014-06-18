@@ -4,6 +4,57 @@ namespace numbat {
 namespace parser {
 
 
+const std::map <string, string> instructions = [] {
+	std::map <string, string> mp;
+	mp [" * "] = "mul";
+	mp [" / "] = "div";
+	mp [" % "] = "rem";
+	
+	mp [" + "] = "add";
+	mp [" - "] = "sub";
+	
+	mp [" << "] = "shl";
+	mp [" >> "] = "shr";
+	
+	mp [" & "] = "and";
+	
+	mp [" | "] = "or";
+	
+	mp [" ^ "] = "xor";
+	
+	mp [" < "] = "cmplt";
+	mp [" <= "] = "cmple";
+	mp [" > "] = "cmpgt";
+	mp [" >= "] = "cmpge";
+	
+	mp [" == "] = "cmpe";
+	mp [" != "] = "cmpne";
+	return mp;
+}();
+
+
+ASTnode defArithmetic (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+	
+	if (lhs->getType ()->isRaw ()) {
+		
+		auto itt = instructions.find (func);
+		string instr = (lhs->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		
+		ASTnode trhs = rhs;
+		if (lhs->getType () != rhs->getType ()) {
+			trhs = ast->createStaticCast (rhs, lhs, 1);
+		}
+		std::vector <ASTnode> args (2);
+		args [0] = lhs;
+		args [1] = trhs;
+		return ASTnode (new ASTnumbatInstr (instr, args, lhs));
+		
+	} else {
+		return ASTnode (new ASTerror ("No suitable function found"));
+	}
+	
+}
+
 ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
 	
 	ASTnode trhs = rhs;
@@ -93,6 +144,11 @@ ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
 		ast->itt = end;
 	}
 	return node;
+}
+
+
+ASTnode parseArithmeticOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	return parseBinary (ast, func, oppLoc, matches, end, defArithmetic);
 }
 
 ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {

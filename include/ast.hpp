@@ -82,6 +82,7 @@ struct AbstractSyntaxTree {
 			return str;
 		}
 		
+		friend ASTnode defArithmetic (AbstractSyntaxTree *, const string &, const ASTnode &, const ASTnode &, tkitt);
 		friend ASTnode defAssign (AbstractSyntaxTree *, const string &, const ASTnode &, const ASTnode &, tkitt);
 		
 		friend ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt);
