@@ -8,7 +8,8 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 	
 	ASTnode trhs = rhs;
 	if (lhs->getType () != rhs->getType ()) {
-		return ASTnode (new ASTerror ("Type mismatch (todo: sutible type conversions)"));
+		trhs = ast->createStaticCast (rhs, lhs, 1);
+		//return ASTnode (new ASTerror ("Type mismatch: (" + lhs->toString () + ", " + rhs->toString () + ") (todo: sutible type conversions)"));
 	}
 	
 	if (lhs->getType ()->isArray ()) {
