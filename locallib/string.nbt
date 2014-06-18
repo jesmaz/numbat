@@ -8,7 +8,8 @@ extern def free @cstyle @free (ref uint8 ptr) {}:
 
 
 def ' [ ]' (ref CString string, uint64 index) {ref uint8}:
-	ref uint8 chars => string.chars
+	ref uint8 chars
+	chars => string.chars
 	return asm 'numbat' : 'gep chars, index'
 
 def ' + ' (CString lhs, CString rhs) {CString}:

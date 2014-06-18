@@ -1,3 +1,5 @@
+import string
+
 # Descriptor containers
 struct filehandle {int32 handle, int32 status}
 struct sockethandle {int32 handle, int32 status}
@@ -29,7 +31,7 @@ def lseek (ref filehandle handle, uint64 offset, int32 whence) {uint64 result}:
 
 def open (const ref string filename, int32 flags) {filehandle handle}:
 	filehandle hand
-	hand.handle = open (filename.cstr (), int32 (flags))
+	hand.handle = open (filename.cstring (), flags)
 	return hand
 
 def read (ref filehandle handle, ref int8 [] data) {int64 read}:

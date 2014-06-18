@@ -1,4 +1,7 @@
-import 'locallib/string.nbt' as strlib
+import 'locallib/math.nbt' as math
+#import 'locallib/string.nbt' as strlib
+import 'libnbt/string.nbt' as strlib
+#import 'libnbt/os.nbt' as os
 
 #struct vec2 $[type T] {T i, T j}
 
@@ -74,8 +77,8 @@ def swap (int8 lhs, int8 rhs) {int8, int8}:
 
 def testFunc (int8 lhs, int8 rhs) {int8}:
 	#vec2 $<int8> vec
-	strlib.CString strtest
-	strlib.CString [1] strarrtest
+	strlib.string strtest
+	strlib.cstring [1] strarrtest
 	int8 [10] array
 	int64 [39] array2
 	array2 [10] = 70
@@ -87,14 +90,14 @@ def testFunc (int8 lhs, int8 rhs) {int8}:
 	while i:
 		i = i + 1
 	int8 b
-	int64 c
+	int64 c = 9 - 1
 	c = b
 	b = func ((a + b) * lhs + rhs * 2)
 	a = max (a, b)
 	a, b, c = b, c, a
 	strlen ("string")
 	strlen ("Another String")
-	strlib.modtest (14)
+	#strlib.modtest (14)
 	return a
 
 def tupletest () {}:
