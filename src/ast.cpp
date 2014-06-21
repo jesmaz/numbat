@@ -230,9 +230,13 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 	}
 	
 	if (arg->getType ()->isRaw () and type->getType ()->isRaw ()) {
-		std::vector <ASTnode> args;
-		args.push_back (arg); args.push_back (type);
-		return ASTnode (new ASTnumbatInstr ("cast", args, type));
+		if (arg->getType ()->getBitSize () != type->getType ()->getBitSize () or arg->getType ()->isFloat () != type->getType ()->isFloat ()) {
+			std::vector <ASTnode> args;
+			args.push_back (arg); args.push_back (type);
+			return ASTnode (new ASTnumbatInstr ("cast", args, type));
+		} else {
+			return arg;
+		}
 	}
 	
 	if (maxDepth > 1) {
@@ -499,7 +503,7 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 		const string & str = itt->iden;
 		nextToken (end);
 		std::set <string> meta; meta.insert ("sint");
-		return ASTnode (new ASTconstantCString (ASTnode (new ASTtype (true, true, generateRawType ("raw 8", 8, meta))), str));
+		return ASTnode (new ASTconstantCString (ASTnode (new ASTtype (true, true, types ["uint8"])), str));
 	} else if (itt->type == TOKEN::nil) {
 		nextToken (end);
 		return ASTnode (new ASTnil ());
