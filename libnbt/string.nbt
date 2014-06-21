@@ -1,7 +1,3 @@
-typedef raw 8 @sint : int8
-typedef raw 8 @uint : uint8
-typedef raw 64 @uint : uint64
-
 struct string {int8 [0] data}
 struct cstring {ref int8 data}
 

@@ -1,21 +1,3 @@
-typedef raw 1 @uint : bool
-
-typedef raw 8 @sint : int8
-typedef raw 16 @sint : int16
-typedef raw 32 @sint : int32
-typedef raw 64 @sint : int64
-
-typedef raw 8 @uint : uint8
-typedef raw 16 @uint : uint16
-typedef raw 32 @uint : uint32
-typedef raw 64 @uint : uint64
-
-typedef raw 16 @fint : half
-typedef raw 32 @fint : float
-typedef raw 64 @fint : double
-typedef raw 128 @fint : quad
-
-
 def '++ ' (ref uint64 arg) {uint64}:
 	arg += 1
 	return arg

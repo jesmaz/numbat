@@ -134,6 +134,28 @@ int main (int argl, char ** args) {
 	core->insertOperator (1600, false, " |= ", parser::parseGenericBinary);
 	core->insertOperator (1600, false, " => ", parser::parseRedirectOperator);
 	
+	
+	auto createType = [&] (const string & iden, size_t s, parser::NumbatRawType::Type t) {
+		core->insertType (iden, shared_ptr <parser::NumbatType> (new parser::NumbatRawType (iden, s, t)));
+	};
+	
+	createType ("bool", 1, parser::NumbatRawType::UNSIGNED);
+	
+	createType ("uint8", 8, parser::NumbatRawType::UNSIGNED);
+	createType ("uint16", 16, parser::NumbatRawType::UNSIGNED);
+	createType ("uint32", 32, parser::NumbatRawType::UNSIGNED);
+	createType ("uint64", 64, parser::NumbatRawType::UNSIGNED);
+	
+	createType ("int8", 8, parser::NumbatRawType::SIGNED);
+	createType ("int16", 16, parser::NumbatRawType::SIGNED);
+	createType ("int32", 32, parser::NumbatRawType::SIGNED);
+	createType ("int64", 64, parser::NumbatRawType::SIGNED);
+	
+	createType ("half", 16, parser::NumbatRawType::FLOAT);
+	createType ("float", 32, parser::NumbatRawType::FLOAT);
+	createType ("double", 64, parser::NumbatRawType::FLOAT);
+	createType ("quad", 128, parser::NumbatRawType::FLOAT);
+	
 	Numbat numbat;
 	for (const string & file : files) {
 		shared_ptr <parser::Module> mod = parser::Module::createFromFile (file);
