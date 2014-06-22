@@ -7,7 +7,7 @@ Associativity		=>	'ltr'
 
 BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'or' | ',' | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
 
-Block				=>	(<indent> TopLevelExpression ; [TopLevelExpression ;]*)*
+Block				=>	'{' (TopLevelExpression;)* '}'
 
 Call				=>	Arguments
 					|	Lvalue [Template] Arguments
@@ -36,7 +36,7 @@ ExternDecl			=>	'extern' FunctionDecl
 
 FloatLiteral		=>	['0' ... '9']* '.' ('0' ... '9')+ [('e' | 'E') ['+' | '-'] ('0' ... '9')+] ['f' | 'F' | 'h' | 'H' | 'q' | 'Q']
 
-FunctionDecl		=>	'def' FunctionID MetaTag* [Template] Paramaters [TypeParamaters] ':' Block
+FunctionDecl		=>	'def' [Template] FunctionID MetaTag* Paramaters ['->' Paramaters] Block
 
 FunctionID			=>	Identifier
 					|	CharArrayLiteral
@@ -84,9 +84,9 @@ StringLiteral		=>	<string double quotes>
 
 StructDecl			=>	struct Identifier MetaTag* [Template] TypeParamaters ;
 
-Template			=>	'${' [ TypedArgsList ] '}'
+Template			=>	'[' [ TypedArgsList ] ']'
 
-Type				=>	Type [Array] [Template]
+Type				=>	[Template] Type [Array]
 					|	Identifier
 					|	'{' TypedArgsList '}'
 					|	'type'
