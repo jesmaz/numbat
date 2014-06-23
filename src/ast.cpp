@@ -878,8 +878,13 @@ shared_ptr <ASTcallable> AbstractSyntaxTree::findFunction (const string & iden, 
 			auto argBegin = expandedArgs.begin ();
 			auto argEnd = expandedArgs.end ();
 			for (uint32_t count=0; funcBegin != funcEnd and argBegin != argEnd; ++funcBegin, ++argBegin, ++count) {
-				if (convert > 0 and (*funcBegin)->getType () != (*argBegin)->getType ()) {
-					if ((*funcBegin)->getType () and (*argBegin)->getType () and (*funcBegin)->getType ()->isRaw () and (*argBegin)->getType ()->isRaw ()) {
+				if (convert > 0 and (*funcBegin)->getType () != (*argBegin)->getType () and (*funcBegin)->getType () and (*argBegin)->getType ()) {
+					
+					bool raw = (*funcBegin)->getType ()->isRaw () and (*argBegin)->getType ()->isRaw ();
+					if (raw and (*funcBegin)->getType ()->getBitSize () == (*argBegin)->getType ()->getBitSize () and (*funcBegin)->getType ()->isFloat () == (*argBegin)->getType ()->isFloat ()) {
+					} else if ((*funcBegin)->isAlias () and !(*funcBegin)->isConst ()) {
+						fail = true;
+					} else if (raw) {
 						score += 10000 - count;
 					} else if (findFunction ((*funcBegin)->getType ()->getIden (), std::vector <ASTnode> (1, *argBegin), convert - 1)->isValid ()) {
 						score += 10000 - count;
