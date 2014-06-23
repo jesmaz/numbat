@@ -20,62 +20,34 @@ struct mn {ref int64 t}
 #	int8 j = vec.j
 #	return i * i + j * j
 
-extern def strlen @cstyle (ref int8 str) {int32}:
-extern def sin @cstyle (double d) {double}:
+extern def strlen @cstyle (ref int8 str) -> (int32)
+extern def sin @cstyle (double d) -> (double)
 
-def ' = ' (ref bool lhs, bool rhs) {bool}:
-	asm 'numbat' : 'mov lhs, rhs'
-	return lhs
-
-def ' = ' (ref int8 lhs, int8 rhs) {int8}:
-	asm 'numbat' : 'mov lhs, rhs'
-	return lhs
-
-def ' = ' (ref int64 lhs, int64 rhs) {int64}:
-	asm 'numbat' : 'mov lhs, rhs'
-	return lhs
-
-def ' = ' (ref double lhs, double rhs) {double}:
-	asm 'numbat' : 'mov lhs, rhs'
-	return lhs
-
-#def ' = ' $<type T> (ref T lhs, T rhs) : {T}
-#	asm 'numbat' : 'mov lhs, rhs'
-#	return lhs
-
-def ' * ' (int8 lhs, int8 rhs) {int8}:
-	return asm 'numbat' : 'mul lhs, rhs'
-
-def ' < ' @cstyle (int8 lhs, int8 rhs) {bool}:
+def ' < ' @cstyle (int8 lhs, int8 rhs) -> (bool)
 	return asm 'numbat' : 'cmplt lhs, rhs'
 
-def ' + ' (int8 lhs, int8 rhs) {int8}:
-	return asm 'numbat' : 'add lhs, rhs'
 
-def ' + ' (double lhs, double rhs) {double}:
-	return asm 'numbat' : 'fadd lhs, rhs'
-
-def redir (ref mn a, ref int64 t) {}:
+def redir (ref mn a, ref int64 t)
 	a.t => t
 	return
 
-def func (int8 num) {int8}:
+def func (int8 num) -> (int8)
 	return num
 
-def max (int8 a, int8 b) {int8}:
+def max (int8 a, int8 b) -> (int8)
 	bool cond = a < b
 	while cond:
 		return b
 	return a
 
-def test () {int8}:
+def test () -> (int8)
 	int8 n = 90
 	return n
 
-def swap (int8 lhs, int8 rhs) {int8, int8}:
+def swap (int8 lhs, int8 rhs) -> (int8, int8)
 	return rhs, lhs
 
-def testFunc (int8 lhs, int8 rhs) {int8}:
+def testFunc (int8 lhs, int8 rhs) -> (int8)
 	#vec2 $<int8> vec
 	strlib.string strtest
 	strlib.cstring [1] strarrtest
@@ -100,30 +72,30 @@ def testFunc (int8 lhs, int8 rhs) {int8}:
 	#strlib.modtest (14)
 	return a
 
-def tupletest () {}:
+def tupletest ()
 	int8 a
 	int8 b
 	a, b = swap (a, b)
 	return
 
-def tfunc (ref int64 t) {}:
+def tfunc (ref int64 t)
 	t = 40
 	return
 
-def tfunc (ref double t) {}:
+def tfunc (ref double t)
 	t = sin (40)
 	return
 
-def I (ref testStruct ts) {int64}:
+def I (ref testStruct ts) -> (int64)
 	return ts.i
 
-def cCallbackTest @cstyle () {int64}:
+def cCallbackTest @cstyle () -> (int64)
 	return 1273
 
-extern def write @cstyle (int64 file, ref int8 str, int32 length) {}:
-extern def exit @cstyle (int32 e) {}:
+extern def write @cstyle (int64 file, ref int8 str, int32 length)
+extern def exit @cstyle (int32 e)
 
-def _start () {int32}:
+def _start () -> (int32)
 	write (0, "test\n", 5)
 	exit (0)
 	return 0

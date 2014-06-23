@@ -1,20 +1,16 @@
-def '++ ' (ref uint64 arg) {uint64}:
+def '++ ' (ref uint64 arg) -> (uint64)
 	arg += 1
 	return arg
 
 
-def ' + ' (uint64 lhs, uint64 rhs) {uint64}:
-	return asm 'numbat' : 'add lhs, rhs'
-
-
-def ' = ' (ref uint8 lhs, uint8 rhs) {uint8}:
+def ' = ' (ref uint8 lhs, uint8 rhs) -> (uint8)
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-def ' = ' (ref uint64 lhs, uint64 rhs) {uint64}:
+def ' = ' (ref uint64 lhs, uint64 rhs) -> (uint64)
 	asm 'numbat' : 'mov lhs, rhs'
 	return lhs
 
-def ' += ' (ref uint64 lhs, uint64 rhs) {uint64}:
+def ' += ' (ref uint64 lhs, uint64 rhs) -> (uint64)
 	lhs = (lhs + rhs)
 	return lhs
