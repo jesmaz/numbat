@@ -42,7 +42,7 @@ ASTnode defArithmetic (AbstractSyntaxTree * ast, const string & func, const ASTn
 		
 		ASTnode trhs = rhs;
 		if (lhs->getType () != rhs->getType ()) {
-			trhs = ast->createStaticCast (rhs, lhs, 1);
+			trhs = ast->createStaticCast (std::vector <ASTnode> (1, rhs), std::vector <ASTnode> (1, lhs), 1) [0];
 		}
 		std::vector <ASTnode> args (2);
 		args [0] = lhs;
@@ -59,7 +59,7 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 	
 	ASTnode trhs = rhs;
 	if (lhs->getType () != rhs->getType ()) {
-		trhs = ast->createStaticCast (rhs, lhs, 1);
+		trhs = ast->createStaticCast (std::vector <ASTnode> (1, rhs), std::vector <ASTnode> (1, lhs), 1) [0];
 		//return ASTnode (new ASTerror ("Type mismatch: (" + lhs->toString () + ", " + rhs->toString () + ") (todo: sutible type conversions)"));
 	}
 	
