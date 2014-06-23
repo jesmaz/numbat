@@ -774,56 +774,42 @@ FunctionDecleration * AbstractSyntaxTree::parseFunctionDecleration (tkitt end) {
 	
 	bool success = true;
 	
+	if (itt->iden == "[") {
+		nextToken (end);
+		//TODO: parse template args
+		itt = findToken ("]", end);
+		nextToken (end);
+	}
+	
 	iden = itt->iden;
 	nextToken (end);
 	
-	if (itt->iden == "$") {
-		templateArgs = parseTemplateArgs (end);
-	}
-	
 	metaTags = parseMetaTags (end);
 	
-	if (itt->iden != "(") {
-		error ("'(' expected after '" + iden + "'", end);
-		success = false;
-	} else {
+	if (itt->iden == "(") {
 		nextToken (end);
 		tkitt argEnd = findToken (")", end);
 		args = parseArgs (& AbstractSyntaxTree::parseParameter, argEnd);
 		nextToken (end);
+	} else {
+		//TODO: fail
 	}
-	//bool success = parseFunctionPrototype (args, iden, findToken (":", end));
 	
-	auto found = functions.find (iden);
-	if (found != functions.end ()) {
-		if (found->second->getArgs () == args) {
-			error ("Function already declared", end);
-			success = false;
+	if (itt->iden == "-" and (nextToken (end), itt->iden == ">")) {
+		nextToken (end);
+		if (itt->iden == "(") {
+			nextToken (end);
+			tkitt argEnd = findToken (")", end);
+			type = parseArgs (&AbstractSyntaxTree::parseType, argEnd);
+			nextToken (end);
+		} else {
+			//TODO: fail
 		}
 	}
 	
 	if (success) {
-		
-		if (itt->iden == "{") {
-			nextToken (end); // eat '{' token
-			tkitt argEnd = findToken ("}", end);
-			type = parseArgs (&AbstractSyntaxTree::parseType, argEnd);
-			nextToken (end); // eat '}' token
-			
-			if (metaTags.count ("cstyle") and type.size () > 1) {
-				error ("Function is decleared cstyle but has multiple reuturn values", end);
-			}
-			
-		}
-		
 		decl = new FunctionDecleration (iden, args, type, metaTags);
 		functions.insert (std::make_pair (iden, unique_ptr <FunctionDecleration> (decl)));
-	}
-	
-	if (itt->iden != ":") {
-		error ("Exppected ':' after function decleration", end);
-	} else {
-		nextToken (end); // eat ':' token
 	}
 	
 	return decl;
