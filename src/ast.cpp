@@ -552,6 +552,9 @@ ASTnode AbstractSyntaxTree::parseStatment (tkitt end) {
 		++beg;
 	}
 	if (tkn.iden != "") reParse += tkn;
+	tkn.iden = "eof";
+	tkn.type = TOKEN::eof;
+	reParse += tkn;
 	
 	/*tkitt tk = reParse.begin ();
 	tkitt tkend = reParse.end ();
@@ -561,17 +564,18 @@ ASTnode AbstractSyntaxTree::parseStatment (tkitt end) {
 	std::cerr << std::endl;*/
 	
 	itt = reParse.begin ();
+	tkitt rpend = lexer::findEOF (reParse.begin (), reParse.end ());
 	ASTnode node;
 	
 	if (itt->type == TOKEN::ret) {
 		nextToken (end);
-		if (itt == reParse.end ()) {
+		if (itt == rpend) {
 			node = ASTnode (new ASTreturnvoid ());
 		} else {
-			node = ASTnode (new ASTreturn (parseExpression (reParse.end ())));
+			node = ASTnode (new ASTreturn (parseExpression (rpend)));
 		}
 	} else {
-		node = parseExpression (reParse.end ());
+		node = parseExpression (rpend);
 	}
 	itt = end;
 	return node;
