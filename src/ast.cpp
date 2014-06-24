@@ -42,7 +42,13 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
 					int oldIndent = indentLevel;
 					funcReparse.push_back (std::make_pair (funcDec, std::make_pair (indentLevel, itt)));
 					eatSemicolon (end);
-					itt = findIndent (oldIndent, end);
+					if (itt->iden == "{") {
+						nextToken (end);
+						itt = findToken ("}", end);
+						nextToken (end);
+					} else {
+						itt = findIndent (oldIndent, end);
+					}
 				}
 				break;
 				
@@ -326,23 +332,26 @@ ASTnode AbstractSyntaxTree::parseBody (tkitt end) {
 	auto oldVariables = variables;
 	size_t level = indentLevel;
 	eatSemicolon (end);
-	end = findIndent (level, end);
-	tkitt scolon;
-	std::vector <ASTnode> exprs;
-	/*while ((scolon = findToken (";", end)) != end) {
-		ASTnode node = parseStatment (scolon);
-		eatSemicolon (end);
-		if (node) {
-			exprs.push_back (node);
+	tkitt bend;
+	if (itt->iden == "{") {
+		nextToken (end);
+		bend = findToken ("}", end);
+		if (bend == end) {
+			itt = findIndent (level, end);
+			error ("Expected '}'", end);
 		}
-	}*/
-	while (itt != end) {
+	} else {
+		bend = findIndent (level, end);
+	}
+	
+	std::vector <ASTnode> exprs;
+	while (itt != bend) {
 		auto func = statementParsers.find (itt->iden);
 		ASTnode exp = nullptr;
 		if (func != statementParsers.end ()) {
-			exp = func->second (this, end);
+			exp = func->second (this, bend);
 		} else {
-			exp = parser::parseExpression (this, end);
+			exp = parser::parseExpression (this, bend);
 		}
 		exprs.push_back (exp);
 	}

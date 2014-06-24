@@ -123,26 +123,18 @@ ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt end) {
 }
 
 ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
-	tkitt colon;
+	ast->nextToken (end);  // Eat 'while' token
 	ASTnode node = nullptr;
-	if ((colon = ast->findToken (":", end)) != end) {
-		ast->nextToken (colon);
-		if (ast->itt != colon) {
-			node = ast->parseStatment (colon);
-		}
-		if (!node) {
-			//TODO: handle a lack of a condition (infinite loop?)
-			return node;
-		}
-		if (node->isCallable ()) {
-			shared_ptr <ASTcallable> call = std::dynamic_pointer_cast <ASTcallable> (node);
-			node = ASTnode (new ASTcallindex (call, 0));
-		}
+	if (ast->itt->iden == "(") {
 		ast->nextToken (end);
-		node = ASTnode (new ASTwhileloop (node, ast->parseBody (end)));
+		tkitt cend = ast->findToken (")", end);
+		node = ast->parseStatment (cend);
+		ast->itt = cend;
+		ast->nextToken (end);
 	} else {
-		ast->itt = end;
+		return ASTnode (new ASTerror ("Expected '('"));
 	}
+	node = ASTnode (new ASTwhileloop (node, ast->parseBody (end)));
 	return node;
 }
 
