@@ -102,7 +102,7 @@ struct AbstractSyntaxTree {
 		friend ASTnode parseTupleOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		
 		AbstractSyntaxTree () {}
-		AbstractSyntaxTree (tkitt beg, tkitt end);
+		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "");
 		
 	private:
 		
@@ -174,6 +174,8 @@ struct AbstractSyntaxTree {
 		tkitt itt;
 		
 		size_t line = 0;
+		
+		string path;
 		
 		std::map <string, shared_ptr <NumbatType>> types;
 		std::map <string, shared_ptr <NumbatVariable>> variables;

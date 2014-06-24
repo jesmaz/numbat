@@ -11,7 +11,7 @@ namespace parser {
 //std::unordered_set <string> AbstractSyntaxTree::parenOpperators, AbstractSyntaxTree::oppTokens, AbstractSyntaxTree::ternaryStart;
 
 
-AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end) {
+AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & path) : path (path) {
 	
 	shared_ptr <Module> core = Module::createEmpty ("numbat core");
 	for (auto opp : core->getOperators ()) {
