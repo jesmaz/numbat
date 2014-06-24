@@ -8,7 +8,11 @@ bool ASTbody::isValid () const {
 
 	bool b=true;
 	for (const ASTnode & n : body) {
-		b &= n->isValid ();
+		if (n) {
+			b &= n->isValid ();
+		} else {
+			return false;
+		}
 	}
 	return b;
 	
