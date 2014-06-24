@@ -355,6 +355,8 @@ ASTnode AbstractSyntaxTree::parseBody (tkitt end) {
 		}
 		exprs.push_back (exp);
 	}
+	nextToken (end);
+	eatSemicolon (end);
 	variables = oldVariables;
 	return ASTnode (new ASTbody (exprs));
 }
