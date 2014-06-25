@@ -42,7 +42,7 @@ struct Module {
 		static const shared_ptr <Module> createFromFile (const string & file);
 		static const shared_ptr <Module> createFromFile (const string & dir, const string & file);
 		static const shared_ptr <Module> import (const string & file);
-		static const shared_ptr <Module> importLocal (const string & dir, const string & file);
+		static const shared_ptr <Module> import (const string & dir, const string & file);
 		
 	protected:
 	private:

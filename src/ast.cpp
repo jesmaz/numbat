@@ -1266,13 +1266,13 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 	
 	if (itt->type == TOKEN::chararrayliteral) {
 		
-		module = Module::importLocal ("", itt->iden);
+		module = Module::createFromFile (path, itt->iden);
 		dependencies.insert (module);
 		nextToken (end);
 		
 	} else if (itt->type == TOKEN::identifier) {
 		
-		module = Module::import (itt->iden);
+		module = Module::import (path, itt->iden);
 		dependencies.insert (module);
 		nextToken (end);
 		

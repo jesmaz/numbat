@@ -92,7 +92,8 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 		return itt->second;
 	}
 	tkstring tks = loadFromFile (file);
-	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()));
+	size_t pos = file.find_last_of ("/");
+	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0));
 	std::cerr << ast.toString () << std::endl;
 	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ()));
 	
@@ -116,10 +117,9 @@ const shared_ptr <Module> Module::import (const string & file) {
 	
 }
 
-const shared_ptr <Module> Module::importLocal (const string & dir, const string & file) {
+const shared_ptr <Module> Module::import (const string & dir, const string & file) {
 	
-	//TODO: error checking
-	return createFromFile (dir, file);
+	return import (joinPaths (dir, file));
 	
 }
 
