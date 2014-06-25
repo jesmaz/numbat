@@ -173,7 +173,8 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 		auto arrType = ast->types.find (key);
 		
 		if (arrType == ast->types.end ()) {
-			nbtype = ast->types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, dataType));
+			ASTnode rawDataType = ASTnode (new ASTtype (false, false, dataType->getType ()));
+			nbtype = ast->types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, rawDataType));
 			ASTnode type = ASTnode (new ASTtype (false, false, ast->generateRawType ("raw 64", 64, std::set <string> ())));
 			ASTnode param = ASTnode (new ASTparamater (shared_ptr <NumbatVariable> (new NumbatVariable (type, "length"))));
 			nbtype->buildData (std::vector <ASTnode> (1, param));
