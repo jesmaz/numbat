@@ -16,6 +16,7 @@ enum class TOKEN {
 	breaktkn,
 	casetkn,
 	chararrayliteral,
+	colon,
 	continuetkn,
 	def,
 	eof,
