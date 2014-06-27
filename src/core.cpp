@@ -193,9 +193,7 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 			}
 		}
 		
-		if (zero) {
-			return var;
-		}
+		std::vector <ASTnode> bodyvec (2);
 		
 		if (dimentions.empty ()) {
 			return var;
@@ -205,11 +203,26 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 			size = ASTnode (new ASTnumbatInstr ("mul", dimentions, dimentions [0]));
 		}
 		
-		ASTnode alloc (new ASTallocate (size, type->getType ()));
+		if (zero) {
+			return var;
+		} else {
+			
+			ASTnode alloc (new ASTallocate (size, type->getType ()));
+			std::vector <ASTnode> movvec (2);
+			movvec [0] = var;
+			movvec [1] = alloc;
+			
+			bodyvec [0] = ASTnode (new ASTnumbatInstr ("mov", movvec, var));
+			
+		}
+		
 		std::vector <ASTnode> movvec (2);
-		movvec [0] = var;
-		movvec [1] = alloc;
-		return ASTnode (new ASTnumbatInstr ("mov", movvec, var));
+		movvec [0] = ASTnode (new ASTstructIndex (0, var));;
+		movvec [1] = size;
+		bodyvec [1] = ASTnode (new ASTnumbatInstr ("mov", movvec, size));
+		
+		return ASTnode (new ASTbody (bodyvec));
+		
 	}
 }
 
