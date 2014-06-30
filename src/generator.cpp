@@ -329,7 +329,24 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 
 void BodyGenerator::visit (ASTconstantCString & exp) {
 	
-	stack.push (builder.CreateGlobalStringPtr (exp.getValue ()));
+	Type * arrType = getType (exp.getType ().get ());
+	std::vector <Type *> members (exp.getValue ().size () + 2, arrType->getPointerElementType ());
+	std::vector <Constant *> string (exp.getValue ().size () + 2);
+	string [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, exp.getValue ().size ()));
+	for (size_t i=1, l=exp.getValue ().size ()+1; i<l; ++i) {
+		string [i] = ConstantInt::get (Type::getInt8Ty (context), APInt (8, exp.getValue () [i-1]));
+	}
+	string [exp.getValue ().size ()+1] = ConstantInt::get (Type::getInt8Ty (context), APInt (8, 0));
+	members [0] = Type::getInt64Ty (context);
+	
+	StructType * type = StructType::get (context, members);
+	Constant * value = ConstantStruct::get (type, string);
+	GlobalVariable * str = new GlobalVariable (*module, type, true, GlobalValue::ExternalLinkage, value, "str");
+	
+	Value * gep = builder.CreateStructGEP (str, 1, "gep");
+	Value * alloca = createEntryBlockAlloc (activeFunction, gep->getType (), "cstr");
+	Value * store = builder.CreateStore (gep, alloca);
+	stack.push (alloca);
 	
 }
 

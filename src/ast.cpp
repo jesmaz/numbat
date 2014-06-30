@@ -533,8 +533,8 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 	} else if (itt->type == TOKEN::stringliteral) {
 		const string & str = itt->iden;
 		nextToken (end);
-		std::set <string> meta; meta.insert ("sint");
-		return ASTnode (new ASTconstantCString (ASTnode (new ASTtype (true, true, types ["uint8"])), str));
+		ASTnode type = createArrayType (ASTnode (new ASTtype (false, true, types ["int8"])), 1);
+		return ASTnode (new ASTconstantCString (type, str));
 	} else if (itt->type == TOKEN::nil) {
 		nextToken (end);
 		return ASTnode (new ASTnil ());
