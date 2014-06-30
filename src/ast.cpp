@@ -118,6 +118,26 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & pat
 	
 }
 
+ASTnode AbstractSyntaxTree::createArrayType (const ASTnode& dataType, size_t dimentions) {
+	
+	string key = dataType->toString () + " []";
+	shared_ptr <NumbatType> nbtype;
+	auto arrType = types.find (key);
+	
+	if (arrType == types.end ()) {
+		ASTnode rawDataType = ASTnode (new ASTtype (false, false, dataType->getType ()));
+		nbtype = types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, rawDataType));
+		ASTnode type = ASTnode (new ASTtype (false, false, generateRawType ("raw 64", 64, std::set <string> ())));
+		ASTnode param = ASTnode (new ASTparamater (shared_ptr <NumbatVariable> (new NumbatVariable (type, "length"))));
+		nbtype->buildData (std::vector <ASTnode> (1, param));
+	} else {
+		nbtype = arrType->second;
+	}
+	
+	return ASTnode (new ASTtype (dataType->isAlias (), dataType->isConst (), nbtype));
+	
+}
+
 ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end, defBinaryImp defImp) {
 	
 	const ASTtuple * tupleLhs = dynamic_cast <const ASTtuple *> (lhs.get ());

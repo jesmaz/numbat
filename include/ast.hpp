@@ -106,6 +106,7 @@ struct AbstractSyntaxTree {
 		
 	private:
 		
+		ASTnode createArrayType (const ASTnode & dataType, size_t dimentions);
 		ASTnode createBinaryCall (const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end, defBinaryImp defImp=nullptr);
 		ASTnode createCallNode (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args);
 		ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth=1);

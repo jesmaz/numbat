@@ -168,21 +168,7 @@ ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, co
 		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
 	} else {
 		
-		string key = dataType->toString () + " []";
-		shared_ptr <NumbatType> nbtype;
-		auto arrType = ast->types.find (key);
-		
-		if (arrType == ast->types.end ()) {
-			ASTnode rawDataType = ASTnode (new ASTtype (false, false, dataType->getType ()));
-			nbtype = ast->types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, rawDataType));
-			ASTnode type = ASTnode (new ASTtype (false, false, ast->generateRawType ("raw 64", 64, std::set <string> ())));
-			ASTnode param = ASTnode (new ASTparamater (shared_ptr <NumbatVariable> (new NumbatVariable (type, "length"))));
-			nbtype->buildData (std::vector <ASTnode> (1, param));
-		} else {
-			nbtype = arrType->second;
-		}
-		
-		ASTnode type (new ASTtype (dataType->isAlias (), dataType->isConst (), nbtype));
+		ASTnode type = ast->createArrayType (dataType, dimentions.size ());
 		ASTnode var (new ASTvariable (ast->variables [iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, iden))));
 		ASTnode size;
 		
