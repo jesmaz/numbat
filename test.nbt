@@ -69,8 +69,8 @@ def testFunc (int8 lhs, int8 rhs) -> (int8) {
 	b = func ((a + b) * lhs + rhs * 2)
 	a = max (a, b)
 	a, b, c = b, c, a
-	strlen ("string")
-	strlen ("Another String")
+	#strlen ("string")
+	#strlen ("Another String")
 	#strlib.modtest (14)
 	return a
 }
@@ -113,6 +113,7 @@ def _start @cstyle () -> (int32) {
 	arr [5] = 10
 	os.filehandle fh
 	fh.handle = 0
+	os.write (fh, "Why ")
 	os.write (fh, arr)
 	#os.write (0, "Text\n\n", 6)
 	exit (0)
