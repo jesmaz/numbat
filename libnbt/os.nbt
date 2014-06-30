@@ -8,7 +8,7 @@ struct sockethandle {int32 handle, int32 status}
 # File handling system functions
 extern def close @cstyle (int32 handle)
 extern def dup @cstyle (int32 handle) -> (int32 copy)
-extern def lseek @cstyle (int32 handle, uint64 offset, int32 whence) -> (int32 copy)
+extern def lseek @cstyle (int32 handle, uint64 offset, int32 whence) -> (uint64 pos)
 extern def open @cstyle (cstring filename, int32 flags) -> (int32 handle)
 extern def read @cstyle (int32 handle, ref int8 data, int64 length) -> (int64 read)
 extern def write @cstyle (int32 handle, ref int8 data, int64 length) -> (int64 written)
@@ -17,8 +17,8 @@ extern def write @cstyle (int32 handle, ref int8 data, int64 length) -> (int64 w
 
 
 # File handling wrapper functions
-def close (ref filehandle handle)
-	close (handle.handle)
+#def close (ref filehandle handle)
+#	close (handle.handle)
 
 def copy (ref filehandle handle) -> (filehandle copy)
 	filehandle ret
@@ -31,12 +31,12 @@ def lseek (ref filehandle handle, uint64 offset, int32 whence) -> (uint64 result
 
 def open (const ref string filename, int32 flags) -> (filehandle handle)
 	filehandle hand
-	hand.handle = open (filename.cstring (), flags)
+	#hand.handle = open (filename.cstring (), flags)
 	return hand
 
-def read (ref filehandle handle, ref int8 [] data) -> (int64 read)
+def read (ref filehandle handle, ref int8 [0] data) -> (int64 read)
 	return read (handle.handle, data [0], data.length)
 
-def write (ref filehandle handle, ref int8 [] data) -> (int64 written)
+def write (ref filehandle handle, ref int8 [0] data) -> (int64 written)
 	return write (handle.handle, data [0], data.length)
 
