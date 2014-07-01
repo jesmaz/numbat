@@ -30,6 +30,7 @@ std::string next (const char * source, size_t & pos, size_t length) {
             ++pos;
             while (pos < length and !(last != '\\' and source [pos] == quote)) {
                 str += source [pos];
+				last = source [pos];
                 ++pos;
             }
             if (pos < length) {
