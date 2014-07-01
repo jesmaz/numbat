@@ -113,7 +113,7 @@ def _start @cstyle () -> (int32) {
 	arr [5] = 10
 	os.filehandle fh
 	fh.handle = 0
-	os.write (fh, "Why ")
+	os.write (fh, "Why \n\"")
 	os.write (fh, arr)
 	#os.write (0, "Text\n\n", 6)
 	exit (0)
