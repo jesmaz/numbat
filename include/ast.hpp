@@ -149,6 +149,7 @@ struct AbstractSyntaxTree {
 		
 		std::vector <shared_ptr <FunctionDecleration>> getFunctionList (const string & iden);
 		
+		string parseString (tkitt end);
 		string parseStructDecleration (tkitt end);
 		
 		tkitt findBlockEnd (tkitt end);

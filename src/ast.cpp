@@ -531,8 +531,7 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 		ASTnode type = ASTnode (new ASTtype (false, true, generateRawType (key, 64, meta)));
 		return ASTnode (new ASTconstantInt (type, amount));
 	} else if (itt->type == TOKEN::stringliteral) {
-		const string & str = itt->iden;
-		nextToken (end);
+		const string & str = parseString (end);
 		ASTnode type = createArrayType (ASTnode (new ASTtype (false, true, types ["int8"])), 1);
 		return ASTnode (new ASTconstantCString (type, str));
 	} else if (itt->type == TOKEN::nil) {
@@ -1091,6 +1090,59 @@ std::vector <shared_ptr <FunctionDecleration>> AbstractSyntaxTree::getFunctionLi
 		++func_beg;
 	}
 	return funcs;
+}
+
+string AbstractSyntaxTree::parseString (tkitt end) {
+	
+	string str;
+	bool escaped = false;
+	for (char c : itt->iden) {
+		if (escaped) {
+			switch (c) {
+				case 'a':
+					str += '\a';
+					break;
+				case 'b':
+					str += '\b';
+					break;
+				case 'f':
+					str += '\f';
+					break;
+				case 'n':
+					str += '\n';
+					break;
+				case 'r':
+					str += '\r';
+					break;
+				case 't':
+					str += '\t';
+					break;
+				case 'v':
+					str += '\v';
+					break;
+				case '\\':
+					str += '\\';
+					break;
+				case '\'':
+					str += '\'';
+					break;
+				case '\"':
+					str += '\"';
+					break;
+				case '?':
+					str += '?';
+					break;
+			}
+			escaped = false;
+		} else if (c == '\\') {
+			escaped = true;
+		} else {
+			str += c;
+		}
+	}
+	nextToken (end);
+	return str;
+	
 }
 
 string AbstractSyntaxTree::parseStructDecleration (tkitt end) {
