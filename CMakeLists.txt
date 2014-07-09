@@ -28,4 +28,5 @@ add_executable(numbat ${sources})
 target_link_libraries(numbat ${libs})
 
 install(FILES numbat.xml DESTINATION /usr/share/kde4/apps/katepart/syntax/)
+install(DIRECTORY "libnbt/" DESTINATION /usr/include/numbat)
 install(TARGETS numbat numbat-static numbat-static RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib/static)
