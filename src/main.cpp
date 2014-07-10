@@ -74,6 +74,8 @@ int main (int argl, char ** args) {
 		}
 	}
 	
+	parser::Module::addIncludeDir ("/usr/include/numbat");
+	
 	shared_ptr <parser::Module> core = parser::Module::createEmpty ("numbat core");
 	core->insertStatmentParser ("while", &numbat::parser::parseWhileLoop);
 	
