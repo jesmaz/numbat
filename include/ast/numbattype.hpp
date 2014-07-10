@@ -3,6 +3,7 @@
 
 #include "astbase.hpp"
 
+#include <set>
 #include <sstream>
 
 
@@ -12,6 +13,7 @@ namespace parser {
 
 class NumbatType {
 	public:
+		const bool hasTag (const string & tag) const {return metaTags.count (tag);}
 		virtual const bool isArray () const {return false;}
 		virtual const bool isFloat () const {return false;}
 		virtual const bool isRaw () const {return false;}
@@ -29,8 +31,10 @@ class NumbatType {
 		
 		NumbatType () {}
 		NumbatType (string iden) : iden (iden) {}
+		NumbatType (string iden, const std::set <string> & meta) : iden (iden), metaTags (meta) {}
 	private:
 		string iden;
+		std::set <string> metaTags;
 		std::vector <ASTnode> members;
 };
 
