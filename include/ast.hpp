@@ -161,6 +161,7 @@ struct AbstractSyntaxTree {
 		
 		void addOperator (const string & pattern, const OperatorDecleration & oppdec);
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
+		void importModule (const shared_ptr <Module> & module, bool extention);
 		void printError (const string & message) {buildFail = true; std::cerr << "error on line " << line << ": " << message << '\n';}
 		void parseImport (tkitt end);
 		void parseOperatorDecleration (tkitt end);

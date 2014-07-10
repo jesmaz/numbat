@@ -13,19 +13,8 @@ namespace parser {
 
 AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & path) : path (path) {
 	
-	shared_ptr <Module> core = Module::createEmpty ("numbat core");
-	for (auto opp : core->getOperators ()) {
-		addOperator (opp.first, *opp.second.get ());
-	}
-	for (auto func : core->getFunctions ()) {
-		functions.insert (func);
-	}
-	for (auto type : core->getTypes ()) {
-		types [type.first] = type.second;
-	}
-	for (auto stmt : core->getStatmentParsers()) {
-		statementParsers [stmt.first] = stmt.second;
-	}
+	importModule (Module::createEmpty ("numbat core"), true);
+	
 	
 	std::vector <std::pair <FunctionDecleration *, std::pair <size_t, tkitt>>> funcReparse;
 	std::vector <std::pair <string, tkitt>> typeReparse;
@@ -1332,6 +1321,28 @@ void AbstractSyntaxTree::addOperator (const string & pattern, const OperatorDecl
 	
 }
 
+void AbstractSyntaxTree::importModule (const shared_ptr <Module> & module, bool extention) {
+	
+	dependencies.insert (module);
+	for (auto opp : module->getOperators ()) {
+		addOperator (opp.first, *opp.second.get ());
+	}
+	for (auto func : module->getFunctions ()) {
+		//if (!func.second->hasTag ("local") or extention) {
+			functions.insert (func);
+		//}
+	}
+	for (auto type : module->getTypes ()) {
+		//if (type.second->hasTag ("export") or type.second->hasTag ("global") or extention) {
+			types [type.first] = type.second;
+		//}
+	}
+	for (auto stmt : module->getStatmentParsers()) {
+		statementParsers [stmt.first] = stmt.second;
+	}
+	
+}
+
 void AbstractSyntaxTree::parseImport(tkitt end) {
 	
 	nextToken (end);//eat 'import' token
@@ -1340,13 +1351,11 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 	if (itt->type == TOKEN::chararrayliteral) {
 		
 		module = Module::createFromFile (path, itt->iden);
-		dependencies.insert (module);
 		nextToken (end);
 		
 	} else if (itt->type == TOKEN::identifier) {
 		
 		module = Module::import (path, itt->iden);
-		dependencies.insert (module);
 		nextToken (end);
 		
 	}
@@ -1362,18 +1371,7 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 	
 	if (module) {
 		
-		for (auto opp : module->getOperators ()) {
-			addOperator (opp.first, *opp.second.get ());
-		}
-		for (auto func : module->getFunctions ()) {
-			functions.insert (func);
-		}
-		for (auto type : module->getTypes ()) {
-			types [type.first] = type.second;
-		}
-		for (auto stmt : module->getStatmentParsers()) {
-			statementParsers [stmt.first] = stmt.second;
-		}
+		importModule (module, false);
 		
 	}
 	eatSemicolon (end);
