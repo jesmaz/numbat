@@ -1,6 +1,6 @@
 Build Prerequisites:
 
-	llvm: version 3.3 or newer
+	llvm: version 3.5 or newer
 	http://llvm.org/
 
 	cmake: version 2.6 or newer
