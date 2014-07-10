@@ -52,6 +52,8 @@ string joinPaths (const string & lhs, const string & rhs) {
 
 const bool Module::validate () const {
 	
+	if (valid == -2) return false;
+	
 	if (0 > valid) {
 		
 		valid = 1;
@@ -92,6 +94,11 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 		return itt->second;
 	}
 	tkstring tks = loadFromFile (file);
+	if (tks.empty ()) {
+		Module * m = new Module;
+		m->valid = -2;
+		return shared_ptr <Module> (m);
+	}
 	size_t pos = file.find_last_of ("/");
 	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0));
 	std::cerr << ast.toString () << std::endl;
@@ -107,19 +114,23 @@ const shared_ptr <Module> Module::createFromFile (const string & dir, const stri
 
 const shared_ptr <Module> Module::import (const string & file) {
 	
-	shared_ptr <Module> mod = nullptr;
-	if (mod = createFromFile (file + ".nbt")) {
-		return mod;
-	} else {
-		std::cerr << "Could not import '" << file << "'" << std::endl;
-		return nullptr;
-	}
+	return import ("", file);
 	
 }
 
 const shared_ptr <Module> Module::import (const string & dir, const string & file) {
 	
-	return import (joinPaths (dir, file));
+	shared_ptr <Module> mod = nullptr;
+	if (-2 < (mod = createFromFile (dir, file + ".nbt"))->valid) {
+	} else {
+		for (const string & inc : includeDirs) {
+			if (-2 < (mod = createFromFile (inc, file + ".nbt"))->valid) {
+				return mod;
+			}
+		}
+		std::cerr << "Could not import '" << file << "'" << std::endl;
+	}
+	return mod;
 	
 }
 
