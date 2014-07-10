@@ -44,6 +44,8 @@ struct Module {
 		static const shared_ptr <Module> import (const string & file);
 		static const shared_ptr <Module> import (const string & dir, const string & file);
 		
+		static void addIncludeDir (const string & dir) {includeDirs.insert (dir);}
+		
 	protected:
 	private:
 		
