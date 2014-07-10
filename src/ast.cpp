@@ -1161,12 +1161,13 @@ string AbstractSyntaxTree::parseStructDecleration (tkitt end) {
 	if (itt->iden == "$") {
 		templateArgs = parseTemplateArgs (end);
 	}
-	//TODO: parse meta tags
+	
+	std::set <string> meta = parseMetaTags (end);
 	
 	if (types.find (iden) != types.end ()) {
 		error ("Struct already declared", end);
 	} else {
-		types [iden] = unique_ptr <NumbatType> (new NumbatType (iden));
+		types [iden] = unique_ptr <NumbatType> (new NumbatType (iden, meta));
 	}
 	
 	return iden;
