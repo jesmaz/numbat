@@ -79,6 +79,17 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 	
 }
 
+Value * BodyGenerator::createTemp (Value * val) {
+	
+	if (ref) {
+		Value * alloc = createEntryBlockAlloc (activeFunction, val->getType (), "temp");
+		builder.CreateStore (val, alloc);
+		val = alloc;
+	}
+	return val;
+	
+}
+
 Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 	
 	Value * hand = namedValues [var];
