@@ -60,51 +60,16 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 	ASTnode trhs = rhs;
 	if (lhs->getType () != rhs->getType ()) {
 		trhs = ast->createStaticCast (std::vector <ASTnode> (1, rhs), std::vector <ASTnode> (1, lhs), 1) [0];
-		//return ASTnode (new ASTerror ("Type mismatch: (" + lhs->toString () + ", " + rhs->toString () + ") (todo: sutible type conversions)"));
 	}
 	
-	if (lhs->getType ()->isArray ()) {
+	if (lhs->getType ()->isArray () and rhs->getType ()->isArray ()) {
 		
-		ASTnode length = ASTnode (new ASTstructIndex (0, rhs));
-		ASTnode type = ASTnode (new ASTtype (false, false, length->getType ()));
-		ASTnode index = ASTnode (new ASTvariable (std::shared_ptr <NumbatVariable> (new NumbatVariable (length->getASTType (), "index"))));
+		//TODO: Complex types, memory allocation
+		return ASTnode (new ASTmemcpy (lhs, trhs));
 		
-		std::vector <ASTnode> args (2);
-		args [0] = index;
-		args [1] = length;
-		ASTnode cond = ASTnode (new ASTnumbatInstr ("cmplt", args, ASTnode (new ASTtype (false, false, ast->generateRawType ("raw 1", 1, std::set <string> ())))));
-		
-		args [0] = index;
-		args [1] = ASTnode (new ASTconstantInt (type, 1));
-		ASTnode incr = ASTnode (new ASTnumbatInstr ("add", args, index));
-		
-		args [1] = ASTnode (new ASTconstantInt (type, 0));
-		ASTnode zero = ASTnode (new ASTnumbatInstr ("mov", args, index));
-		
-		ASTnode geplhs = ASTnode (new ASTgep (lhs, index));
-		ASTnode geprhs = ASTnode (new ASTgep (rhs, index));
-		args [0] = ast->createBinaryCall (func, geplhs, geprhs, end, defAssign);
-		args [1] = incr;
-		ASTnode body = ASTnode (new ASTbody (args));
-		ASTnode loop = ASTnode (new ASTwhileloop (cond, body));
-		
-		args [0] = lhs;
-		args [1] = ASTnode (new ASTallocate (length, lhs->getType ()));
-		ASTnode alloc = ASTnode (new ASTnumbatInstr ("mov", args, lhs));
-		
-		args [0] = alloc;
-		args [1] = zero;
-		args.push_back (loop);
-		return ASTnode (new ASTbody (args));
-		
-	} else if (lhs->getType ()->isRaw ()) {
-		std::vector <ASTnode> args (2);
-		args [0] = lhs;
-		args [1] = trhs;
-		return ASTnode (new ASTnumbatInstr ("mov", args, lhs));
 	} else {
-		std::vector <ASTnode> instr;
-		return ASTnode (new ASTerror ("NYI"));
+		//TODO: Complex types
+		return ASTnode (new ASTmemcpy (lhs, trhs));
 	}
 	
 }
