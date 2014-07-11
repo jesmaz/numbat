@@ -247,10 +247,13 @@ void BodyGenerator::visit (ASTallocate & exp) {
 	
 	size_t esize = dataLayout->getTypeAllocSize (getType (type->getDataType ()));
 	
+	bool oldRef = ref;
+	ref = true;
 	exp.getAmount ()->accept (*this);
+	ref = oldRef;
 	Value * count;
 	if (!stack.empty ()) {
-		count = stack.top (); stack.pop ();
+		count = builder.CreateLoad (stack.top ()); stack.pop ();
 	} else {
 		return;
 	}
@@ -267,7 +270,7 @@ void BodyGenerator::visit (ASTallocate & exp) {
 	
 	Type * ptrt = getType (type);
 	
-	stack.push (builder.CreateBitCast (address, ptrt));
+	stack.push (createTemp (builder.CreateBitCast (address, ptrt)));
 	
 }
 
@@ -313,18 +316,17 @@ void BodyGenerator::visit (ASTcallindex & exp) {
 		retVal = tempValues [call.get ()] = stack.top (); stack.pop ();
 	}
 	
-	if (call->getFunction ()->hasTag ("cstyle")) {
-		stack.push (retVal);
-	} else {
+	if (!call->getFunction ()->hasTag ("cstyle")) {
 		if (retVal->getType ()->isPointerTy ()) {
 			std::vector <Value *> indicies (2);
 			indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
 			indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
-			stack.push (builder.CreateGEP (retVal, indicies));
+			retVal = builder.CreateGEP (retVal, indicies);
 		} else {
-			stack.push (builder.CreateExtractValue (retVal, exp.getIndex ()));
+			retVal = builder.CreateExtractValue (retVal, exp.getIndex ());
 		}
 	}
+	stack.push (createTemp (retVal));
 	
 }
 
@@ -332,7 +334,7 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 	
 	Type * type = getType (exp.getType ().get ());
 	if (type->isIntegerTy ())
-		stack.push (ConstantInt::get (type, APInt (exp.getBitSize (), exp.getValue ())));
+		stack.push (createTemp (builder.getInt (APInt (exp.getBitSize (), exp.getValue ()))));
 	else
 		stack.push ((Value *)nullptr);
 	
@@ -364,12 +366,12 @@ void BodyGenerator::visit (ASTconstantCString & exp) {
 void BodyGenerator::visit (ASTgep & exp) {
 	
 	bool oldRef = ref;
-	ref = false;
+	ref = true;
 	exp.getRef ()->accept (*this);
-	Value * ptr = stack.top ();
+	Value * ptr = builder.CreateLoad (stack.top ());
 	stack.pop ();
 	exp.getIndex ()->accept (*this);
-	Value * index = stack.top ();
+	Value * index = builder.CreateLoad (stack.top ());
 	stack.pop ();
 	ref = oldRef;
 	
@@ -388,48 +390,53 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	const string & instr = exp.getInstr ();
 	
 	if (instr == "cast") {
+		bool oldref = ref;
+		ref = true;
 		exp.getArgs () [0]->accept (*this);
-		Value * arg = stack.top (); stack.pop ();
+		Value * arg = builder.CreateLoad (stack.top ()); stack.pop ();
 		Type * type = getType (exp.getArgs () [1]->getType ().get ());
+		Value * val;
+		ref = oldref;
 		if (arg->getType ()->isFloatingPointTy ()) {
 			if (type->isFloatingPointTy ()) {
 				if (arg->getType ()->getPrimitiveSizeInBits () < type->getPrimitiveSizeInBits ()) {
-					stack.push (builder.CreateFPExt (arg, type));
+					val = builder.CreateFPExt (arg, type);
 				} else {
-					stack.push (builder.CreateFPTrunc (arg, type));
+					val = builder.CreateFPTrunc (arg, type);
 				}
 			} else {
 				if (exp.getArgs () [1]->getType ()->isSigned ()) {
-					stack.push (builder.CreateFPToSI (arg, type));
+					val = builder.CreateFPToSI (arg, type);
 				} else {
-					stack.push (builder.CreateFPToUI (arg, type));
+					val = builder.CreateFPToUI (arg, type);
 				}
 			}
 		} else {
 			if (type->isFloatingPointTy ()) {
 				if (exp.getArgs () [0]->getType ()->isSigned ()) {
-					stack.push (builder.CreateSIToFP (arg, type));
+					val = builder.CreateSIToFP (arg, type);
 				} else {
-					stack.push (builder.CreateUIToFP (arg, type));
+					val = builder.CreateUIToFP (arg, type);
 				}
 			} else {
 				bool argSinged = exp.getArgs () [0]->getType ()->isSigned ();
 				if (argSinged) {
 					if (arg->getType ()->getPrimitiveSizeInBits () != type->getPrimitiveSizeInBits ()) {
-						stack.push (builder.CreateSExtOrTrunc (arg, type));
+						val = builder.CreateSExtOrTrunc (arg, type);
 					} else {
-						stack.push (arg);
+						val = arg;
 					}
 				} else {
 					if (arg->getType ()->getPrimitiveSizeInBits () != type->getPrimitiveSizeInBits ()) {
-						stack.push (builder.CreateZExtOrTrunc (arg, type));
+						val = builder.CreateZExtOrTrunc (arg, type);
 					} else {
-						stack.push (arg);
+						val = arg;
 					}
 				}
 				
 			}
 		}
+		stack.push (createTemp (val));
 		return;
 	} else if (instr == "gep") {
 		bool oldAlias = ref;
@@ -456,11 +463,16 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		bool oldAlias = ref;
 		ref = true;
 		exp.getArgs () [0]->accept (*this);
-		ref = oldAlias;
 		Value * lhs = stack.top (); stack.pop ();
 		exp.getArgs () [1]->accept (*this);
-		Value * rhs = stack.top (); stack.pop ();
-		stack.push (builder.CreateStore (rhs, lhs));
+		Value * rhs = builder.CreateLoad (stack.top ()); stack.pop ();
+		ref = oldAlias;
+		builder.CreateStore (rhs, lhs);
+		if (ref) {
+			stack.push (lhs);
+		} else {
+			stack.push (builder.CreateLoad (lhs));
+		}
 		return;
 	} else if (instr == "redir") {
 		bool oldAlias = ref;
@@ -482,8 +494,11 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	}
 	
 	for (const ASTnode & arg : exp.getArgs ()) {
+		bool oldRef = ref;
+		ref = true;
 		arg->accept (*this);
-		args.push_back (stack.top ()); stack.pop ();
+		args.push_back (builder.CreateLoad ((stack.top ()))); stack.pop ();
+		ref = oldRef;
 	}
 	
 	if (instr == "add") {
@@ -537,7 +552,7 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	} else if (instr == "xor") {
 		val = builder.CreateXor (args [0], args [1], instr);
 	}
-	stack.push (val);
+	stack.push (createTemp (val));
 	
 }
 
