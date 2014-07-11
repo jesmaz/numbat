@@ -156,7 +156,8 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 			shared_ptr <ASTcallable> call = findFunction (func, args);
 			calls.push_back (call);
 			if (!call->isValid ()) {
-				printError (call->toString ());
+				error (call->toString (), end);
+				continue;
 			}
 			lhsArgs.push_back (createStaticCast (args [0], call->getFunction ()->getArgs () [0]));
 			rhsArgs.push_back (createStaticCast (args [1], call->getFunction ()->getArgs () [1]));
@@ -182,6 +183,10 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 					args [1] = ASTnode (new ASTcallindex (rhsFunc, i));;
 					shared_ptr <ASTcallable> call = findFunction (func, args);
 					calls.push_back (call);
+					if (!call->isValid ()) {
+						error (call->toString (), end);
+						continue;
+					}
 					lhsArgs.push_back (createStaticCast (args [0], call->getFunction ()->getArgs () [0]));
 					rhsArgs.push_back (createStaticCast (args [1], call->getFunction ()->getArgs () [1]));
 				}
