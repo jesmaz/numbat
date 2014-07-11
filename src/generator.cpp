@@ -404,11 +404,6 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 			size_t size = dataLayout->getTypeAllocSize (getType (exp.getArrayType ()));
 			builder.CreateMemCpy (builder.CreateLoad (dest), builder.CreateLoad (source), builder.CreateMul (len, builder.getInt64 (size)), false);
 		} else {
-			source->getType ()->dump ();
-			std::cerr << std::endl;
-			dest->getType ()->dump ();
-			std::cerr << std::endl << exp.getSource ()->toString (" >> ") << std::endl;
-			std::cerr << exp.getDest ()->toString (" >> ") << std::endl;
 			builder.CreateStore (builder.CreateLoad (source), dest);
 		}
 	} else {
