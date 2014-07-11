@@ -582,6 +582,9 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		val = builder.CreateSub (args [0], args [1], instr);
 	} else if (instr == "xor") {
 		val = builder.CreateXor (args [0], args [1], instr);
+	} else {
+		std::cerr << "Invalid instruction: " + instr << std::endl;
+		exit (1);
 	}
 	stack.push (createTemp (val));
 	
