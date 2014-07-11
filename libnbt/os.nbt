@@ -13,6 +13,17 @@ extern def open @cstyle (cstring filename, int32 flags) -> (int32 handle)
 extern def read @cstyle (int32 handle, ref int8 data, int64 length) -> (int64 read)
 extern def write @cstyle (int32 handle, ref int8 data, int64 length) -> (int64 written)
 
+# Socket system functions
+extern def accept @cstyle (int32 handle, ref int8 sockaddr, ref uint32 length) -> (int32 status)
+extern def bind @cstyle (int32 handle, ref int8 sockaddr, uint32 length) -> (int32 status)
+extern def connect @cstyle (int32 handle, ref int8 sockaddr, uint32 length) -> (int32 status)
+extern def listen @cstyle (int32 handle, int32 backlog) -> (int32 status)
+extern def recv @cstyle (int32 handle, ref int8 buffer, uint64 length, uint32 flags) -> (int64 recvd)
+extern def recvfrom @cstyle (int32 handle, ref int8 buffer, uint64 length, uint32 flags, ref int8 sockaddr, ref uint32 addrlength) -> (int64 recvd)
+extern def send @cstyle (int32 handle, ref int8 buffer, uint64 length, uint32 flags) -> (int64 sent)
+extern def sendto @cstyle (int32 handle, ref int8 buffer, uint64 length, uint32 flags, ref int8 sockaddr, ref uint32 addrlength) -> (int64 sent)
+extern def socket @cstyle (int32 domain, int32 type, int32 protocol) -> (int32 handle)
+
 
 
 
@@ -40,3 +51,5 @@ def read (ref filehandle handle, ref int8 [0] data) -> (int64 read)
 def write (ref filehandle handle, ref int8 [0] data) -> (int64 written)
 	return write (handle.handle, data [0], data.length)
 
+
+# Socket wrapper functions
