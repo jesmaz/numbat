@@ -74,6 +74,29 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 	
 }
 
+ASTnode defCompare (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+	
+	if (lhs->getType ()->isRaw ()) {
+		
+		auto itt = instructions.find (func);
+		string instr = (lhs->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		
+		ASTnode trhs = rhs;
+		if (lhs->getType () != rhs->getType ()) {
+			trhs = ast->createStaticCast (std::vector <ASTnode> (1, rhs), std::vector <ASTnode> (1, lhs), 1) [0];
+		}
+		std::vector <ASTnode> args (2);
+		args [0] = lhs;
+		args [1] = trhs;
+		auto typ = ast->types.find ("bool");
+		return ASTnode (new ASTnumbatInstr (instr, args, ASTnode (new ASTtype (false, true, typ->second))));
+		
+	} else {
+		return ASTnode (new ASTerror ("No suitable function found"));
+	}
+	
+}
+
 
 ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt end) {
 	tkitt scolon;
@@ -193,6 +216,10 @@ ASTnode parseBinary (AbstractSyntaxTree * ast, const string & func, const std::v
 	ASTnode rhs = ast->parseExpression (matches, end);
 	return ast->createBinaryCall (func, lhs, rhs, end, defImpl);
 	
+}
+
+ASTnode parseComparisonOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	return parseBinary (ast, func, oppLoc, matches, end, defCompare);
 }
 
 ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {

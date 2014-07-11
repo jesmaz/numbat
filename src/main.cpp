@@ -109,13 +109,13 @@ int main (int argl, char ** args) {
 	
 	core->insertOperator (1000, true, " | ", parser::parseGenericBinary);
 	
-	core->insertOperator (1100, true, " < ", parser::parseGenericBinary);
-	core->insertOperator (1100, true, " <= ", parser::parseGenericBinary);
-	core->insertOperator (1100, true, " > ", parser::parseGenericBinary);
-	core->insertOperator (1100, true, " >= ", parser::parseGenericBinary);
+	core->insertOperator (1100, true, " < ", parser::parseComparisonOperator);
+	core->insertOperator (1100, true, " <= ", parser::parseComparisonOperator);
+	core->insertOperator (1100, true, " > ", parser::parseComparisonOperator);
+	core->insertOperator (1100, true, " >= ", parser::parseComparisonOperator);
 	
-	core->insertOperator (1200, true, " == ", parser::parseGenericBinary);
-	core->insertOperator (1200, true, " != ", parser::parseGenericBinary);
+	core->insertOperator (1200, true, " == ", parser::parseComparisonOperator);
+	core->insertOperator (1200, true, " != ", parser::parseComparisonOperator);
 	
 	core->insertOperator (1300, true, " and ", parser::parseGenericBinary);
 	
