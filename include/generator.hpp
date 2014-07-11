@@ -38,7 +38,7 @@ using namespace llvm;
 using visitor::Visitor;
 
 
-class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTallocate>, public Visitor <ASTbody>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTgep>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop> {
+class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTallocate>, public Visitor <ASTbody>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTgep>, public Visitor <ASTmemcpy>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop> {
 	public:
 		virtual void visit (AbstractSyntaxTree & exp);
 		virtual void visit (ASTallocate & exp);
@@ -49,6 +49,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		virtual void visit (ASTconstantCString & exp);
 		virtual void visit (ASTfunctionPointer & exp) {}
 		virtual void visit (ASTgep & exp);
+		virtual void visit (ASTmemcpy & exp);
 		virtual void visit (ASTnumbatInstr & exp);
 		virtual void visit (ASTparamater & exp);
 		virtual void visit (ASTrawdata & exp) {}

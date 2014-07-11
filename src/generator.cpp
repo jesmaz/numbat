@@ -383,6 +383,42 @@ void BodyGenerator::visit (ASTgep & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTmemcpy & exp) {
+	
+	bool oldRef = ref;
+	ref = true;
+	exp.getDest ()->accept (*this);
+	Value * dest = stack.top ();
+	stack.pop ();
+	exp.getSource ()->accept (*this);
+	Value * source = stack.top ();
+	stack.pop ();
+	
+	shared_ptr <ASTcallable> conv = exp.getConv ();
+	
+	if (!conv) {
+		if (ASTnode length = exp.getDest ()->getLength ()) {
+			length->accept (*this);
+			Value * len = builder.CreateLoad (stack.top ());
+			stack.pop ();
+			size_t size = dataLayout->getTypeAllocSize (getType (exp.getArrayType ()));
+			builder.CreateMemCpy (builder.CreateLoad (dest), builder.CreateLoad (source), builder.CreateMul (len, builder.getInt64 (size)), false);
+		} else {
+			source->getType ()->dump ();
+			std::cerr << std::endl;
+			dest->getType ()->dump ();
+			std::cerr << std::endl << exp.getSource ()->toString (" >> ") << std::endl;
+			std::cerr << exp.getDest ()->toString (" >> ") << std::endl;
+			builder.CreateStore (builder.CreateLoad (source), dest);
+		}
+	} else {
+		//TODO: complex data types
+	}
+	ref = oldRef;
+	stack.push (dest);
+	
+}
+
 void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	
 	Value * val = nullptr;
