@@ -3,6 +3,7 @@
 
 #include "ast/astallocate.hpp"
 #include "ast/astbody.hpp"
+#include "ast/astbranch.hpp"
 #include "ast/astcall.hpp"
 #include "ast/astcallerror.hpp"
 #include "ast/astcallindex.hpp"
