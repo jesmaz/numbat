@@ -12,6 +12,9 @@ namespace parser {
 class ASTbranch : public ASTbase {
 	VISITABLE
 	public:
+		const ASTnode & getCond () const {return cond;}
+		const ASTnode & getBody () const {return body;}
+		const ASTnode & getAlt () const {return alt;}
 		virtual bool isValid () const {return true;}
 		virtual string getIden () const {return "branch";}
 		virtual string toString (const string & indent = "") const {return indent + "branch (" + cond->toString () + ") {" + body->toString (indent + '\t') + "} {" + alt->toString (indent + '\t') + "\n}";}
