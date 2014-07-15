@@ -19,6 +19,7 @@ class ASTbody : public ASTbase {
 		
 		ASTbody () {}
 		ASTbody (std::vector <ASTnode> body) : body (body) {}
+		ASTbody (const ASTnode & body) : body (1, body) {}
 	private:
 		std::vector <ASTnode> body;
 };
