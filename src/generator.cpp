@@ -119,6 +119,29 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 	
 }
 
+Value * BodyGenerator::makeCompare (Value * val) {
+	
+	if (val->getType ()->isPointerTy ()) {
+		
+		Value * ptrint = builder.CreatePtrToInt (val, Type::getInt64Ty (context));
+		val = builder.CreateICmpNE (ptrint, builder.getInt64 (0));
+		
+	} else {
+		if (val->getType()->isStructTy ()) {
+			val = builder.CreateExtractValue (val, 0);
+			val = makeCompare (val);
+		} else if (val->getType ()->isFloatingPointTy ()) {
+			val = builder.CreateFCmpONE (val, ConstantFP::get (val->getType (), 0.0));
+		} else if (val->getType ()->isIntegerTy ()) {
+			if (val->getType ()->getIntegerBitWidth () != 1) {
+				val = builder.CreateICmpNE (val, builder.getInt (APInt (val->getType ()->getIntegerBitWidth (), 0)));
+			}
+		}
+	}
+	return val;
+	
+}
+
 void BodyGenerator::makeCompare (const ASTnode & exp) {
 	exp->accept (*this);
 	Value * v = stack.top ();
