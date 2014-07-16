@@ -16,6 +16,17 @@ const ASTnode ASTbase::getLength (const ASTnode & exp) {
 	
 }
 
+const ASTnode ASTbase::getArrayType () const {
+	
+	auto type = getType ();
+	ASTnode t = nullptr;
+	if (type) {
+		t = type->getArrayType ();
+	}
+	return t;
+	
+}
+
 ssize_t ASTbase::getLengthIndex () const {
 	
 	auto type = getType ();
