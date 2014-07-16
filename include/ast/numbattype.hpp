@@ -14,12 +14,14 @@ namespace parser {
 class NumbatType {
 	public:
 		const bool hasTag (const string & tag) const {return metaTags.count (tag);}
+		virtual const ASTnode getArrayType () const {return nullptr;}
 		virtual const bool isArray () const {return false;}
 		virtual const bool isFloat () const {return false;}
 		virtual const bool isRaw () const {return false;}
 		virtual const bool isSigned () const {return false;}
 		virtual const bool isValid () const;
 		virtual const size_t getBitSize () const;
+		virtual const ssize_t getLengthIndex () const {return -1;}
 		virtual const std::vector <ASTnode> & getMembers () const {return members;}
 		virtual const string & getIden () const {return iden;}
 		virtual string convertDataToString (const void * data) const {size_t offset=0; return convertDataToString (data, offset);}
