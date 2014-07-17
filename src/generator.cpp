@@ -310,6 +310,28 @@ void BodyGenerator::visit (ASTbody & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTbranch & exp) {
+	
+	BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
+	BasicBlock * alt = BasicBlock::Create (context, "alt", activeFunction);
+	BasicBlock * resume = BasicBlock::Create (context, "alt", activeFunction);
+	bool oldRef = ref;
+	ref = true;
+	exp.getCond ()->accept (*this);
+	Value * cond = makeCompare (builder.CreateLoad (stack.top ()));
+	stack.pop ();
+	ref = oldRef;
+	builder.CreateCondBr (cond, body, alt);
+	builder.SetInsertPoint (body);
+	exp.getBody ()->accept (*this);
+	builder.CreateBr (resume);
+	builder.SetInsertPoint (alt);
+	exp.getAlt ()->accept (*this);
+	builder.CreateBr (resume);
+	builder.SetInsertPoint (resume);
+	
+}
+
 void BodyGenerator::visit (ASTcall & exp) {
 	
 	Function * func = functions [exp.getFunction ().get ()];
