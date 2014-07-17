@@ -420,7 +420,7 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 	shared_ptr <ASTcallable> conv = exp.getConv ();
 	
 	if (!conv) {
-		if (ASTnode length = exp.getDest ()->getLength ()) {
+		if (ASTnode length = ASTbase::getLength (exp.getDest ())) {
 			length->accept (*this);
 			Value * len = builder.CreateLoad (stack.top ());
 			stack.pop ();
