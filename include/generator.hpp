@@ -84,6 +84,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		Type * getType (const NumbatType * type);
 		Value * createTemp (Value * val);
 		Value * getVariableHandle (const NumbatVariable * var);
+		Value * initialise (const NumbatType * var);
 		Value * makeCompare (Value * val);
 		void makeCompare (const ASTnode & exp);
 		void registerFunction (const FunctionDecleration * func);

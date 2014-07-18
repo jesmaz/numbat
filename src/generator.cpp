@@ -109,6 +109,7 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 			hand = createEntryBlockAlloc (activeFunction, type, var->getIden ());
 		}
 		namedValues [var] = hand;
+		builder.CreateStore (initialise (var->getType ().get ()), hand);
 		
 	}
 	
@@ -116,6 +117,31 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 		hand = builder.CreateLoad (hand, var->getIden ());
 	
 	return hand;
+	
+}
+
+Value * BodyGenerator::initialise (const NumbatType * ntype) {
+	
+	Type * ltype = getType (ntype);
+	Value * val = GlobalValue::getNullValue (ltype);
+	
+	if (ltype->isPointerTy ()) {
+		if (ntype->isArray ()) {
+			static Value * zeroArray = new GlobalVariable (*module, Type::getInt64Ty (context), true, GlobalValue::ExternalLinkage, builder.getInt64 (0), "default array");
+			Value * pint = builder.CreatePtrToInt (zeroArray, Type::getInt64Ty (context));
+			Value * cpos = builder.CreateAdd (pint, builder.getInt64 (dataLayout->getPointerSize ()));
+			val = builder.CreateIntToPtr (cpos, ltype);
+		} else {
+			//Maybe point to something useful?
+		}
+	} else if (ltype->isStructTy ()) {
+		std::vector <uint32_t> index (1, 0);
+		for (ASTnode arg : ntype->getMembers ()) {
+			val = builder.CreateInsertValue (val, initialise (arg->getType ().get ()), index);
+			++(index [0]);
+		}
+	}
+	return val;
 	
 }
 
