@@ -65,7 +65,20 @@ ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode 
 	if (lhs->getType ()->isArray () and rhs->getType ()->isArray ()) {
 		
 		//TODO: Complex types, memory allocation
-		return ASTnode (new ASTmemcpy (lhs, trhs));
+		std::vector <ASTnode> args (2);
+		ASTnode compare = defCompare (ast, " < ", ASTbase::getLength (lhs), ASTbase::getLength (rhs), end);
+		args [0] = lhs;
+		args [1] = ASTnode (new ASTallocate (ASTbase::getLength (rhs), rhs->getType ()));
+		ASTnode mov (new ASTnumbatInstr ("mov", args, lhs));
+		args [0] = ASTbase::getLength (lhs);
+		args [1] = ASTbase::getLength (rhs);
+		ASTnode smv (new ASTnumbatInstr ("mov", args, ASTbase::getLength (rhs)));
+		args [0] = mov;
+		args [1] = smv;
+		ASTnode branch (new ASTbranch (compare, ASTnode (new ASTbody (args))));
+		args [0] = branch;
+		args [1] = ASTnode (new ASTmemcpy (lhs, trhs));
+		return ASTnode (new ASTbody (args));
 		
 	} else {
 		//TODO: Complex types
