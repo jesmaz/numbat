@@ -833,7 +833,12 @@ FunctionDecleration * AbstractSyntaxTree::parseFunctionDecleration (tkitt end) {
 	
 	if (success) {
 		decl = new FunctionDecleration (iden, args, type, metaTags);
-		functions.insert (std::make_pair (iden, unique_ptr <FunctionDecleration> (decl)));
+		shared_ptr <FunctionDecleration> fptr (decl);
+		functions.insert (std::make_pair (iden, fptr));
+		auto type = types.find (iden);
+		if (type != types.end ()) {
+			type->second->addConstructor (fptr);
+		}
 	}
 	
 	return decl;
