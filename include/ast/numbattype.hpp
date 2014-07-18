@@ -2,6 +2,7 @@
 #define NUMBATTYPE_HPP
 
 #include "astbase.hpp"
+#include "functiondecleration.hpp"
 
 #include <set>
 #include <sstream>
@@ -14,6 +15,8 @@ namespace parser {
 class NumbatType {
 	public:
 		const bool hasTag (const string & tag) const {return metaTags.count (tag);}
+		const std::vector <shared_ptr <FunctionDecleration>> & getConstructors () const {return constructors;}
+		void addConstructor (const shared_ptr <FunctionDecleration> & func) {constructors.push_back (func);}
 		virtual const ASTnode getArrayType () const {return nullptr;}
 		virtual const bool isArray () const {return false;}
 		virtual const bool isFloat () const {return false;}
@@ -38,6 +41,7 @@ class NumbatType {
 		string iden;
 		std::set <string> metaTags;
 		std::vector <ASTnode> members;
+		std::vector <shared_ptr <FunctionDecleration>> constructors;
 };
 
 
