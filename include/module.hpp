@@ -44,6 +44,7 @@ struct Module {
 		static const shared_ptr <Module> import (const string & file);
 		static const shared_ptr <Module> import (const string & dir, const string & file);
 		
+		static void setDebugMode (bool b) {debugMode = b;}
 		static void addIncludeDir (const string & dir) {includeDirs.insert (dir);}
 		
 	protected:
@@ -59,6 +60,7 @@ struct Module {
 		std::set <shared_ptr <Module>> dependencies;
 		std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> statementParsers;
 		
+		static bool debugMode;
 		static std::map <string, shared_ptr <Module>> allModules;
 		static std::set <string> includeDirs;
 		mutable int8_t valid = -1;

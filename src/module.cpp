@@ -8,6 +8,7 @@ namespace numbat {
 namespace parser {
 using lexer::tkstring;
 
+bool Module::debugMode = false;
 std::map <string, shared_ptr <Module>> Module::allModules;
 std::set <string> Module::includeDirs;
 
@@ -58,17 +59,36 @@ const bool Module::validate () const {
 		
 		valid = 1;
 		for (auto t : types) {
-			valid &= t.second->isValid ();
+			if (!t.second->isValid ()) {
+				valid = 0;
+				if (debugMode) {
+					std::cerr << "Invalid type: " << t.second->toString () << std::endl;
+				}
+			}
 		}
 		
 		for (auto f : functions) {
 			if (f.second->getBody ()) {
-				valid &= f.second->getBody ()->isValid ();
+				if (!f.second->getBody ()->isValid ()) {
+					valid = 0;
+					if (debugMode) {
+						std::cerr << "Invalid function: " << f.second->toString () << std::endl;
+					}
+				}
 			}
 		}
 		
 		for (auto m : dependencies) {
-			valid &= m->validate ();
+			if (!m->validate ()) {
+				valid = 0;
+				if (debugMode) {
+					for (auto & mod : allModules) {
+						if (mod.second == m) {
+							std::cerr << "Invalid dependency: " << mod.first << std::endl;
+						}
+					}
+				}
+			}
 		}
 		
 	}
@@ -101,7 +121,9 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	}
 	size_t pos = file.find_last_of ("/");
 	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0));
-	std::cerr << ast.toString () << std::endl;
+	if (debugMode) {
+		std::cerr << ast.toString () << std::endl;
+	}
 	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ()));
 	
 }
