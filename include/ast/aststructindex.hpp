@@ -14,6 +14,7 @@ class ASTstructIndex : public ASTbase {
 	public:
 		const ASTnode & getExpr () const {return expr;}
 		const size_t & getIndex () const {return index;}
+		virtual const ASTnode getArrayType () const {return expr->getType ()->getArrayType ();}
 		virtual const ASTnode getASTType () const {return expr->getType ()->getMembers ()[index]->getASTType ();}
 		virtual bool isAlias () const {return expr->isAlias ();}
 		virtual bool isConst () const {return expr->isConst ();}

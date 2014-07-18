@@ -12,6 +12,7 @@ namespace parser {
 class ASTtype : public ASTbase {
 	VISITABLE
 	public:
+		virtual const ASTnode getArrayType () const {return type->getArrayType ();}
 		virtual bool isAlias () const {return ref;}
 		virtual bool isArray () const {return type->isArray ();}
 		virtual bool isConst () const {return constType;}
