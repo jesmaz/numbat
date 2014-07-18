@@ -301,6 +301,13 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 			ast->error ("No suitable function found", end);
 		}
 		
+	} else if (ASTtype * type = dynamic_cast <ASTtype *> (lhs.get ())) {
+		
+		ret = findBestMatch (ast, params, type->getType ()->getConstructors ());
+		if (!ret->isValid ()) {
+			ast->error ("No suitable constructor found", end);
+		}
+		
 	} else {
 		//function object
 		//TODO: function objects
