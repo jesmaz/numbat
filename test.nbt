@@ -123,6 +123,8 @@ def _start @cstyle () -> (int32) {
 	string str
 	str.data = "Hello again\n"
 	io.print (str)
+	io.print (string ("string\n"))
+	io.print ("just a raw string\n")
 	#strlib.string ("str\n")
 	#io.print (str)
 	exit (0)
