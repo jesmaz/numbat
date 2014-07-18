@@ -292,36 +292,13 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 	
 	shared_ptr <ASTfunctionlist> flist = std::dynamic_pointer_cast <ASTfunctionlist> (lhs);
 	ASTnode ret;
-	std::cerr << "'" << lhs->getIden () << "'" << std::endl;
 	
 	if (flist) {
 		
-		std::cerr << flist->getElements ().size () << " matches" << std::endl;
-		for (auto & fdef : flist->getElements ()) {
-			
-			std::cerr << fdef->getIden () << " (" << fdef->getArgs ().size () << ")" << std::endl;
-			if (fdef->getArgs ().size () == params.size ()) {
-				
-				std::vector <ASTnode> cast = ast->createStaticCast (params, fdef->getArgs ());
-				
-				bool success = true;
-				for (auto & arg : cast) {
-					success &= arg->isValid ();
-				}
-				
-				//TODO: Prioritize function conversions
-				if (success) {
-					ret = ASTnode (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (fdef)), cast));
-					break;
-				}
-				
-			}
-			
-		}
+		ret = findBestMatch (ast, params, flist->getElements ());
 		
-		if (!ret) {
-			ret = ASTnode (new ASTerror ("No sutible function found"));
-			ast->error ("No sutible function found", end);
+		if (!ret->isValid ()) {
+			ast->error ("No suitable function found", end);
 		}
 		
 	} else {
@@ -434,6 +411,39 @@ ASTnode parseTupleOperator (AbstractSyntaxTree * ast, const string & func, const
 	ast->nextToken (end);
 	ASTnode rhs = ast->parseExpression (matches, end); 
 	return ast->createTuple (lhs, rhs);
+	
+}
+
+
+shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree * ast, const std::vector <ASTnode> & args, const std::vector <shared_ptr <FunctionDecleration>> & candidates) {
+	
+	shared_ptr <FunctionDecleration> func = nullptr;
+	std::vector <ASTnode> params (args);
+	size_t weight = __UINT64_MAX__ - 1;
+	for (auto & fdef : candidates) {
+		if (fdef->getArgs ().size () == args.size ()) {
+			std::vector <ASTnode> cast = ast->createStaticCast (args, fdef->getArgs ());
+			size_t w = 0;
+			for (const ASTnode & node : cast) {
+				if (node->isValid ()) {
+					w += node->calculateWeight ();
+				} else {
+					w = __UINT64_MAX__;
+					break;
+				}
+			}
+			if (w < weight) {
+				weight = w;
+				func = fdef;
+				params = cast;
+			}	
+		}
+	}
+	if (func) {
+		return shared_ptr <ASTcallable> (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (func)), params));
+	} else {
+		return shared_ptr <ASTcallable> (new ASTcallerror ("No match for function"));
+	}
 	
 }
 
