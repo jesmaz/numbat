@@ -259,7 +259,7 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 		}
 	}
 	
-	if (maxDepth > 1) {
+	if (0 < maxDepth) {
 	
 		ASTnode func;
 		
@@ -272,7 +272,7 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 				const ASTnode & funcarg = beg->second->getArgs () [0];
 				func = createStaticCast (arg, funcarg, maxDepth-1);
 				if (func->isValid ()) {
-					func = ASTnode (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (beg->second)), std::vector <ASTnode> (1, func)));
+					func = ASTnode (new ASTcallindex (shared_ptr <ASTcallable> (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (beg->second)), std::vector <ASTnode> (1, func))), 0));
 					found.push_back (std::make_pair (func->calculateWeight (), func));
 				}
 			}
