@@ -16,6 +16,7 @@ class ASTmodule : public ASTbase {
 		virtual bool isConst () const {return false;}
 		virtual bool isNil () const {return false;}
 		virtual bool isValid () const {return true;}
+		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "module";}
 		virtual string toString (const string & indent = "") const {return indent + "module";}

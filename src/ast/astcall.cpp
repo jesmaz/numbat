@@ -14,6 +14,16 @@ bool ASTcall::isValid () const {
 	
 }
 
+size_t ASTcall::calculateWeight () const {
+	
+	size_t weight = callee->calculateWeight ();
+	for (const ASTnode & arg : args) {
+		weight += arg->calculateWeight ();
+	}
+	return weight;
+	
+}
+
 string ASTcall::toString (const string & indent) const {
 	
 	string ret = indent + callee->toString () + "(";

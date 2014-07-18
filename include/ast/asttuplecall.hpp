@@ -18,6 +18,7 @@ class ASTtuplecall : public ASTbase {
 		const std::vector <shared_ptr <ASTcallable>> & getCalls () const {return calls;}
 		virtual bool isCallable () const {return true;}
 		virtual bool isValid () const;
+		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return iden;}
 		virtual string toString (const string & indent = "") const;

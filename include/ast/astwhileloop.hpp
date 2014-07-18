@@ -14,6 +14,7 @@ class ASTwhileloop : public ASTbase {
 		const ASTnode & getBody () const {return body;}
 		const ASTnode & getCondition () const {return condition;}
 		virtual bool isValid () const {return condition->isValid () and body->isValid ();}
+		virtual size_t calculateWeight () const {return condition->calculateWeight () + body->calculateWeight () + 2;}//The extra 2 is for jumps
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "while";}
 		virtual string toString (const string & indent = "") const {return indent + "while " + condition->toString () + ":\n" + body->toString (indent + '\t');}

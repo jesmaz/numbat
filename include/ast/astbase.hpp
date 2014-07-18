@@ -40,7 +40,7 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual bool isRaw () const {return false;}
 		virtual bool isValid () const=0;
 		virtual shared_ptr <NumbatType> getType () const {return nullptr;}
-		virtual size_t calculateWeight () const {return 0;};
+		virtual size_t calculateWeight () const=0;
 		//DEPRECATED
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const=0;

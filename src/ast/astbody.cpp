@@ -18,6 +18,16 @@ bool ASTbody::isValid () const {
 	
 }
 
+size_t ASTbody::calculateWeight () const {
+	
+	size_t sum=0;
+	for (const ASTnode & n : body) {
+		sum += n->calculateWeight ();
+	}
+	return sum;
+	
+}
+
 string ASTbody::toString (const string & indent) const {
 	
 	string str;

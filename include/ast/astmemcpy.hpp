@@ -21,6 +21,7 @@ class ASTmemcpy : public ASTbase {
 		virtual bool isConst () const {return dest->isConst ();}
 		virtual bool isValid () const {return source->isValid () and dest->isValid () and (!conv or conv->isValid ());}
 		virtual shared_ptr <NumbatType> getType () const {return dest->getType ();}
+		virtual size_t calculateWeight () const {return dest->calculateWeight () + source->calculateWeight () + (conv ? conv->calculateWeight () : 0);}
 		virtual size_t getBitSize () const {return dest->getBitSize ();}
 		virtual string getIden () const {return dest->getIden ();}
 		virtual string toString (const string & indent = "") const {return indent + dest->toString () + " = " + source->toString ();}

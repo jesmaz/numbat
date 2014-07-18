@@ -18,6 +18,7 @@ class ASTtype : public ASTbase {
 		virtual bool isConst () const {return constType;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
+		virtual size_t calculateWeight () const {return 1;}
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {

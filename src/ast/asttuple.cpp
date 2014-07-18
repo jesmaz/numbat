@@ -14,6 +14,16 @@ bool ASTtuple::isValid () const {
 	
 }
 
+size_t ASTtuple::calculateWeight () const {
+	
+	size_t weight = 0;
+	for (const ASTnode & n : elements) {
+		weight += n->calculateWeight( );
+	}
+	return weight;
+	
+}
+
 string ASTtuple::toString (const string & indent) const {
 	
 	string str;

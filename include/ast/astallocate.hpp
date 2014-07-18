@@ -17,6 +17,7 @@ class ASTallocate : public ASTbase {
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
+		virtual size_t calculateWeight () const {return 32;}//This is honestly just an arbitrary number.
 		virtual size_t getBitSize () const {return 64;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {

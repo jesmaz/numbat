@@ -13,6 +13,7 @@ class ASTfunctionPointer : public ASTcallable {
 	public:
 		virtual bool isValid () const {return true;}
 		virtual const shared_ptr <FunctionDecleration> & getFunction () const {return function;}
+		virtual size_t calculateWeight () const {return function->getBody ()->calculateWeight () + 2;}
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + "'" + function->getIden () + "'";}

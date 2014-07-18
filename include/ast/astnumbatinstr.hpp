@@ -16,6 +16,7 @@ class ASTnumbatInstr : public ASTbase {
 		virtual const ASTnode getASTType () const {return type;}
 		virtual bool isValid () const;
 		virtual shared_ptr <NumbatType> getType () const {return type->getType ();}
+		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const;

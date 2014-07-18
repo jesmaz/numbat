@@ -20,6 +20,22 @@ bool ASTtuplecall::isValid () const {
 	
 }
 
+size_t ASTtuplecall::calculateWeight () const {
+	
+	size_t weight = 0;
+	for (const shared_ptr <ASTcallable> & call : calls) {
+		weight += call->calculateWeight ();
+	}
+	for (const ASTnode & node : lhsArgs) {
+		weight += node->calculateWeight ();
+	}
+	for (const ASTnode & node : rhsArgs) {
+		weight += node->calculateWeight ();
+	}
+	return weight;
+	
+}
+
 string ASTtuplecall::toString (const string & indent) const {
 	
 	string ret = indent + '(';
