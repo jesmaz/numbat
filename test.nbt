@@ -1,7 +1,8 @@
-import 'locallib/math.nbt' as math
+#import 'locallib/math.nbt' as math
 #import 'locallib/string.nbt' as strlib
-import 'libnbt/string.nbt' as strlib
-import 'libnbt/os.nbt' as os
+import string as strlib
+import os as os
+import io as io
 
 #struct vec2 $[type T] {T i, T j}
 
@@ -68,7 +69,7 @@ def testFunc (int8 lhs, int8 rhs) -> (int8) {
 	c = b
 	b = func ((a + b) * lhs + rhs * 2)
 	a = max (a, b)
-	a, b, c = b, c, a
+	#a, b, c = b, c, a
 	#strlen ("string")
 	#strlen ("Another String")
 	#strlib.modtest (14)
@@ -104,18 +105,26 @@ extern def write @cstyle (int64 file, ref int8 str, int32 length)
 extern def exit @cstyle (int32 e)
 
 def _start @cstyle () -> (int32) {
+	bool t = 10 < 50
 	int8 [6] arr
 	arr [0] = 104
 	arr [1] = 101
 	arr [2] = 108
-	arr [3] = 108
+	arr [3] = arr [2]
 	arr [4] = 111
 	arr [5] = 10
+	#int8 [6] arr2
+	#arr2 = arr
 	os.filehandle fh
 	fh.handle = 0
 	os.write (fh, "Why \n\"")
 	os.write (fh, arr)
 	#os.write (0, "Text\n\n", 6)
+	string str
+	str.data = "Hello again\n"
+	io.print (str)
+	#strlib.string ("str\n")
+	#io.print (str)
 	exit (0)
 	int32 l = 0
 	return l
