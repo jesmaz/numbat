@@ -2,7 +2,7 @@
 #import 'locallib/string.nbt' as strlib
 import string as strlib
 import os as os
-import io as io
+import io
 
 #struct vec2 $[type T] {T i, T j}
 
@@ -79,7 +79,7 @@ def testFunc (int8 lhs, int8 rhs) -> (int8) {
 def tupletest () {
 	int8 a
 	int8 b
-	a, b = swap (a, b)
+	#a, b = swap (a, b)
 	return
 }
 
@@ -101,11 +101,12 @@ def cCallbackTest @cstyle () -> (int64) {
 	return 1273
 }
 
-extern def write @cstyle (int64 file, ref int8 str, int32 length)
 extern def exit @cstyle (int32 e)
 
+int64 global = 10
+
 def _start @cstyle () -> (int32) {
-	bool t = 10 < 50
+	bool t = 10 < global
 	int8 [6] arr
 	arr [0] = 104
 	arr [1] = 101
@@ -131,3 +132,5 @@ def _start @cstyle () -> (int32) {
 	int32 l = 0
 	return l
 }
+
+_start ()
