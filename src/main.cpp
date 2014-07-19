@@ -88,6 +88,7 @@ int main (int argl, char ** args) {
 	
 	core->insertOperator (200, true, " [ ] ", parser::parseArrayDecleration);
 	
+	core->insertOperator (200, true, " ()", parser::parseFunctionCall);
 	core->insertOperator (200, true, " ( )", parser::parseFunctionCall);
 	core->insertOperator (200, true, " [ ]", parser::parseGenericIndexCall);
 	core->insertOperator (200, true, " . ", parser::parseElementReferenceOperator);

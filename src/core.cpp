@@ -281,9 +281,14 @@ ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const 
 	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
 	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
 	ast->itt = oppLoc [0];
-	ast->nextToken (oppLoc [1]);
-	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
-	ast->itt = oppLoc [1];
+	std::vector <ASTnode> params;
+	if (oppLoc.size () == 2) {
+		ast->nextToken (oppLoc [1]);
+		params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
+		ast->itt = oppLoc [1];
+	} else {
+		ast->nextToken (end);
+	}
 	ast->nextToken (end);
 	
 	if (ast->itt != end) {
