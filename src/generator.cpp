@@ -811,12 +811,27 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 
 void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
-	auto itt = builtModules.find (nbtMod.get ());
-	if (itt != builtModules.end ()) return;
-	
 	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod->getFunctions ()) {
 		getFunction (func.second.get ());
 	}
+	
+	if (!main) {
+		FunctionDecleration funcDecl;
+		activeFunctionDecleration = &funcDecl;
+		FunctionType * ft = FunctionType::get (Type::getVoidTy (context), false);
+		activeFunction = main = Function::Create (ft, Function::ExternalLinkage, "__entry__", module);
+		builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
+		for (const ASTnode & n : parser::Module::getMain ()) {
+			n->accept (*this);
+		}
+		builder.CreateRetVoid ();
+		verifyFunction (*activeFunction);
+		if (fpm)
+			fpm->run (*activeFunction);
+	}
+	
+	auto itt = builtModules.find (nbtMod.get ());
+	if (itt != builtModules.end ()) return;
 	
 	for (const shared_ptr <Module> & mod : nbtMod->getDependencies ()) {
 		visit (mod);
