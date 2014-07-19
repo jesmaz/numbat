@@ -43,7 +43,6 @@ int main (int argl, char ** args) {
 			if (str [1] == '-') {
 				//TODO: handle options
 			} else {
-				std::cerr << "'" << str << "'" << std::endl;
 				if (std::strcmp (str, "-emit-llvm") == 0) {
 					emitLLVM = true;
 					continue;

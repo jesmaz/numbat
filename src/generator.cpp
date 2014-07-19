@@ -328,8 +328,6 @@ void BodyGenerator::visit (ASTbody & exp) {
 	for (const ASTnode & node : exp.getBody ()) {
 		node->accept (*this);
 		while (stack.size ()) {
-			if (stack.top ())
-				stack.top ()->dump ();
 			stack.pop ();
 		}
 	}

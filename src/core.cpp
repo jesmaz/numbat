@@ -353,7 +353,6 @@ ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, co
 	if (!args [0]->getType ()) {
 		return ASTnode (new ASTerror ("Invalid type"));
 	}
-	std::cerr << args [0]->getType ()->toString ("====> ") << std::endl;
 	
 	if (args [0]->isArray ()) {
 		return ASTnode (new ASTgep (args [0], params [0]));
