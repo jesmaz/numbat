@@ -1357,32 +1357,37 @@ void AbstractSyntaxTree::parseImport(tkitt end) {
 	
 	nextToken (end);//eat 'import' token
 	shared_ptr <Module> module = nullptr;
+	string name = itt->iden;
 	
 	if (itt->type == TOKEN::chararrayliteral) {
 		
-		module = Module::createFromFile (path, itt->iden);
+		module = Module::createFromFile (path, name);
 		nextToken (end);
 		
 	} else if (itt->type == TOKEN::identifier) {
 		
-		module = Module::import (path, itt->iden);
-		nextToken (end);
-		
-	}
-	
-	if (module and itt->type == TOKEN::as) {
-		
-		nextToken (end);//eat 'as' token
-		ASTnode type = ASTnode (new ASTmodule (module));
-		variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden));
+		module = Module::import (path, name);
 		nextToken (end);
 		
 	}
 	
 	if (module) {
+	
+		ASTnode type = ASTnode (new ASTmodule (module));
+		if (itt->type == TOKEN::as) {
+			
+			nextToken (end);//eat 'as' token
+			variables [itt->iden] = shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden));
+			nextToken (end);
+			
+		} else {
+			variables [name] = shared_ptr <NumbatVariable> (new NumbatVariable (type, itt->iden));
+		}
 		
 		importModule (module, false);
 		
+	} else {
+		flushLine (end);
 	}
 	eatSemicolon (end);
 	
