@@ -80,6 +80,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 			stackVal (Value * ptr) : type (VALUE), valuePtr (ptr) {}
 		};
 		
+		Function * getFunction (const FunctionDecleration * func);
 		Type * getType (const ASTnode & node);
 		Type * getType (const NumbatType * type);
 		Value * createTemp (Value * val);
@@ -87,7 +88,6 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		Value * initialise (const NumbatType * var);
 		Value * makeCompare (Value * val);
 		void makeCompare (const ASTnode & exp);
-		void registerFunction (const FunctionDecleration * func);
 		
 		AbstractSyntaxTree * tree;
 		BasicBlock * breakBlock, * continueBlock;

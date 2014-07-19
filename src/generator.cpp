@@ -191,10 +191,10 @@ void BodyGenerator::makeCompare (const ASTnode & exp) {
 	}
 }
 
-void BodyGenerator::registerFunction (const FunctionDecleration * func) {
+Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 	
 	Function * f = functions [func];
-	if (f) return;
+	if (f) return f;
 	
 	std::vector <Type *> args;
 	std::string name = func->getIden ();
@@ -251,7 +251,7 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 		memfree = f;
 	}
 	
-	functions [func] = f;
+	return functions [func] = f;
 	
 }
 
@@ -259,7 +259,7 @@ void BodyGenerator::registerFunction (const FunctionDecleration * func) {
 void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 	
 	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : ast.getFunctions ()) {
-		registerFunction (func.second.get ());
+		getFunction (func.second.get ());
 	}
 	
 	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : ast.getFunctions ()) {
@@ -360,7 +360,7 @@ void BodyGenerator::visit (ASTbranch & exp) {
 
 void BodyGenerator::visit (ASTcall & exp) {
 	
-	Function * func = functions [exp.getFunction ().get ()];
+	Function * func = getFunction (exp.getFunction ().get ());
 	std::vector <Value *> args;// (exp.getArgs ().size ());
 	
 	bool oldAlias = ref;
@@ -761,7 +761,7 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	
 	bool oldAlias = ref;
 	for (const shared_ptr <ASTcallable> & call : exp.getCalls ()) {
-		Function * func = functions [call->getFunction ().get ()];
+		Function * func = getFunction (call->getFunction ().get ());
 		auto param = func->arg_begin ();
 		ref = param->getType ()->isPointerTy ();
 		(*lhsItt)->accept (*this);
@@ -778,7 +778,7 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	auto lhsParam = lhsArgs.begin ();
 	auto rhsParam = rhsArgs.begin ();
 	for (const shared_ptr <ASTcallable> & call : exp.getCalls ()) {
-		Function * func = functions [call->getFunction ().get ()];
+		Function * func = getFunction (call->getFunction ().get ());
 		stack.push (builder.CreateCall2 (func, *lhsParam, *rhsParam));
 		++lhsParam;
 		++rhsParam;
@@ -815,7 +815,7 @@ void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	if (itt != builtModules.end ()) return;
 	
 	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod->getFunctions ()) {
-		registerFunction (func.second.get ());
+		getFunction (func.second.get ());
 	}
 	
 	for (const shared_ptr <Module> & mod : nbtMod->getDependencies ()) {
@@ -824,7 +824,7 @@ void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
 	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod->getFunctions ()) {
 		activeFunctionDecleration = func.second.get ();
-		activeFunction = functions [activeFunctionDecleration];
+		activeFunction = getFunction (func.second.get ());
 		ASTnode body = func.second->getBody ();
 		if (body) {
 			builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
