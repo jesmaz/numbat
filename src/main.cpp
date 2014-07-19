@@ -34,6 +34,7 @@ int main (int argl, char ** args) {
 	bool emitAssembly=false;
 	bool link=true;
 	bool emitLLVM = false;
+	bool jit = false;
 	std::set <string> files;
 	for (int i=1; i<argl; ++i) {
 		char * str = args [i];
@@ -45,6 +46,12 @@ int main (int argl, char ** args) {
 				std::cerr << "'" << str << "'" << std::endl;
 				if (std::strcmp (str, "-emit-llvm") == 0) {
 					emitLLVM = true;
+					continue;
+				} else if (std::strcmp (str, "-jit") == 0) {
+					jit = true;
+					continue;
+				} else if (std::strcmp (str, "-debug-compiler") == 0) {
+					parser::Module::setDebugMode (true);
 					continue;
 				}
 				for (int j=1; str [j]; ++j) {
