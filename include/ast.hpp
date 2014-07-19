@@ -72,6 +72,7 @@ struct AbstractSyntaxTree {
 		const std::map <string, shared_ptr <OperatorDecleration>> & getOperators () const {return operators;}
 		const std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> & getStatmentParsers () const {return statementParsers;}
 		const std::set <shared_ptr <Module>> & getDependencies () const {return dependencies;}
+		const std::vector <ASTnode> getBody () const {return body;}
 		string toString (const string & indent = "") const {
 			string str="";
 			for (auto & itt : types) {
@@ -198,6 +199,8 @@ struct AbstractSyntaxTree {
 		std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> statementParsers;
 		
 		std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
+		
+		std::vector <ASTnode> body;
 		
 };
 

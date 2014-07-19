@@ -72,11 +72,23 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & pat
 				parseTypeDef (end);
 				break;
 				
+			case TOKEN::semicolon:
+				nextToken (end);
+				break;
+				
 			default:
-				error ("Unexpected token '" + itt->iden + "'", end);
+				if (ASTnode n = parser::parseExpression (this, end)) {
+					body.push_back (n);
+				} else {
+					nextToken (end);
+				}
 				break;
 				
 		}
+	}
+	
+	for (auto var : variables) {
+		var.second->isGlobal (true);
 	}
 	
 	for (std::pair <string, tkitt> & pair : typeReparse) {
