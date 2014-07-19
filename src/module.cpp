@@ -11,6 +11,7 @@ using lexer::tkstring;
 bool Module::debugMode = false;
 std::map <string, shared_ptr <Module>> Module::allModules;
 std::set <string> Module::includeDirs;
+std::vector <ASTnode> Module::main;
 
 tkstring loadFromStream (std::istream & is) {
 	std::string out;
@@ -124,6 +125,7 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	if (debugMode) {
 		std::cerr << ast.toString () << std::endl;
 	}
+	main.push_back (ASTnode (new ASTbody (ast.getBody ())));
 	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ()));
 	
 }

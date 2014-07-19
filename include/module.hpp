@@ -1,6 +1,7 @@
 #ifndef MODULE_HPP
 #define MODULE_HPP
 
+#include "ast/astbody.hpp"
 #include "ast/functiondecleration.hpp"
 #include "ast/numbattype.hpp"
 #include "ast/operatordecleration.hpp"
@@ -44,6 +45,8 @@ struct Module {
 		static const shared_ptr <Module> import (const string & file);
 		static const shared_ptr <Module> import (const string & dir, const string & file);
 		
+		static const std::vector <ASTnode> & getMain () {return main;}
+		
 		static void setDebugMode (bool b) {debugMode = b;}
 		static void addIncludeDir (const string & dir) {includeDirs.insert (dir);}
 		
@@ -63,6 +66,7 @@ struct Module {
 		static bool debugMode;
 		static std::map <string, shared_ptr <Module>> allModules;
 		static std::set <string> includeDirs;
+		static std::vector <ASTnode> main;
 		mutable int8_t valid = -1;
 		
 };
