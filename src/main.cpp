@@ -234,7 +234,7 @@ int main (int argl, char ** args) {
 	out->keep ();
 	
 	if (link) {
-		system (("ld .numbat.o -lc -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o " + outfile).c_str ());
+		system (("ld .numbat.o -e __entry__ -lc -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o " + outfile).c_str ());
 	} else {
 		system (("mv .numbat.o " + outfile).c_str ());
 	}
