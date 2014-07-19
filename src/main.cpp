@@ -175,6 +175,10 @@ int main (int argl, char ** args) {
 		numbat.loadFromModule (mod);
 	}
 	
+	if (jit) {
+		numbat.getFunction <int> ("__entry__") ();
+	}
+	
 	Module * mod = numbat.getModule ();
 	Triple theTriple (mod->getTargetTriple ());
 	
