@@ -1,0 +1,9 @@
+import os
+import string
+
+
+def print (const ref string str) -> (int64) {
+        os.filehandle stdin
+        stdin.hand = 0
+        return os.write (stdin, str.data)
+}
