@@ -826,7 +826,7 @@ void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 		activeFunctionDecleration = func.second.get ();
 		activeFunction = getFunction (func.second.get ());
 		ASTnode body = func.second->getBody ();
-		if (body) {
+		if (body and activeFunction->empty ()) {
 			builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
 			for (const ASTnode & node : func.second->getArgs ()) {
 				node->accept (*this);
