@@ -16,6 +16,7 @@ struct NumbatVariable {
 		bool isArray () const {return type->isArray ();}
 		bool isConst () const {return type->isConst ();}
 		bool isGlobal () const {return global;}
+		bool isGlobal (bool glo) {return global = glo;}
 		shared_ptr <NumbatType> getType () const {return type->getType ();}
 		const size_t getSize () const {return type->getBitSize ();}
 		const string & getIden () const {return iden;}
