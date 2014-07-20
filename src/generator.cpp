@@ -605,6 +605,8 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		val = builder.CreateAdd (args [0], args [1], instr);
 	} else if (instr == "and") {
 		val = builder.CreateAnd (args [0], args [1], instr);
+	} else if (instr == "cmpe") {
+		val = builder.CreateICmpEQ (args [0], args [1], instr);
 	} else if (instr == "cmplt") {
 		if (exp.getArgs () [0]->getType ()->isSigned ()) {
 			val = builder.CreateICmpSLT (args [0], args [1], instr);
