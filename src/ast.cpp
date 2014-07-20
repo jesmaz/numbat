@@ -1415,7 +1415,7 @@ void AbstractSyntaxTree::parseOperatorDecleration (tkitt end) {
 void AbstractSyntaxTree::parseTypeDef (tkitt end) {
 	
 	nextToken (end); // eat typedef
-	ASTnode type = parseType (findToken (":", end));
+	ASTnode type = parseStatment (findToken (":", end));
 	nextToken (end);
 	string iden = itt->iden;
 	nextToken (end);
