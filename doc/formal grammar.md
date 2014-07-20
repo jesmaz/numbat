@@ -48,7 +48,7 @@ ExternDecl			=>	'extern' FunctionDecl
 FloatLiteral		=>	['0' ... '9']* '.' ('0' ... '9')+ [('e' | 'E') ['+' | '-'] ('0' ... '9')+] ['f' | 'F' | 'h' | 'H' | 'q' | 'Q']
 ```
 ```
-FunctionDecl		=>	'def' [Template] FunctionID MetaTag* Paramaters ['->' Paramaters] Block
+FunctionDecl		=>	'def' [Template] ['~'] FunctionID MetaTag* Paramaters ['->' Paramaters] Block
 ```
 ```
 FunctionID			=>	Identifier
