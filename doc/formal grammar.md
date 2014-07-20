@@ -84,8 +84,8 @@ Lvalue				=>	Identifier
 ```
 MetaTag				=>	'@'Identifier
 ```
-##DEPRECATED##
 ```
+##DEPRECATED##
 OperatorDecl		=>	'operator' CharArrayLiteral ':' IntLiteral Associativity
 ```
 ```
