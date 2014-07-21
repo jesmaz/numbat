@@ -121,12 +121,14 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 		return shared_ptr <Module> (m);
 	}
 	size_t pos = file.find_last_of ("/");
+	allModules [file] = shared_ptr <Module> (new Module);
 	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0));
 	if (debugMode) {
 		std::cerr << ast.toString () << std::endl;
 	}
 	main.push_back (ASTnode (new ASTbody (ast.getBody ())));
-	return allModules [file] = shared_ptr <Module> (new Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ()));
+	*allModules [file] = Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ());
+	return allModules [file];
 	
 }
 

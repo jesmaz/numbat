@@ -832,6 +832,7 @@ void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
 	auto itt = builtModules.find (nbtMod.get ());
 	if (itt != builtModules.end ()) return;
+	builtModules.insert (nbtMod.get ());
 	
 	for (const shared_ptr <Module> & mod : nbtMod->getDependencies ()) {
 		visit (mod);
