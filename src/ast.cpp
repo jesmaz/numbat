@@ -14,6 +14,7 @@ namespace parser {
 AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & path) : path (path) {
 	
 	importModule (Module::createEmpty ("numbat core"), true);
+	importModule (Module::import (path, "core util"), false);
 	
 	
 	std::vector <std::pair <FunctionDecleration *, std::pair <size_t, tkitt>>> funcReparse;
