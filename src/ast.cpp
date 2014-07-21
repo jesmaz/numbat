@@ -224,7 +224,15 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		
 	} else {
 		
-		if (!lhs->isValid () or !rhs->isValid ()) return ASTnode (new ASTerror ("Invalid expression"));
+		if (!lhs->isValid () or !rhs->isValid ()) {
+			if (!lhs->isValid ()) {
+				error (lhs->toString (), end);
+			}
+			if (!rhs->isValid ()) {
+				error (rhs->toString (), end);
+			}
+			return ASTnode (new ASTerror ("Invalid expression"));
+		}
 		
 		std::vector <ASTnode> args (2);
 		args [0] = lhs;
@@ -234,6 +242,8 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		while (fbeg != fend) cands.push_back (fbeg->second), ++fbeg;
 		shared_ptr <ASTcallable> call =  parser::findBestMatch (this, args, cands);
 		if (!call->isValid () and defImp) {
+			if (!lhs->getType ()) return lhs;
+			if (!rhs->getType ()) return rhs;
 			return defImp (this, func, lhs, rhs, end);
 		} else {
 			return call;
