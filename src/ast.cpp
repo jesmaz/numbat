@@ -237,11 +237,11 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 		
 		std::vector <ASTnode> args (2);
 		args [0] = lhs;
-		args [1] = rhs;
+		args [1] = createStaticCast (rhs, lhs);
 		auto fbeg = functions.lower_bound (func), fend = functions.upper_bound (func);
 		std::vector <shared_ptr <FunctionDecleration>> cands;
 		while (fbeg != fend) cands.push_back (fbeg->second), ++fbeg;
-		shared_ptr <ASTcallable> call =  parser::findBestMatch (this, args, cands);
+		shared_ptr <ASTcallable> call =  parser::findBestMatch (this, args, cands, 0);
 		if (!call->isValid () and defImp) {
 			if (!lhs->getType ()) return lhs;
 			if (!rhs->getType ()) return rhs;
