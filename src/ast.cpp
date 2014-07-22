@@ -286,27 +286,10 @@ ASTnode AbstractSyntaxTree::createStaticCast (const ASTnode & arg, const ASTnode
 	}
 	
 	if (0 < maxDepth) {
-	
-		ASTnode func;
 		
-		const string & iden = type->getType ()->getIden ();
-		auto beg = functions.lower_bound (iden), end = functions.upper_bound (iden);
-		std::list <std::pair <uint32_t, ASTnode>> found;
-		
-		while (beg != end) {
-			if (beg->second->getArgs ().size () == 1) {
-				const ASTnode & funcarg = beg->second->getArgs () [0];
-				func = createStaticCast (arg, funcarg, maxDepth-1);
-				if (func->isValid ()) {
-					func = ASTnode (new ASTcallindex (shared_ptr <ASTcallable> (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (beg->second)), std::vector <ASTnode> (1, func))), 0));
-					found.push_back (std::make_pair (func->calculateWeight (), func));
-				}
-			}
-			++beg;
-		}
-		
-		if (found.size ()) {
-			return found.front ().second;
+		shared_ptr <ASTcallable> func = parser::findBestMatch (this, std::vector <ASTnode> (1, arg), type->getType ()->getConstructors (), maxDepth-1);
+		if (func->isValid ()) {
+			return ASTnode (new ASTcallindex (func, 0));
 		}
 		
 	}
