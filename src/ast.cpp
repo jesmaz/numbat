@@ -11,7 +11,7 @@ namespace parser {
 //std::unordered_set <string> AbstractSyntaxTree::parenOpperators, AbstractSyntaxTree::oppTokens, AbstractSyntaxTree::ternaryStart;
 
 
-AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & path) : path (path) {
+AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & path, const string & file) : path (path), file (file) {
 	
 	importModule (Module::createEmpty ("numbat core"), true);
 	importModule (Module::import (path, "core util"), false);

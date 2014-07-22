@@ -108,7 +108,7 @@ struct AbstractSyntaxTree {
 		friend shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree *, const std::vector <ASTnode> &, const std::vector <shared_ptr <FunctionDecleration>> &);
 		
 		AbstractSyntaxTree () {}
-		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "");
+		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "", const string & file = "");
 		
 	private:
 		
@@ -168,7 +168,7 @@ struct AbstractSyntaxTree {
 		void addOperator (const string & pattern, const OperatorDecleration & oppdec);
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
 		void importModule (const shared_ptr <Module> & module, bool extention);
-		void printError (const string & message) {buildFail = true; std::cerr << "error on line " << line << ": " << message << '\n';}
+		void printError (const string & message) {buildFail = true; std::cerr << file << " >> error on line " << line << ": " << message << '\n';}
 		void parseImport (tkitt end);
 		void parseOperatorDecleration (tkitt end);
 		void parseTypeDef (tkitt end);
@@ -184,7 +184,7 @@ struct AbstractSyntaxTree {
 		
 		size_t line = 0;
 		
-		string path;
+		string path, file;
 		
 		std::map <string, shared_ptr <NumbatType>> types;
 		std::map <string, shared_ptr <NumbatVariable>> variables;
