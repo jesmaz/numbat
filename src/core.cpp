@@ -426,14 +426,14 @@ ASTnode parseTupleOperator (AbstractSyntaxTree * ast, const string & func, const
 }
 
 
-shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree * ast, const std::vector <ASTnode> & args, const std::vector <shared_ptr <FunctionDecleration>> & candidates) {
+shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree * ast, const std::vector <ASTnode> & args, const std::vector <shared_ptr <FunctionDecleration>> & candidates, int maxDepth) {
 	
 	shared_ptr <FunctionDecleration> func = nullptr;
 	std::vector <ASTnode> params (args);
 	size_t weight = __UINT64_MAX__ - 1;
 	for (auto & fdef : candidates) {
 		if (fdef->getArgs ().size () == args.size ()) {
-			std::vector <ASTnode> cast = ast->createStaticCast (args, fdef->getArgs ());
+			std::vector <ASTnode> cast = ast->createStaticCast (args, fdef->getArgs (), maxDepth);
 			size_t w = 0;
 			for (const ASTnode & node : cast) {
 				if (node->isValid ()) {

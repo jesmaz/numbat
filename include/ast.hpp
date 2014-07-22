@@ -105,7 +105,7 @@ struct AbstractSyntaxTree {
 		friend ASTnode parseRedirectOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		friend ASTnode parseTupleOperator (AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
 		
-		friend shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree *, const std::vector <ASTnode> &, const std::vector <shared_ptr <FunctionDecleration>> &);
+		friend shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree *, const std::vector <ASTnode> &, const std::vector <shared_ptr <FunctionDecleration>> &, int);
 		
 		AbstractSyntaxTree () {}
 		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "", const string & file = "");
