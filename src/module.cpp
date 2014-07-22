@@ -122,7 +122,7 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	}
 	size_t pos = file.find_last_of ("/");
 	allModules [file] = shared_ptr <Module> (new Module);
-	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0));
+	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0), file);
 	if (debugMode) {
 		std::cerr << ast.toString () << std::endl;
 	}
