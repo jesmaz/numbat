@@ -33,6 +33,18 @@ const std::map <string, string> instructions = [] {
 }();
 
 
+ASTnode defAddition (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+	
+	if (lhs->getType ()->isArray ()) {
+		
+		return ASTnode (new ASTerror ("Array concatenation not implemented yet"));
+		
+	} else {
+		return defArithmetic (ast, func, lhs, rhs, end);
+	}
+	
+}
+
 ASTnode defArithmetic (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
 	
 	if (lhs->getType ()->isRaw ()) {
@@ -139,6 +151,10 @@ ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
 	return node;
 }
 
+
+ASTnode parseAdditionOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+	return parseBinary (ast, func, oppLoc, matches, end, defAddition);
+}
 
 ASTnode parseArithmeticOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
 	return parseBinary (ast, func, oppLoc, matches, end, defArithmetic);

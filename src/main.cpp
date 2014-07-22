@@ -104,7 +104,7 @@ int main (int argl, char ** args) {
 	core->insertOperator (500, true, " / ", parser::parseArithmeticOperator);
 	core->insertOperator (500, true, " % ", parser::parseArithmeticOperator);
 	
-	core->insertOperator (600, true, " + ", parser::parseArithmeticOperator);
+	core->insertOperator (600, true, " + ", parser::parseAdditionOperator);
 	core->insertOperator (600, true, " - ", parser::parseArithmeticOperator);
 	
 	core->insertOperator (700, true, " << ", parser::parseGenericBinary);
