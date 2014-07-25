@@ -166,6 +166,9 @@ int main (int argl, char ** args) {
 	createType ("quad", 128, parser::NumbatRawType::FLOAT);
 	
 	Numbat numbat;
+	
+	createType ("ptrint", numbat.getEngine ()->getDataLayout ()->getPointerSizeInBits (), parser::NumbatRawType::UNSIGNED);
+	
 	for (const string & file : files) {
 		shared_ptr <parser::Module> mod = parser::Module::createFromFile (file);
 		if (!mod->validate ()) {
