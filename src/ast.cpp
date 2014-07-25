@@ -127,8 +127,10 @@ ASTnode AbstractSyntaxTree::createArrayType (const ASTnode& dataType, size_t dim
 	auto arrType = types.find (key);
 	
 	if (arrType == types.end ()) {
+		std::set <string> tags;
+		tags.insert ("export");
 		ASTnode rawDataType = ASTnode (new ASTtype (false, false, dataType->getType ()));
-		nbtype = types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, rawDataType));
+		nbtype = types [key] = shared_ptr <NumbatType> (new NumbatPointerType (key, rawDataType, tags));
 		ASTnode type = ASTnode (new ASTtype (false, false, generateRawType ("raw 64", 64, std::set <string> ())));
 		ASTnode param = ASTnode (new ASTparamater (shared_ptr <NumbatVariable> (new NumbatVariable (type, "length"))));
 		nbtype->buildData (std::vector <ASTnode> (1, param));
