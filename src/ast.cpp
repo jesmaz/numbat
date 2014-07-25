@@ -1050,8 +1050,10 @@ std::vector <ASTnode> AbstractSyntaxTree::createStaticCast (const std::vector <A
 		if (argItt == argEnd) {
 			//TODO: do something?
 		} else {
-			//std::cerr << (*argItt)->toString () << " : " << std::boolalpha << (*argItt)->isCallable () << std::endl;
-			if ((*argItt)->isCallable ()) {
+			if (!(*argItt)->isValid ()) {
+				*resItt = *argItt;
+				++resItt, ++typeItt;
+			} else if ((*argItt)->isCallable ()) {
 				std::vector <ASTnode> indexing = createCallIndexList (std::dynamic_pointer_cast <ASTcallable> (*argItt));
 				for (const ASTnode & index : indexing) {
 					*resItt = createStaticCast (index, *typeItt, maxDepth);
