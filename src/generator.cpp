@@ -811,8 +811,11 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 
 void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
-	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod->getFunctions ()) {
-		getFunction (func.second.get ());
+	if (!memfree) {
+		memfree = getFunction (parser::Module::getFree ().get ());
+	}
+	if (!memalloc) {
+		memalloc = getFunction (parser::Module::getMalloc ().get ());
 	}
 	
 	if (!main) {
