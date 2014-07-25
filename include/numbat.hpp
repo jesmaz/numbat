@@ -68,6 +68,7 @@ class Numbat {
 		void registerFunction (FunctionType * ft, const std::string & name, T funcPtr) {engine->addGlobalMapping (Function::Create (ft, Function::ExternalLinkage, name, module), reinterpret_cast <void *> (funcPtr));}
 		//template <typename T, typename Ret, typename ... Args>
 		//void registerFunction (const std::string & name, T funcPtr);
+		ExecutionEngine * getEngine () {return engine;}
 		Module * getModule () {return module;}
 		
 		Numbat ();
