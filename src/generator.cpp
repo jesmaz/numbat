@@ -79,6 +79,30 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 	
 }
 
+Value * BodyGenerator::allocteArray (Value * length, NumbatPointerType * type) {
+	
+	size_t mdsize=0;
+	for (auto & t : type->getMembers ()) {
+		mdsize += dataLayout->getTypeAllocSize (getType (t));
+	}
+	
+	size_t esize = dataLayout->getTypeAllocSize (getType (type->getDataType ()));
+	
+	Value * mdbytes = builder.getInt64 (mdsize);
+	Value * bytes;
+	bytes = builder.CreateMul (length, builder.getInt64 (esize));
+	bytes = builder.CreateAdd (bytes, mdbytes);
+	
+	Value * call = builder.CreateCall (memalloc, std::vector <Value *> (1, bytes));
+	
+	Value * addressInt = builder.CreateAdd (builder.CreatePtrToInt (call, Type::getInt64Ty (context)), mdbytes);
+	
+	Type * ptrt = getType (type);
+	
+	return createTemp (builder.CreateIntToPtr (addressInt, ptrt));
+	
+}
+
 Value * BodyGenerator::createTemp (Value * val) {
 	
 	if (ref) {
@@ -289,13 +313,6 @@ void BodyGenerator::visit (ASTallocate & exp) {
 		return;
 	}
 	
-	size_t mdsize=0;
-	for (auto & t : type->getMembers ()) {
-		mdsize += dataLayout->getTypeAllocSize (getType (t));
-	}
-	
-	size_t esize = dataLayout->getTypeAllocSize (getType (type->getDataType ()));
-	
 	bool oldRef = ref;
 	ref = true;
 	exp.getAmount ()->accept (*this);
@@ -307,19 +324,7 @@ void BodyGenerator::visit (ASTallocate & exp) {
 		return;
 	}
 	
-	Value * mdbytes = ConstantInt::get (Type::getInt64Ty (context), APInt (64, mdsize));
-	Value * bytes;
-	bytes = builder.CreateMul (count, ConstantInt::get (Type::getInt64Ty (context), APInt (64, esize)));
-	bytes = builder.CreateAdd (bytes, mdbytes);
-	
-	Value * call = builder.CreateCall (memalloc, std::vector <Value *> (1, bytes));
-	
-	Value * addressInt = builder.CreateAdd (builder.CreatePtrToInt (call, Type::getInt64Ty (context)), mdbytes);
-	//Value * address = builder.CreateIntToPtr (addressInt, call->getType ());
-	
-	Type * ptrt = getType (type);
-	
-	stack.push (createTemp (builder.CreateIntToPtr (addressInt, ptrt)));
+	stack.push (allocteArray (count, type));
 	
 }
 
