@@ -469,7 +469,22 @@ shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree * ast, const std::vec
 	if (func) {
 		return shared_ptr <ASTcallable> (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (func)), params));
 	} else {
-		return shared_ptr <ASTcallable> (new ASTcallerror ("No match for function"));
+		string err = "\n\tTarget is: (";
+		for (auto & arg : args) {
+			if (!arg->isValid ()) {
+				return shared_ptr <ASTcallable> (new ASTcallerror (arg->toString ()));
+			}
+			err += arg->getType ()->getIden () + ", ";
+		}
+		err += ")\n\tCandidates are:";
+		for (auto & fdef : candidates) {
+			err += "\n\t\t(";
+			for (auto & arg : fdef->getArgs ()) {
+				err += arg->getType ()->getIden () + ", ";
+			}
+			err += ")";
+		}
+		return shared_ptr <ASTcallable> (new ASTcallerror (err));
 	}
 	
 }
