@@ -1351,14 +1351,14 @@ void AbstractSyntaxTree::importModule (const shared_ptr <Module> & module, bool 
 		addOperator (opp.first, *opp.second.get ());
 	}
 	for (auto func : module->getFunctions ()) {
-		//if (!func.second->hasTag ("local") or extention) {
+		if (func.second->hasTag ("export") or func.second->hasTag ("global") or extention) {
 			functions.insert (func);
-		//}
+		}
 	}
 	for (auto type : module->getTypes ()) {
-		//if (type.second->hasTag ("export") or type.second->hasTag ("global") or extention) {
+		if (type.second->hasTag ("export") or type.second->hasTag ("global") or extention) {
 			types [type.first] = type.second;
-		//}
+		}
 	}
 	for (auto stmt : module->getStatmentParsers()) {
 		statementParsers [stmt.first] = stmt.second;
