@@ -39,6 +39,9 @@ struct Module {
 		void insertFunction (const string & iden, const shared_ptr <FunctionDecleration> & func) {functions.insert (std::make_pair (iden, func));}
 		void insertDependency (const shared_ptr <Module> & module) {dependencies.insert (module);}
 		
+		static const shared_ptr <FunctionDecleration> & getFree () {return memfree;}
+		static const shared_ptr <FunctionDecleration> & getMalloc () {return memalloc;}
+		
 		static const shared_ptr <Module> createEmpty (const string & id);
 		static const shared_ptr <Module> createFromFile (const string & file);
 		static const shared_ptr <Module> createFromFile (const string & dir, const string & file);
@@ -63,7 +66,11 @@ struct Module {
 		std::set <shared_ptr <Module>> dependencies;
 		std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> statementParsers;
 		
+		
+		static void checkForBuiltins (Module & mod);
+		
 		static bool debugMode;
+		static shared_ptr <FunctionDecleration> memalloc, memfree;
 		static std::map <string, shared_ptr <Module>> allModules;
 		static std::set <string> includeDirs;
 		static std::vector <ASTnode> main;

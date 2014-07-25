@@ -9,6 +9,7 @@ namespace parser {
 using lexer::tkstring;
 
 bool Module::debugMode = false;
+shared_ptr <FunctionDecleration> Module::memalloc = nullptr, Module::memfree = nullptr;
 std::map <string, shared_ptr <Module>> Module::allModules;
 std::set <string> Module::includeDirs;
 std::vector <ASTnode> Module::main;
@@ -128,6 +129,7 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	}
 	main.push_back (ASTnode (new ASTbody (ast.getBody ())));
 	*allModules [file] = Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ());
+	checkForBuiltins (*allModules [file]);
 	return allModules [file];
 	
 }
@@ -157,6 +159,31 @@ const shared_ptr <Module> Module::import (const string & dir, const string & fil
 		std::cerr << "Could not import '" << file << "'" << std::endl;
 	}
 	return mod;
+	
+}
+
+
+void Module::checkForBuiltins (Module & mod) {
+	
+	for (const auto & e : mod.functions) {
+		const auto & func = e.second;
+		if (func->hasTag ("malloc")) {
+			//TODO: prototype checking
+			if (!memalloc) {
+				memalloc = func;
+			} else {
+				//TODO: raise error
+			}
+		}
+		if (func->hasTag ("free")) {
+			//TODO: prototype checking
+			if (!memfree) {
+				memfree = func;
+			} else {
+				//TODO: raise error
+			}
+		}
+	}
 	
 }
 
