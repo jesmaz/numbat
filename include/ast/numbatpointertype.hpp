@@ -22,6 +22,7 @@ class NumbatPointerType : public NumbatType {
 		
 		NumbatPointerType () {}
 		NumbatPointerType (string iden, ASTnode dataType) : NumbatType (iden), dataType (dataType) {}
+		NumbatPointerType (string iden, ASTnode dataType, const std::set <string> & meta) : NumbatType (iden, meta), dataType (dataType) {}
 	private:
 		ASTnode dataType;
 };
