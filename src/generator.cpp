@@ -315,11 +315,11 @@ void BodyGenerator::visit (ASTallocate & exp) {
 	Value * call = builder.CreateCall (memalloc, std::vector <Value *> (1, bytes));
 	
 	Value * addressInt = builder.CreateAdd (builder.CreatePtrToInt (call, Type::getInt64Ty (context)), mdbytes);
-	Value * address = builder.CreateIntToPtr (addressInt, call->getType ());
+	//Value * address = builder.CreateIntToPtr (addressInt, call->getType ());
 	
 	Type * ptrt = getType (type);
 	
-	stack.push (createTemp (builder.CreateBitCast (address, ptrt)));
+	stack.push (createTemp (builder.CreateIntToPtr (addressInt, ptrt)));
 	
 }
 
