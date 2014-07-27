@@ -192,6 +192,21 @@ Value * BodyGenerator::makeCompare (Value * val) {
 	
 }
 
+void BodyGenerator::createMemCpy (Value * dest, Value * source, Value * length, const shared_ptr <ASTcallable> & conv) {
+	
+	if (!conv) {
+		if (length) {
+			size_t size = dataLayout->getTypeAllocSize (dest->getType()->getPointerElementType ()->getPointerElementType ());
+			builder.CreateMemCpy (builder.CreateLoad (dest), builder.CreateLoad (source), builder.CreateMul (length, builder.getInt64 (size)), false);
+		} else {
+			builder.CreateStore (builder.CreateLoad (source), dest);
+		}
+	} else {
+		//TODO: complex data types
+	}
+	
+}
+
 void BodyGenerator::makeCompare (const ASTnode & exp) {
 	exp->accept (*this);
 	Value * v = stack.top ();
@@ -469,20 +484,15 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 	stack.pop ();
 	
 	shared_ptr <ASTcallable> conv = exp.getConv ();
+	Value * length = nullptr;
 	
-	if (!conv) {
-		if (ASTnode length = ASTbase::getLength (exp.getDest ())) {
-			length->accept (*this);
-			Value * len = builder.CreateLoad (stack.top ());
-			stack.pop ();
-			size_t size = dataLayout->getTypeAllocSize (getType (exp.getArrayType ()));
-			builder.CreateMemCpy (builder.CreateLoad (dest), builder.CreateLoad (source), builder.CreateMul (len, builder.getInt64 (size)), false);
-		} else {
-			builder.CreateStore (builder.CreateLoad (source), dest);
-		}
-	} else {
-		//TODO: complex data types
+	if (ASTnode len = ASTbase::getLength (exp.getDest ())) {
+		len->accept (*this);
+		length = builder.CreateLoad (stack.top ());
+		stack.pop ();
 	}
+	
+	createMemCpy (dest, source, length, conv);
 	ref = oldRef;
 	stack.push (dest);
 	

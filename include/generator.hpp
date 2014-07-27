@@ -88,6 +88,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		Value * getVariableHandle (const NumbatVariable * var);
 		Value * initialise (const NumbatType * var);
 		Value * makeCompare (Value * val);
+		void createMemCpy (Value * dest, Value * source, Value * length, const shared_ptr <ASTcallable> & conv);
 		void makeCompare (const ASTnode & exp);
 		
 		AbstractSyntaxTree * tree;
