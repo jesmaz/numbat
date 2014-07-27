@@ -13,6 +13,7 @@ class ASTconcat : public ASTbase {
 	public:
 		const ASTnode & getLhs () const {return lhs;}
 		const ASTnode & getRhs () const {return rhs;}
+		const shared_ptr <ASTcallable> & getConv () const {return conv;}
 		virtual bool isAlias () const {return false;}
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return true;}
@@ -22,9 +23,10 @@ class ASTconcat : public ASTbase {
 		virtual string toString (const string & indent = "") const {return indent + lhs->toString () + " + " + rhs->toString ();}
 		
 		ASTconcat () {}
-		ASTconcat (const ASTnode & lhs, const ASTnode & rhs) : lhs (lhs), rhs (rhs) {}
+		ASTconcat (const ASTnode & lhs, const ASTnode & rhs, const shared_ptr <ASTcallable> & conv = nullptr) : lhs (lhs), rhs (rhs), conv (conv) {}
 	private:
 		ASTnode lhs, rhs;
+		shared_ptr <ASTcallable> conv;
 };
 
 
