@@ -37,7 +37,7 @@ ASTnode defAddition (AbstractSyntaxTree * ast, const string & func, const ASTnod
 	
 	if (lhs->getType ()->isArray ()) {
 		
-		return ASTnode (new ASTerror ("Array concatenation not implemented yet"));
+		return ASTnode (new ASTconcat (lhs, rhs));
 		
 	} else {
 		return defArithmetic (ast, func, lhs, rhs, end);
