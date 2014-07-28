@@ -99,7 +99,15 @@ Value * BodyGenerator::allocteArray (Value * length, NumbatPointerType * type) {
 	
 	Type * ptrt = getType (type);
 	
-	return createTemp (builder.CreateIntToPtr (addressInt, ptrt));
+	Value * array = builder.CreateIntToPtr (addressInt, ptrt);
+	
+	int lenDex = type->findMember ("length");
+	if (0 <= lenDex) {
+		Value * lenPtr = pointerTypeGEP (array, type, type->findMember ("length"));
+		builder.CreateStore (length, lenPtr);
+	}
+	
+	return createTemp (array);
 	
 }
 
