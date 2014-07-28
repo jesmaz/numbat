@@ -192,6 +192,21 @@ Value * BodyGenerator::makeCompare (Value * val) {
 	
 }
 
+Value * BodyGenerator::pointerTypeGEP (Value * val, const NumbatPointerType * ptrType, size_t index) {
+	
+	size_t offset=0;
+	auto & members = ptrType->getMembers ();
+	for (size_t i=index, l=members.size (); i<l; ++i) {
+		offset += dataLayout->getTypeAllocSize (getType (members [index]));
+	}
+	Value * oset = ConstantInt::get (Type::getInt64Ty (context), APInt (64, offset));
+	Value * iptr = builder.CreatePtrToInt (val, Type::getInt64Ty (context));
+	Type * type = getType (members [index]);
+	Value * dataiptr = builder.CreateSub (iptr, oset);
+	return builder.CreateIntToPtr (dataiptr, type->getPointerTo ());
+	
+}
+
 void BodyGenerator::createMemCpy (Value * dest, Value * source, Value * length, const shared_ptr <ASTcallable> & conv) {
 	
 	if (!conv) {
@@ -728,37 +743,32 @@ void BodyGenerator::visit (ASTreturnvoid & exp) {
 }
 
 void BodyGenerator::visit (ASTstructIndex & exp) {
+	
+	bool oldRef = ref;
+	ref = true;
 	exp.getExpr ()->accept (*this);
 	Value * val = stack.top (); stack.pop ();
+	ref = oldRef;
 	
-	if (dynamic_cast <NumbatPointerType *> (exp.getExpr ()->getType ().get ())) {
-		if (ref) {
-			val = builder.CreateLoad (val);
-		}
-		size_t offset=0;
-		auto & members = exp.getExpr ()->getType ()->getMembers ();
-		for (size_t i=exp.getIndex (), l=members.size (); i<l; ++i) {
-			offset += dataLayout->getTypeAllocSize (getType (members [exp.getIndex ()]));
-		}
-		Value * oset = ConstantInt::get (Type::getInt64Ty (context), APInt (64, offset));
-		Value * iptr = builder.CreatePtrToInt (val, Type::getInt64Ty (context));
-		Type * type = getType (members [exp.getIndex ()]);
-		Value * dataiptr = builder.CreateSub (iptr, oset);
-		Value * dptr = builder.CreateIntToPtr (dataiptr, type->getPointerTo ());
+	if (NumbatPointerType * type = dynamic_cast <NumbatPointerType *> (exp.getExpr ()->getType ().get ())) {
+		Value * dptr = pointerTypeGEP (builder.CreateLoad (val), type, exp.getIndex ());
 		if (ref) {
 			stack.push (dptr);
 		} else {
 			stack.push (builder.CreateLoad (dptr));
 		}
-	} else if (ref) {
+	} else {
 		std::vector <Value *> indicies (2);
 		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
 		indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
 		val = builder.CreateGEP (val, indicies);
-		stack.push (val);
-	} else {
-		stack.push (builder.CreateExtractValue (val, exp.getIndex ()));
+		if (ref) {
+			stack.push (val);
+		} else {
+			stack.push (builder.CreateLoad (val));
+		}
 	}
+	
 }
 
 void BodyGenerator::visit (ASTvariable & exp) {
