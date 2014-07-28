@@ -442,6 +442,56 @@ void BodyGenerator::visit (ASTcallindex & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTconcat & exp) {
+	
+	NumbatPointerType * type = dynamic_cast <NumbatPointerType *> (exp.getLhs ()->getType ().get ());
+	
+	if (!type) {
+		return;
+	}
+	
+	auto oldRef = ref;
+	ref = true;
+	exp.getLhs ()->accept (*this);
+	Value * lhs = stack.top ();
+	stack.pop ();
+	exp.getRhs ()->accept (*this);
+	Value * rhs = stack.top ();
+	stack.pop ();
+	
+	ASTbase::getLength (exp.getLhs ())->accept (*this);
+	Value * llen = builder.CreateLoad (stack.top ());
+	stack.pop ();
+	
+	ASTnode n = ASTbase::getLength (exp.getRhs ());
+	Value * rlen;
+	if (n) {
+		n->accept (*this);
+		rlen = builder.CreateLoad (stack.top ());
+		stack.pop ();
+	} else {
+		rlen = builder.getInt64 (1);
+	}
+	Value * length = builder.CreateAdd (llen, rlen);
+	
+	Value * array = allocteArray (length, type);
+	
+	createMemCpy (array, lhs, llen, exp.getConv ());
+	Value * rdestint = builder.CreatePtrToInt (builder.CreateLoad (array), llen->getType ());
+	Value * rharray = builder.CreateIntToPtr (builder.CreateAdd (rdestint, llen), array->getType ());
+	rharray = createTemp (rharray);
+	if (n) {
+		createMemCpy (rharray, rhs, rlen, exp.getConv ());
+	} else {
+		createMemCpy (rharray, rhs, nullptr, exp.getConv ());
+	}
+	
+	stack.push (array);
+	
+	ref = oldRef;
+	
+}
+
 void BodyGenerator::visit (ASTconstantInt & exp) {
 	
 	Type * type = getType (exp.getType ().get ());
