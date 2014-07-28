@@ -478,7 +478,7 @@ void BodyGenerator::visit (ASTconcat & exp) {
 	
 	createMemCpy (array, lhs, llen, exp.getConv ());
 	Value * rdestint = builder.CreatePtrToInt (builder.CreateLoad (array), llen->getType ());
-	Value * rharray = builder.CreateIntToPtr (builder.CreateAdd (rdestint, llen), array->getType ());
+	Value * rharray = builder.CreateIntToPtr (builder.CreateAdd (rdestint, llen), array->getType ()->getPointerElementType ());
 	rharray = createTemp (rharray);
 	if (n) {
 		createMemCpy (rharray, rhs, rlen, exp.getConv ());
