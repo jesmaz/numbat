@@ -17,16 +17,17 @@ struct NumbatVariable {
 		bool isConst () const {return type->isConst ();}
 		bool isGlobal () const {return global;}
 		bool isGlobal (bool glo) {return global = glo;}
+		bool isTemp () const {return temp;}
 		shared_ptr <NumbatType> getType () const {return type->getType ();}
 		const size_t getSize () const {return type->getBitSize ();}
 		const string & getIden () const {return iden;}
 		
 		NumbatVariable () {}
-		NumbatVariable (const ASTnode & type, const string & iden, bool global=false) : type (type), iden (iden), global (global) {}
+		NumbatVariable (const ASTnode & type, const string & iden, bool global=false, bool temp=false) : type (type), iden (iden), global (global), temp (temp) {}
 	private:
 		ASTnode type;
 		string iden;
-		bool global;
+		bool global, temp;
 };
 
 
