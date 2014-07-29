@@ -141,7 +141,17 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 			hand = createEntryBlockAlloc (activeFunction, type, var->getIden ());
 		}
 		namedValues [var] = hand;
-		builder.CreateStore (initialise (var->getType ().get ()), hand);
+		
+		if (const ASTnode & init = var->getInit ()) {
+			bool oldRef = ref;
+			ref = true;
+			init->accept (*this);
+			builder.CreateStore (builder.CreateLoad (stack.top ()), hand);
+			stack.pop ();
+			ref = oldRef;
+		} else {
+			builder.CreateStore (initialise (var->getType ().get ()), hand);
+		}
 		
 	}
 	
