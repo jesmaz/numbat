@@ -237,17 +237,27 @@ ASTnode AbstractSyntaxTree::createBinaryCall (const string & func, const ASTnode
 			return ASTnode (new ASTerror ("Invalid expression"));
 		}
 		
+		ASTnode tlhs = lhs;
+		ASTnode trhs = rhs;
+		
+		if (lhs->isCallable ()) {
+			tlhs = ASTnode (new ASTcallindex (std::dynamic_pointer_cast <ASTcallable> (lhs), 0));
+		}
+		if (rhs->isCallable ()) {
+			trhs = ASTnode (new ASTcallindex (std::dynamic_pointer_cast <ASTcallable> (rhs), 0));
+		}
+		
 		std::vector <ASTnode> args (2);
-		args [0] = lhs;
-		args [1] = createStaticCast (rhs, lhs);
+		args [0] = tlhs;
+		args [1] = createStaticCast (trhs, tlhs);
 		auto fbeg = functions.lower_bound (func), fend = functions.upper_bound (func);
 		std::vector <shared_ptr <FunctionDecleration>> cands;
 		while (fbeg != fend) cands.push_back (fbeg->second), ++fbeg;
 		shared_ptr <ASTcallable> call =  parser::findBestMatch (this, args, cands, 0);
 		if (!call->isValid () and defImp) {
-			if (!lhs->getType ()) return lhs;
-			if (!rhs->getType ()) return rhs;
-			return defImp (this, func, lhs, rhs, end);
+			if (!tlhs->getType ()) return tlhs;
+			if (!trhs->getType ()) return trhs;
+			return defImp (this, func, tlhs, trhs, end);
 		} else {
 			return call;
 		}
