@@ -12,6 +12,7 @@ namespace parser {
 struct NumbatVariable {
 	public:
 		const ASTnode & getASTType () const {return type;}
+		const ASTnode & getInit () const {return init;}
 		bool isAlias () const {return type->isAlias ();}
 		bool isArray () const {return type->isArray ();}
 		bool isConst () const {return type->isConst ();}
@@ -23,9 +24,10 @@ struct NumbatVariable {
 		const string & getIden () const {return iden;}
 		
 		NumbatVariable () {}
-		NumbatVariable (const ASTnode & type, const string & iden, bool global=false, bool temp=false) : type (type), iden (iden), global (global), temp (temp) {}
+		NumbatVariable (const ASTnode & type, const string & iden, bool global=false, bool temp=false) : type (type), init (nullptr), iden (iden), global (global), temp (temp) {}
+		NumbatVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global=false, bool temp=false) : type (type), init (init), iden (iden), global (global), temp (temp) {}
 	private:
-		ASTnode type;
+		ASTnode type, init;
 		string iden;
 		bool global, temp;
 };
