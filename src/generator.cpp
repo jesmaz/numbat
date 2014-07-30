@@ -493,7 +493,7 @@ void BodyGenerator::visit (ASTconcat & exp) {
 	if (n) {
 		createMemCpy (rharray, rhs, rlen, exp.getConv ());
 	} else {
-		createMemCpy (rharray, rhs, nullptr, exp.getConv ());
+		createMemCpy (builder.CreateLoad (rharray), rhs, nullptr, exp.getConv ());
 	}
 	
 	stack.push (array);
@@ -573,6 +573,8 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 		len->accept (*this);
 		length = builder.CreateLoad (stack.top ());
 		stack.pop ();
+	} else if (exp.getDest ()->isArray ()) {
+		dest = builder.CreateLoad (dest);
 	}
 	
 	createMemCpy (dest, source, length, conv);
@@ -895,7 +897,7 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 	
 	builder.SetInsertPoint (loopBlock);
 	exp.getBody ()->accept (*this);
-	if (!loopBlock->getTerminator())
+	if (!builder.GetInsertBlock ()->getTerminator())
 		builder.CreateBr (continueBlock);
 	
 	builder.SetInsertPoint (breakBlock);
