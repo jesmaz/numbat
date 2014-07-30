@@ -132,7 +132,7 @@ def _start @cstyle () -> (int32) {
 	l = k + str
 	io.print ("just a raw string\n")
 	io.print (k + str)
-	io.print (l)
+	io.print (l + 42 + "\n")
 	#strlib.string ("str\n")
 	#io.print (str)
 	exit (0)
