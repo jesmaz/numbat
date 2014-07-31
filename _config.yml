@@ -2,7 +2,7 @@
 title: Numbat
 email: recursiveowl@gmail.com
 description: "Official website for the Numbat programming language."
-baseurl: ""
+baseurl: "/numbat"
 url: "http://yourdomain.com"
 twitter_username: jesmaz
 github_username:  jesmaz
