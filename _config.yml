@@ -1,0 +1,21 @@
+# Site settings
+title: Numbat
+email: recursiveowl@gmail.com
+description: "Official website for the Numbat programming language."
+baseurl: ""
+url: "http://yourdomain.com"
+twitter_username: jesmaz
+github_username:  jesmaz
+timezone: Australia/Melbourne
+
+# Build settings
+markdown: kramdown
+permalink: pretty
+
+
+defaults:
+  -
+    scope:
+        path: ""
+    values:
+        layout: "default"
