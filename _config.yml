@@ -2,8 +2,8 @@
 title: Numbat
 email: recursiveowl@gmail.com
 description: "Official website for the Numbat programming language."
-baseurl: "/numbat"
-url: "http://yourdomain.com"
+baseurl: ""
+url: "http://numbatlang.org"
 twitter_username: jesmaz
 github_username:  jesmaz
 timezone: Australia/Melbourne
