@@ -1257,7 +1257,7 @@ tkitt AbstractSyntaxTree::findLastToken (const string & token, tkitt tmpitt, tki
 					default:
 						break;
 				}
-			} else if (end->iden == token) {
+			} else if (end->iden == token and end->type != TOKEN::chararrayliteral and end->type != TOKEN::stringliteral) {
 				return end;
 			}
 		}
@@ -1297,7 +1297,7 @@ tkitt AbstractSyntaxTree::findToken (const string & token, tkitt tmpitt, tkitt e
 					default:
 						break;
 				}
-			} else if (tmpitt->iden == token) {
+			} else if (tmpitt->iden == token and tmpitt->type != TOKEN::chararrayliteral and tmpitt->type != TOKEN::stringliteral) {
 				return tmpitt;
 			}
 		}
