@@ -1,8 +1,70 @@
 import os
 
 
-def print (const ref string str) -> (int64) {
-        os.filehandle stdin
-        stdin.hand = 0
-        return os.write (stdin, str.data)
+os.filehandle stdout
+stdout.handle = 0
+os.filehandle stdin
+stdin.handle = 1
+os.filehandle stderr
+stderr.handle = 2
+
+
+def print (const ref string str) -> (int64 length) {
+	int64 l = os.write (stdout, str.data)
+	return l
+}
+
+def scan () -> (string token) {
+	string s = scan (" \n\r\t")
+	return s
+}
+
+int8 [1024] buffer
+int64 pos = 0
+int64 back = 0
+
+def next @local () -> (int8) {
+	while (pos == back) {
+		back = 0
+		pos = 0
+		back = os.read (stdin, buffer)
+	}
+	int8 char = buffer [pos]
+	pos = pos + 1
+	return char
+}
+
+def max @local (bool a, bool b) -> (bool) {
+	while (a) {
+		return a
+	}
+	return b
+}
+
+def in @local (int8 char, const ref int8 [0] data) -> (bool) {
+	bool found = 0
+	int64 pos = 0
+	while (pos < data.length) {
+		bool n = data [pos] == char
+		found = max (found, n)
+		pos = pos + 1
+	}
+	return found
+}
+
+def scan (const ref string term) -> (string token) {
+	int8 [1024] buff
+	string s
+	int8 char = next ()
+	int64 pos = 0
+	bool cont = 1
+	while (cont) {
+		buff [pos] = char
+		pos = pos + 1
+		char = next ()
+		cont = 1-in (char, term.data)
+	}
+	buff.length = pos
+	s.data = buff
+	return s
 }
