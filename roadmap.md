@@ -5,7 +5,7 @@
  - [ ] File I/O
  - [ ] Function auto return
  - [ ] if/else statement
- - [ ] intptr casting
+ - [ ] ptrint casting
    - [ ] Arrays
    - [ ] References
  - [ ] Socket I/O (TCP and UDP only)
