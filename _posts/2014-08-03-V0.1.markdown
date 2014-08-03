@@ -1,0 +1,12 @@
+---
+layout: post
+title: "V0.1"
+date: 2014-08-03 11:24:37
+categories: development release preview
+---
+
+Numbat's first preview release is now available. This version is only available as source code and requires llvm-3.5 to build.
+
+Source:
+[tar](https://github.com/jesmaz/numbat/archive/V0.1.tar.gz)
+[zip](https://github.com/jesmaz/numbat/archive/V0.1.zip).
