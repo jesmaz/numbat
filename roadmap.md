@@ -1,5 +1,9 @@
 #Roadmap#
 
+##Version 0.1.1##
+ - [ ] Floating point constants
+ - [ ] Nested while loops
+
 ##Version 0.2##
  - [ ] Enums
  - [ ] File I/O
