@@ -885,22 +885,28 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 	
 	Function * func = builder.GetInsertBlock ()->getParent ();
 	
-	continueBlock = BasicBlock::Create (context, "condition", func);
-	BasicBlock * loopBlock = BasicBlock::Create (context, "loop", func);
-	breakBlock = BasicBlock::Create (context, "break", func);
-	builder.CreateBr (continueBlock);
+	BasicBlock * oldCont = continueBlock;
+	BasicBlock * oldBreak = breakBlock;
 	
-	builder.SetInsertPoint (continueBlock);
+	BasicBlock *  contBlk = continueBlock = BasicBlock::Create (context, "condition", func);
+	BasicBlock * loopBlock = BasicBlock::Create (context, "loop", func);
+	BasicBlock *  brakeBlk = breakBlock = BasicBlock::Create (context, "break", func);
+	builder.CreateBr (contBlk);
+	
+	builder.SetInsertPoint (contBlk);
 	makeCompare (exp.getCondition ());
 	Value * cond = stack.top (); stack.pop ();
-	builder.CreateCondBr (cond, loopBlock, breakBlock);
+	builder.CreateCondBr (cond, loopBlock, brakeBlk);
 	
 	builder.SetInsertPoint (loopBlock);
 	exp.getBody ()->accept (*this);
 	if (!builder.GetInsertBlock ()->getTerminator())
-		builder.CreateBr (continueBlock);
+		builder.CreateBr (contBlk);
 	
-	builder.SetInsertPoint (breakBlock);
+	builder.SetInsertPoint (brakeBlk);
+	
+	continueBlock = oldCont;
+	breakBlock = oldBreak;
 	
 }
 
