@@ -2,7 +2,7 @@
 
 ##Version 0.1.1##
  - [x] Floating point constants
- - [ ] Nested while loops
+ - [x] Nested while loops
 
 ##Version 0.2##
  - [ ] Enums
