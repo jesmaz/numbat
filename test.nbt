@@ -110,6 +110,16 @@ extern def exit @cstyle (int32 e)
 int64 global = 10
 
 def _start @cstyle () -> (int32) {
+	uint64 a = 3
+	while (0 < a) {
+		uint64 b = 3
+		while (0 < b) {
+			io.print ("(" + a + (", " + b + ")"))
+			b = b - 1
+		}
+		a = a - 1
+		io.print ("\n")
+	}
 	float f = 0.4f
 	quad q = 0.4q
 	bool t = 10 < global
