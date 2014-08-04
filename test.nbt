@@ -63,6 +63,10 @@ def testFunc (int8 lhs, int8 rhs) -> (int8) {
 	int8 i = 10
 	while (i) {
 		i = i + 1
+		int8 j = 1
+		while (j) {
+			j = j - 1
+		}
 	}
 	int8 b
 	int64 c = 9 - 1
@@ -106,6 +110,8 @@ extern def exit @cstyle (int32 e)
 int64 global = 10
 
 def _start @cstyle () -> (int32) {
+	float f = 0.4f
+	quad q = 0.4q
 	bool t = 10 < global
 	int8 [6] arr
 	arr [0] = 104
