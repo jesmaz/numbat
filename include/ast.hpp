@@ -123,6 +123,7 @@ struct AbstractSyntaxTree {
 		ASTnode parseBody (tkitt end); // TODO: needs template info parem
 		ASTnode parseExpression (tkitt end);
 		ASTnode parseExpression (std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end, const std::vector <ASTnode> * args = nullptr);
+		ASTnode parseNumericliteral (tkitt end);
 		ASTnode parseOperator (const OperatorDecleration & opp, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt softEnd, tkitt end, const std::vector <ASTnode> * prevArgs = nullptr);
 		ASTnode parseParameter (tkitt end);
 		ASTnode parsePrimaryExpression (tkitt end) {return parsePrimaryExpression (end, nullptr);}

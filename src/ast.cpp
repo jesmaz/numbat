@@ -457,6 +457,27 @@ ASTnode AbstractSyntaxTree::parseExpression (std::list <OperatorDecleration::Ope
 	
 }
 
+ASTnode AbstractSyntaxTree::parseNumericliteral (tkitt end) {
+	
+	ASTnode num;
+	if (itt->iden.back () == 'f') {
+		num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, types ["float"])), itt->iden));
+	} else if (itt->iden.back () == 'h') {
+		num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, types ["half"])), itt->iden));
+	} else if (itt->iden.back () == 'q') {
+		num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, types ["quad"])), itt->iden));
+	} else if (itt->iden.find ('.') != string::npos) {
+		num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, types ["double"])), itt->iden));
+	} else {
+		size_t l = std::stoull (itt->iden);
+		num = ASTnode (new ASTconstantInt (ASTnode (new ASTtype (false, true, types ["uint64"])), l));
+	}
+	
+	nextToken (end);
+	return num;
+	
+}
+
 ASTnode AbstractSyntaxTree::parseOperator (const OperatorDecleration & opp, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt matchPtr, tkitt end, const std::vector <ASTnode> * prevArgs) {
 	
 	std::vector <tkitt> oppLoc;
@@ -540,11 +561,7 @@ ASTnode AbstractSyntaxTree::parsePrimaryExpression (tkitt end, const std::vector
 		return ASTnode (new ASTerror ("NYI"));
 	} else if (itt->type == TOKEN::numericliteral) {
 		//TODO: deal with float and double literals
-		string key = "raw 64";
-		size_t amount = parseIntLiteral (end);
-		std::set <string> meta; meta.insert ("sint");
-		ASTnode type = ASTnode (new ASTtype (false, true, generateRawType (key, 64, meta)));
-		return ASTnode (new ASTconstantInt (type, amount));
+		return parseNumericliteral (end);
 	} else if (itt->type == TOKEN::stringliteral) {
 		const string & str = parseString (end);
 		return ASTnode (new ASTconstantCString (ASTnode (new ASTtype (false, true, types ["string"])), str));
