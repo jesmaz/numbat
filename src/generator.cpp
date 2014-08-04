@@ -502,6 +502,13 @@ void BodyGenerator::visit (ASTconcat & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTconstantFPInt & exp) {
+	
+	Type * type = getType (exp.getType ().get ());
+	stack.push (createTemp (ConstantFP::get (type, exp.getValue ())));
+	
+}
+
 void BodyGenerator::visit (ASTconstantInt & exp) {
 	
 	Type * type = getType (exp.getType ().get ());
