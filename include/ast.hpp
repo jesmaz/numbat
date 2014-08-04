@@ -8,6 +8,7 @@
 #include "ast/astcallerror.hpp"
 #include "ast/astcallindex.hpp"
 #include "ast/astconcat.hpp"
+#include "ast/astconstantfpint.hpp"
 #include "ast/astconstantint.hpp"
 #include "ast/astconstantcstring.hpp"
 #include "ast/asterror.hpp"
