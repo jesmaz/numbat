@@ -42,7 +42,7 @@ std::string next (const char * source, size_t & pos, size_t length) {
                 str += source [pos];
                 ++pos;
 			} else if (isdigit (source [pos])) {
-				while (isdigit (source [pos]) or source [pos] == '.' or source [pos] == 'x' or source [pos] == 'X' or (source [pos] >= 'a' and source [pos] <= 'f') or (source [pos] >= 'A' and source [pos] <= 'F')) {
+				while (isdigit (source [pos]) or source [pos] == '.' or source [pos] == 'x' or source [pos] == 'X' or source [pos] == 'q' or source [pos] == 'Q' or (source [pos] >= 'a' and source [pos] <= 'f') or (source [pos] >= 'A' and source [pos] <= 'F')) {
 					str += source [pos];
 					++pos;
 				}
