@@ -114,7 +114,7 @@ def _start @cstyle () -> (int32) {
 	while (0 < a) {
 		uint64 b = 3
 		while (0 < b) {
-			io.print ("(" + a + (", " + b + ")"))
+			io.print ("(" + a + ", " + b + ")")
 			b = b - 1
 		}
 		a = a - 1
