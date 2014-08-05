@@ -6,3 +6,7 @@ categories: development release preview
 ---
 
 Version 0.1.1 of Numbat has been released. Change log can be seen [here](https://github.com/jesmaz/numbat/blob/V0.1.1/changelog.md).
+
+Source:
+[tar](https://github.com/jesmaz/numbat/archive/V0.1.1.tar.gz)
+[zip](https://github.com/jesmaz/numbat/archive/V0.1.1.zip)
