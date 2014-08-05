@@ -1022,7 +1022,7 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 					if (!cmp) {
 						cand.second += len + 1;
 					}
-				} else {
+				} else if (tkn->type != TOKEN::chararrayliteral and tkn->type != TOKEN::stringliteral) {
 					size_t len = std::min (ptn.size () - cand.second, sym.size ());
 					int cmp = sym.compare (0, len, ptn, cand.second, len);
 					if (cmp) {
@@ -1031,6 +1031,9 @@ std::list <OperatorDecleration::OperatorMatch> AbstractSyntaxTree::generateOpera
 					} else {
 						cand.second += len;
 					}
+				} else {
+					remove.push_back (cand);
+					continue;
 				}
 				if (cand.second >= ptn.size () or (cand.second + 1 >= ptn.size () and ptn.back () == ' ')) {
 					matches.push_back (cand.first);
