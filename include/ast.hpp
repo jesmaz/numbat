@@ -66,7 +66,7 @@ typedef ASTnode (*defBinaryImp)(AbstractSyntaxTree * ast, const string & func, c
 typedef lexer::tkstring::const_iterator tkitt;
 
 
-struct AbstractSyntaxTree {
+class AbstractSyntaxTree {
 	
 	public:
 		const bool buildSuccessfull () const {return !buildFail;}
@@ -121,7 +121,7 @@ struct AbstractSyntaxTree {
 		ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth=1);
 		ASTnode createTuple (const ASTnode & lhs, const ASTnode & rhs);
 		ASTnode parseAssembly (const string & type, const string & code);
-		ASTnode parseBody (tkitt end); // TODO: needs template info parem
+		ASTnode parseBody (tkitt end); // TODO: needs template info parameter?
 		ASTnode parseExpression (tkitt end);
 		ASTnode parseExpression (std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end, const std::vector <ASTnode> * args = nullptr);
 		ASTnode parseNumericliteral (tkitt end);
