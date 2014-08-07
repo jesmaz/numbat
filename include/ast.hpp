@@ -29,6 +29,7 @@
 #include "ast/astvariable.hpp"
 #include "ast/astwhileloop.hpp"
 #include "ast/functiondecleration.hpp"
+#include "ast/numbatenumtype.hpp"
 #include "ast/numbatpointertype.hpp"
 #include "ast/numbatrawtype.hpp"
 #include "ast/numbattype.hpp"
@@ -172,6 +173,7 @@ struct AbstractSyntaxTree {
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
 		void importModule (const shared_ptr <Module> & module, bool extention);
 		void printError (const string & message) {buildFail = true; std::cerr << file << " >> error on line " << line << ": " << message << '\n';}
+		void parseEnum (tkitt end);
 		void parseImport (tkitt end);
 		void parseOperatorDecleration (tkitt end);
 		void parseTypeDef (tkitt end);
