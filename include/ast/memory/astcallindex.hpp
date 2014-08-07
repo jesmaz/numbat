@@ -1,8 +1,8 @@
 #ifndef ASTCALLINDEX_HPP
 #define ASTCALLINDEX_HPP
 
-#include "astcallable.hpp"
-#include "numbattype.hpp"
+#include "../callable/astcallable.hpp"
+#include "../type/numbattype.hpp"
 
 
 namespace numbat {

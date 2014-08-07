@@ -1,4 +1,4 @@
-#include "../include/ast/astbody.hpp"
+#include "../include/ast/control/astbody.hpp"
 
 namespace numbat {
 namespace parser {

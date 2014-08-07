@@ -1,7 +1,7 @@
 #ifndef ASTWHILELOOP_HPP
 #define ASTWHILELOOP_HPP
 
-#include "astbase.hpp"
+#include "../astbase.hpp"
 
 
 namespace numbat {

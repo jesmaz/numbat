@@ -1,8 +1,8 @@
 #ifndef NUMBATTYPE_HPP
 #define NUMBATTYPE_HPP
 
-#include "astbase.hpp"
-#include "functiondecleration.hpp"
+#include "../astbase.hpp"
+#include "../functiondecleration.hpp"
 
 #include <set>
 #include <sstream>

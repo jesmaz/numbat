@@ -1,8 +1,8 @@
 #ifndef ASTCONSTANT_HPP
 #define ASTCONSTANT_HPP
 
-#include "astbase.hpp"
-#include "numbattype.hpp"
+#include "../astbase.hpp"
+#include "../type/numbattype.hpp"
 
 
 namespace numbat {

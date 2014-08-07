@@ -1,5 +1,5 @@
-#include "../include/ast/astbody.hpp"
-#include "../include/ast/aststructindex.hpp"
+#include "../include/ast/control/astbody.hpp"
+#include "../include/ast/memory/aststructindex.hpp"
 
 namespace numbat {
 namespace parser {

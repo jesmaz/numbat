@@ -1,8 +1,8 @@
 #ifndef ASTCALLABLE_HPP
 #define ASTCALLABLE_HPP
 
-#include "astbase.hpp"
-#include "functiondecleration.hpp"
+#include "../astbase.hpp"
+#include "../functiondecleration.hpp"
 
 
 namespace numbat {

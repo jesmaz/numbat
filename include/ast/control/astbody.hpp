@@ -1,7 +1,7 @@
 #ifndef ASTBODY_HPP
 #define ASTBODY_HPP
 
-#include "astbase.hpp"
+#include "../astbase.hpp"
 
 
 namespace numbat {

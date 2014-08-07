@@ -1,8 +1,8 @@
 #ifndef ASTSTRUCTINDEX_HPP
 #define ASTSTRUCTINDEX_HPP
 
-#include "astbase.hpp"
-#include "numbattype.hpp"
+#include "../astbase.hpp"
+#include "../type/numbattype.hpp"
 
 
 namespace numbat {

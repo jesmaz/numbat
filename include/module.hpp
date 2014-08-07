@@ -1,9 +1,9 @@
 #ifndef MODULE_HPP
 #define MODULE_HPP
 
-#include "ast/astbody.hpp"
+#include "ast/control/astbody.hpp"
 #include "ast/functiondecleration.hpp"
-#include "ast/numbattype.hpp"
+#include "ast/type/numbattype.hpp"
 #include "ast/operatordecleration.hpp"
 
 #include <map>

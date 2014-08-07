@@ -1,7 +1,7 @@
 #ifndef ASTCONCAT_HPP
 #define ASTCONCAT_HPP
 
-#include "astbase.hpp"
+#include "../astbase.hpp"
 
 
 namespace numbat {

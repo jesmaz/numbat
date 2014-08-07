@@ -1,22 +1,21 @@
-#ifndef ASTRAWDATA_HPP
-#define ASTRAWDATA_HPP
+#ifndef ASTTYPE_HPP
+#define ASTTYPE_HPP
 
-#include "astbase.hpp"
+#include "../astbase.hpp"
 #include "numbattype.hpp"
-
-#include <set>
 
 
 namespace numbat {
 namespace parser {
 
 
-class ASTrawdata : public ASTbase {
+class ASTtype : public ASTbase {
 	VISITABLE
 	public:
+		virtual const ASTnode getArrayType () const {return type->getArrayType ();}
 		virtual bool isAlias () const {return ref;}
+		virtual bool isArray () const {return type->isArray ();}
 		virtual bool isConst () const {return constType;}
-		virtual bool isRaw () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual shared_ptr <NumbatType> getType () const {return type;}
 		virtual size_t calculateWeight () const {return 1;}
@@ -26,12 +25,11 @@ class ASTrawdata : public ASTbase {
 			return indent + type->getIden ();
 		}
 		
-		ASTrawdata () {}
-		ASTrawdata (const bool ref, const bool constType, const shared_ptr <NumbatType> & type, const std::set <string> & metaTags) : ref (ref), constType (constType), type (type), metaTags (metaTags) {}
+		ASTtype () {}
+		ASTtype (const bool ref, const bool constType, const shared_ptr <NumbatType> & type) : ref (ref), constType (constType), type (type) {}
 	private:
 		bool ref, constType;
 		shared_ptr <NumbatType> type;
-		std::set <string> metaTags;
 };
 
 
@@ -39,4 +37,4 @@ class ASTrawdata : public ASTbase {
 }
 
 
-#endif /*ASTRAWDATA_HPP*/
+#endif /*ASTTYPE_HPP*/

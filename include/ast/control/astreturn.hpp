@@ -1,8 +1,8 @@
 #ifndef ASTRETURN_HPP
 #define ASTRETURN_HPP
 
-#include "astbase.hpp"
-#include "numbattype.hpp"
+#include "../astbase.hpp"
+#include "../type/numbattype.hpp"
 
 
 namespace numbat {

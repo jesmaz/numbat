@@ -1,8 +1,8 @@
 #ifndef ASTGEP_HPP
 #define ASTGEP_HPP
 
-#include "astcallable.hpp"
-#include "numbatpointertype.hpp"
+#include "../callable/astcallable.hpp"
+#include "../type/numbatpointertype.hpp"
 
 
 namespace numbat {
