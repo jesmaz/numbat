@@ -1,7 +1,6 @@
 #ifndef ABSTRACT_SYNTAX_TREE_HPP
 #define ABSTRACT_SYNTAX_TREE_HPP
 
-#include "ast/astcontext.hpp"
 #include "ast/asterror.hpp"
 #include "ast/astfunctionlist.hpp"
 #include "ast/astmodule.hpp"
