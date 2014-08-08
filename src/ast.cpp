@@ -42,6 +42,10 @@ AbstractSyntaxTree::AbstractSyntaxTree (tkitt beg, tkitt end, const string & pat
 				}
 				break;
 				
+			case TOKEN::enumtkn:
+				parseEnum (end);
+				break;
+				
 			case TOKEN::externdef:
 				nextToken (end);
 				parseFunctionDecleration (end);
@@ -1392,6 +1396,34 @@ void AbstractSyntaxTree::importModule (const shared_ptr <Module> & module, bool 
 	for (auto stmt : module->getStatmentParsers()) {
 		statementParsers [stmt.first] = stmt.second;
 	}
+	
+}
+
+void AbstractSyntaxTree::parseEnum (tkitt end) {
+	
+	error ("Enums not yet implemented", end);
+	return;
+	/*nextToken (end);//eat 'enum' token
+	string iden = itt->iden;
+	nextToken (end);
+	std::set <string> meta = parseMetaTags (end);
+	ASTnode type;
+	
+	if (itt->type == TOKEN::colon) {
+		nextToken (end);
+		type = resolveSymbol (itt->iden);
+	} else {
+		type = resolveSymbol ("uint32");
+	}
+	
+	std::vector <ASTnode> members;
+	if (itt->iden == "{") {
+		nextToken (end);
+		//members = parseArgs (& AbstractSyntaxTree::parseParameter, findToken ("}", end));
+	}
+	
+	types [iden] = shared_ptr <NumbatType> (new NumbatEnumType (iden, type->getType (), meta));
+	types [iden]->buildData (members);*/
 	
 }
 
