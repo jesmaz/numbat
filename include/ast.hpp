@@ -27,6 +27,7 @@
 #include "ast/memory/aststructindex.hpp"
 #include "ast/memory/astvariable.hpp"
 #include "ast/memory/numbatvariable.hpp"
+#include "ast/numbatscope.hpp"
 #include "ast/type/astrawdata.hpp"
 #include "ast/type/asttuple.hpp"
 #include "ast/type/asttype.hpp"
@@ -66,7 +67,7 @@ typedef ASTnode (*defBinaryImp)(AbstractSyntaxTree * ast, const string & func, c
 typedef lexer::tkstring::const_iterator tkitt;
 
 
-class AbstractSyntaxTree {
+class AbstractSyntaxTree : NumbatScope {
 	
 	public:
 		const bool buildSuccessfull () const {return !buildFail;}
