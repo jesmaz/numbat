@@ -14,6 +14,11 @@ class NumbatScope : public ASTbase {
 	VISITABLE
 	public:
 		
+		virtual bool isValid () const;
+		virtual size_t calculateWeight () const;
+		virtual string getIden () const {return "scope";}
+		virtual string toString (const string & indent = "") const;
+		
 		friend ASTnode collectDestructors (const NumbatScope * scope);
 		friend ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent=nullptr, bool cascade=true, bool local=true);
 		friend NumbatScope * createChild (NumbatScope * scope);
@@ -23,13 +28,14 @@ class NumbatScope : public ASTbase {
 		friend const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
 		
 	protected:
-	private:
 		
 		NumbatScope () {}
 		
-		bool registerSymbol_ (const string & iden, FunctionDecleration * func);
-		bool registerSymbol_ (const string & iden, NumbatType * type);
-		bool registerSymbol_ (const string & iden, NumbatVariable * var);
+	private:
+		
+		bool registerSymbol (const string & iden, FunctionDecleration * func);
+		bool registerSymbol (const string & iden, NumbatType * type);
+		bool registerSymbol (const string & iden, NumbatVariable * var);
 		
 		bool symbolRegisted (const string & iden);
 		
@@ -39,7 +45,7 @@ class NumbatScope : public ASTbase {
 		
 		std::set <unique_ptr <NumbatScope>> children;
 		
-		std::vector <unique_ptr <ASTbase>> body;
+		std::vector <ASTnode> body;
 		
 		NumbatScope * parent=nullptr;;
 		
