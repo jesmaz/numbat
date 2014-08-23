@@ -29,6 +29,7 @@ typedef shared_ptr <ASTbase> ASTnode;
 class ASTbase : public visitor::BaseVisitable {
 	public:
 		static const ASTnode getLength (const ASTnode & exp);
+		virtual ASTnode resolveSymbol (const string & iden) {return nullptr;}
 		virtual const ASTnode getArrayType () const;
 		virtual const ASTnode getASTType () const {return nullptr;}
 		virtual bool isAlias () const {return false;}
