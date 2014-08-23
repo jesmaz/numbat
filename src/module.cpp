@@ -126,6 +126,7 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0), file);
 	if (debugMode) {
 		std::cerr << ast.toString () << std::endl;
+		std::cerr << ASTnode (new ASTbody (ast.getBody ()))->toString ("") << std::endl;
 	}
 	main.push_back (ASTnode (new ASTbody (ast.getBody ())));
 	*allModules [file] = Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ());
