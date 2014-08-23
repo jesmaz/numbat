@@ -5,6 +5,50 @@ namespace numbat {
 namespace parser {
 
 
+ASTnode NumbatScope::resolveSymbol (const string & iden) const {
+	
+	auto var = variables.find (iden);
+	if (var != variables.end ()) {
+		return ASTnode (new ASTvariable (var->second));
+	}
+	auto typ = types.find (iden);
+	if (typ != types.end ()) {
+		return ASTnode (new ASTtype (false, false, typ->second));
+	}
+	//auto funcs = findFunctions (this, iden);
+	auto func_beg = functions.lower_bound (iden);
+	auto func_end = functions.upper_bound (iden);
+	std::vector <shared_ptr <FunctionDecleration>> funcs;
+	while (func_beg != func_end) {
+		funcs.push_back (func_beg->second);
+		++func_beg;
+	}
+	if (!funcs.empty ()) {
+		return ASTnode (new ASTfunctionlist (iden, funcs));
+	}
+	
+	return nullptr;
+	
+}
+
+ASTnode resolveSymbol (const NumbatScope* scope, const string & iden, ASTnode parent, bool cascade, bool local) {
+	
+	ASTnode ret;
+	if (parent) {
+		ret = parent->resolveSymbol (iden);
+	} else {
+		ret = scope->resolveSymbol (iden);
+		if (!ret and scope->parent) {
+			return resolveSymbol (scope->parent, iden, parent, cascade, local);
+		}
+	}
+	if (!ret) {
+		ret = ASTnode (new ASTerror ("'" + iden + "' is undefined within this scope."));
+	}
+	return ret;
+	
+}
+
 bool NumbatScope::isValid () const {
 	if (0 > valid) {
 		valid = 1;
@@ -51,6 +95,9 @@ bool NumbatScope::registerSymbol (const string & iden, NumbatVariable * var) {
 	if (symbolRegisted (iden)) {
 		return false;
 	}
+	if (!parent) {
+		var->isGlobal (true);
+	}
 	variables [iden] = unique_ptr <NumbatVariable> (var);
 	return true;
 	
@@ -77,6 +124,17 @@ NumbatScope * createChild (NumbatScope * scope) {
 	child->parent = scope; 
 	scope->children.insert (unique_ptr <NumbatScope> (child));
 	return child;
+}
+
+NumbatVariable * NumbatScope::createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {
+	
+	NumbatVariable * var = new NumbatVariable (type, init, iden, global, temp);
+	if (!registerSymbol (iden, var)) {
+		delete var;
+		var = nullptr;
+	}
+	return var;
+	
 }
 
 
