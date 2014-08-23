@@ -123,13 +123,14 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	}
 	size_t pos = file.find_last_of ("/");
 	allModules [file] = shared_ptr <Module> (new Module);
-	AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0), file);
+	AbstractSyntaxTree * ast = new AbstractSyntaxTree (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0), file);
 	if (debugMode) {
-		std::cerr << ast.toString () << std::endl;
-		std::cerr << ASTnode (new ASTbody (ast.getBody ()))->toString ("") << std::endl;
+		std::cerr << ast->toString () << std::endl;
+		std::cerr << ASTnode (new ASTbody (ast->getBody ()))->toString ("") << std::endl;
 	}
-	main.push_back (ASTnode (new ASTbody (ast.getBody ())));
-	*allModules [file] = Module (ast.getTypes (), ast.getFunctions (), ast.getOperators (), ast.getDependencies (), ast.getStatmentParsers ());
+	main.push_back (ASTnode (new ASTbody (ast->getBody ())));
+	*allModules [file] = Module (ast->getTypes (), ast->getFunctions (), ast->getOperators (), ast->getDependencies (), ast->getStatmentParsers ());
+	allModules [file]->ast = ast;
 	checkForBuiltins (*allModules [file]);
 	return allModules [file];
 	
@@ -186,6 +187,11 @@ void Module::checkForBuiltins (Module & mod) {
 		}
 	}
 	
+}
+
+Module::~Module () {
+	if (ast)
+		delete ast;
 }
 
 

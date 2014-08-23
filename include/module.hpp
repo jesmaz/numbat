@@ -24,6 +24,8 @@ struct Module {
 	
 	public:
 		
+		const AbstractSyntaxTree * getAst () {return ast;}
+		
 		const bool validate () const;
 		
 		const std::map <string, shared_ptr <NumbatType>> & getTypes () const {return types;}
@@ -53,6 +55,8 @@ struct Module {
 		static void setDebugMode (bool b) {debugMode = b;}
 		static void addIncludeDir (const string & dir) {includeDirs.insert (dir);}
 		
+		~Module ();
+		
 	protected:
 	private:
 		
@@ -65,6 +69,8 @@ struct Module {
 		std::map <string, shared_ptr <OperatorDecleration>> operators;
 		std::set <shared_ptr <Module>> dependencies;
 		std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> statementParsers;
+		
+		AbstractSyntaxTree * ast=nullptr;
 		
 		
 		static void checkForBuiltins (Module & mod);
