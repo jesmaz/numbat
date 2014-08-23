@@ -39,9 +39,9 @@ class NumbatScope : public ASTbase {
 		
 		bool symbolRegisted (const string & iden);
 		
-		std::map <string, unique_ptr <NumbatType>> types;
-		std::map <string, unique_ptr <NumbatVariable>> variables;
-		std::multimap <string, unique_ptr <FunctionDecleration>> functions;
+		std::map <string, shared_ptr <NumbatType>> types;
+		std::map <string, shared_ptr <NumbatVariable>> variables;
+		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
 		
 		std::set <unique_ptr <NumbatScope>> children;
 		
