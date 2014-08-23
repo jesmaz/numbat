@@ -2,7 +2,11 @@
 #define NUMBATSCOPE_HPP
 
 #include "astbase.hpp"
+#include "asterror.hpp"
+#include "astfunctionlist.hpp"
+#include "memory/astvariable.hpp"
 #include "memory/numbatvariable.hpp"
+#include "type/asttype.hpp"
 
 #include <map>
 
@@ -14,6 +18,7 @@ class NumbatScope : public ASTbase {
 	VISITABLE
 	public:
 		
+		virtual ASTnode resolveSymbol (const string & iden) const;
 		virtual bool isValid () const;
 		virtual size_t calculateWeight () const;
 		virtual string getIden () const {return "scope";}
@@ -28,6 +33,8 @@ class NumbatScope : public ASTbase {
 		friend const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
 		
 	protected:
+		
+		virtual NumbatVariable * createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
 		
 		NumbatScope () {}
 		
@@ -48,6 +55,7 @@ class NumbatScope : public ASTbase {
 		std::vector <ASTnode> body;
 		
 		NumbatScope * parent=nullptr;;
+		mutable int valid = -1;
 		
 };
 
