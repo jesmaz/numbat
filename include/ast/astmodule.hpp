@@ -12,6 +12,7 @@ namespace parser {
 class ASTmodule : public ASTbase {
 	public:
 		const shared_ptr <Module> & getModule () const {return module;}
+		virtual ASTnode resolveSymbol (const string & iden) const;
 		virtual bool isAlias () const {return false;}
 		virtual bool isConst () const {return false;}
 		virtual bool isNil () const {return false;}

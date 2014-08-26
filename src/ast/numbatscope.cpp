@@ -27,7 +27,7 @@ ASTnode NumbatScope::resolveSymbol (const string & iden) const {
 		return ASTnode (new ASTfunctionlist (iden, funcs));
 	}
 	
-	return nullptr;
+	return ASTbase::resolveSymbol (iden);
 	
 }
 

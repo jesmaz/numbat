@@ -189,6 +189,10 @@ void Module::checkForBuiltins (Module & mod) {
 	
 }
 
+ASTnode ASTmodule::resolveSymbol (const string & iden) const {
+	return module->getAst ()->resolveSymbol (iden);
+}
+
 Module::~Module () {
 	if (ast)
 		delete ast;
