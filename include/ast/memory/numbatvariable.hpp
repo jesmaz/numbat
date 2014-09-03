@@ -19,7 +19,7 @@ struct NumbatVariable {
 		bool isGlobal () const {return global;}
 		bool isGlobal (bool glo) {return global = glo;}
 		bool isTemp () const {return temp;}
-		shared_ptr <NumbatType> getType () const {return type->getType ();}
+		const NumbatType * getType () const {return type->getType ();}
 		const size_t getSize () const {return type->getBitSize ();}
 		const string & getIden () const {return iden;}
 		

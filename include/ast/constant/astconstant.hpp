@@ -17,7 +17,7 @@ class ASTconstant : public ASTbase {
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return type->isValid ();}
 		virtual const T & getValue () const=0;
-		virtual shared_ptr <NumbatType> getType () const {return type->getType ();}
+		virtual const NumbatType * getType () const {return type->getType ();}
 		virtual size_t calculateWeight () const {return 1;}
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}

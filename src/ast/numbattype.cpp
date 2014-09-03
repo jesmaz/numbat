@@ -36,7 +36,7 @@ string NumbatType::toString (const string & indent) const {
 	return ss.str ();
 }
 
-int NumbatType::findMember (const std::string & iden) {
+int NumbatType::findMember (const std::string & iden) const {
 	for (int i=0, l=members.size (); i<l; ++i) {
 		if (members [i]->getIden () == iden) {
 			return i;

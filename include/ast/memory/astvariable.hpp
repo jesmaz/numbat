@@ -21,7 +21,7 @@ class ASTvariable : public ASTbase {
 		virtual bool isArray () const {return variable->isArray ();}
 		virtual bool isConst () const {return variable->isConst ();}
 		virtual bool isValid () const {return true;}
-		virtual shared_ptr <NumbatType> getType () const {return variable->getType ();}
+		virtual const NumbatType * getType () const {return variable->getType ();}
 		virtual size_t calculateWeight () const {return 1;}
 		virtual size_t getBitSize () const {return variable->getSize ();}
 		virtual string getIden () const {return variable->getIden ();}

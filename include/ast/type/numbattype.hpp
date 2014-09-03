@@ -31,7 +31,7 @@ class NumbatType {
 		virtual string convertDataToString (const void * data, size_t & offset) const;
 		virtual string toString (const string & indent = "") const;
 		
-		int findMember (const std::string & iden);
+		int findMember (const std::string & iden) const;
 		void buildData (std::vector <ASTnode> data) {members = data;}
 		
 		NumbatType () {}

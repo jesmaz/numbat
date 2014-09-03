@@ -17,7 +17,7 @@ AllocaInst * createEntryBlockAlloc (Function * func, Type * type, const std::str
 
 Type * BodyGenerator::getType (const ASTnode & node) {
 	
-	Type * t = getType (node->getType ().get ());
+	Type * t = getType (node->getType ());
 	if (node->isAlias ())
 		t = t->getPointerTo ();
 	return t;
@@ -79,7 +79,7 @@ Type * BodyGenerator::getType (const NumbatType * type) {
 	
 }
 
-Value * BodyGenerator::allocteArray (Value * length, NumbatPointerType * type) {
+Value * BodyGenerator::allocteArray (Value * length, const NumbatPointerType * type) {
 	
 	size_t mdsize=0;
 	for (auto & t : type->getMembers ()) {
@@ -132,7 +132,7 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 		
 		
 		
-		Type * type = getType (var->getType().get ());
+		Type * type = getType (var->getType());
 		//TODO: apply type modifiers
 		
 		if (var->isGlobal()) {
@@ -150,7 +150,7 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 			stack.pop ();
 			ref = oldRef;
 		} else {
-			builder.CreateStore (initialise (var->getType ().get ()), hand);
+			builder.CreateStore (initialise (var->getType ()), hand);
 		}
 		
 	}
@@ -179,7 +179,7 @@ Value * BodyGenerator::initialise (const NumbatType * ntype) {
 	} else if (ltype->isStructTy ()) {
 		std::vector <uint32_t> index (1, 0);
 		for (ASTnode arg : ntype->getMembers ()) {
-			val = builder.CreateInsertValue (val, initialise (arg->getType ().get ()), index);
+			val = builder.CreateInsertValue (val, initialise (arg->getType ()), index);
 			++(index [0]);
 		}
 	}
@@ -355,7 +355,7 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 
 void BodyGenerator::visit (ASTallocate & exp) {
 	
-	NumbatPointerType * type = dynamic_cast <NumbatPointerType *> (exp.getType ().get ());
+	const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (exp.getType ());
 	
 	if (!type) {
 		return;
@@ -454,7 +454,7 @@ void BodyGenerator::visit (ASTcallindex & exp) {
 
 void BodyGenerator::visit (ASTconcat & exp) {
 	
-	NumbatPointerType * type = dynamic_cast <NumbatPointerType *> (exp.getLhs ()->getType ().get ());
+	const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (exp.getLhs ()->getType ());
 	
 	if (!type) {
 		return;
@@ -504,14 +504,14 @@ void BodyGenerator::visit (ASTconcat & exp) {
 
 void BodyGenerator::visit (ASTconstantFPInt & exp) {
 	
-	Type * type = getType (exp.getType ().get ());
+	Type * type = getType (exp.getType ());
 	stack.push (createTemp (ConstantFP::get (type, exp.getValue ())));
 	
 }
 
 void BodyGenerator::visit (ASTconstantInt & exp) {
 	
-	Type * type = getType (exp.getType ().get ());
+	Type * type = getType (exp.getType ());
 	if (type->isIntegerTy ())
 		stack.push (createTemp (builder.getInt (APInt (exp.getBitSize (), exp.getValue ()))));
 	else
@@ -521,7 +521,7 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 
 void BodyGenerator::visit (ASTconstantCString & exp) {
 	
-	StructType * strType = reinterpret_cast <StructType *> (getType (exp.getType ().get ()));
+	StructType * strType = reinterpret_cast <StructType *> (getType (exp.getType ()));
 	
 	Type * arrType = strType->getStructElementType (0);
 	std::vector <Type *> members (exp.getValue ().size () + 2, arrType->getPointerElementType ());
@@ -601,7 +601,7 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		ref = true;
 		exp.getArgs () [0]->accept (*this);
 		Value * arg = builder.CreateLoad (stack.top ()); stack.pop ();
-		Type * type = getType (exp.getArgs () [1]->getType ().get ());
+		Type * type = getType (exp.getArgs () [1]->getType ());
 		Value * val;
 		ref = oldref;
 		if (arg->getType ()->isFloatingPointTy ()) {
@@ -827,7 +827,7 @@ void BodyGenerator::visit (ASTstructIndex & exp) {
 	Value * val = stack.top (); stack.pop ();
 	ref = oldRef;
 	
-	if (NumbatPointerType * type = dynamic_cast <NumbatPointerType *> (exp.getExpr ()->getType ().get ())) {
+	if (const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (exp.getExpr ()->getType ())) {
 		Value * dptr = pointerTypeGEP (builder.CreateLoad (val), type, exp.getIndex ());
 		if (ref) {
 			stack.push (dptr);

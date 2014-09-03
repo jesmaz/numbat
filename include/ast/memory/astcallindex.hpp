@@ -18,7 +18,7 @@ class ASTcallindex : public ASTbase {
 		virtual bool isAlias () const {return ref->isAlias ();}
 		virtual bool isConst () const {return ref->isConst ();}
 		virtual bool isValid () const {return call->isValid ();}
-		virtual shared_ptr <NumbatType> getType () const {return ref->getType ();}
+		virtual const NumbatType * getType () const {return ref->getType ();}
 		virtual size_t calculateWeight () const {return call->calculateWeight ();}
 		virtual size_t getBitSize () const {return ref->getBitSize ();}
 		virtual string getIden () const {return ref->getIden ();}

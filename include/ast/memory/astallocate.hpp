@@ -16,7 +16,7 @@ class ASTallocate : public ASTbase {
 		virtual bool isAlias () const {return true;}
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return true;}
-		virtual shared_ptr <NumbatType> getType () const {return type;}
+		virtual const NumbatType * getType () const {return type;}
 		virtual size_t calculateWeight () const {return 32;}//This is honestly just an arbitrary number.
 		virtual size_t getBitSize () const {return 64;}
 		virtual string getIden () const {return "";}
@@ -26,10 +26,11 @@ class ASTallocate : public ASTbase {
 		}
 		
 		ASTallocate () {}
-		ASTallocate (const ASTnode & amount, const shared_ptr <NumbatType> & type) : amount (amount), type (type) {}
+		ASTallocate (const ASTnode & amount, const shared_ptr <NumbatType> & type) : amount (amount), type (type.get ()) {}
+		ASTallocate (const ASTnode & amount, const NumbatType * type) : amount (amount), type (type) {}
 	private:
 		ASTnode amount;
-		shared_ptr <NumbatType> type;
+		const NumbatType * type;
 };
 
 

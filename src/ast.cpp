@@ -1485,7 +1485,7 @@ void AbstractSyntaxTree::parseTypeDef (tkitt end) {
 	
 	if (types.find (iden) == types.end ()) {
 		if (type->isValid ()) {
-			types [iden] = type->getType ();
+			types [iden] = * new shared_ptr <NumbatType> (const_cast <NumbatType *> (type->getType ()));
 		}
 	} else {
 		error ("", end);

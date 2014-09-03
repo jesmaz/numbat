@@ -19,7 +19,7 @@ class ASTstructIndex : public ASTbase {
 		virtual bool isAlias () const {return expr->isAlias ();}
 		virtual bool isConst () const {return expr->isConst ();}
 		virtual bool isValid () const {return expr->isValid ();}
-		virtual shared_ptr <NumbatType> getType () const {return expr->getType ()->getMembers ()[index]->getType ();}
+		virtual const NumbatType * getType () const {return expr->getType ()->getMembers ()[index]->getType ();}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return expr->getType ()->getMembers ()[index]->getBitSize ();}
 		virtual string getIden () const {return expr->getType ()->getMembers ()[index]->getIden ();}

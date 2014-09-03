@@ -18,7 +18,7 @@ class ASTrawdata : public ASTbase {
 		virtual bool isConst () const {return constType;}
 		virtual bool isRaw () const {return true;}
 		virtual bool isValid () const {return true;}
-		virtual shared_ptr <NumbatType> getType () const {return type;}
+		virtual const NumbatType * getType () const {return type;}
 		virtual size_t calculateWeight () const {return 1;}
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}
@@ -27,10 +27,11 @@ class ASTrawdata : public ASTbase {
 		}
 		
 		ASTrawdata () {}
-		ASTrawdata (const bool ref, const bool constType, const shared_ptr <NumbatType> & type, const std::set <string> & metaTags) : ref (ref), constType (constType), type (type), metaTags (metaTags) {}
+		ASTrawdata (const bool ref, const bool constType, const shared_ptr <NumbatType> & type, const std::set <string> & metaTags) : ref (ref), constType (constType), type (type.get ()), metaTags (metaTags) {}
+		ASTrawdata (const bool ref, const bool constType, const NumbatType * type, const std::set <string> & metaTags) : ref (ref), constType (constType), type (type), metaTags (metaTags) {}
 	private:
 		bool ref, constType;
-		shared_ptr <NumbatType> type;
+		const NumbatType * type;
 		std::set <string> metaTags;
 };
 

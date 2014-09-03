@@ -17,7 +17,7 @@ class ASTconcat : public ASTbase {
 		virtual bool isAlias () const {return false;}
 		virtual bool isConst () const {return true;}
 		virtual bool isValid () const {return lhs->isValid () and rhs->isValid () and (!conv or conv->isValid ());}
-		virtual shared_ptr <NumbatType> getType () const {return lhs->getType ();}
+		virtual const NumbatType * getType () const {return lhs->getType ();}
 		virtual size_t calculateWeight () const {return lhs->calculateWeight () + rhs->calculateWeight () + (conv ? conv->calculateWeight () : 0);}
 		virtual size_t getBitSize () const {return lhs->getBitSize ();}
 		virtual string getIden () const {return " + ";}

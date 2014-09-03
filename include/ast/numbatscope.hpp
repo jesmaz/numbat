@@ -29,8 +29,12 @@ class NumbatScope : public ASTbase {
 		friend NumbatScope * createChild (NumbatScope * scope);
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
+		friend NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
+		
 		friend const NumbatType * getType (NumbatScope * scope, const string & iden);
 		friend const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
+		
+		friend void addToBody (NumbatScope * scope, ASTnode n) {scope->body.push_back (n);}
 		
 	protected:
 		
@@ -46,10 +50,12 @@ class NumbatScope : public ASTbase {
 		
 		bool symbolRegisted (const string & iden);
 		
+	protected:
 		std::map <string, shared_ptr <NumbatType>> types;
 		std::map <string, shared_ptr <NumbatVariable>> variables;
 		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
 		
+	private:
 		std::set <unique_ptr <NumbatScope>> children;
 		
 		std::vector <ASTnode> body;

@@ -17,7 +17,7 @@ class ASTtype : public ASTbase {
 		virtual bool isArray () const {return type->isArray ();}
 		virtual bool isConst () const {return constType;}
 		virtual bool isValid () const {return true;}
-		virtual shared_ptr <NumbatType> getType () const {return type;}
+		virtual const NumbatType * getType () const {return type;}
 		virtual size_t calculateWeight () const {return 1;}
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}
@@ -26,10 +26,11 @@ class ASTtype : public ASTbase {
 		}
 		
 		ASTtype () {}
-		ASTtype (const bool ref, const bool constType, const shared_ptr <NumbatType> & type) : ref (ref), constType (constType), type (type) {}
+		ASTtype (const bool ref, const bool constType, const shared_ptr <NumbatType> & type) : ref (ref), constType (constType), type (type.get ()) {}
+		ASTtype (const bool ref, const bool constType, const NumbatType * type) : ref (ref), constType (constType), type (type) {}
 	private:
 		bool ref, constType;
-		shared_ptr <NumbatType> type;
+		const NumbatType * type;
 };
 
 
