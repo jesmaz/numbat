@@ -20,9 +20,11 @@ struct OperatorDecleration {
 		struct OperatorMatch {
 			const bool operator == (const OperatorMatch & rhs) const {return opp == rhs.opp and ptr == rhs.ptr;}
 			const static bool treeOrder (const OperatorMatch & lhs, const OperatorMatch & rhs);
-			const static bool parseOrder (const OperatorMatch & lhs, const OperatorMatch & rhs) {return lhs.ptr < rhs.ptr;}
+			const static bool parseOrder (const OperatorMatch & lhs, const OperatorMatch & rhs) {return lhs.level == rhs.level ? lhs.ptr < rhs.ptr : lhs.level < rhs.level;}
 			std::shared_ptr <OperatorDecleration> opp;
 			tkitt ptr;
+			std::vector <tkitt> ptrs;
+			int level;
 		};
 		
 		ASTnode parse (AbstractSyntaxTree * ast, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) const {return parser (ast, pattern, oppLoc, matches, end);}
