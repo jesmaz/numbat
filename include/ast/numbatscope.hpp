@@ -31,7 +31,7 @@ class NumbatScope : public ASTbase {
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
 		friend NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
-		friend NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
+		friend NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {return scope->createVariable (type, init, iden, global, temp);}
 		
 		friend const NumbatType * getType (NumbatScope * scope, const string & iden);
 		friend const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
