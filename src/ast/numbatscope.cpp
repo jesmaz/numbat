@@ -126,6 +126,30 @@ NumbatScope * createChild (NumbatScope * scope) {
 	return child;
 }
 
+const NumbatType * getType (NumbatScope * scope, const string & iden) {
+	
+	auto itt = scope->types.find (iden);
+	if (itt != scope->types.end ()) {
+		return itt->second.get ();
+	} else if (scope->parent) {
+		return getType (scope->parent, iden);
+	} else {
+		return nullptr;
+	}
+	
+}
+
+NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type) {
+	
+	NumbatType * nt = new NumbatRawType (iden, size, type);
+	if (!scope->registerSymbol (iden, nt)) {
+		delete nt;
+		nt = nullptr;
+	}
+	return nt;
+	
+}
+
 NumbatVariable * NumbatScope::createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {
 	
 	NumbatVariable * var = new NumbatVariable (type, init, iden, global, temp);

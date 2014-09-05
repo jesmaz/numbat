@@ -7,6 +7,7 @@
 #include "memory/astvariable.hpp"
 #include "memory/numbatvariable.hpp"
 #include "type/asttype.hpp"
+#include "type/numbatrawtype.hpp"
 
 #include <map>
 
@@ -29,6 +30,7 @@ class NumbatScope : public ASTbase {
 		friend NumbatScope * createChild (NumbatScope * scope);
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
+		friend NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
 		friend NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
 		
 		friend const NumbatType * getType (NumbatScope * scope, const string & iden);
