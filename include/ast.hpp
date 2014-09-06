@@ -67,7 +67,7 @@ typedef ASTnode (*defBinaryImp)(AbstractSyntaxTree * ast, const string & func, c
 typedef lexer::tkstring::const_iterator tkitt;
 
 
-class AbstractSyntaxTree : NumbatScope {
+class AbstractSyntaxTree : public NumbatScope {
 	
 	public:
 		const bool buildSuccessfull () const {return !buildFail;}
