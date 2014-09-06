@@ -120,7 +120,7 @@ bool NumbatScope::symbolRegisted (const string & iden) {
 }
 
 NumbatScope * createChild (NumbatScope * scope) {
-	NumbatScope * child = new NumbatScope;
+	NumbatScope * child = new NumbatScope (scope->context);
 	child->parent = scope; 
 	scope->children.insert (unique_ptr <NumbatScope> (child));
 	return child;

@@ -111,7 +111,7 @@ class AbstractSyntaxTree : public NumbatScope {
 		
 		friend shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree *, const std::vector <ASTnode> &, const std::vector <shared_ptr <FunctionDecleration>> &, int);
 		
-		AbstractSyntaxTree () {}
+		AbstractSyntaxTree () : NumbatScope (&context) {}
 		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "", const string & file = "");
 		
 	private:
@@ -207,6 +207,8 @@ class AbstractSyntaxTree : public NumbatScope {
 		std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
 		
 		std::vector <ASTnode> body;
+		
+		ParsingContext context;
 		
 };
 

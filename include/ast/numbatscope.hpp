@@ -8,6 +8,7 @@
 #include "memory/numbatvariable.hpp"
 #include "type/asttype.hpp"
 #include "type/numbatrawtype.hpp"
+#include "../context.hpp"
 
 #include <map>
 
@@ -28,6 +29,7 @@ class NumbatScope : public ASTbase {
 		friend ASTnode collectDestructors (const NumbatScope * scope);
 		friend ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent=nullptr, bool cascade=true, bool local=true);
 		friend NumbatScope * createChild (NumbatScope * scope);
+		friend ParsingContext * getContext (NumbatScope * scope) {return scope->context;}
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
 		friend NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
@@ -42,7 +44,7 @@ class NumbatScope : public ASTbase {
 		
 		virtual NumbatVariable * createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
 		
-		NumbatScope () {}
+		NumbatScope (ParsingContext * context) : context (context) {}
 		
 	private:
 		
@@ -63,6 +65,7 @@ class NumbatScope : public ASTbase {
 		std::vector <ASTnode> body;
 		
 		NumbatScope * parent=nullptr;;
+		ParsingContext * context;
 		mutable int valid = -1;
 		
 };
