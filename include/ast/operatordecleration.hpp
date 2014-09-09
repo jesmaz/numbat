@@ -11,6 +11,8 @@ namespace numbat {
 namespace parser {
 
 struct AbstractSyntaxTree;
+class NumbatScope;
+struct Position;
 typedef lexer::tkstring::const_iterator tkitt;
 
 struct OperatorDecleration {
@@ -26,6 +28,8 @@ struct OperatorDecleration {
 			std::vector <tkitt> ptrs;
 			int level;
 		};
+		typedef ASTnode(*OperatorParser)(NumbatScope *, const string &, const std::vector <Position> &, std::list <OperatorDecleration::OperatorMatch> &);
+		typedef ASTnode(*DefaultImplementation)(NumbatScope *, const std::vector <ASTnode> &);
 		
 		ASTnode parse (AbstractSyntaxTree * ast, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) const {return parser (ast, pattern, oppLoc, matches, end);}
 		
@@ -38,7 +42,7 @@ struct OperatorDecleration {
 		static TYPE calculateOperatorType (const string & pattern);
 		
 		OperatorDecleration ();
-		OperatorDecleration (int precidance, bool ltr, const string & pattern, ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt));
+		OperatorDecleration (int precidance, bool ltr, const string & pattern, ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt), OperatorParser oppParser=nullptr, DefaultImplementation defImp=nullptr);
 		
 	private:
 		int precidance;
@@ -47,6 +51,8 @@ struct OperatorDecleration {
 		string pattern; // space for identifier eg: " * ", " [ ]", " ? : "
 		TYPE type;
 		ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt);
+		OperatorParser oppParser;
+		DefaultImplementation defImp;
 };
 
 
