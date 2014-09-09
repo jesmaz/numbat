@@ -18,7 +18,7 @@ void Numbat::loadFromFile (const std::string & file) {
 
 void Numbat::loadFromModule (const shared_ptr <parser::Module> & mod) {
 	FunctionPassManager fpm (module);
-	fpm.add (new DataLayout(*engine->getDataLayout()));
+	fpm.add (new DataLayoutPass(*engine->getDataLayout()));
 	fpm.add (createBasicAliasAnalysisPass ());
 	fpm.add (createReassociatePass ());
 	fpm.add (createGVNPass ());
@@ -28,7 +28,7 @@ void Numbat::loadFromModule (const shared_ptr <parser::Module> & mod) {
 	parser::BodyGenerator generator (module, engine->getDataLayout());
 	generator.visit (mod);
 	PassManager mpm;
-	mpm.add (new DataLayout(*engine->getDataLayout()));
+	mpm.add (new DataLayoutPass(*engine->getDataLayout()));
 	mpm.add (createFunctionInliningPass ());
 	mpm.run (*module);
 	for (Function & func : module->getFunctionList ()) {
@@ -48,7 +48,7 @@ void Numbat::loadFromTokenStr (const tkstring & tks) {
 	parser::AbstractSyntaxTree ast (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()));
 	std::cerr << ast.toString () << std::endl;
 	FunctionPassManager fpm (module);
-	fpm.add (new DataLayout(*engine->getDataLayout()));
+	fpm.add (new DataLayoutPass(*engine->getDataLayout()));
 	fpm.add (createBasicAliasAnalysisPass ());
 	fpm.add (createReassociatePass ());
 	fpm.add (createGVNPass ());
@@ -58,7 +58,7 @@ void Numbat::loadFromTokenStr (const tkstring & tks) {
 	parser::BodyGenerator generator (module, engine->getDataLayout());
 	generator.visit (ast);
 	PassManager mpm;
-	mpm.add (new DataLayout(*engine->getDataLayout()));
+	mpm.add (new DataLayoutPass(*engine->getDataLayout()));
 	mpm.add (createFunctionInliningPass ());
 	mpm.run (*module);
 	for (Function & func : module->getFunctionList ()) {

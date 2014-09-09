@@ -188,9 +188,9 @@ int main (int argl, char ** args) {
 	string error;
 	
 	if (emitAssembly and emitLLVM) {
-		OwningPtr <tool_output_file> out (new tool_output_file (outfile.c_str (), error));
-		mod->print (out->os (), nullptr);
-		out->keep ();
+		tool_output_file out (outfile.c_str (), error, sys::fs::F_None);
+		mod->print (out.os (), nullptr);
+		out.keep ();
 		return 0;
 	}
 	
@@ -200,36 +200,35 @@ int main (int argl, char ** args) {
 		return 1;
 	}
 	SubtargetFeatures features;
-	features.AddFeature ("64bit", true);
+	features.AddFeature ("64bit");
 	
 	TargetOptions options;
 	
-	OwningPtr <TargetMachine> mchPtr (target->createTargetMachine (theTriple.getTriple (), "generic", features.getString (), options));
-	if (!mchPtr.get ()) {
+	TargetMachine * machine = target->createTargetMachine (theTriple.getTriple (), "generic", features.getString (), options);
+	if (!machine) {
 		std::cerr << "Could not allocate the target machine" << std::endl;
 		return 1;
 	}
-	TargetMachine * machine = mchPtr.get ();
 	
 	machine->setAsmVerbosityDefault (true);
 	
 	PassManager PM;
 	PM.add (new TargetLibraryInfo (theTriple));
 	machine->addAnalysisPasses (PM);
-	PM.add (new DataLayout (*machine->getDataLayout ()));
+	PM.add (new DataLayoutPass (*machine->getDataLayout ()));
 	
 	TargetMachine::CodeGenFileType fileType = TargetMachine::CGFT_ObjectFile;
 	if (emitAssembly) {
 		link = false;
 		fileType = TargetMachine::CGFT_AssemblyFile;
 	}
-	OwningPtr <tool_output_file> out (new tool_output_file (".numbat.o", error));
+	tool_output_file out (".numbat.o", error, sys::fs::F_None);
 	if (!error.empty ()) {
 		std::cerr << error << std::endl;
 		return 1;
 	}
 	{
-		formatted_raw_ostream fos (out->os ());
+		formatted_raw_ostream fos (out.os ());
 		if (machine->addPassesToEmitFile (PM, fos, fileType)) {
 			std::cerr << "The target does not suport the generaton of this file type" << std::endl;
 			return 1;
@@ -238,7 +237,7 @@ int main (int argl, char ** args) {
 		PM.run (*mod);
 	}
 	
-	out->keep ();
+	out.keep ();
 	
 	if (link) {
 		system (("ld .numbat.o -e __entry__ -lc -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o " + outfile).c_str ());
