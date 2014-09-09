@@ -28,10 +28,11 @@ struct OperatorDecleration {
 			std::vector <tkitt> ptrs;
 			int level;
 		};
-		typedef ASTnode(*OperatorParser)(NumbatScope *, const string &, const std::vector <Position> &, std::list <OperatorDecleration::OperatorMatch> &);
 		typedef ASTnode(*DefaultImplementation)(NumbatScope *, const std::vector <ASTnode> &);
+		typedef ASTnode(*OperatorParser)(NumbatScope *, const string &, const std::vector <Position> &, std::list <OperatorDecleration::OperatorMatch> *, DefaultImplementation);
 		
 		ASTnode parse (AbstractSyntaxTree * ast, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) const {return parser (ast, pattern, oppLoc, matches, end);}
+		ASTnode parse (NumbatScope * c, const string & s, const std::vector <Position> & a, std::list <OperatorDecleration::OperatorMatch> * m) const {return oppParser (c, s, a, m, defImp);}
 		
 		const bool isLtr () const {return ltr;}
 		const bool operator < (const OperatorDecleration & rhs) const {if (precidance == rhs.precidance) return pattern < rhs.pattern; return precidance < rhs.precidance;}
