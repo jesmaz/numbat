@@ -15,7 +15,7 @@ class Position;
 
 struct ParsingContext {
 	
-	typedef ASTnode(*parseStatment)(ParsingContext & context, Position pos, NumbatScope * scope);
+	typedef ASTnode(*ExpressionParser)(Position pos, NumbatScope * scope);
 	string path, file;
 	
 	std::map <string, shared_ptr <OperatorDecleration>> operators;
@@ -23,11 +23,7 @@ struct ParsingContext {
 	
 	std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
 	
-	//std::set <shared_ptr <OperatorDecleration>, std::greater <shared_ptr <OperatorDecleration>>> precidenceOrderedOperators;
-	
-	std::unordered_map <string, parseStatment> statementParsers;
-	
-	//std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
+	std::unordered_map <string, ExpressionParser> expressionParsers;
 };
 
 
