@@ -29,16 +29,16 @@ class NumbatScope : public ASTbase {
 		friend ASTnode collectDestructors (const NumbatScope * scope);
 		friend ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent=nullptr, bool cascade=true, bool local=true);
 		friend NumbatScope * createChild (NumbatScope * scope);
-		friend ParsingContext * getContext (NumbatScope * scope) {return scope->context;}
+		friend ParsingContext * getContext (NumbatScope * scope);
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
 		friend NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
-		friend NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {return scope->createVariable (type, init, iden, global, temp);}
+		friend NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
 		
 		friend const NumbatType * getType (NumbatScope * scope, const string & iden);
 		friend const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
 		
-		friend void addToBody (NumbatScope * scope, ASTnode n) {scope->body.push_back (n);}
+		friend void addToBody (NumbatScope * scope, ASTnode n);
 		
 	protected:
 		
@@ -69,6 +69,21 @@ class NumbatScope : public ASTbase {
 		mutable int valid = -1;
 		
 };
+
+
+ASTnode collectDestructors (const NumbatScope * scope);
+ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent, bool cascade, bool local);
+NumbatScope * createChild (NumbatScope * scope);
+inline ParsingContext * getContext (NumbatScope * scope) {return scope->context;}
+std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
+
+NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
+inline NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {return scope->createVariable (type, init, iden, global, temp);}
+
+const NumbatType * getType (NumbatScope * scope, const string & iden);
+const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
+
+inline void addToBody (NumbatScope * scope, ASTnode n) {scope->body.push_back (n);}
 
 
 }
