@@ -38,7 +38,7 @@ ASTnode resolveSymbol (const NumbatScope* scope, const string & iden, ASTnode pa
 		ret = parent->resolveSymbol (iden);
 	} else {
 		ret = scope->resolveSymbol (iden);
-		if (!ret and scope->parent) {
+		if (!ret->isValid () and scope->parent and cascade) {
 			return resolveSymbol (scope->parent, iden, parent, cascade, local);
 		}
 	}
@@ -71,7 +71,11 @@ size_t NumbatScope::calculateWeight() const {
 }
 
 string NumbatScope::toString (const string & indent) const {
-	return "NYI";
+	string s=indent + "{\n";
+	for (const ASTnode & n : body) {
+		s += n->toString (indent + "    ") + "\n";
+	}
+	return s + "}";
 }
 
 
