@@ -3,6 +3,7 @@
 
 #include "../visitor.hpp"
 
+#include <list>
 #include <memory>
 #include <vector>
 
@@ -45,6 +46,7 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual size_t calculateWeight () const=0;
 		//DEPRECATED
 		virtual size_t getBitSize () const {return 0;}
+		virtual const std::list <ASTnode> getList () const {return std::list <ASTnode> ();}
 		virtual string getIden () const=0;
 		virtual string toString (const string & indent = "") const=0;
 		virtual ssize_t getLengthIndex () const;

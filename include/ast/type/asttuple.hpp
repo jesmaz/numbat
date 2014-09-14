@@ -14,9 +14,11 @@ class ASTtuple : public ASTbase {
 	VISITABLE
 	public:
 		const std::list <ASTnode> & getElements () const {return elements;}
+		virtual bool isList () const {return true;}
 		virtual bool isValid () const;
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return 0;}
+		virtual const std::list <ASTnode> getList () const {return elements;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const;
 		
