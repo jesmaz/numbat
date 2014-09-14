@@ -28,7 +28,7 @@ struct OperatorDecleration {
 			std::vector <tkitt> ptrs;
 			int level;
 		};
-		typedef ASTnode(*DefaultImplementation)(NumbatScope *, const std::vector <ASTnode> &);
+		typedef ASTnode(*DefaultImplementation)(NumbatScope *, const string &, const std::vector <ASTnode> &);
 		typedef ASTnode(*OperatorParser)(NumbatScope *, const string &, const std::vector <Position> &, std::list <OperatorDecleration::OperatorMatch> *, DefaultImplementation);
 		
 		ASTnode parse (AbstractSyntaxTree * ast, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) const {return parser (ast, pattern, oppLoc, matches, end);}
