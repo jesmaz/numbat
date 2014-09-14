@@ -143,6 +143,17 @@ const NumbatType * getType (NumbatScope * scope, const string & iden) {
 	
 }
 
+FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags) {
+	
+	FunctionDecleration * func = new FunctionDecleration (iden, args, type, metaTags);
+	if (!scope->registerSymbol (iden, func)) {
+		delete func;
+		func = nullptr;
+	}
+	return func;
+	
+}
+
 NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type) {
 	
 	NumbatType * nt = new NumbatRawType (iden, size, type);
