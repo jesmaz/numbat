@@ -27,6 +27,7 @@ struct Position {
 	Position (tkitt itt, tkitt end) : itt (itt), end (end) {allign ();}
 };
 
+Position nextArg (const Position & pos);
 Position nextBody (const Position & pos);
 Position nextExpression (const Position & pos);
 Position nextIden (const Position & pos);

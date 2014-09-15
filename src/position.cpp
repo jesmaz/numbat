@@ -6,6 +6,10 @@ using namespace lexer;
 namespace parser {
 
 
+Position nextArg (const Position & pos) {
+	return Position (pos.itt, findToken (pos.itt, pos.end, TOKEN::symbol, ","));
+}
+
 Position nextBody (const Position & pos) {
 	tkitt start = findToken (pos.itt, pos.end, TOKEN::symbol, "{") + 1;
 	tkitt end = findToken (start, pos.end, TOKEN::symbol, "}");
