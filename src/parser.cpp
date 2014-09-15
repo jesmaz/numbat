@@ -36,6 +36,52 @@ ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 	
 }
 
+ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
+	
+	ASTnode symb = nullptr;
+	switch (pos.itt->type) {
+		case TOKEN::chararrayliteral:
+			return ASTnode (new ASTerror ("NYI"));
+			break;
+		case TOKEN::nil:
+			return ASTnode (new ASTnil ());
+			break;
+		case TOKEN::numericliteral:
+			return parseNumericliteral (pos, scope);
+			break;
+		case TOKEN::stringliteral:
+			if (pos+1) return ASTnode (new ASToperatorError ("Unexpected token: '" + (pos+1).itt->iden + "'"));
+			return ASTnode (new ASTconstantCString (ASTnode (new ASTtype (false, true, getType (scope, "string"))), parseString (pos)));
+			break;
+		case TOKEN::symbol:
+			return ASTnode (new ASToperatorError ("Unexpected symbol: '" + pos.itt->iden + "'"));
+			break;
+		case TOKEN::typemodifier:
+			symb = parseType (&pos, scope);
+			break;
+		default:
+			break;
+	}
+	
+	if (!symb) {
+		symb = resolveSymbol (scope, pos.itt->iden);
+	}
+	
+	if (typeid (*symb.get ()) == typeid (ASTtype)) {
+		NumbatVariable * var = createVariable (scope, symb, nullptr, (++pos).itt->iden, false, false);
+		if (var) {
+			return ASTnode (new ASTvariable (var));
+		} else {
+			return generateError (pos, "'" + pos.itt->iden + "' already declared in this scope");
+		}
+	}
+	if ((pos+1) and (pos+1).itt->type != TOKEN::semicolon) {
+		return ASTnode (new ASToperatorError ("Unexpected token: '" + (pos+1).itt->iden + "'"));
+	}
+	return symb;
+	
+}
+
 ASTnode parseType (Position * pos, NumbatScope * scope) {
 	
 	bool ref=false, constTkn=false;

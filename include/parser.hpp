@@ -11,6 +11,7 @@ namespace parser {
 
 
 ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope);
+ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope);
 ASTnode parseType (Position * pos, NumbatScope * scope);
 
 std::list <OperatorDecleration::OperatorMatch> generateOperatorMatches (const ParsingContext * context, Position pos);
