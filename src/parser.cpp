@@ -36,6 +36,29 @@ ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 	
 }
 
+ASTnode parseType (Position * pos, NumbatScope * scope) {
+	
+	bool ref=false, constTkn=false;
+	while (*pos and pos->itt->type == TOKEN::typemodifier) {
+		if (pos->itt->iden == "ref") {
+			ref = true;
+		} else if (pos->itt->iden == "const") {
+			constTkn = true;
+		}
+		++*pos;
+	}
+	
+	if (*pos) {
+		const NumbatType * type = getType (scope, pos->itt->iden);
+		if (!type) {
+			return generateError (*pos, "'" + pos->itt->iden + "' is not a type");
+		}
+		return ASTnode (new ASTtype (ref, constTkn, type));
+	}
+	return generateError (*pos, "Expected identifier");
+	
+}
+
 
 std::list <OperatorDecleration::OperatorMatch> generateOperatorMatches (const ParsingContext * context, Position pos) {
 	
