@@ -695,7 +695,7 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		if (lhs->getType ()->getPointerElementType ()->isPointerTy ()) {
 			stack.push (builder.CreateStore (rhs, lhs));
 		} else if (shared_ptr <ASTvariable> var = std::dynamic_pointer_cast <ASTvariable> (exp.getArgs () [0])) {
-			stack.push (namedValues [var->getVariable ().get ()] = rhs);
+			stack.push (namedValues [var->getVariable ()] = rhs);
 		}
 		return;
 	}
@@ -774,10 +774,10 @@ void BodyGenerator::visit (ASTparamater & exp) {
 	for (Function::arg_iterator ai = activeFunction->arg_begin (); ai != activeFunction->arg_end (); ++index, ++ ai) {
 		if (ai->getName () == exp.getIden ()) {
 			if (exp.isAlias ()) {
-				namedValues [exp.getVariable ().get ()] = ai;
+				namedValues [exp.getVariable ()] = ai;
 			} else {
 				ref = true;
-				Value * v = getVariableHandle (exp.getVariable ().get ());
+				Value * v = getVariableHandle (exp.getVariable ());
 				ref = false;
 				builder.CreateStore (ai, v);
 			}
@@ -850,7 +850,7 @@ void BodyGenerator::visit (ASTstructIndex & exp) {
 
 void BodyGenerator::visit (ASTvariable & exp) {
 	
-	Value * v = getVariableHandle (exp.getVariable ().get ());
+	Value * v = getVariableHandle (exp.getVariable ());
 	stack.push (v);
 	
 }

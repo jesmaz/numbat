@@ -13,7 +13,7 @@ namespace parser {
 class ASTparamater : public ASTbase {
 	VISITABLE
 	public:
-		const std::shared_ptr <NumbatVariable> & getVariable () {return variable;}
+		const NumbatVariable * getVariable () {return variable;}
 		virtual const ASTnode getArrayType () const {return variable->getASTType ()->getArrayType ();}
 		virtual const ASTnode getASTType () const {return variable->getASTType ();}
 		virtual bool isAlias () const {return variable->isAlias ();}
@@ -28,9 +28,10 @@ class ASTparamater : public ASTbase {
 		}
 		
 		ASTparamater () {}
-		ASTparamater (const std::shared_ptr <NumbatVariable> & variable) : variable (variable) {}
+		ASTparamater (const std::shared_ptr <NumbatVariable> & variable) : variable (variable.get ()) {}
+		ASTparamater (const NumbatVariable * variable) : variable (variable) {}
 	private:
-		std::shared_ptr <NumbatVariable> variable;
+		const NumbatVariable * variable;
 };
 
 

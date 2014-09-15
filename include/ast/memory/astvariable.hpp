@@ -13,7 +13,7 @@ namespace parser {
 class ASTvariable : public ASTbase {
 	VISITABLE
 	public:
-		const std::shared_ptr <NumbatVariable> & getVariable () {return variable;}
+		const NumbatVariable * getVariable () {return variable;}
 		virtual ASTnode resolveSymbol (const string & iden) const {return variable->getASTType ()->resolveSymbol (iden);}
 		virtual const ASTnode getArrayType () const {return variable->getASTType ()->getArrayType ();}
 		virtual const ASTnode getASTType () const {return variable->getASTType ();}
@@ -28,9 +28,10 @@ class ASTvariable : public ASTbase {
 		virtual string toString (const string & indent = "") const {return indent + variable->getIden ();}
 		
 		ASTvariable () {}
-		ASTvariable (const std::shared_ptr <NumbatVariable> & variable) : variable (variable) {}
+		ASTvariable (const std::shared_ptr <NumbatVariable> & variable) : variable (variable.get ()) {}
+		ASTvariable (const NumbatVariable * variable) : variable (variable) {}
 	private:
-		std::shared_ptr <NumbatVariable> variable;
+		const NumbatVariable * variable;
 };
 
 
