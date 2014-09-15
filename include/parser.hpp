@@ -2,15 +2,17 @@
 #define PARSER_HPP
 
 #include "ast.hpp"
-#include "context.hpp"
 #include "position.hpp"
+
+#include <stack>
 
 namespace numbat {
 namespace parser {
 
 
-void parseBody (Parser parser, NumbatScope * body);
+ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope);
 
+string parseString (const Position & pos);
 
 };
 };
