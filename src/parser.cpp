@@ -1,3 +1,4 @@
+#include "../include/ast/astidentifier.hpp"
 #include "../include/core.hpp"
 #include "../include/parser.hpp"
 
@@ -32,6 +33,86 @@ ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 		return ASTnode (new ASToperatorError ("Unexpected token: '" + (pos+1).itt->iden + "'"));
 	}
 	return num;
+	
+}
+
+
+std::list <OperatorDecleration::OperatorMatch> generateOperatorMatches (const ParsingContext * context, Position pos) {
+	
+	std::list <OperatorDecleration::OperatorMatch> matches;
+	int brace = 0;
+	std::list <std::pair <OperatorDecleration::OperatorMatch, size_t>> candidates;
+	std::list <std::pair <OperatorDecleration::OperatorMatch, size_t> *> remove;
+	std::stack <string> bracket;
+	while (pos) {
+		
+		if (pos.itt->type != TOKEN::stringliteral and pos.itt->type != TOKEN::chararrayliteral) {
+			if (!bracket.empty () and (bracket.top () == pos.itt->iden)) {
+				bracket.pop ();
+				--brace;
+			}
+			if (0 > brace) break;
+		}
+		
+		auto oppBeg = context->operatorsByFirstToken.lower_bound (pos.itt->iden.substr (0, 1));
+		auto oppEnd = context->operatorsByFirstToken.upper_bound (pos.itt->iden.substr (0, 1));
+		for (; oppBeg != oppEnd; ++oppBeg) {
+			OperatorDecleration::OperatorMatch match;
+			match.opp = oppBeg->second;
+			match.ptr = pos.itt;
+			match.level = brace;
+			candidates.push_back (std::make_pair (match, oppBeg->second->getPattern ().find_first_not_of (" ")));
+		}
+		for (auto & cand : candidates) {
+			if (brace < cand.first.level) {
+				remove.push_back (&cand);
+				continue;
+			} else if (brace > cand.first.level) {
+				continue;
+			}
+			const string & ptn = cand.first.opp->getPattern ();
+			const string & sym = pos.itt->iden;
+			
+			if (ptn [cand.second] == ' ') {
+				size_t len = std::min (ptn.size () - cand.second - 1, sym.size ());
+				int cmp = sym.compare (0, len, ptn, cand.second + 1,  len);
+				if (!cmp) {
+					cand.first.ptrs.push_back (pos.itt);
+					cand.second += len + 1;
+				}
+			} else if (pos.itt->type != TOKEN::chararrayliteral and pos.itt->type != TOKEN::stringliteral) {
+				size_t len = std::min (ptn.size () - cand.second, sym.size ());
+				int cmp = sym.compare (0, len, ptn, cand.second, len);
+				if (cmp) {
+					remove.push_back (&cand);
+					continue;
+				} else {
+					cand.first.ptrs.push_back (pos.itt);
+					cand.second += len;
+				}
+			} else {
+				remove.push_back (&cand);
+				continue;
+			}
+			if (cand.second >= ptn.size () or (cand.second + 1 >= ptn.size () and ptn.back () == ' ')) {
+				matches.push_back (cand.first);
+				remove.push_back (&cand);
+			}
+		}
+		for (auto & r : remove) {
+			candidates.remove (*r);
+		}
+		remove.clear ();
+		if (pos.itt->type != TOKEN::stringliteral and pos.itt->type != TOKEN::chararrayliteral) {
+			auto itt = context->blocks.find (pos.itt->iden);
+			if (itt != context->blocks.end ()) {
+				bracket.push (itt->second);
+				++brace;
+			}
+		}
+		++pos;
+	}
+	return matches;
 	
 }
 
@@ -85,10 +166,6 @@ string parseString (const Position & pos) {
 		}
 	}
 	return str;
-	
-}
-	
-	
 	
 }
 
