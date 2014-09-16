@@ -168,6 +168,17 @@ NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t siz
 	
 }
 
+NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set< string > & meta) {
+	
+	NumbatType * nt = new NumbatType (iden, meta);
+	if (!scope->registerSymbol (iden, nt)) {
+		delete nt;
+		nt = nullptr;
+	}
+	return nt;
+	
+}
+
 NumbatVariable * NumbatScope::createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {
 	
 	NumbatVariable * var = new NumbatVariable (type, init, iden, global, temp);

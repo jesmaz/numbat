@@ -34,6 +34,7 @@ class NumbatScope : public ASTbase {
 		
 		friend FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags);
 		friend NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
+		friend NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set <string> & meta);
 		friend NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
 		
 		friend const NumbatType * getType (NumbatScope * scope, const string & iden);
@@ -80,6 +81,7 @@ std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, co
 
 FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags);
 NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
+NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set <string> & meta);
 inline NumbatVariable * createVariable (NumbatScope * scope, const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {return scope->createVariable (type, init, iden, global, temp);}
 
 const NumbatType * getType (NumbatScope * scope, const string & iden);
