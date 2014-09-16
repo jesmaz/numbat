@@ -53,22 +53,10 @@ OperatorDecleration::TYPE OperatorDecleration::calculateOperatorType (const stri
 
 OperatorDecleration::OperatorDecleration (int precidance, bool ltr, const string & pattern, ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt), OperatorParser oppParser, DefaultImplementation defImp) : precidance (precidance), ltr (ltr), pattern (pattern), type (calculateOperatorType (pattern)), parser (parser), oppParser (oppParser), defImp (defImp) {
 	string buffer = "";
-	for (char c : pattern) {
-		if (buffer == "") {
-			buffer += c;
-		} else {
-			if (c == ' ') {
-				if (buffer != " ") {
-					symbols.push_back (buffer);
-					buffer = " ";
-				}
-			} else {
-				if (buffer == " ") {
-					symbols.push_back (buffer);
-					buffer = c;
-				}
-			}
-		}
+	size_t length = pattern.size(), pos=0;
+	const char * cptr = pattern.c_str();
+	while (pos < length) {
+		symbols.push_back (lexer::next (cptr, pos, length));
 	}
 	if (buffer != "")
 		symbols.push_back (buffer);
