@@ -6,15 +6,15 @@ namespace parser {
 string FunctionDecleration::toString (const string & indent) {
 	string str = "(";
 	for (ASTnode n : parameters) {
-		str += n->toString (indent) + ", ";
+		str += n->toString () + ", ";
 	}
-	str += "): {";
+	str += ") -> (";
 	for (ASTnode n : type) {
-		str += n->toString (indent) + ", ";
+		str += n->toString () + ", ";
 	}
-	str += "}";
+	str += ")";
 	if (body)
-		return str + "\n" + body->toString (indent + "\t") + "\n";
+		return str + body->toString (indent) + "\n";
 	else
 		return str + "\n";
 }

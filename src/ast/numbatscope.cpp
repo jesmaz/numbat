@@ -72,6 +72,9 @@ size_t NumbatScope::calculateWeight() const {
 
 string NumbatScope::toString (const string & indent) const {
 	string s=indent + "{\n";
+	for (auto func : functions){
+		s += indent + "    " + func.first + " " + func.second->toString (indent) + "\n";
+	}
 	for (const ASTnode & n : body) {
 		s += n->toString (indent + "    ") + "\n";
 	}
