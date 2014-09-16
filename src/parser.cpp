@@ -68,11 +68,13 @@ ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
 	}
 	
 	if (typeid (*symb.get ()) == typeid (ASTtype)) {
-		NumbatVariable * var = createVariable (scope, symb, nullptr, (++pos).itt->iden, false, false);
-		if (var) {
-			return ASTnode (new ASTvariable (var));
-		} else {
-			return generateError (pos, "'" + pos.itt->iden + "' already declared in this scope");
+		if (++pos) {
+			NumbatVariable * var = createVariable (scope, symb, nullptr, pos.itt->iden, false, false);
+			if (var) {
+				symb = ASTnode (new ASTvariable (var));
+			} else {
+				symb = generateError (pos, "'" + pos.itt->iden + "' already declared in this scope");
+			}
 		}
 	}
 	if ((pos+1) and (pos+1).itt->type != TOKEN::semicolon) {
