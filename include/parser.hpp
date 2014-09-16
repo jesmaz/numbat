@@ -16,6 +16,8 @@ ASTnode parseType (Position * pos, NumbatScope * scope);
 
 std::list <OperatorDecleration::OperatorMatch> generateOperatorMatches (const ParsingContext * context, Position pos);
 
+std::vector <ASTnode> parseArgs (Position pos, NumbatScope * scope);
+
 string parseString (const Position & pos);
 
 };

@@ -188,6 +188,16 @@ std::list <OperatorDecleration::OperatorMatch> generateOperatorMatches (const Pa
 }
 
 
+std::vector <ASTnode> parseArgs (Position pos, NumbatScope * scope) {
+	std::vector <ASTnode> args;
+	while (Position exp = nextArg (pos)) {
+		args.push_back (parseExpression (exp, scope));
+		pos += exp;
+	}
+	return args;
+}
+
+
 string parseString (const Position & pos) {
 	
 	string str;
