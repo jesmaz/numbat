@@ -4,6 +4,7 @@
 #include "../astbase.hpp"
 #include "../functiondecleration.hpp"
 
+#include <map>
 #include <set>
 #include <sstream>
 
@@ -16,7 +17,9 @@ class NumbatType {
 	public:
 		const bool hasTag (const string & tag) const {return metaTags.count (tag);}
 		const std::vector <shared_ptr <FunctionDecleration>> & getConstructors () const {return constructors;}
+		const std::vector <FunctionDecleration *> getMethods (const string & iden) const {std::vector <FunctionDecleration *> m; for (auto e = methods.begin (), end = methods.end (); e != end; ++e) {m.push_back (e->second);} return m;}
 		void addConstructor (const shared_ptr <FunctionDecleration> & func) {constructors.push_back (func);}
+		void addMethod (const string & iden, FunctionDecleration * func) {methods.insert (std::make_pair (iden, func));}
 		virtual const ASTnode getArrayType () const {return nullptr;}
 		virtual const bool isArray () const {return false;}
 		virtual const bool isFloat () const {return false;}
@@ -42,6 +45,7 @@ class NumbatType {
 		std::set <string> metaTags;
 		std::vector <ASTnode> members;
 		std::vector <shared_ptr <FunctionDecleration>> constructors;
+		std::multimap <string, FunctionDecleration *> methods;
 };
 
 
