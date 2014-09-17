@@ -411,7 +411,7 @@ void BodyGenerator::visit (ASTbranch & exp) {
 
 void BodyGenerator::visit (ASTcall & exp) {
 	
-	Function * func = getFunction (exp.getFunction ().get ());
+	Function * func = getFunction (exp.getFunction ());
 	std::vector <Value *> args;// (exp.getArgs ().size ());
 	
 	bool oldAlias = ref;
@@ -863,7 +863,7 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	
 	bool oldAlias = ref;
 	for (const shared_ptr <ASTcallable> & call : exp.getCalls ()) {
-		Function * func = getFunction (call->getFunction ().get ());
+		Function * func = getFunction (call->getFunction ());
 		auto param = func->arg_begin ();
 		ref = param->getType ()->isPointerTy ();
 		(*lhsItt)->accept (*this);
@@ -880,7 +880,7 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	auto lhsParam = lhsArgs.begin ();
 	auto rhsParam = rhsArgs.begin ();
 	for (const shared_ptr <ASTcallable> & call : exp.getCalls ()) {
-		Function * func = getFunction (call->getFunction ().get ());
+		Function * func = getFunction (call->getFunction ());
 		stack.push (builder.CreateCall2 (func, *lhsParam, *rhsParam));
 		++lhsParam;
 		++rhsParam;
