@@ -14,7 +14,7 @@ class ASTcall : public ASTcallable {
 		const shared_ptr <ASTcallable> & getCallee () const {return callee;}
 		const std::vector <ASTnode> & getArgs () const {return args;}
 		virtual bool isValid () const;
-		virtual const shared_ptr <FunctionDecleration> & getFunction () const {return callee->getFunction ();}
+		virtual const FunctionDecleration * getFunction () const {return callee->getFunction ();}
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return callee->getIden ();}

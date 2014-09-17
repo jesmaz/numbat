@@ -12,7 +12,7 @@ namespace parser {
 class ASTcallable : public ASTbase {
 	public:
 		virtual bool isCallable () const {return true;}
-		virtual const shared_ptr <FunctionDecleration> & getFunction () const=0;
+		virtual const FunctionDecleration * getFunction () const=0;
 };
 
 

@@ -10,7 +10,7 @@ namespace parser {
 class ASTcallerror : public ASTcallable {
 	public:
 		virtual bool isValid () const {return false;}
-		virtual const shared_ptr <FunctionDecleration> & getFunction () const {return func;}
+		virtual const FunctionDecleration * getFunction () const {return nullptr;}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}
@@ -20,7 +20,6 @@ class ASTcallerror : public ASTcallable {
 		ASTcallerror (const string & message) : message (message) {}
 	private:
 		string message;
-		shared_ptr <FunctionDecleration> func = nullptr;
 };
 
 
