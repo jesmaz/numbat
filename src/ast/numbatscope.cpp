@@ -72,6 +72,9 @@ size_t NumbatScope::calculateWeight() const {
 
 string NumbatScope::toString (const string & indent) const {
 	string s=indent + "{\n";
+	for (auto type: types) {
+		s += indent + "    " + type.second->toString () + "\n";
+	}
 	for (auto func : functions){
 		s += indent + "    " + func.first + " " + func.second->toString (indent) + "\n";
 	}
@@ -177,6 +180,31 @@ NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::
 	}
 	return nt;
 	
+}
+
+NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t dimentions) {
+	while (scope->parent) {
+		scope = scope->parent;
+	}
+	while (scope->arrayTypes.size () < dimentions) {
+		scope->arrayTypes.push_back (std::map <void *, unique_ptr <NumbatPointerType>> ());
+	}
+	auto itt = scope->arrayTypes [dimentions - 1].find ((void *)type);
+	if (itt != scope->arrayTypes [dimentions - 1].end ()) {
+		return itt->second.get ();
+	}
+	ASTnode rawDataType = ASTnode (new ASTtype (false, false, type));
+	NumbatPointerType * arrayType = new NumbatPointerType (type->getIden () + "[]", rawDataType);
+	scope->arrayTypes [dimentions - 1][(void *)type] = unique_ptr <NumbatPointerType> (arrayType);
+	std::vector <ASTnode> params (dimentions, nullptr);
+	ASTnode indexType (ASTnode (new ASTtype (false, false, getType (scope, "uint64"))));
+	for (size_t i=0; i<dimentions; ++i) {
+		//strig iden = 
+		std::ostringstream ss;
+		ss << dimentions;
+		params [i] = ASTnode (new ASTmember (ss.str (), indexType));
+	}
+	return arrayType;
 }
 
 NumbatVariable * NumbatScope::createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {
