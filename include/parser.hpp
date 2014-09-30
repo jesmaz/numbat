@@ -16,6 +16,7 @@ ASTnode generateOperatorError (const Position & pos, const string & message);
 
 ASTnode parseBody (Position pos, NumbatScope * scope);
 ASTnode parseExpression (Position pos, NumbatScope * scope);
+ASTnode parseExpression (Position pos, NumbatScope * scope, std::list <OperatorDecleration::OperatorMatch> matches);
 ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope);
 ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope);
 ASTnode parseType (Position * pos, NumbatScope * scope);
