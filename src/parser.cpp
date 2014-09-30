@@ -67,12 +67,9 @@ ASTnode parseExpression (Position pos, NumbatScope * scope, std::list <OperatorD
 	
 	for (auto & match : matches) {
 		node = parseOperator (pos, scope, *match.opp, &matches, match.ptrs);
-		if (node and typeid (*node.get ()) != typeid (ASToperatorError)) {
+		if (node and node->isParsed ()) {
 			break;
 		}
-		/*if (node and node->isParsed ()) {
-			break;
-		}*/
 		std::cout << node->toString () << std::endl;
 		
 	}
@@ -159,7 +156,7 @@ ASTnode parseOperator (Position pos, NumbatScope * scope, const OperatorDeclerat
 			if (matchPtr.size () <= match) return generateError (Position (matchPtr.front ()), "Syntax error when parsing '" + opp.getPattern () + "' operator");
 			if (args.size () > arg) {
 				if (!(matchPtr [match] < args [arg])) {
-					return generateOperatorError (pos, "Argument error (probably a bug)");
+					return generateOperatorError (pos, "Argument error (probably a bug) when parsing '" + opp.getPattern () + "'");
 				}
 			}
 			++match;
