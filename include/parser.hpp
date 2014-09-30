@@ -20,6 +20,9 @@ std::vector <ASTnode> parseArgs (Position pos, NumbatScope * scope);
 
 string parseString (const Position & pos);
 
+void * futureFunc (void *);
+void * futureStruct (void *);
+
 };
 };
 

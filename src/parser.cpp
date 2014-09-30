@@ -251,5 +251,25 @@ string parseString (const Position & pos) {
 }
 
 
+void * futureFunc (void * data) {
+	
+	std::tuple <Position, NumbatScope *, FunctionDecleration *> * args = reinterpret_cast <std::tuple <Position, NumbatScope *, FunctionDecleration *> *> (data);
+	Position body = nextBody (std::get <0> (*args));
+	std::get <2> (*args)->assignBody (parseBody (body ? body : std::get <0> (*args), std::get <1> (*args)));
+	delete args;
+	return nullptr;
+	
+}
+
+void * futureStruct (void * data) {
+	
+	std::tuple <Position, NumbatScope *, NumbatType *> * args = reinterpret_cast <std::tuple <Position, NumbatScope *, NumbatType *> *> (data);
+	std::get <2> (*args)->buildData (parseArgs (std::get <0> (*args), std::get <1> (*args)));
+	delete args;
+	return nullptr;
+	
+}
+
+
 };
 };
