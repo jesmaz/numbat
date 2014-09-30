@@ -22,7 +22,7 @@ class NumbatRawType : public NumbatType {
 		virtual string toString (const string & indent = "") const;
 		
 		NumbatRawType () {}
-		NumbatRawType (string iden, size_t size, Type type) : NumbatType (iden), size (size), type (type) {} // for raw data
+		NumbatRawType (string iden, size_t size, Type type, FunctionDecleration * mallocFunc, FunctionDecleration * freeFunc) : NumbatType (iden, mallocFunc, freeFunc), size (size), type (type) {} // for raw data
 	private:
 		size_t size=0;
 		Type type;

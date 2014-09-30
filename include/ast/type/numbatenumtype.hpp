@@ -20,7 +20,7 @@ class NumbatEnumType : public NumbatType {
 		virtual string toString (const string & indent = "") const {return indent + "enum " + NumbatType::toString ();}
 		
 		NumbatEnumType () {}
-		NumbatEnumType (const string & iden, const shared_ptr <NumbatType> & baseType, const std::set <string> & meta) : NumbatType (iden, meta), baseType (baseType) {}
+		NumbatEnumType (const string & iden, const shared_ptr <NumbatType> & baseType, const std::set <string> & meta, FunctionDecleration * mallocFunc, FunctionDecleration *  freeFunc) : NumbatType (iden, meta, mallocFunc, freeFunc), baseType (baseType) {}
 	private:
 		shared_ptr <NumbatType> baseType;
 };

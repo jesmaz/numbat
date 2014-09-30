@@ -21,8 +21,8 @@ class NumbatPointerType : public NumbatType {
 		virtual string toString (const string & indent = "") const;
 		
 		NumbatPointerType () {}
-		NumbatPointerType (string iden, ASTnode dataType) : NumbatType (iden), dataType (dataType) {}
-		NumbatPointerType (string iden, ASTnode dataType, const std::set <string> & meta) : NumbatType (iden, meta), dataType (dataType) {}
+		NumbatPointerType (string iden, ASTnode dataType, FunctionDecleration * mallocFunc, FunctionDecleration *  freeFunc) : NumbatType (iden, mallocFunc, freeFunc), dataType (dataType) {}
+		NumbatPointerType (string iden, ASTnode dataType, const std::set <string> & meta, FunctionDecleration * mallocFunc, FunctionDecleration *  freeFunc) : NumbatType (iden, meta, mallocFunc, freeFunc), dataType (dataType) {}
 	private:
 		ASTnode dataType;
 };

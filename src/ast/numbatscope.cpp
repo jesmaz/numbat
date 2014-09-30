@@ -1,3 +1,4 @@
+#include "../../include/ast.hpp"
 #include "../../include/ast/functiondecleration.hpp"
 #include "../../include/ast/numbatscope.hpp"
 
@@ -176,7 +177,7 @@ FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const stri
 
 NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type) {
 	
-	NumbatType * nt = new NumbatRawType (iden, size, type);
+	NumbatType * nt = new NumbatRawType (iden, size, type, scope->getAST ()->MallocFunc (), scope->getAST ()->FreeFunc ());
 	if (!scope->registerSymbol (iden, nt)) {
 		delete nt;
 		nt = nullptr;
@@ -187,7 +188,7 @@ NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t siz
 
 NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set< string > & meta) {
 	
-	NumbatType * nt = new NumbatType (iden, meta);
+	NumbatType * nt = new NumbatType (iden, meta, scope->getAST ()->MallocFunc (), scope->getAST ()->FreeFunc ());
 	if (!scope->registerSymbol (iden, nt)) {
 		delete nt;
 		nt = nullptr;
@@ -201,11 +202,11 @@ NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t 
 	while (type->arrayType.size () < dimentions) {
 		type->arrayType.push_back (nullptr);
 	}
-	if (ptrType = type->arrayType [dimentions - 1]) {
+	if ((ptrType = type->arrayType [dimentions - 1])) {
 		return ptrType;
 	}
 	ASTnode rawDataType = ASTnode (new ASTtype (false, false, type));
-	ptrType = type->arrayType [dimentions - 1] = new NumbatPointerType (type->getIden () + "[]", rawDataType);
+	ptrType = type->arrayType [dimentions - 1] = new NumbatPointerType (type->getIden () + "[]", rawDataType, scope->getAST ()->MallocFunc (), scope->getAST ()->FreeFunc ());
 	std::vector <ASTnode> params (dimentions, nullptr);
 	ASTnode indexType (ASTnode (new ASTtype (false, false, getType (scope, "uint64"))));
 	for (size_t i=0; i<dimentions-1; ++i) {
