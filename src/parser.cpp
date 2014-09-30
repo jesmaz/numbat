@@ -57,11 +57,11 @@ ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
 			return parseNumericliteral (pos, scope);
 			break;
 		case TOKEN::stringliteral:
-			if (pos+1) return ASTnode (new ASToperatorError ("Unexpected token: '" + (pos+1).itt->iden + "'"));
+			if (pos+1) return generateOperatorError (pos+1, "Unexpected token: '" + (pos+1).itt->iden + "'");
 			return ASTnode (new ASTconstantCString (ASTnode (new ASTtype (false, true, getType (scope, "string"))), parseString (pos)));
 			break;
 		case TOKEN::symbol:
-			return ASTnode (new ASToperatorError ("Unexpected symbol: '" + pos.itt->iden + "'"));
+			return generateOperatorError (pos, "Unexpected symbol: '" + pos.itt->iden + "'");
 			break;
 		case TOKEN::typemodifier:
 			symb = parseType (&pos, scope);
@@ -84,8 +84,9 @@ ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
 			}
 		}
 	}
+	if (!symb->isValid ()) return symb;
 	if ((pos+1) and (pos+1).itt->type != TOKEN::semicolon) {
-		return ASTnode (new ASToperatorError ("Unexpected token: '" + (pos+1).itt->iden + "'"));
+		return generateOperatorError (pos+1, "Unexpected token: '" + (pos+1).itt->iden+ "'");
 	}
 	return symb;
 	
