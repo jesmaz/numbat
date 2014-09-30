@@ -120,6 +120,73 @@ ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 	
 }
 
+ASTnode parseOperator (Position pos, NumbatScope * scope, const OperatorDecleration & opp, std::list <OperatorDecleration::OperatorMatch> * matches, std::vector <tkitt> matchPtr) {
+	
+	std::vector <Position> args;
+	const std::vector <string> & symb = opp.getSymbols ();
+	
+	if (symb.size () < 1) {
+		return generateOperatorError (pos, "Invalid operator");
+	}
+	
+	if (symb.front() != " ") {
+		if (matchPtr.front () != pos.itt) return generateOperatorError (pos, "Unexpected token '" + pos.itt->iden + "' when parsing '" + opp.getPattern () + "'");
+	}
+	if (symb.back() != " ") {
+		if (++Position (matchPtr.back (), pos.end)) return generateOperatorError (pos, "Unexpected token '" + (++Position (matchPtr.back (), pos.end)).itt->iden  + "' when parsing '" + opp.getPattern () + "'");
+	}
+	
+	Position lhs = pos;
+	for (tkitt itt : matchPtr) {
+		lhs = Position (pos.itt, itt);
+		pos = Position (itt + 1, pos.end);
+		if (lhs) {
+			args.push_back (lhs);
+		}
+	}
+	if (pos) {
+		args.push_back (pos);
+	}
+	
+	size_t arg=0, match=0 ;
+	for (const string & s : opp.getSymbols ()) {
+		if (s == " ") {
+			if (args.size () <= arg) {
+				return generateOperatorError (pos, "Not enough arguments");
+			}
+			++arg;
+		} else {
+			if (matchPtr.size () <= match) return generateError (Position (matchPtr.front ()), "Syntax error when parsing '" + opp.getPattern () + "' operator");
+			if (args.size () > arg) {
+				if (!(matchPtr [match] < args [arg])) {
+					return generateOperatorError (pos, "Argument error (probably a bug)");
+				}
+			}
+			++match;
+		}
+	}
+	
+	//matches->sort (&OperatorDecleration::OperatorMatch::parseOrder);
+	
+	if (opp.parsable ()) return opp.parse (scope, opp.getPattern (), args, matches);
+	
+	//TODO: return opp.parse (scope, args, matches);
+	string err;// = " (";
+	arg=0;
+	for (const string & s : opp.getSymbols ()) {
+		if (s == " ") {
+			ASTnode exp = parseExpression (args [arg], scope, *matches);
+			//if (!exp->isValid()) return exp;
+			if (typeid (*exp.get ()) == typeid (ASToperatorError)) return exp;
+			err += exp->toString ();
+			++arg;
+		} else {
+			err += " " + s + " ";
+		}
+	}
+	return ASTnode (new ASTidentifier (/*opp.getSymbols ().back () == ")" ? err :*/ " (" + err + ") "));
+}
+
 ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
 	
 	ASTnode symb = nullptr;
@@ -338,6 +405,123 @@ string parseString (const Position & pos) {
 }
 
 
+void importModule (NumbatScope * scope, shared_ptr <Module> module, bool extention) {
+	scope->getAST ()->importModule (module, extention);
+}
+
+void parseBodyInline (Position pos, NumbatScope * scope) {
+	
+	Position oldPos = pos;
+	std::list <std::pair <void*(*)(void*), void*>> futureBody, futureType;
+	
+	while (Position exp = nextExpression (pos)) {
+		/*for (tkitt itt = exp.itt; itt != exp.end; ++itt)
+			std::cout << itt->iden;
+		std::cout << std::endl;*/
+		switch (exp.itt->type) {
+			case TOKEN::def:
+				if (void * data = parseFunctionDecleration (exp, scope)) {
+					futureBody.push_back (std::make_pair (futureFunc, data));
+				}
+				break;
+				
+			case TOKEN::enumtkn:
+				//TODO: register enum
+				//TODO: future-parse enum body
+				break;
+				
+			case TOKEN::externdef:
+				parseFunctionDecleration (exp, scope);
+				break;
+				
+			case TOKEN::import:
+				parseImport (exp, scope);
+				break;
+				
+			case TOKEN::structure:
+				if (void * data = parseStructDecleration (exp, scope)) {
+					futureType.push_back (std::make_pair (futureStruct, data));
+				}
+				break;
+				
+			case TOKEN::typedeftkn:
+				//parseTypeDef (exp, body);
+				break;
+				
+			default:
+				break;
+		}
+		pos += exp;
+	}
+	
+	
+	pos = oldPos;
+	
+	while (Position exp = nextExpression (pos)) {
+		switch (exp.itt->type) {
+			case TOKEN::def:
+			case TOKEN::enumtkn:
+			case TOKEN::externdef:
+			case TOKEN::import:
+			case TOKEN::structure:
+			case TOKEN::typedeftkn:
+				break;
+				
+			case TOKEN::ret:
+				if (++exp) {
+					addToBody (scope, ASTnode (new ASTreturn (parseExpression (exp, scope))));
+				} else {
+					addToBody (scope, ASTnode (new ASTreturnvoid ()));
+				}
+				break;
+				
+			default:
+				addToBody (scope, parseExpression (exp, scope));
+				break;
+		}
+		pos += exp;
+	}
+	
+	
+	for (auto e : futureType) {
+		e.first (e.second);
+	}
+	
+	for (auto e : futureBody) {
+		e.first (e.second);
+	}
+	
+}
+
+void parseImport (Position pos, NumbatScope * scope) {
+	
+	++pos;//eat import token
+	
+	string mod = pos.itt->iden;
+	string iden = mod;
+	while (++pos and pos.itt->type == TOKEN::symbol and pos.itt->iden == ".") {
+		mod = joinPaths (mod, iden = (++pos).itt->iden);
+	}
+	
+	if (pos.itt->type == TOKEN::as) {
+		iden = (++pos).itt->iden;
+	}
+	
+	auto module = Module::import (getContext (scope)->path, mod);
+	
+	ASTnode type = ASTnode (new ASTmodule (module));
+	createVariable (scope, type, nullptr, iden, false, false);
+	
+}
+
+void parseModule (Position pos, NumbatScope * scope) {
+	importModule (scope, Module::createEmpty ("numbat core"), true);
+	importModule (scope, Module::import (getContext (scope)->path, "core util"), false);
+	
+	parseBodyInline (pos, scope);
+}
+
+
 void * futureFunc (void * data) {
 	
 	std::tuple <Position, NumbatScope *, FunctionDecleration *> * args = reinterpret_cast <std::tuple <Position, NumbatScope *, FunctionDecleration *> *> (data);
@@ -354,6 +538,101 @@ void * futureStruct (void * data) {
 	std::get <2> (*args)->buildData (parseArgs (std::get <0> (*args), std::get <1> (*args)));
 	delete args;
 	return nullptr;
+	
+}
+
+void * parseFunctionDecleration (Position pos, NumbatScope * scope) {
+	
+	bool future=true;
+	if (pos.itt->type == TOKEN::externdef){
+		++pos;
+		future=false;
+	}
+	++pos;//eat def token
+	if (pos.itt->type != TOKEN::identifier and pos.itt->type != TOKEN::chararrayliteral) {
+		std::cout << "Not identifier or char array literal" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
+	const string & iden = pos.itt->iden;
+	std::set <string> tags;
+	while (++pos and pos.itt->type == TOKEN::atsym) {
+		tags.insert ((++pos).itt->iden);
+	}
+	
+	if (pos.itt->type != TOKEN::symbol or pos.itt->iden != "(") {
+		std::cout << "Missing first '('" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
+	
+	tkitt end = findToken (pos.itt, pos.end, TOKEN::symbol, ")");
+	NumbatScope * fScope = createChild (scope);
+	std::vector <ASTnode> param = parseArgs (Position (pos.itt + 1, end), fScope);
+	pos.itt = end;
+	std::vector <ASTnode> type;
+	if ((pos + 1).itt->type == TOKEN::symbol and (pos + 1).itt->iden == "-" and ((pos + 1) + 1).itt->type == TOKEN::symbol and ((pos + 1) + 1).itt->iden == ">") {
+		++pos;++pos;
+		if ((++pos).itt->type != TOKEN::symbol or pos.itt->iden != "(") {
+			std::cout << "Missing second '('" << std::endl;
+			std::cout << "'" << pos.itt->iden << "'" << std::endl;
+			return nullptr;
+		}
+		end = findToken (pos.itt, pos.end, TOKEN::symbol, ")");
+		type = parseArgs (Position (pos.itt + 1, end), fScope);
+		pos.itt = end;
+		++pos;
+	}
+	
+	FunctionDecleration * funcDec = createFunctionDecleration (scope, iden, param, type, tags);
+	if (funcDec) {
+		std::set <const NumbatType *> types;
+		for (auto & a : param) {
+			types.insert (a->getType ());
+		}
+		for (const NumbatType * type : types) {
+			const_cast <NumbatType *> (type)->addMethod (iden, funcDec);
+		}
+		if (future) {
+			return (void *) new std::tuple <Position, NumbatScope *, FunctionDecleration *> (pos, fScope, funcDec);
+		} else {
+			return nullptr;
+		}
+	} else {
+		std::cout << "Failed to register" << std::endl;
+		return nullptr;
+	}
+	
+}
+
+void * parseStructDecleration (Position pos, NumbatScope * scope) {
+	
+	++pos;//eat struct token
+	if (pos.itt->type != TOKEN::identifier) {
+		std::cout << "Not an identifier" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
+	const string & iden = pos.itt->iden;
+	std::set <string> tags;
+	while (++pos and pos.itt->type == TOKEN::atsym) {
+		tags.insert ((++pos).itt->iden);
+	}
+	if (pos.itt->type != TOKEN::symbol or pos.itt->iden != "{") {
+		std::cout << "Expected a '{'" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
+	tkitt end = findToken (pos.itt, pos.end, TOKEN::symbol, "}");
+	
+	NumbatType * type = createStruct (scope, iden, tags);
+	if (type) {
+		return (void *) new std::tuple <Position, NumbatScope *, NumbatType *> (Position (pos.itt + 1, end), createChild (scope), type);
+	} else {
+		std::cout << "Failed to register" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
 	
 }
 
