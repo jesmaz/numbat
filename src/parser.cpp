@@ -7,6 +7,32 @@ using namespace lexer;
 namespace parser {
 
 
+ASTnode generateError (const Position & pos, const string & message) {
+	std::ostringstream ss;
+	ss << pos.itt->line << ": " << message;
+	return ASTnode (new ASTerror (ss.str ()));
+}
+
+ASTnode generateOperatorError (const Position & pos, const string & message) {
+	std::ostringstream ss;
+	ss << pos.itt->line << ": " << message;
+	return ASTnode (new ASToperatorError (ss.str ()));
+}
+
+
+ASTnode parseBody (Position pos, NumbatScope * scope) {
+	NumbatScope * body = createChild (scope);
+	parseBodyInline (pos, body);
+	//The memory leak here is on purpose
+	return * new ASTnode (body);
+}
+
+ASTnode parseExpression (Position pos, NumbatScope * scope) {
+	auto matches = generateOperatorMatches (getContext (scope), pos);
+	matches.sort (&OperatorDecleration::OperatorMatch::treeOrder);
+	return parseExpression (pos, scope, matches);
+}
+
 ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 	
 	const string & str = pos.itt->iden;
