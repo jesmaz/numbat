@@ -4,6 +4,7 @@
 #include "ast/operatordecleration.hpp"
 
 #include <map>
+#include <set>
 #include <unordered_map>
 
 namespace numbat {
@@ -22,6 +23,8 @@ struct ParsingContext {
 	std::map <string, string> blocks;
 	
 	std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
+	
+	std::set <string> keywords;
 	
 	std::unordered_map <string, ExpressionParser> expressionParsers;
 };
