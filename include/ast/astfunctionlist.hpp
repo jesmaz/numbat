@@ -16,7 +16,7 @@ class ASTfunctionlist : public ASTbase {
 	
 	public:
 		
-		const std::vector <shared_ptr <FunctionDecleration>> & getElements () const {return elements;}
+		const std::vector <FunctionDecleration *> & getElements () const {return elements;}
 		virtual bool isValid () const {return true;}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return 0;}
@@ -24,12 +24,13 @@ class ASTfunctionlist : public ASTbase {
 		virtual string toString (const string & indent = "") const {return indent + iden;}
 		
 		ASTfunctionlist () {}
-		ASTfunctionlist (const string & iden, const std::vector <shared_ptr <FunctionDecleration>> & elements) : iden (iden), elements (elements) {}
+		ASTfunctionlist (const string & iden, const std::vector <shared_ptr <FunctionDecleration>> & ein) : iden (iden) {for (auto e : ein) {elements.push_back (e.get ());}}
+		ASTfunctionlist (const string & iden, const std::vector <FunctionDecleration *> & elements) : iden (iden), elements (elements) {}
 		
 	private:
 		
 		string iden;
-		std::vector <shared_ptr <FunctionDecleration>> elements;
+		std::vector <FunctionDecleration *> elements;
 		
 };
 
