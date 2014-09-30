@@ -93,7 +93,7 @@ Value * BodyGenerator::allocteArray (Value * length, const NumbatPointerType * t
 	bytes = builder.CreateMul (length, builder.getInt64 (esize));
 	bytes = builder.CreateAdd (bytes, mdbytes);
 	
-	Value * call = builder.CreateCall (memalloc, std::vector <Value *> (1, bytes));
+	Value * call = builder.CreateCall (getFunction (type->getDataType ()->getType ()->getMalloc ()), std::vector <Value *> (1, bytes));
 	
 	Value * addressInt = builder.CreateAdd (builder.CreatePtrToInt (call, Type::getInt64Ty (context)), mdbytes);
 	
@@ -113,11 +113,10 @@ Value * BodyGenerator::allocteArray (Value * length, const NumbatPointerType * t
 
 Value * BodyGenerator::createTemp (Value * val) {
 	
-	if (ref) {
-		Value * alloc = createEntryBlockAlloc (activeFunction, val->getType (), "temp");
-		builder.CreateStore (val, alloc);
-		val = alloc;
-	}
+	
+	Value * alloc = createEntryBlockAlloc (activeFunction, val->getType (), "temp");
+	builder.CreateStore (val, alloc);
+	val = alloc;
 	return val;
 	
 }
@@ -143,20 +142,15 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 		namedValues [var] = hand;
 		
 		if (const ASTnode & init = var->getInit ()) {
-			bool oldRef = ref;
-			ref = true;
-			init->accept (*this);
-			builder.CreateStore (builder.CreateLoad (stack.top ()), hand);
+			builder.CreateStore (builder.CreateLoad (getValue (init)), hand);
 			stack.pop ();
-			ref = oldRef;
 		} else {
 			builder.CreateStore (initialise (var->getType ()), hand);
 		}
 		
 	}
 	
-	if (!ref)
-		hand = builder.CreateLoad (hand, var->getIden ());
+	hand = builder.CreateLoad (hand, var->getIden ());
 	
 	return hand;
 	
@@ -241,8 +235,7 @@ void BodyGenerator::createMemCpy (Value * dest, Value * source, Value * length, 
 }
 
 void BodyGenerator::makeCompare (const ASTnode & exp) {
-	exp->accept (*this);
-	Value * v = stack.top ();
+	Value * v = getValue (exp);
 	if (v->getType ()->isStructTy () and v->getType ()->getStructNumElements () == 1) {
 		v = builder.CreateExtractValue (v, 0);
 	}
@@ -313,42 +306,35 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 		ai->setName (func->getArgs ()[index]->getIden ());
 	}
 	
-	if (func->hasTag ("malloc") and !memalloc) {
-		//TODO: function type testing
-		memalloc = f;
+	functions [func] = f;
+	ASTnode body = func->getBody ();
+	if (body and !body->isNil ()) {
+		Function * prev = activeFunction;
+		BasicBlock * block = builder.GetInsertBlock ();
+		builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
+		for (const ASTnode & node : func->getArgs ()) {
+			getValue (node);
+		}
+		getValue (body);
+		verifyFunction (*activeFunction);
+		if (fpm)
+			fpm->run (*activeFunction);
+		activeFunction = prev;
+		builder.SetInsertPoint (block);
 	}
-	
-	if (func->hasTag ("free") and !memfree) {
-		//TODO: function type testing
-		memfree = f;
-	}
-	
-	return functions [func] = f;
+	return f;
 	
 }
 
 
 void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 	
-	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : ast.getFunctions ()) {
-		getFunction (func.second.get ());
+	for (auto mod : ast.getDependencies ()) {
+		visit (mod);
 	}
 	
 	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : ast.getFunctions ()) {
-		activeFunctionDecleration = func.second.get ();
-		activeFunction = functions [activeFunctionDecleration];
-		ASTnode body = func.second->getBody ();
-		if (body) {
-			builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
-			for (const ASTnode & node : func.second->getArgs ()) {
-				node->accept (*this);
-			}
-			body->accept (*this);
-			//TODO: weight calculations for inlining
-			verifyFunction (*activeFunction);
-			if (fpm)
-				fpm->run (*activeFunction);
-		}
+		getFunction (func.second.get ());
 	}
 	
 }
@@ -361,10 +347,7 @@ void BodyGenerator::visit (ASTallocate & exp) {
 		return;
 	}
 	
-	bool oldRef = ref;
-	ref = true;
 	exp.getAmount ()->accept (*this);
-	ref = oldRef;
 	Value * count;
 	if (!stack.empty ()) {
 		count = builder.CreateLoad (stack.top ()); stack.pop ();
@@ -392,12 +375,9 @@ void BodyGenerator::visit (ASTbranch & exp) {
 	BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
 	BasicBlock * alt = BasicBlock::Create (context, "alt", activeFunction);
 	BasicBlock * resume = BasicBlock::Create (context, "alt", activeFunction);
-	bool oldRef = ref;
-	ref = true;
 	exp.getCond ()->accept (*this);
 	Value * cond = makeCompare (builder.CreateLoad (stack.top ()));
 	stack.pop ();
-	ref = oldRef;
 	builder.CreateCondBr (cond, body, alt);
 	builder.SetInsertPoint (body);
 	exp.getBody ()->accept (*this);
@@ -414,15 +394,13 @@ void BodyGenerator::visit (ASTcall & exp) {
 	Function * func = getFunction (exp.getFunction ());
 	std::vector <Value *> args;// (exp.getArgs ().size ());
 	
-	bool oldAlias = ref;
 	auto argItt = exp.getArgs ().begin (), argEnd = exp.getArgs ().end ();
 	auto param = func->arg_begin (), paramEnd = func->arg_end ();
 	for (; param != paramEnd and argItt != argEnd; ++argItt, ++param) {
-		ref = param->getType ()->isPointerTy ();
+		param->getType ()->isPointerTy ();
 		(*argItt)->accept (*this);
 		args.push_back (stack.top ()); stack.pop ();
 	}
-	ref = oldAlias;
 	
 	stack.push (builder.CreateCall (func, args));
 	
@@ -430,12 +408,12 @@ void BodyGenerator::visit (ASTcall & exp) {
 
 void BodyGenerator::visit (ASTcallindex & exp) {
 	
-	auto & call = exp.getCall ();
-	Value * retVal = tempValues [call.get ()];
+	ASTcallable * call = exp.getCall ();
+	Value * retVal = tempValues [call];
 	
 	if (!retVal) {
 		call->accept (*this);
-		retVal = tempValues [call.get ()] = stack.top (); stack.pop ();
+		retVal = tempValues [call] = stack.top (); stack.pop ();
 	}
 	
 	if (!call->getFunction ()->hasTag ("cstyle")) {
@@ -460,8 +438,6 @@ void BodyGenerator::visit (ASTconcat & exp) {
 		return;
 	}
 	
-	auto oldRef = ref;
-	ref = true;
 	exp.getLhs ()->accept (*this);
 	Value * lhs = stack.top ();
 	stack.pop ();
@@ -497,8 +473,6 @@ void BodyGenerator::visit (ASTconcat & exp) {
 	}
 	
 	stack.push (array);
-	
-	ref = oldRef;
 	
 }
 
@@ -544,28 +518,20 @@ void BodyGenerator::visit (ASTconstantCString & exp) {
 
 void BodyGenerator::visit (ASTgep & exp) {
 	
-	bool oldRef = ref;
-	ref = true;
 	exp.getRef ()->accept (*this);
 	Value * ptr = builder.CreateLoad (stack.top ());
 	stack.pop ();
 	exp.getIndex ()->accept (*this);
 	Value * index = builder.CreateLoad (stack.top ());
 	stack.pop ();
-	ref = oldRef;
 	
 	Value * gep = builder.CreateGEP (ptr, std::vector <Value *> (1, index));
-	if (!ref) {
-		gep = builder.CreateLoad (gep);
-	}
 	stack.push (gep);
 	
 }
 
 void BodyGenerator::visit (ASTmemcpy & exp) {
 	
-	bool oldRef = ref;
-	ref = true;
 	exp.getDest ()->accept (*this);
 	Value * dest = stack.top ();
 	stack.pop ();
@@ -585,7 +551,6 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 	}
 	
 	createMemCpy (dest, source, length, conv);
-	ref = oldRef;
 	stack.push (dest);
 	
 }
@@ -597,13 +562,10 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	const string & instr = exp.getInstr ();
 	
 	if (instr == "cast") {
-		bool oldref = ref;
-		ref = true;
 		exp.getArgs () [0]->accept (*this);
 		Value * arg = builder.CreateLoad (stack.top ()); stack.pop ();
 		Type * type = getType (exp.getArgs () [1]->getType ());
-		Value * val;
-		ref = oldref;
+		Value * val;\
 		if (arg->getType ()->isFloatingPointTy ()) {
 			if (type->isFloatingPointTy ()) {
 				if (arg->getType ()->getPrimitiveSizeInBits () < type->getPrimitiveSizeInBits ()) {
@@ -646,10 +608,7 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		stack.push (createTemp (val));
 		return;
 	} else if (instr == "gep") {
-		bool oldAlias = ref;
-		ref = true;
 		exp.getArgs () [0]->accept (*this);
-		ref = oldAlias;
 		Value * lhs = stack.top (); stack.pop ();
 		int l = exp.getArgs().size ();
 		for (int i=1; i<l; ++i) {
@@ -667,28 +626,18 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 		stack.push (builder.CreateGEP (lhs, args));
 		return;
 	} else if (instr == "mov") {
-		bool oldAlias = ref;
-		ref = true;
 		exp.getArgs () [0]->accept (*this);
 		Value * lhs = stack.top (); stack.pop ();
 		exp.getArgs () [1]->accept (*this);
 		Value * rhs = builder.CreateLoad (stack.top ()); stack.pop ();
-		ref = oldAlias;
 		builder.CreateStore (rhs, lhs);
-		if (ref) {
-			stack.push (lhs);
-		} else {
-			stack.push (builder.CreateLoad (lhs));
-		}
+		stack.push (lhs);
 		return;
 	} else if (instr == "redir") {
-		bool oldAlias = ref;
-		ref = true;
 		exp.getArgs () [0]->accept (*this);
 		Value * lhs = stack.top (); stack.pop ();
 		exp.getArgs () [1]->accept (*this);
 		Value * rhs = stack.top (); stack.pop ();
-		ref = oldAlias;
 		if (rhs->getType ()->getPointerElementType ()->isPointerTy ()) {
 			rhs = builder.CreateLoad (rhs);
 		}
@@ -701,11 +650,8 @@ void BodyGenerator::visit (ASTnumbatInstr & exp) {
 	}
 	
 	for (const ASTnode & arg : exp.getArgs ()) {
-		bool oldRef = ref;
-		ref = true;
 		arg->accept (*this);
 		args.push_back (builder.CreateLoad ((stack.top ()))); stack.pop ();
-		ref = oldRef;
 	}
 	
 	if (instr == "add") {
@@ -776,9 +722,7 @@ void BodyGenerator::visit (ASTparamater & exp) {
 			if (exp.isAlias ()) {
 				namedValues [exp.getVariable ()] = ai;
 			} else {
-				ref = true;
 				Value * v = getVariableHandle (exp.getVariable ());
-				ref = false;
 				builder.CreateStore (ai, v);
 			}
 			return;
@@ -821,29 +765,18 @@ void BodyGenerator::visit (ASTreturnvoid & exp) {
 
 void BodyGenerator::visit (ASTstructIndex & exp) {
 	
-	bool oldRef = ref;
-	ref = true;
 	exp.getExpr ()->accept (*this);
 	Value * val = stack.top (); stack.pop ();
-	ref = oldRef;
 	
 	if (const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (exp.getExpr ()->getType ())) {
 		Value * dptr = pointerTypeGEP (builder.CreateLoad (val), type, exp.getIndex ());
-		if (ref) {
-			stack.push (dptr);
-		} else {
-			stack.push (builder.CreateLoad (dptr));
-		}
+		stack.push (dptr);
 	} else {
 		std::vector <Value *> indicies (2);
 		indicies [0] = ConstantInt::get (Type::getInt64Ty (context), APInt (64, 0));
 		indicies [1] = ConstantInt::get (Type::getInt32Ty (context), APInt (32, exp.getIndex ()));
 		val = builder.CreateGEP (val, indicies);
-		if (ref) {
-			stack.push (val);
-		} else {
-			stack.push (builder.CreateLoad (val));
-		}
+		stack.push (val);
 	}
 	
 }
@@ -861,21 +794,19 @@ void BodyGenerator::visit (ASTtuplecall & exp) {
 	auto rhsItt = exp.getRhsArgs ().begin ();
 	std::list <Value *> lhsArgs, rhsArgs;
 	
-	bool oldAlias = ref;
 	for (const shared_ptr <ASTcallable> & call : exp.getCalls ()) {
 		Function * func = getFunction (call->getFunction ());
 		auto param = func->arg_begin ();
-		ref = param->getType ()->isPointerTy ();
+		param->getType ()->isPointerTy ();
 		(*lhsItt)->accept (*this);
 		lhsArgs.push_back (stack.top ()); stack.pop ();
 		++lhsItt;
 		++param;
-		ref = param->getType ()->isPointerTy ();
+		param->getType ()->isPointerTy ();
 		(*rhsItt)->accept (*this);
 		rhsArgs.push_back (stack.top ()); stack.pop ();
 		++rhsItt;
 	}
-	ref = oldAlias;
 	
 	auto lhsParam = lhsArgs.begin ();
 	auto rhsParam = rhsArgs.begin ();
@@ -919,13 +850,6 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 
 void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
-	if (!memfree) {
-		memfree = getFunction (parser::Module::getFree ().get ());
-	}
-	if (!memalloc) {
-		memalloc = getFunction (parser::Module::getMalloc ().get ());
-	}
-	
 	if (!main) {
 		FunctionDecleration funcDecl;
 		activeFunctionDecleration = &funcDecl;
@@ -945,25 +869,7 @@ void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	if (itt != builtModules.end ()) return;
 	builtModules.insert (nbtMod.get ());
 	
-	for (const shared_ptr <Module> & mod : nbtMod->getDependencies ()) {
-		visit (mod);
-	}
-	
-	for (const std::pair <string, shared_ptr <FunctionDecleration>> & func : nbtMod->getFunctions ()) {
-		activeFunctionDecleration = func.second.get ();
-		activeFunction = getFunction (func.second.get ());
-		ASTnode body = func.second->getBody ();
-		if (body and activeFunction->empty ()) {
-			builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
-			for (const ASTnode & node : func.second->getArgs ()) {
-				node->accept (*this);
-			}
-			body->accept (*this);
-			verifyFunction (*activeFunction);
-			if (fpm)
-				fpm->run (*activeFunction);
-		}
-	}
+	visit (*nbtMod->getAST ());
 	
 }
 
