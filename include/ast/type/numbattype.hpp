@@ -17,7 +17,7 @@ class NumbatType {
 	public:
 		const bool hasTag (const string & tag) const {return metaTags.count (tag);}
 		const std::vector <shared_ptr <FunctionDecleration>> & getConstructors () const {return constructors;}
-		const std::vector <FunctionDecleration *> getMethods (const string & iden) const {std::vector <FunctionDecleration *> m; for (auto e = methods.begin (), end = methods.end (); e != end; ++e) {m.push_back (e->second);} return m;}
+		const std::vector <FunctionDecleration *> getMethods (const string & iden) const {std::vector <FunctionDecleration *> m; for (auto e = methods.lower_bound (iden), end = methods.upper_bound (iden); e != end; ++e) {m.push_back (e->second);} return m;}
 		void addConstructor (const shared_ptr <FunctionDecleration> & func) {constructors.push_back (func);}
 		void addMethod (const string & iden, FunctionDecleration * func) {methods.insert (std::make_pair (iden, func));}
 		virtual const ASTnode getArrayType () const {return nullptr;}
