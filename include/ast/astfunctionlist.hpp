@@ -17,6 +17,7 @@ class ASTfunctionlist : public ASTbase {
 	public:
 		
 		const std::vector <FunctionDecleration *> & getElements () const {return elements;}
+		virtual bool isParsed () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return 0;}

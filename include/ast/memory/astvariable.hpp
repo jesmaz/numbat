@@ -20,6 +20,7 @@ class ASTvariable : public ASTbase {
 		virtual bool isAlias () const {return variable->isAlias ();}
 		virtual bool isArray () const {return variable->isArray ();}
 		virtual bool isConst () const {return variable->isConst ();}
+		virtual bool isParsed () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual const NumbatType * getType () const {return variable->getType ();}
 		virtual size_t calculateWeight () const {return 1;}

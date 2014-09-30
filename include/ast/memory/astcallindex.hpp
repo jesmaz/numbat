@@ -18,6 +18,7 @@ class ASTcallindex : public ASTbase {
 		virtual const ASTnode getASTType () const {return ref->getASTType ();}
 		virtual bool isAlias () const {return ref->isAlias ();}
 		virtual bool isConst () const {return ref->isConst ();}
+		virtual bool isParsed () const {return (callp ? callp : call.get ())->isParsed ();}
 		virtual bool isValid () const {return (callp ? callp : call.get ())->isValid ();}
 		virtual const NumbatType * getType () const {return ref->getType ();}
 		virtual size_t calculateWeight () const {return (callp ? callp : call.get ())->calculateWeight ();}

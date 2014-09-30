@@ -18,6 +18,7 @@ class ASTgep : public ASTbase {
 		virtual bool isAlias () const {return true;}
 		virtual bool isCallable () const {return false;}
 		virtual bool isConst () const {return ref->isConst ();}
+		virtual bool isParsed () const {return ref->isParsed () and index->isParsed ();}
 		virtual bool isValid () const {return ref->isValid () and index->isValid ();}
 		virtual const NumbatType * getType () const {if (const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (ref->getType ())) {return type->getDataType ()->getType ();} return nullptr;}
 		virtual size_t calculateWeight () const {return 0;}

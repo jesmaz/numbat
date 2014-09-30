@@ -15,6 +15,7 @@ class ASTtuple : public ASTbase {
 	public:
 		const std::list <ASTnode> & getElements () const {return elements;}
 		virtual bool isList () const {return true;}
+		virtual bool isParsed () const;
 		virtual bool isValid () const;
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return 0;}

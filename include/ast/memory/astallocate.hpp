@@ -15,7 +15,8 @@ class ASTallocate : public ASTbase {
 		const ASTnode & getAmount () const {return amount;}
 		virtual bool isAlias () const {return true;}
 		virtual bool isConst () const {return true;}
-		virtual bool isValid () const {return true;}
+		virtual bool isParsed () const {return amount->isParsed ();}
+		virtual bool isValid () const {return amount->isValid ();}
 		virtual const NumbatType * getType () const {return type;}
 		virtual size_t calculateWeight () const {return 32;}//This is honestly just an arbitrary number.
 		virtual size_t getBitSize () const {return 64;}

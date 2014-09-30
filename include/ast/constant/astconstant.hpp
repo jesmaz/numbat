@@ -15,6 +15,7 @@ class ASTconstant : public ASTbase {
 		virtual const ASTnode getASTType () const {return type;}
 		virtual bool isAlias () const {return type->isAlias ();}
 		virtual bool isConst () const {return true;}
+		virtual bool isParsed () const {return type->isValid ();}
 		virtual bool isValid () const {return type->isValid ();}
 		virtual const T & getValue () const=0;
 		virtual const NumbatType * getType () const {return type->getType ();}

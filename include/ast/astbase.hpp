@@ -40,6 +40,7 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual bool isConst () const {return false;}
 		virtual bool isList () const {return false;}
 		virtual bool isNil () const {return false;}
+		virtual bool isParsed () const=0;
 		virtual bool isRaw () const {return false;}
 		virtual bool isValid () const=0;
 		virtual const NumbatType * getType () const {return nullptr;}

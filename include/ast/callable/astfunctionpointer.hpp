@@ -11,6 +11,7 @@ namespace parser {
 class ASTfunctionPointer : public ASTcallable {
 	VISITABLE
 	public:
+		virtual bool isParsed () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual const FunctionDecleration * getFunction () const {return function;}
 		virtual size_t calculateWeight () const {return function->calculateWeight ();}

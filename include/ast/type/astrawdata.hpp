@@ -17,6 +17,7 @@ class ASTrawdata : public ASTbase {
 		virtual bool isAlias () const {return ref;}
 		virtual bool isConst () const {return constType;}
 		virtual bool isRaw () const {return true;}
+		virtual bool isParsed () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual const NumbatType * getType () const {return type;}
 		virtual size_t calculateWeight () const {return 1;}

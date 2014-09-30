@@ -20,6 +20,7 @@ class ASTsubexp : public ASTbase {
 		virtual bool isList () const {return exp->isList();}
 		virtual bool isNil () const {return exp->isNil();}
 		virtual bool isRaw () const {return exp->isRaw();}
+		virtual bool isParsed () const {return exp->isParsed ();}
 		virtual bool isValid () const {return exp->isValid();}
 		virtual const NumbatType * getType () const {return exp->getType();}
 		virtual size_t calculateWeight () const {return exp->calculateWeight();}

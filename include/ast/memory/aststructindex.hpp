@@ -18,6 +18,7 @@ class ASTstructIndex : public ASTbase {
 		virtual const ASTnode getASTType () const {return expr->getType ()->getMembers ()[index]->getASTType ();}
 		virtual bool isAlias () const {return expr->isAlias ();}
 		virtual bool isConst () const {return expr->isConst ();}
+		virtual bool isParsed () const {return expr->isParsed ();}
 		virtual bool isValid () const {return expr->isValid ();}
 		virtual const NumbatType * getType () const {return expr->getType ()->getMembers ()[index]->getType ();}
 		virtual size_t calculateWeight () const {return 0;}

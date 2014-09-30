@@ -33,6 +33,7 @@ struct OperatorDecleration {
 		
 		ASTnode parse (AbstractSyntaxTree * ast, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) const {return parser (ast, pattern, oppLoc, matches, end);}
 		ASTnode parse (NumbatScope * c, const string & s, const std::vector <Position> & a, std::list <OperatorDecleration::OperatorMatch> * m) const {return oppParser (c, s, a, m, defImp);}
+		const bool parsable () const {return oppParser != nullptr;}
 		
 		const bool isLtr () const {return ltr;}
 		const bool operator < (const OperatorDecleration & rhs) const {if (precidance == rhs.precidance) return pattern < rhs.pattern; return precidance < rhs.precidance;}

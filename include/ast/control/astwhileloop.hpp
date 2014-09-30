@@ -13,6 +13,7 @@ class ASTwhileloop : public ASTbase {
 	public:
 		const ASTnode & getBody () const {return body;}
 		const ASTnode & getCondition () const {return condition;}
+		virtual bool isParsed () const {return condition->isParsed () and body->isParsed ();}
 		virtual bool isValid () const {return condition->isValid () and body->isValid ();}
 		virtual size_t calculateWeight () const {return condition->calculateWeight () + body->calculateWeight () + 2;}//The extra 2 is for jumps
 		virtual size_t getBitSize () const {return 0;}

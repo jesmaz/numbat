@@ -12,6 +12,7 @@ class ASTbody : public ASTbase {
 	VISITABLE
 	public:
 		const std::vector <ASTnode> & getBody () const {return body;}
+		virtual bool isParsed () const;
 		virtual bool isValid () const;
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return 0;}

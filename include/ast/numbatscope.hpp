@@ -23,6 +23,7 @@ class NumbatScope : public ASTbase {
 	public:
 		
 		virtual ASTnode resolveSymbol (const string & iden) const;
+		virtual bool isParsed () const;
 		virtual bool isValid () const;
 		virtual size_t calculateWeight () const;
 		virtual string getIden () const {return "scope";}

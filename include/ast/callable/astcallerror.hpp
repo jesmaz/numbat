@@ -9,6 +9,7 @@ namespace parser {
 
 class ASTcallerror : public ASTcallable {
 	public:
+		virtual bool isParsed () const {return true;}
 		virtual bool isValid () const {return false;}
 		virtual const FunctionDecleration * getFunction () const {return nullptr;}
 		virtual size_t calculateWeight () const {return 0;}

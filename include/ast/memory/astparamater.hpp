@@ -18,6 +18,7 @@ class ASTparamater : public ASTbase {
 		virtual const ASTnode getASTType () const {return variable->getASTType ();}
 		virtual bool isAlias () const {return variable->isAlias ();}
 		virtual bool isConst () const {return variable->isConst ();}
+		virtual bool isParsed () const {return variable != nullptr;}
 		virtual bool isValid () const {return variable != nullptr;}
 		virtual const NumbatType * getType () const {return variable->getType ();}
 		virtual size_t calculateWeight () const {return 1;}

@@ -16,6 +16,7 @@ class ASTmodule : public ASTbase {
 		virtual bool isAlias () const {return false;}
 		virtual bool isConst () const {return false;}
 		virtual bool isNil () const {return false;}
+		virtual bool isParsed () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return 0;}
