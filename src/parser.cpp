@@ -210,14 +210,16 @@ std::list <OperatorDecleration::OperatorMatch> generateOperatorMatches (const Pa
 			if (0 > brace) break;
 		}
 		
-		auto oppBeg = context->operatorsByFirstToken.lower_bound (pos.itt->iden.substr (0, 1));
-		auto oppEnd = context->operatorsByFirstToken.upper_bound (pos.itt->iden.substr (0, 1));
-		for (; oppBeg != oppEnd; ++oppBeg) {
-			OperatorDecleration::OperatorMatch match;
-			match.opp = oppBeg->second;
-			match.ptr = pos.itt;
-			match.level = brace;
-			candidates.push_back (std::make_pair (match, oppBeg->second->getPattern ().find_first_not_of (" ")));
+		if (brace == 0) {
+			auto oppBeg = context->operatorsByFirstToken.lower_bound (pos.itt->iden.substr (0, 1));
+			auto oppEnd = context->operatorsByFirstToken.upper_bound (pos.itt->iden.substr (0, 1));
+			for (; oppBeg != oppEnd; ++oppBeg) {
+				OperatorDecleration::OperatorMatch match;
+				match.opp = oppBeg->second;
+				match.ptr = pos.itt;
+				match.level = brace;
+				candidates.push_back (std::make_pair (match, oppBeg->second->getPattern ().find_first_not_of (" ")));
+			}
 		}
 		for (auto & cand : candidates) {
 			if (brace < cand.first.level) {
