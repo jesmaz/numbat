@@ -18,10 +18,13 @@ namespace numbat {
 namespace parser {
 
 
+class AbstractSyntaxTree;
+
 class NumbatScope : public ASTbase {
 	VISITABLE
 	public:
 		
+		virtual AbstractSyntaxTree * getAST () {return parent->getAST();}
 		virtual ASTnode resolveSymbol (const string & iden) const;
 		virtual bool isParsed () const;
 		virtual bool isValid () const;
@@ -45,8 +48,11 @@ class NumbatScope : public ASTbase {
 		friend const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
 		
 		friend void addToBody (NumbatScope * scope, ASTnode n);
+		friend void giveNode (NumbatScope * scope, ASTnode n);
 		
 	protected:
+		
+		virtual const NumbatType * getType (const string & iden);
 		
 		virtual NumbatVariable * createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
 		
@@ -66,6 +72,7 @@ class NumbatScope : public ASTbase {
 		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
 		
 	private:
+		std::set <ASTnode> nodes;
 		std::set <unique_ptr <NumbatScope>> children;
 		
 		std::vector <ASTnode> body;
@@ -94,6 +101,7 @@ const NumbatType * getType (NumbatScope * scope, const string & iden);
 const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
 
 inline void addToBody (NumbatScope * scope, ASTnode n) {scope->body.push_back (n);}
+inline void giveNode (NumbatScope * scope, ASTnode n) {scope->nodes.insert (n);}
 
 
 }
