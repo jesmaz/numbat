@@ -17,19 +17,22 @@ def string (const ref string rhs) -> (string) {
 }
 
 def string (uint64 num) -> (string) {
+	while (num == 0) {
+		return "0"
+	}
 	string str
 	uint64 tmp = num
 	int8 [1] arr
 	while (0 < tmp) {
 		arr [0] = (tmp % 10) + 48
 		tmp = tmp / 10
-		str.data = arr + str.data
+		str.data = arr ~ str.data
 	}
 	return str
 }
 
-def " + " @export (const ref string lhs, const ref string rhs) -> (string) {
+def " ~ " (const ref string lhs, const ref string rhs) -> (string) {
 	string str
-	str.data = lhs.data + rhs.data
+	str.data = lhs.data ~ rhs.data
 	return str
 }

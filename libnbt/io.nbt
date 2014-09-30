@@ -1,10 +1,15 @@
 import os
 
 
+struct ifstream {os.filehandle handle, int8 [0] buffer, int64 pos, int64 back}
+struct ofstream {os.filehandle handle, int8 [0] buffer, int64 pos, int64 back}
+struct fstream {os.filehandle handle, int8 [0] buffer, int64 pos, int64 back}
+
+
 os.filehandle stdout
-stdout.handle = 0
+stdout.handle = 1
 os.filehandle stdin
-stdin.handle = 1
+stdin.handle = 0
 os.filehandle stderr
 stderr.handle = 2
 
@@ -27,7 +32,9 @@ def next @local () -> (int8) {
 	while (pos == back) {
 		back = 0
 		pos = 0
+		print ("length: " ~ buffer.length ~ "\n")
 		back = os.read (stdin, buffer)
+		print ("b\n")
 	}
 	int8 char = buffer [pos]
 	pos = pos + 1
@@ -54,11 +61,14 @@ def in @local (int8 char, const ref int8 [0] data) -> (bool) {
 
 def scan (const ref string term) -> (string token) {
 	int8 [1024] buff
+	print ("1")
 	string s
 	int8 char = next ()
 	int64 pos = 0
 	bool cont = 1
+	print ("2")
 	while (cont) {
+		print ("3")
 		buff [pos] = char
 		pos = pos + 1
 		char = next ()
@@ -67,4 +77,9 @@ def scan (const ref string term) -> (string token) {
 	buff.length = pos
 	s.data = buff
 	return s
+}
+
+
+def add (double x, double y) -> (double) {
+	return x + y
 }
