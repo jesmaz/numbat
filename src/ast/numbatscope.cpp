@@ -35,7 +35,7 @@ ASTnode resolveSymbol (const NumbatScope* scope, const string & iden, ASTnode pa
 	
 	ASTnode ret;
 	if (parent) {
-		ret = parent->resolveSymbol (iden);
+		ret = ASTbase::resolveSymbol (iden, parent);
 	} else {
 		ret = scope->resolveSymbol (iden);
 		if (!ret->isValid () and scope->parent and cascade) {
@@ -47,6 +47,23 @@ ASTnode resolveSymbol (const NumbatScope* scope, const string & iden, ASTnode pa
 	}
 	return ret;
 	
+}
+
+bool NumbatScope::isParsed () const {
+	if (0 > valid) {
+		valid = 1;
+		for (const auto & n : body) {
+			valid &= n->isParsed ();
+		}
+		for (const auto & n : children) {
+			valid &= n->isParsed ();
+		}
+	} else {
+		return 0 < valid;
+	}
+	bool v = 0 < valid;
+	valid = -1;
+	return v;
 }
 
 bool NumbatScope::isValid () const {
@@ -76,12 +93,12 @@ string NumbatScope::toString (const string & indent) const {
 		s += indent + "    " + type.second->toString () + "\n";
 	}
 	for (auto func : functions){
-		s += indent + "    " + func.first + " " + func.second->toString (indent) + "\n";
+		s += indent + "    " + func.first + " " + func.second->toString ("    " + indent) + "\n";
 	}
 	for (const ASTnode & n : body) {
 		s += n->toString (indent + "    ") + "\n";
 	}
-	return s + "}";
+	return s + indent +  "}";
 }
 
 
@@ -138,14 +155,11 @@ NumbatScope * createChild (NumbatScope * scope) {
 
 const NumbatType * getType (NumbatScope * scope, const string & iden) {
 	
-	auto itt = scope->types.find (iden);
-	if (itt != scope->types.end ()) {
-		return itt->second.get ();
-	} else if (scope->parent) {
-		return getType (scope->parent, iden);
-	} else {
-		return nullptr;
+	const NumbatType * type = scope->getType (iden);
+	if (!type and scope->parent) {
+		type = getType (scope->parent, iden);
 	}
+	return type;
 	
 }
 
@@ -183,28 +197,37 @@ NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::
 }
 
 NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t dimentions) {
-	while (scope->parent) {
-		scope = scope->parent;
+	NumbatPointerType * ptrType;
+	while (type->arrayType.size () < dimentions) {
+		type->arrayType.push_back (nullptr);
 	}
-	while (scope->arrayTypes.size () < dimentions) {
-		scope->arrayTypes.push_back (std::map <void *, unique_ptr <NumbatPointerType>> ());
-	}
-	auto itt = scope->arrayTypes [dimentions - 1].find ((void *)type);
-	if (itt != scope->arrayTypes [dimentions - 1].end ()) {
-		return itt->second.get ();
+	if (ptrType = type->arrayType [dimentions - 1]) {
+		return ptrType;
 	}
 	ASTnode rawDataType = ASTnode (new ASTtype (false, false, type));
-	NumbatPointerType * arrayType = new NumbatPointerType (type->getIden () + "[]", rawDataType);
-	scope->arrayTypes [dimentions - 1][(void *)type] = unique_ptr <NumbatPointerType> (arrayType);
+	ptrType = type->arrayType [dimentions - 1] = new NumbatPointerType (type->getIden () + "[]", rawDataType);
 	std::vector <ASTnode> params (dimentions, nullptr);
 	ASTnode indexType (ASTnode (new ASTtype (false, false, getType (scope, "uint64"))));
-	for (size_t i=0; i<dimentions; ++i) {
+	for (size_t i=0; i<dimentions-1; ++i) {
 		//strig iden = 
 		std::ostringstream ss;
 		ss << dimentions;
 		params [i] = ASTnode (new ASTmember (ss.str (), indexType));
 	}
-	return arrayType;
+	params [dimentions-1] = ASTnode (new ASTmember ("length", indexType));
+	ptrType->buildData (params);
+	return ptrType;
+}
+
+const NumbatType * NumbatScope::getType (const string & iden) {
+	
+	auto itt = types.find (iden);
+	if (itt != types.end ()) {
+		return itt->second.get ();
+	} else {
+		return nullptr;
+	}
+	
 }
 
 NumbatVariable * NumbatScope::createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp) {
