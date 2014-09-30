@@ -4,6 +4,16 @@ namespace numbat {
 namespace parser {
 
 
+bool ASTtuple::isParsed () const {
+
+	bool b=true;
+	for (const ASTnode & n : elements) {
+		b &= n->isParsed ();
+	}
+	return b;
+	
+}
+
 bool ASTtuple::isValid () const {
 
 	bool b=true;
@@ -26,11 +36,10 @@ size_t ASTtuple::calculateWeight () const {
 
 string ASTtuple::toString (const string & indent) const {
 	
-	string str;
-	string inden = indent + '{';
+	string str = indent + '{';
 	for (ASTnode n : elements) {
 		if (n)
-			str += n->toString (inden) + ", ";
+			str += n->toString () + ", ";
 		else
 			str += "null, ";
 	}

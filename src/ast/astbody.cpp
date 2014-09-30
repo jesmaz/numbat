@@ -4,6 +4,20 @@ namespace numbat {
 namespace parser {
 
 
+bool ASTbody::isParsed () const {
+
+	bool b=true;
+	for (const ASTnode & n : body) {
+		if (n) {
+			b &= n->isParsed ();
+		} else {
+			return false;
+		}
+	}
+	return b;
+	
+}
+
 bool ASTbody::isValid () const {
 
 	bool b=true;

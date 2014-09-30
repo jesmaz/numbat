@@ -1,8 +1,19 @@
 #include "../include/ast/callable/astcall.hpp"
+#include "../include/ast/memory/astcallindex.hpp"
 
 namespace numbat {
 namespace parser {
 
+
+bool ASTcall::isParsed () const {
+	
+	bool b=callee->isParsed ();
+	for (const ASTnode & n : args) {
+		b &= n->isParsed ();
+	}
+	return b;
+	
+}
 
 bool ASTcall::isValid () const {
 	
@@ -21,6 +32,18 @@ size_t ASTcall::calculateWeight () const {
 		weight += arg->calculateWeight ();
 	}
 	return weight;
+	
+}
+
+const std::list <ASTnode> ASTcall::getList () const {
+	
+	auto & types = callee->getFunction ()->getType ();
+	std::list <ASTnode> list;
+	size_t l = types.size ();
+	for (size_t i=0; i<l; ++i) {
+		list.push_back (ASTnode (new ASTcallindex (const_cast <ASTcall *> (this), i)));
+	}
+	return list;
 	
 }
 
