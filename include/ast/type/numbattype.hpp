@@ -13,6 +13,9 @@ namespace numbat {
 namespace parser {
 
 
+class NumbatPointerType;
+class NumbatScope;
+
 class NumbatType {
 	public:
 		const bool hasTag (const string & tag) const {return metaTags.count (tag);}
@@ -37,6 +40,8 @@ class NumbatType {
 		int findMember (const std::string & iden) const;
 		void buildData (std::vector <ASTnode> data) {members = data;}
 		
+		friend NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t dimentions);
+		
 		NumbatType () {}
 		NumbatType (string iden) : iden (iden) {}
 		NumbatType (string iden, const std::set <string> & meta) : iden (iden), metaTags (meta) {}
@@ -46,6 +51,7 @@ class NumbatType {
 		std::vector <ASTnode> members;
 		std::vector <shared_ptr <FunctionDecleration>> constructors;
 		std::multimap <string, FunctionDecleration *> methods;
+		mutable std::vector <NumbatPointerType *> arrayType;
 };
 
 
