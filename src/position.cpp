@@ -11,9 +11,9 @@ Position nextArg (const Position & pos) {
 }
 
 Position nextBody (const Position & pos) {
-	tkitt start = findToken (pos.itt, pos.end, TOKEN::symbol, "{") + 1;
+	tkitt start = findToken (pos.itt, pos.end, TOKEN::symbol, "{");
 	tkitt end = findToken (start, pos.end, TOKEN::symbol, "}");
-	return Position (start, end);
+	return Position (start + 1, end);
 }
 
 Position nextExpression (const Position & pos) {
