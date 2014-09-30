@@ -22,15 +22,22 @@ ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 		ftype = getType (scope, "double");
 	} else {
 		size_t l = std::stoull (str);
-		num = ASTnode (new ASTconstantInt (ASTnode (new ASTtype (false, true, getType (scope, "uint64"))), l));
+		ftype = getType (scope, "uint64");
+		if (ftype) {
+			num = ASTnode (new ASTconstantInt (ASTnode (new ASTtype (false, true, ftype)), l));
+		}
 	}
 	
-	if (ftype) {
-		num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, ftype)), str));
+	if (!num) {
+		if (ftype) {
+			num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, ftype)), str));
+		} else {
+			num = generateError (pos, "There is no type available for this kind of literal");
+		}
 	}
 	
 	if (Position p = pos + 1) {
-		return ASTnode (new ASToperatorError ("Unexpected token: '" + (pos+1).itt->iden + "'"));
+		return generateOperatorError (pos+1, "Unexpected token: '" + (pos+1).itt->iden + "'");
 	}
 	return num;
 	
