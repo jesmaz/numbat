@@ -40,6 +40,9 @@ using visitor::Visitor;
 
 class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTallocate>, public Visitor <ASTbody>, public Visitor <ASTbranch>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconcat>, public Visitor <ASTconstantFPInt>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTgep>, public Visitor <ASTmemcpy>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop> {
 	public:
+		Value * getValue (const ASTnode & node) {return getValue (node.get ());}
+		Value * getValue (ASTbase * node, bool ref=false);
+		
 		virtual void visit (AbstractSyntaxTree & exp);
 		virtual void visit (ASTallocate & exp);
 		virtual void visit (ASTbody & exp);
@@ -104,6 +107,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		llvm::Module * module;
 		FunctionPassManager * fpm;
 		std::map <const ASTbase *, Value *> tempValues;
+		std::map <const ASTbase *, Value *> values;
 		std::map <const FunctionDecleration *, Function *> functions;
 		std::map <const NumbatType *, Type *> structures;
 		std::map <const NumbatVariable *, Value *> namedValues;

@@ -113,10 +113,28 @@ Value * BodyGenerator::allocteArray (Value * length, const NumbatPointerType * t
 
 Value * BodyGenerator::createTemp (Value * val) {
 	
-	
 	Value * alloc = createEntryBlockAlloc (activeFunction, val->getType (), "temp");
 	builder.CreateStore (val, alloc);
 	val = alloc;
+	return val;
+	
+}
+
+Value * BodyGenerator::getValue (ASTbase * node,  bool ref) {
+	
+	auto itt = values.find (node);
+	Value * val = nullptr;
+	if (itt != values.end ()) {
+		val = itt->second;
+	} else {
+		std::cout << typeid (*node).name () << std::endl;
+		node->accept (*this);
+		val = stack.top ();
+		stack.pop ();
+	}
+	if (!ref and node->isAlias ()) {
+		val = builder.CreateLoad (val);
+	}
 	return val;
 	
 }
