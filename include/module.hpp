@@ -4,6 +4,7 @@
 #include "ast/control/astbody.hpp"
 #include "ast/functiondecleration.hpp"
 #include "ast/type/numbattype.hpp"
+#include "ast/numbatcontext.hpp"
 #include "ast/operatordecleration.hpp"
 
 #include <map>
@@ -15,31 +16,23 @@
 namespace numbat {
 namespace parser {
 
-struct AbstractSyntaxTree;
-
 using std::shared_ptr;
 using std::string;
+
+
+string joinPaths (const string & lhs, const string & rhs);
 
 struct Module {
 	
 	public:
 		
-		const AbstractSyntaxTree * getAst () {return ast;}
+		AbstractSyntaxTree * getAST () {return ast;}
+		const AbstractSyntaxTree * getAST () const {return ast;}
 		
 		const bool validate () const;
 		
-		const std::map <string, shared_ptr <NumbatType>> & getTypes () const {return types;}
-		const std::map <string, shared_ptr <OperatorDecleration>> & getOperators () const {return operators;}
-		const std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> & getStatmentParsers () const {return statementParsers;}
-		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
-		const std::set <shared_ptr <Module>> & getDependencies () const {return dependencies;}
-		
-		void insertType (const string & iden, const shared_ptr <NumbatType> & type) {types [iden] = type;}
-		void insertOperator (const string & iden, const shared_ptr <OperatorDecleration> & opp) {operators [iden] = opp;}
-		void insertOperator (const int prec, const bool ltr, const string & iden, ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt)) {operators [iden] = std::shared_ptr <numbat::parser::OperatorDecleration> (new numbat::parser::OperatorDecleration (prec, ltr, iden, parser));}
-		void insertStatmentParser (const string & iden, ASTnode(*parser)(AbstractSyntaxTree *, tkitt)) {statementParsers [iden] = parser;}
-		void insertFunction (const string & iden, const shared_ptr <FunctionDecleration> & func) {functions.insert (std::make_pair (iden, func));}
-		void insertDependency (const shared_ptr <Module> & module) {dependencies.insert (module);}
+		void addBrace (const string & beg, const string & end);
+		void addOperator (int precidence, bool ltr, const string & pattern, OperatorDecleration::OperatorParser parser, OperatorDecleration::DefaultImplementation defImp = nullptr);
 		
 		static const shared_ptr <FunctionDecleration> & getFree () {return memfree;}
 		static const shared_ptr <FunctionDecleration> & getMalloc () {return memalloc;}
@@ -60,17 +53,9 @@ struct Module {
 	protected:
 	private:
 		
-		Module () {}
-		Module (const std::map <string, shared_ptr <NumbatType>> & types, const std::multimap <string, shared_ptr <FunctionDecleration>> & functions, const std::map <string, shared_ptr <OperatorDecleration>> & operators, const std::set <shared_ptr <Module>> & dependencies, const std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> & stmtParse) : types (types), functions (functions), operators (operators), dependencies (dependencies), statementParsers (stmtParse) {}
+		Module ();
 		
-		
-		std::map <string, shared_ptr <NumbatType>> types;
-		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
-		std::map <string, shared_ptr <OperatorDecleration>> operators;
-		std::set <shared_ptr <Module>> dependencies;
-		std::unordered_map <string, ASTnode(*)(AbstractSyntaxTree *, tkitt)> statementParsers;
-		
-		AbstractSyntaxTree * ast=nullptr;
+		AbstractSyntaxTree * ast;
 		
 		
 		static void checkForBuiltins (Module & mod);

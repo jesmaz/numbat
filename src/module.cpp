@@ -1,5 +1,6 @@
 #include "../include/ast.hpp"
 #include "../include/module.hpp"
+#include "../include/parser.hpp"
 
 #include <fstream>
 
@@ -59,39 +60,7 @@ const bool Module::validate () const {
 	
 	if (0 > valid) {
 		
-		valid = 1;
-		for (auto t : types) {
-			if (!t.second->isValid ()) {
-				valid = 0;
-				if (debugMode) {
-					std::cerr << "Invalid type: " << t.second->toString () << std::endl;
-				}
-			}
-		}
 		
-		for (auto f : functions) {
-			if (f.second->getBody ()) {
-				if (!f.second->getBody ()->isValid ()) {
-					valid = 0;
-					if (debugMode) {
-						std::cerr << "Invalid function: " << f.second->toString () << std::endl;
-					}
-				}
-			}
-		}
-		
-		for (auto m : dependencies) {
-			if (!m->validate ()) {
-				valid = 0;
-				if (debugMode) {
-					for (auto & mod : allModules) {
-						if (mod.second == m) {
-							std::cerr << "Invalid dependency: " << mod.first << std::endl;
-						}
-					}
-				}
-			}
-		}
 		
 	}
 	
@@ -123,13 +92,13 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	}
 	size_t pos = file.find_last_of ("/");
 	allModules [file] = shared_ptr <Module> (new Module);
-	AbstractSyntaxTree * ast = new AbstractSyntaxTree (tks.begin (), lexer::findEOF (tks.begin (), tks.end ()), file.substr (0, pos != string::npos ? pos : 0), file);
+	AbstractSyntaxTree * ast = allModules [file]->ast;
+	parseModule (Position (tks.begin (), lexer::findEOF (tks.begin (), tks.end ())), ast);
 	if (debugMode) {
 		std::cerr << ast->toString () << std::endl;
 		std::cerr << ASTnode (new ASTbody (ast->getBody ()))->toString ("") << std::endl;
 	}
 	main.push_back (ASTnode (new ASTbody (ast->getBody ())));
-	*allModules [file] = Module (ast->getTypes (), ast->getFunctions (), ast->getOperators (), ast->getDependencies (), ast->getStatmentParsers ());
 	allModules [file]->ast = ast;
 	checkForBuiltins (*allModules [file]);
 	return allModules [file];
@@ -165,33 +134,52 @@ const shared_ptr <Module> Module::import (const string & dir, const string & fil
 }
 
 
-void Module::checkForBuiltins (Module & mod) {
+void Module::addBrace (const string & beg, const string & end) {
+	getContext (ast)->blocks [beg] = end;
+}
+
+void Module::addOperator (int precidence, bool ltr, const string & pattern, OperatorDecleration::OperatorParser parser, OperatorDecleration::DefaultImplementation defImp) {
 	
-	for (const auto & e : mod.functions) {
-		const auto & func = e.second;
-		if (func->hasTag ("malloc")) {
-			//TODO: prototype checking
-			if (!memalloc) {
-				memalloc = func;
-			} else {
-				//TODO: raise error
-			}
+	ParsingContext * context = getContext (ast);
+	OperatorDecleration oppdec (precidence, ltr, pattern, nullptr, parser, defImp);
+	
+	if (context->operators.find (pattern) != context->operators.end ()) {
+		return;
+	}
+	
+	shared_ptr <OperatorDecleration> opp (new OperatorDecleration (oppdec));
+	
+	context->operators [pattern] = opp;
+	
+	for (const string & s : opp->getSymbols ()) {
+		if (s != " ") {
+			context->operatorsByFirstToken.insert (std::make_pair (s.substr(0,1), opp));
+			break;
 		}
-		if (func->hasTag ("free")) {
-			//TODO: prototype checking
-			if (!memfree) {
-				memfree = func;
-			} else {
-				//TODO: raise error
-			}
+	}
+	for (const string & s : opp->getSymbols ()) {
+		if (s != " ") {
+			context->keywords.insert(s);
 		}
 	}
 	
 }
 
-ASTnode ASTmodule::resolveSymbol (const string & iden) const {
-	return module->getAst ()->resolveSymbol (iden);
+void Module::checkForBuiltins (Module & mod) {
+	
+	
+	
 }
+
+ASTnode ASTmodule::resolveSymbol (const string & iden) const {
+	return module->getAST ()->resolveSymbol (iden);
+}
+
+
+Module::Module() {
+	ast = new AbstractSyntaxTree ();
+}
+
 
 Module::~Module () {
 	if (ast)
