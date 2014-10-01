@@ -38,7 +38,7 @@ using namespace llvm;
 using visitor::Visitor;
 
 
-class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTallocate>, public Visitor <ASTbody>, public Visitor <ASTbranch>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconcat>, public Visitor <ASTconstantFPInt>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTgep>, public Visitor <ASTmemcpy>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop> {
+class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTallocate>, public Visitor <ASTbody>, public Visitor <ASTbranch>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconcat>, public Visitor <ASTconstantFPInt>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTgep>, public Visitor <ASTmemcpy>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuple>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop>, public Visitor <NumbatScope> {
 	public:
 		Value * getValue (const ASTnode & node) {return getValue (node.get ());}
 		Value * getValue (ASTbase * node, bool ref=false);
@@ -62,10 +62,12 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		virtual void visit (ASTreturn & exp);
 		virtual void visit (ASTreturnvoid & exp);
 		virtual void visit (ASTstructIndex & exp);
+		virtual void visit (ASTtuple & exp);
 		virtual void visit (ASTtuplecall & exp);
 		virtual void visit (ASTtype & exp) {}
 		virtual void visit (ASTvariable & exp);
 		virtual void visit (ASTwhileloop & exp);
+		virtual void visit (NumbatScope & exp);
 		void visit (const shared_ptr <Module> & module);
 		//std::vector <Value *> operator () (AbstractSyntaxTree & ast) {tree = &ast; ast.getBody ().accept (*this); return body;}
 		BodyGenerator (llvm::Module * mod, const DataLayout * dataLayout, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), dataLayout (dataLayout), activeFunction (nullptr), main (nullptr), memalloc (nullptr), memfree (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
@@ -89,19 +91,20 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		Type * getType (const ASTnode & node);
 		Type * getType (const NumbatType * type);
 		Value * allocteArray (Value * length, const NumbatPointerType * type);
+		Value * createTemp (std::vector <Value *> vals);
 		Value * createTemp (Value * val);
 		Value * getVariableHandle (const NumbatVariable * var);
 		Value * initialise (const NumbatType * var);
 		Value * makeCompare (Value * val);
 		Value * pointerTypeGEP (Value * ptr, const NumbatPointerType * ptrType, size_t index);
 		void createMemCpy (Value * dest, Value * source, Value * length, const shared_ptr <ASTcallable> & conv);
-		void makeCompare (const ASTnode & exp);
+		Value * makeCompare (const ASTnode & exp);
 		
 		AbstractSyntaxTree * tree;
 		BasicBlock * breakBlock, * continueBlock;
 		const DataLayout * dataLayout;
 		Function * activeFunction, * main, * memalloc, * memfree;
-		FunctionDecleration * activeFunctionDecleration;
+		const FunctionDecleration * activeFunctionDecleration;
 		IRBuilder<> builder;
 		LLVMContext & context;
 		llvm::Module * module;
