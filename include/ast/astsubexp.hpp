@@ -10,6 +10,8 @@ namespace parser {
 
 class ASTsubexp : public ASTbase {
 	public:
+		virtual void accept (visitor::BaseVisitor & vis) {exp->accept (vis);}
+		ASTnode getExp () {return exp;}
 		virtual ASTnode resolveSymbol (const string & iden) const {return exp->resolveSymbol(iden);}
 		virtual const ASTnode getArrayType () const {return exp->getArrayType();}
 		virtual const ASTnode getASTType () const {return exp->getASTType();}
