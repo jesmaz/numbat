@@ -21,6 +21,8 @@ class NumbatType {
 		const bool hasTag (const string & tag) const {return metaTags.count (tag);}
 		const FunctionDecleration * getMalloc () const {return mallocFunc;}
 		const FunctionDecleration * getFree () const {return freeFunc;}
+		void setMalloc (FunctionDecleration * malloc) const {mallocFunc = malloc;}
+		void setFree (FunctionDecleration * free) const {freeFunc = free;}
 		const std::vector <shared_ptr <FunctionDecleration>> & getConstructors () const {return constructors;}
 		const std::vector <FunctionDecleration *> getMethods (const string & iden) const {std::vector <FunctionDecleration *> m; for (auto e = methods.lower_bound (iden), end = methods.upper_bound (iden); e != end; ++e) {m.push_back (e->second);} return m;}
 		void addConstructor (const shared_ptr <FunctionDecleration> & func) {constructors.push_back (func);}
@@ -53,7 +55,7 @@ class NumbatType {
 		std::vector <ASTnode> members;
 		std::vector <shared_ptr <FunctionDecleration>> constructors;
 		std::multimap <string, FunctionDecleration *> methods;
-		FunctionDecleration * mallocFunc, * freeFunc;
+		mutable FunctionDecleration * mallocFunc, * freeFunc;
 		mutable std::vector <NumbatPointerType *> arrayType;
 };
 
