@@ -84,16 +84,21 @@ ASTnode parseExpression (Position pos, NumbatScope * scope, std::list <OperatorD
 ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 	
 	const string & str = pos.itt->iden;
+	string fStr;
 	ASTnode num;
 	const NumbatType * ftype = nullptr;
 	if (str.back () == 'f') {
 		ftype = getType (scope, "float");
+		fStr = str.substr (0, str.length ()-1);
 	} else if (str.back () == 'h') {
 		ftype = getType (scope, "half");
+		fStr = str.substr (0, str.length ()-1);
 	} else if (str.back () == 'q') {
 		ftype = getType (scope, "quad");
+		fStr = str.substr (0, str.length ()-1);
 	} else if (str.find ('.') != string::npos) {
 		ftype = getType (scope, "double");
+		fStr = str;
 	} else {
 		size_t l = std::stoull (str);
 		ftype = getType (scope, "uint64");
@@ -104,7 +109,7 @@ ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 	
 	if (!num) {
 		if (ftype) {
-			num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, ftype)), str));
+			num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, ftype)), fStr));
 		} else {
 			num = generateError (pos, "There is no type available for this kind of literal");
 		}
@@ -584,10 +589,13 @@ void * parseFunctionDecleration (Position pos, NumbatScope * scope) {
 	FunctionDecleration * funcDec = createFunctionDecleration (scope, iden, param, type, tags);
 	if (funcDec) {
 		std::set <const NumbatType *> types;
-		for (auto & a : param) {
+		for (ASTnode & a : param) {
 			types.insert (a->getType ());
 		}
 		for (const NumbatType * type : types) {
+			const_cast <NumbatType *> (type)->addMethod (iden, funcDec);
+		}
+		if (const NumbatType * type = getType (scope, iden)) {
 			const_cast <NumbatType *> (type)->addMethod (iden, funcDec);
 		}
 		if (future) {
