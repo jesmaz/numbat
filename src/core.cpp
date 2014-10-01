@@ -132,10 +132,10 @@ ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const s
 	}
 	
 	if (args.back ().itt->type != lexer::TOKEN::identifier) {
-		return generateError (args.back (), "Identifier expected");
+		return generateOperatorError (args.back (), "Identifier expected");
 	}
 	if (args.back () + 1) {
-		return generateError (args.back () + 1, "Unexpected token: '" + (args.back () + 1).itt->iden + "'");
+		return generateOperatorError (args.back () + 1, "Unexpected token: '" + (args.back () + 1).itt->iden + "'");
 	}
 	
 	const string & iden = args.back ().itt->iden;
@@ -180,6 +180,22 @@ ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const
 	if (args.size () != 2) return ASTnode (new ASToperatorError ("Assignment operators require exactly two arguments"));
 	ASTnode lhs = parseExpression (args [0], scope, *matches);
 	ASTnode rhs = parseExpression (args [1], scope, *matches);
+	giveNode (scope, lhs);
+	giveNode (scope, rhs);
+	
+	if (lhs->isList ()) {
+		auto list = lhs->getList ();
+		if (list.size () == 1) {
+			lhs = list.front ();
+		}
+	}
+	
+	if (rhs->isList ()) {
+		auto list = rhs->getList ();
+		if (list.size () == 1) {
+			rhs = list.front ();
+		}
+	}
 	
 	if (!lhs->isValid () or !rhs->isValid () or !lhs->getType () or !rhs->getType ()) {
 		std::cout << typeid (*lhs.get ()).name () << " " << lhs->getType () << " " << lhs->toString () << std::endl;
@@ -203,6 +219,7 @@ ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector
 	
 	ASTnode lhs = parseExpression (args [0], scope, *matches);
 	ASTnode rhs = parseExpression (args [1], scope, *matches);
+	
 	giveNode (scope, lhs);
 	giveNode (scope, rhs);
 	
@@ -244,8 +261,10 @@ ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector
 	std::copy (rhsCand.begin (), rhsCand.end (), std::back_inserter (candidates));
 	auto callable = findBestMatch (std::vector <ASTnode> {lhs, rhs}, candidates);
 	
+	std::cout << callable->toString () <<std::endl;
 	if (callable->isValid ()) {
-		return ASTnode (new ASTcall (callable, createStaticCast (std::vector <ASTnode> {lhs, rhs}, callable->getFunction ()->getType ())));
+		giveNode (scope, callable);
+		return callable->getList ().front ();
 	} else if (defImp) {
 		return defImp (scope, func , std::vector <ASTnode> ({lhs, rhs}));
 	} else {
@@ -382,7 +401,7 @@ ASTnode parseReferenceOperator (NumbatScope * scope, const string & func, const 
 		if (pos.itt->type == lexer::TOKEN::identifier) {
 			ret = ASTnode (new ASTvariable (createVariable (scope, ret, nullptr, pos.itt->iden, false, false)));
 		} else {
-			ret = ASTnode (new ASTerror ("Identifier expected"));
+			ret = generateOperatorError (pos, "Identifier expected");
 		}
 		++pos;
 	}
