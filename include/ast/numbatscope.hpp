@@ -24,6 +24,9 @@ class NumbatScope : public ASTbase {
 	VISITABLE
 	public:
 		
+		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
+		const std::vector <ASTnode> & getBody () const {return body;}
+		
 		virtual AbstractSyntaxTree * getAST () {return parent->getAST();}
 		virtual ASTnode resolveSymbol (const string & iden) const;
 		virtual bool isParsed () const;
