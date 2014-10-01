@@ -22,7 +22,7 @@ class ASTconcat : public ASTbase {
 		virtual size_t calculateWeight () const {return lhs->calculateWeight () + rhs->calculateWeight () + (conv ? conv->calculateWeight () : 0);}
 		virtual size_t getBitSize () const {return lhs->getBitSize ();}
 		virtual string getIden () const {return " + ";}
-		virtual string toString (const string & indent = "") const {return indent + lhs->toString () + " + " + rhs->toString ();}
+		virtual string toString (const string & indent = "") const {return indent + lhs->toString () + " ~ " + rhs->toString ();}
 		
 		ASTconcat () {}
 		ASTconcat (const ASTnode & lhs, const ASTnode & rhs, const shared_ptr <ASTcallable> & conv = nullptr) : lhs (lhs), rhs (rhs), conv (conv) {}
