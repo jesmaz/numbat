@@ -198,6 +198,13 @@ NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::
 }
 
 NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t dimentions) {
+	if (!type->getMalloc ()) {
+		type->setMalloc (scope->getAST ()->MallocFunc ());
+	}
+	if (!type->getFree ()) {
+		type->setFree (scope->getAST ()->FreeFunc ());
+	}
+	
 	NumbatPointerType * ptrType;
 	while (type->arrayType.size () < dimentions) {
 		type->arrayType.push_back (nullptr);
