@@ -60,7 +60,8 @@ const bool Module::validate () const {
 	
 	if (0 > valid) {
 		
-		
+		valid = 1;
+		valid = ast->isValid () ? 1 : 0;
 		
 	}
 	
