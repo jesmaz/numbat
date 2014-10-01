@@ -83,69 +83,81 @@ int main (int argl, char ** args) {
 	parser::Module::addIncludeDir ("/usr/include/numbat");
 	
 	shared_ptr <parser::Module> core = parser::Module::createEmpty ("numbat core");
-	core->insertStatmentParser ("while", &numbat::parser::parseWhileLoop);
 	
-	core->insertOperator (200, true, " [ ] ", parser::parseArrayDecleration);
+	core->addOperator (200, true, "{}", parser::parseBlockOperator);
+	core->addOperator (200, true, "{ }", parser::parseBlockOperator);
+	core->addOperator (200, true, "()", parser::parseSubExpression);
+	core->addOperator (200, true, "( )", parser::parseSubExpression);
+	core->addOperator (200, true, " ()", parser::parseCall);
+	core->addOperator (200, true, " ( )", parser::parseCall);
+	//core->addOperator (200, true, "[] ", parser::parseTemplate);
+	//core->addOperator (200, true, "[ ] ", parser::parseTemplate);
+	core->addOperator (200, true, " []", parser::parseIndex);
+	core->addOperator (200, true, " [ ]", parser::parseIndex);
+	core->addOperator (200, true, " [ ] ", parser::parseArrayDecleration);
+	core->addOperator (200, true, " . ", parser::parseReferenceOperator);
 	
-	core->insertOperator (200, true, " ()", parser::parseFunctionCall);
-	core->insertOperator (200, true, " ( )", parser::parseFunctionCall);
-	core->insertOperator (200, true, " [ ]", parser::parseGenericIndexCall);
-	core->insertOperator (200, true, " . ", parser::parseElementReferenceOperator);
+	//core->addOperator (300, false, "++ ", parser::parseUnary, parser::defIterate);
+	//core->addOperator (300, false, "-- ", parser::parseUnary, parser::defIterate);
+	core->addOperator (300, false, "- ", parser::parseUnary, parser::defNegation);
+	core->addOperator (300, false, "! ", parser::parseUnary, parser::defNegation);
+	core->addOperator (300, false, "not ", parser::parseUnary, parser::defNegation);
+	core->addOperator (300, false, "~ ", parser::parseUnary, parser::defNegation);
 	
-	core->insertOperator (300, false, "++ ", parser::parseGenericUnaryPrefix);
-	core->insertOperator (300, false, "-- ", parser::parseGenericUnaryPrefix);
-	core->insertOperator (300, false, "+ ", parser::parseGenericUnaryPrefix);
-	core->insertOperator (300, false, "- ", parser::parseGenericUnaryPrefix);
-	core->insertOperator (300, false, "! ", parser::parseGenericUnaryPrefix);
-	core->insertOperator (300, false, "not ", parser::parseGenericUnaryPrefix);
-	core->insertOperator (300, false, "~ ", parser::parseGenericUnaryPrefix);
+	core->addOperator (500, true, " * ", parser::parseBinary, parser::defArithmetic);
+	core->addOperator (500, true, " / ", parser::parseBinary, parser::defArithmetic);
+	core->addOperator (500, true, " % ", parser::parseBinary, parser::defArithmetic);
 	
-	core->insertOperator (500, true, " * ", parser::parseArithmeticOperator);
-	core->insertOperator (500, true, " / ", parser::parseArithmeticOperator);
-	core->insertOperator (500, true, " % ", parser::parseArithmeticOperator);
+	core->addOperator (600, true, " + ", parser::parseBinary, parser::defArithmetic);
+	core->addOperator (600, true, " - ", parser::parseBinary, parser::defArithmetic);
+	core->addOperator (600, true, " ~ ", parser::parseBinary, parser::defConcat);
 	
-	core->insertOperator (600, true, " + ", parser::parseAdditionOperator);
-	core->insertOperator (600, true, " - ", parser::parseArithmeticOperator);
+	core->addOperator (700, true, " << ", parser::parseBinary, parser::defArithmetic);
+	core->addOperator (700, true, " >> ", parser::parseBinary, parser::defArithmetic);
 	
-	core->insertOperator (700, true, " << ", parser::parseGenericBinary);
-	core->insertOperator (700, true, " >> ", parser::parseGenericBinary);
+	core->addOperator (800, true, " & ", parser::parseBinary, parser::defArithmetic);
 	
-	core->insertOperator (800, true, " & ", parser::parseGenericBinary);
+	core->addOperator (900, true, " ^ ", parser::parseBinary, parser::defArithmetic);
 	
-	core->insertOperator (900, true, " ^ ", parser::parseGenericBinary);
+	core->addOperator (1000, true, " | ", parser::parseBinary, parser::defArithmetic);
 	
-	core->insertOperator (1000, true, " | ", parser::parseGenericBinary);
+	core->addOperator (1100, true, " < ", parser::parseBinary, parser::defCompare);
+	core->addOperator (1100, true, " <= ", parser::parseBinary, parser::defCompare);
+	core->addOperator (1100, true, " > ", parser::parseBinary, parser::defCompare);
+	core->addOperator (1100, true, " >= ", parser::parseBinary, parser::defCompare);
 	
-	core->insertOperator (1100, true, " < ", parser::parseComparisonOperator);
-	core->insertOperator (1100, true, " <= ", parser::parseComparisonOperator);
-	core->insertOperator (1100, true, " > ", parser::parseComparisonOperator);
-	core->insertOperator (1100, true, " >= ", parser::parseComparisonOperator);
+	core->addOperator (1200, true, " == ", parser::parseBinary, parser::defCompare);
+	core->addOperator (1200, true, " != ", parser::parseBinary, parser::defCompare);
 	
-	core->insertOperator (1200, true, " == ", parser::parseComparisonOperator);
-	core->insertOperator (1200, true, " != ", parser::parseComparisonOperator);
+	core->addOperator (1300, true, " and ", parser::parseBinary, parser::defLogic);
 	
-	core->insertOperator (1300, true, " and ", parser::parseGenericBinary);
+	core->addOperator (1400, true, " or ", parser::parseBinary, parser::defLogic);
 	
-	core->insertOperator (1400, true, " or ", parser::parseGenericBinary);
+	core->addOperator (1500, true, " , ", parser::parseComma);
 	
-	core->insertOperator (1500, true, " , ", parser::parseTupleOperator);
+	core->addOperator (1600, false, " = ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " += ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " -= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " ~= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " *= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " /= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " %= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " <<= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " >>= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " &= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " ^= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " |= ", parser::parseAssignmentOperator);
+	core->addOperator (1600, false, " => ", parser::parseRedirectOperator);
 	
-	core->insertOperator (1600, false, " = ", parser::parseAssignmentOperator);
-	core->insertOperator (1600, false, " += ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " -= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " *= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " /= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " %= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " <<= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " >>= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " &= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " ^= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " |= ", parser::parseGenericBinary);
-	core->insertOperator (1600, false, " => ", parser::parseRedirectOperator);
+	core->addOperator (1700, false, "while( ) ", parser::parseWhileLoop);
 	
+	core->addBrace ("(", ")");
+	core->addBrace ("{", "}");
+	core->addBrace ("[", "]");
+	core->addBrace ("?", ":");
 	
 	auto createType = [&] (const string & iden, size_t s, parser::NumbatRawType::Type t) {
-		core->insertType (iden, shared_ptr <parser::NumbatType> (new parser::NumbatRawType (iden, s, t)));
+		if (!parser::createRawType (core->getAST (), iden, s, t)) std::cerr << "Failed to register " << iden << " as a type" << std::endl;
 	};
 	
 	createType ("bool", 1, parser::NumbatRawType::UNSIGNED);
