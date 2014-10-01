@@ -353,8 +353,13 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 		activeFunctionDecleration = func;
 		builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
 		std::cout << func->getIden () <<std::endl;
+		auto beg = activeFunction->arg_begin ();
+		auto end = activeFunction->arg_end ();
 		for (const ASTnode & node : func->getArgs ()) {
-			getValue (node);
+			Value * v = getValue (node.get (), true);
+			beg->dump ();v->dump();
+			builder.CreateStore (beg, v);
+			++beg;
 		}
 		getValue (body);
 		verifyFunction (*activeFunction);
