@@ -27,7 +27,7 @@ class ASTcallindex : public ASTbase {
 		virtual string toString (const string & indent = "") const {return (callp ? callp : call.get ())->toString (indent) + " " + ref->toString ();}
 		
 		ASTcallindex () {}
-		ASTcallindex (const shared_ptr <ASTcallable> & call, const size_t index) : ref (call->getFunction ()->getType () [index]), call (call), index (index) {}
+		ASTcallindex (const shared_ptr <ASTcallable> & call, const size_t index) : ref (call->getFunction ()->getType () [index]), call (call), callp (nullptr), index (index) {}
 		ASTcallindex (ASTcallable * call, const size_t index) : ref (call->getFunction ()->getType () [index]), callp (call), index (index) {}
 	private:
 		ASTnode ref;
