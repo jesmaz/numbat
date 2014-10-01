@@ -8,8 +8,8 @@ extern def close @cstyle @local (int32 handle)
 extern def dup @cstyle @local (int32 handle) -> (int32 copy)
 extern def lseek @cstyle @local (int32 handle, uint64 offset, int32 whence) -> (uint64 pos)
 extern def open @cstyle @local (ptrint filename, int32 flags) -> (int32 handle)
-extern def read @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 read)
-extern def write @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 written)
+extern def read @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 bytes)
+extern def write @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 bytes)
 
 # Socket system functions
 extern def accept @cstyle @local (int32 handle, ref int8 sockaddr, ref uint32 length) -> (int32 status)
@@ -47,11 +47,11 @@ def open (const ref string filename, int32 flags) -> (filehandle handle) {
 	return hand
 }
 
-def read (ref filehandle handle, ref int8 [0] data) -> (int64 read) {
+def read (ref filehandle handle, ref int8 [0] data) -> (int64 bytes) {
 	return read (handle.handle, data [0], data.length)
 }
 
-def write (ref filehandle handle, ref int8 [0] data) -> (int64 written) {
+def write (ref filehandle handle, ref int8 [0] data) -> (int64 bytes) {
 	return write (handle.handle, data [0], data.length)
 }
 
