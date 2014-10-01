@@ -6,6 +6,8 @@
 #include "ast/astmodule.hpp"
 #include "ast/astnil.hpp"
 #include "ast/astnumbatinstr.hpp"
+#include "ast/astoperatorerror.hpp"
+#include "ast/astsubexp.hpp"
 #include "ast/memory/astparamater.hpp"
 #include "ast/asttuplecall.hpp"
 #include "ast/callable/astcall.hpp"
@@ -79,15 +81,47 @@ class AbstractSyntaxTree : public NumbatScope {
 		const std::vector <ASTnode> getBody () const {return body;}
 		string toString (const string & indent = "") const {
 			string str="";
-			for (auto & itt : types) {
+			for (auto & itt : extTypes) {
 				str += itt.first + " : " + itt.second->toString (indent) + "\n";
 			}
 			str += '\n';
-			for (auto & itt : functions) {
+			for (auto & itt : extFunctions) {
 				str += indent + "'" + itt.first + "' " + itt.second->toString (indent);
 			}
+			str += "\n" + NumbatScope::toString (indent);
 			return str;
 		}
+		
+		FunctionDecleration * MallocFunc () {
+			if (mallocFunc) return mallocFunc;
+			for (auto mod : dependencies) {
+				for (auto func : mod->getAST ()->functions) {
+					if (func.second->hasTag ("malloc")) return mallocFunc = func.second.get ();
+				}
+			}
+			for (auto func : functions) {
+				if (func.second->hasTag ("malloc")) return mallocFunc = func.second.get ();
+			}
+			return mallocFunc;
+		}
+		
+		FunctionDecleration * FreeFunc () {
+			if (freeFunc) return freeFunc;
+			for (auto mod : dependencies) {
+				for (auto func : mod->getAST ()->functions) {
+					if (func.second->hasTag ("free")) return freeFunc = func.second.get ();
+				}
+			}
+			for (auto func : functions) {
+				if (func.second->hasTag ("free")) return freeFunc = func.second.get ();
+			}
+			return freeFunc;
+		}
+		
+		virtual AbstractSyntaxTree * getAST () {return this;}
+		virtual ASTnode resolveSymbol (const string & iden) const;
+		
+		void importModule (const shared_ptr <Module> & module, bool extention);
 		
 		friend ASTnode defArithmetic (AbstractSyntaxTree *, const string &, const ASTnode &, const ASTnode &, tkitt);
 		friend ASTnode defAssign (AbstractSyntaxTree *, const string &, const ASTnode &, const ASTnode &, tkitt);
@@ -114,6 +148,10 @@ class AbstractSyntaxTree : public NumbatScope {
 		AbstractSyntaxTree () : NumbatScope (&context) {}
 		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "", const string & file = "");
 		
+	protected:
+		
+		virtual const NumbatType * getType (const string & iden);
+		
 	private:
 		
 		ASTnode createArrayType (const ASTnode & dataType, size_t dimentions);
@@ -132,7 +170,7 @@ class AbstractSyntaxTree : public NumbatScope {
 		ASTnode parsePrimaryExpression (tkitt end, const std::vector <ASTnode> * args);
 		ASTnode parseStatment (tkitt end);
 		ASTnode parseType (tkitt end);
-		ASTnode resolveSymbol (const string & iden, ASTnode parent=nullptr);
+		//ASTnode resolveSymbol (const string & iden, ASTnode parent=nullptr);
 		
 		bool eatSemicolon (tkitt end) {if (itt->type == lexer::TOKEN::semicolon) return nextToken (end); return false;}
 		bool flushLine (tkitt end);
@@ -172,7 +210,6 @@ class AbstractSyntaxTree : public NumbatScope {
 		
 		void addOperator (const string & pattern, const OperatorDecleration & oppdec);
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
-		void importModule (const shared_ptr <Module> & module, bool extention);
 		void printError (const string & message) {buildFail = true; std::cerr << file << " >> error on line " << line << ": " << message << '\n';}
 		void parseEnum (tkitt end);
 		void parseImport (tkitt end);
@@ -192,11 +229,11 @@ class AbstractSyntaxTree : public NumbatScope {
 		
 		string path, file;
 		
-		std::map <string, shared_ptr <NumbatType>> types;
-		std::map <string, shared_ptr <NumbatVariable>> variables;
+		//std::map <string, shared_ptr <NumbatType>> types;
+		//std::map <string, shared_ptr <NumbatVariable>> variables;
 		std::map <string, shared_ptr <OperatorDecleration>> operators;
 		
-		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
+		//std::multimap <string, shared_ptr <FunctionDecleration>> functions;
 		std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
 		
 		std::set <shared_ptr <Module>> dependencies;
@@ -209,6 +246,12 @@ class AbstractSyntaxTree : public NumbatScope {
 		std::vector <ASTnode> body;
 		
 		ParsingContext context;
+		
+		std::map <string, NumbatType *> extTypes;
+		std::map <string, NumbatVariable *> extVariables;
+		std::multimap <string, FunctionDecleration *> extFunctions;
+		
+		FunctionDecleration * mallocFunc=nullptr, * freeFunc=nullptr;
 		
 };
 
