@@ -76,13 +76,15 @@ shared_ptr <ASTcallable> findBestMatch (const std::vector <ASTnode> & args, cons
 			if (!arg->isValid ()) {
 				return shared_ptr <ASTcallable> (new ASTcallerror (arg->toString ()));
 			}
-			err += arg->getType ()->getIden () + ", ";
+			if (arg->getType ())
+				err += arg->getType ()->getIden () + ", ";
 		}
 		err += ")\n\tCandidates are:";
 		for (auto & fdef : candidates) {
 			err += "\n\t\t(";
 			for (auto & arg : fdef->getArgs ()) {
-				err += arg->getType ()->getIden () + ", ";
+				if (arg->getType ())
+					err += arg->getType ()->getIden () + ", ";
 			}
 			err += ")";
 		}
