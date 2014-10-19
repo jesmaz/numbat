@@ -118,7 +118,7 @@ ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const s
 		case 3: {
 			Position pos = args [1];
 			while (Position exp = nextArg (pos)) {
-				if (exp + 1) {
+				if (exp) {
 					dimentions.push_back (parseExpression (exp, scope));
 				} else {
 					dimentions.push_back (ASTnode (new ASTnil ()));
@@ -156,14 +156,14 @@ ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const s
 	}
 	
 	ASTnode init = nullptr;
-	if (!nil) {
+	if (!nil and !dimentions.empty ()) {
 		std::list <ASTnode> args;
 		args.push_back (dimentions [0]);
 		for (size_t i=1; i<dimentions.size (); ++i) {
 			args.push_back (ASTnode (new ASTnumbatInstr ("mul", {args.back (), dimentions [i]}, dimentions [0])));
 		}
 		args.push_front (ASTnode (new ASTallocate (args.back (), type->getType ())));
-		init = ASTnode (new ASTtuple (init));
+		init = ASTnode (new ASTtuple (args));
 	}
 	NumbatVariable * var = createVariable (scope, type, init, iden, false, false);
 	if (!var) {
@@ -346,7 +346,7 @@ ASTnode parseIndex (NumbatScope * scope, const string & func, const std::vector 
 		case 1:
 			exp = parseExpression (args [0], scope, *matches);
 			if (exp->getType ()) {
-				if (exp->isArray ()) {
+				if (exp->getType ()->isArray ()) {
 					return ASTnode (new ASTgep (exp, params[0]));
 				} else {
 					candidates = exp->getType ()->getMethods (func);
