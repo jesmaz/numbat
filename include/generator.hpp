@@ -91,7 +91,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		Type * getType (const ASTnode & node);
 		Type * getType (const NumbatType * type);
 		Value * allocteArray (Value * length, const NumbatPointerType * type);
-		Value * createTemp (std::vector <Value *> vals);
+		Value * createTemp (std::vector <Value *> vals, bool alloc=true);
 		Value * createTemp (Value * val);
 		Value * getVariableHandle (const NumbatVariable * var);
 		Value * initialise (const NumbatType * var);

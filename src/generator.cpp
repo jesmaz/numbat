@@ -111,11 +111,12 @@ Value * BodyGenerator::allocteArray (Value * length, const NumbatPointerType * t
 	
 }
 
-Value * BodyGenerator::createTemp (std::vector <Value *> vals) {
+Value * BodyGenerator::createTemp (std::vector <Value *> vals, bool alloc) {
 	std::vector <Type *> types;
 	std::vector <Value *> temps;
 	for (Value * val : vals) {
-		Value * tmp = createTemp (val);
+		Value * tmp = val;
+		if (alloc) tmp = createTemp (val);
 		types.push_back (tmp->getType ());
 		temps.push_back (tmp);
 	}
@@ -172,20 +173,48 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 		if (var->isAlias ()) type = type->getPointerTo ();
 		//TODO: apply type modifiers
 		
+		BasicBlock * block = builder.GetInsertBlock ();
+		Function * func = activeFunction;
 		if (var->isGlobal()) {
+			activeFunction = main;
+			builder.SetInsertPoint (&main->getEntryBlock ());
 			hand = new GlobalVariable (*module, type, var->isConst (), GlobalValue::ExternalLinkage, GlobalValue::getNullValue (type), var->getIden ());
 		} else {
 			hand = createEntryBlockAlloc (activeFunction, type, var->getIden ());
 		}
 		namedValues [var] = hand;
 		
+		std::cout << var->getIden () << std::endl;
+		if (var->getInit ()) std::cout << var->getInit ()->toString () << std::endl; else std::cout << "nullptr" << std::endl;
 		if (const ASTnode & init = var->getInit ()) {
-			builder.CreateStore (builder.CreateLoad (getValue (init)), hand);
+			if (var->getType ()->isArray ()) {
+				const NumbatPointerType * pType = static_cast <const NumbatPointerType *> (var->getType ());
+				Value * val = getValue (init);
+				Value * arrayPtr = builder.CreateLoad (builder.CreateExtractValue (val, {0}));
+				val->dump ();
+				for (size_t i=0; i<pType->getMembers ().size (); ++i) {
+					Value * dest = pointerTypeGEP (arrayPtr, pType, i), * source = builder.CreateLoad (builder.CreateExtractValue (val, {i+1}));
+					source->dump ();
+					dest->dump ();
+					builder.CreateStore (source, dest);
+				}
+				arrayPtr->dump ();
+				hand->dump ();
+				if (var->isAlias ()) {
+					builder.CreateStore (builder.CreateExtractValue (val, {0}), hand);
+				} else {
+					builder.CreateStore (arrayPtr, hand);
+				}
+			} else {
+				builder.CreateStore (builder.CreateLoad (getValue (init)), hand);
+			}
 		} else if (var->isAlias ()) {
 			builder.CreateStore (GlobalValue::getNullValue (type), hand);
 		} else {
 			builder.CreateStore (initialise (var->getType ()), hand);
 		}
+		activeFunction = func;
+		builder.SetInsertPoint (block);
 		
 	}
 	
@@ -851,7 +880,7 @@ void BodyGenerator::visit (ASTtuple & exp) {
 	for (const ASTnode & node : exp.getElements ()) {
 		args.push_back (getValue (node));
 	}
-	stack.push (createTemp (args));
+	stack.push (createTemp (args, false));
 	
 }
 
@@ -924,13 +953,13 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 
 void BodyGenerator::visit (NumbatScope & exp) {
 	
-	for (const auto & func : exp.getFunctions ()) {
-		getFunction (func.second.get ());
-	}
-	
 	Value * val = nullptr;
 	for (const auto & node : exp.getBody ()) {
 		val = getValue (node);
+	}
+	
+	for (const auto & func : exp.getFunctions ()) {
+		getFunction (func.second.get ());
 	}
 	stack.push (val);
 	
