@@ -5,6 +5,7 @@
  - [x] Nested while loops
 
 ##Version 0.2##
+ - [ ] 'as' operator
  - [ ] Enums
  - [ ] File I/O
  - [ ] Function auto return
