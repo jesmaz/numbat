@@ -149,6 +149,8 @@ int main (int argl, char ** args) {
 	core->addOperator (1600, false, " |= ", parser::parseAssignmentOperator);
 	core->addOperator (1600, false, " => ", parser::parseRedirectOperator);
 	
+	core->addOperator (1700, false, "if( ) ", parser::parseIfStatment);
+	core->addOperator (1700, false, "if( ) else ", parser::parseIfStatment);
 	core->addOperator (1700, false, "while( ) ", parser::parseWhileLoop);
 	
 	core->addBrace ("(", ")");

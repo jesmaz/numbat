@@ -334,6 +334,21 @@ ASTnode parseComma (NumbatScope * scope, const string & func, const std::vector 
 	
 }
 
+ASTnode parseIfStatment (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	if (args.size () < 2 or args.size () > 3) return ASTnode (new ASToperatorError ("If statements require a body"));
+	NumbatScope * child = createChild (scope);
+	ASTnode cond = parseExpression (args.front (), child);
+	ASTnode body = parseExpression (args [1], child);
+	if (args.size () == 3) {
+		ASTnode alt = parseExpression (args.back (), child);
+		return ASTnode (new ASTbranch (cond, body, alt));
+	} else {
+		return ASTnode (new ASTbranch (cond, body));
+	}
+	
+}
+
 ASTnode parseIndex (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
 	std::vector <ASTnode> params;

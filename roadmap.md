@@ -8,7 +8,7 @@
  - [ ] Enums
  - [ ] File I/O
  - [ ] Function auto return
- - [ ] if/else statement
+ - [x] if/else statement
  - [ ] ptrint casting
    - [ ] Arrays
    - [ ] References
