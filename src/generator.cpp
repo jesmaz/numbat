@@ -633,7 +633,7 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 	Value * length = nullptr;
 	
 	if (ASTnode len = ASTbase::getLength (exp.getDest ())) {
-		length = builder.CreateLoad (getValue (len));
+		Value * llen = builder.CreateLoad (getValue (len));
 		ASTnode rlen = ASTbase::getLength (exp.getSource ());
 		
 		BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
@@ -641,13 +641,14 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 		
 		Value * srclen = builder.CreateLoad (getValue (rlen));
 		
-		Value * cond = builder.CreateICmpULT (length, srclen);
+		Value * cond = builder.CreateICmpULT (llen, srclen);
 		
 		builder.CreateCondBr (cond, body, resume);
 		builder.SetInsertPoint (body);
 		builder.CreateStore (builder.CreateLoad (allocteArray (srclen, dynamic_cast <const NumbatPointerType *> (exp.getDest ()->getType ()))), dest);
 		builder.CreateBr (resume);
 		builder.SetInsertPoint (resume);
+		length = srclen;
 	} else if (exp.getDest ()->isArray ()) {
 		dest = builder.CreateLoad (dest);
 	}
@@ -848,7 +849,7 @@ void BodyGenerator::visit (ASTreturn & exp) {
 	val->dump ();
 	if (val->getType ()->isStructTy ()) {
 		if (activeFunctionDecleration->hasTag ("cstyle")) {
-			val = builder.CreateExtractValue (val, {1});
+			val = builder.CreateExtractValue (val, {0});
 		}
 		ret = builder.CreateRet (val);
 	} else {
