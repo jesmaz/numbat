@@ -593,6 +593,9 @@ void BodyGenerator::visit (ASTconstantInt & exp) {
 
 void BodyGenerator::visit (ASTconstantCString & exp) {
 	
+	auto itt = strConstants.find (exp.getValue());
+	if (itt != strConstants.end ()) {stack.push (createTemp (itt->second)); return;}
+	
 	StructType * strType = reinterpret_cast <StructType *> (getType (exp.getType ()));
 	
 	Type * arrType = strType->getStructElementType (0);
@@ -610,7 +613,11 @@ void BodyGenerator::visit (ASTconstantCString & exp) {
 	GlobalVariable * str = new GlobalVariable (*module, type, true, GlobalValue::ExternalLinkage, value, "str");
 	
 	Value * gep = builder.CreateStructGEP (str, 1, "gep");
-	stack.push (createTemp (builder.CreateInsertValue (GlobalValue::getNullValue (strType), gep, std::vector <uint32_t> (1, 0))));
+	Value * global = builder.CreateInsertValue (GlobalValue::getNullValue (strType), gep, std::vector <uint32_t> (1, 0));
+	
+	strConstants [exp.getValue ()] = global;
+	
+	stack.push (createTemp (global));
 	
 }
 

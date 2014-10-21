@@ -115,6 +115,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		std::map <const FunctionDecleration *, Function *> functions;
 		std::map <const NumbatType *, Type *> structures;
 		std::map <const NumbatVariable *, Value *> namedValues;
+		std::map <string, Value *> strConstants;
 		//std::stack <stackVal> stack;
 		std::set <Module *> builtModules;
 		std::stack <Value *> stack;
