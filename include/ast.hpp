@@ -31,6 +31,7 @@
 #include "ast/memory/numbatvariable.hpp"
 #include "ast/numbatscope.hpp"
 #include "ast/type/astrawdata.hpp"
+#include "ast/type/astreinterpretcast.hpp"
 #include "ast/type/asttuple.hpp"
 #include "ast/type/asttype.hpp"
 #include "ast/type/numbatenumtype.hpp"

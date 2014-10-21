@@ -842,6 +842,26 @@ void BodyGenerator::visit (ASTparamater & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTreinterpretCast & exp) {
+	
+	Type * target = getType (exp.getASTType ());
+	Value * source = getValue (exp.getArg ());
+	if (exp.loadSource ()) source = builder.CreateLoad (source);
+	if (target->isPointerTy () and source->getType ()->isPointerTy ()) {
+		stack.push (builder.CreateBitCast (source, target));
+	} else if (source->getType ()->isPointerTy ()) {
+		stack.push (createTemp (builder.CreatePtrToInt (source, target)));
+	} else if (target->isPointerTy ()) {
+		stack.push (builder.CreateIntToPtr (source, target));
+		if (exp.getType ()->isArray ()) {
+			stack.top () = createTemp (stack.top ());
+		}
+	} else {
+		abort ();
+	}
+	
+}
+
 void BodyGenerator::visit (ASTreturn & exp) {
 	
 	Value * ret, * val = getValue (exp.getExpr ());
