@@ -58,6 +58,14 @@ ASTnode defArithmetic (NumbatScope * scope, const string & func, const std::vect
 	
 }
 
+ASTnode defAs (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
+	
+	//TODO: determine is cast makes sense
+	ASTnode type (new ASTtype (!(args [1]->getType ()->isArray () or args [1]->getType ()->getIden () == "ptrint"), args [1]->isConst (), args [1]->getType ()));
+	return ASTnode (new ASTreinterpretCast (args [0], type, args [0]->getType ()->isArray () or args [0]->getType ()->getIden () == "ptrint"));
+	
+}
+
 ASTnode defCompare (NumbatScope * scope, const string & func, const std::vector< ASTnode > & args) {
 	
 	const NumbatType * nType = getType (scope, "bool");

@@ -10,6 +10,7 @@ namespace parser {
 
 
 ASTnode defArithmetic (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args);
+ASTnode defAs (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args);
 ASTnode defAssign (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args);
 ASTnode defCompare (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args);
 ASTnode defConcat (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args);

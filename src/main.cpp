@@ -104,6 +104,8 @@ int main (int argl, char ** args) {
 	core->addOperator (300, false, "not ", parser::parseUnary, parser::defNegation);
 	core->addOperator (300, false, "~ ", parser::parseUnary, parser::defNegation);
 	
+	core->addOperator (400, true, " as ", parser::parseBinary, parser::defAs);
+	
 	core->addOperator (500, true, " * ", parser::parseBinary, parser::defArithmetic);
 	core->addOperator (500, true, " / ", parser::parseBinary, parser::defArithmetic);
 	core->addOperator (500, true, " % ", parser::parseBinary, parser::defArithmetic);
