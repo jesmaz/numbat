@@ -219,7 +219,7 @@ NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t 
 	for (size_t i=0; i<dimentions-1; ++i) {
 		//strig iden = 
 		std::ostringstream ss;
-		ss << dimentions;
+		ss << i;
 		params [i] = ASTnode (new ASTmember (ss.str (), indexType));
 	}
 	params [dimentions-1] = ASTnode (new ASTmember ("length", indexType));
