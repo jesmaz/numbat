@@ -3,7 +3,9 @@
 ###Bug Fixes###
  - Global variables are now initialised correctly
 ###Features###
+ - as operator added (overloading not supported yet)
  - if and else if statements added
+ - ptrint reinterpret casting (using as operator)
 
 ##Version 0.1.1##
 ###Bug fixes###

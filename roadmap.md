@@ -10,8 +10,8 @@
  - [ ] File I/O
  - [ ] Function auto return
  - [x] if/else statement
- - [ ] ptrint casting
-   - [ ] Arrays
-   - [ ] References
+ - [x] ptrint casting
+   - [x] Arrays
+   - [x] References
  - [ ] Socket I/O (TCP and UDP only)
  - [ ] Type meta data
