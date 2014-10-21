@@ -15,3 +15,7 @@
    - [x] References
  - [ ] Socket I/O (TCP and UDP only)
  - [x] Type meta data
+
+##Version 0.2.1##
+ - [ ] Clean-up output
+ - [ ] Print error nodes as errors and end compilation
