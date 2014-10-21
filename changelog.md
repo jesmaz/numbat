@@ -6,6 +6,7 @@
  - as operator added (overloading not supported yet)
  - if and else if statements added
  - ptrint reinterpret casting (using as operator)
+ - Type meta data
 
 ##Version 0.1.1##
 ###Bug fixes###

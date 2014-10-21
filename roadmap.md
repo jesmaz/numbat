@@ -14,4 +14,4 @@
    - [x] Arrays
    - [x] References
  - [ ] Socket I/O (TCP and UDP only)
- - [ ] Type meta data
+ - [x] Type meta data
