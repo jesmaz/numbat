@@ -30,9 +30,11 @@ class NumbatScope : public ASTbase {
 		const std::vector <ASTnode> & getBody () const {return body;}
 		
 		virtual AbstractSyntaxTree * getAST () {return parent->getAST();}
+		virtual const ASTnode getASTType () const {return body.empty () ? nullptr : body.back ()->getASTType ();}
 		virtual ASTnode resolveSymbol (const string & iden) const;
 		virtual bool isParsed () const;
 		virtual bool isValid () const;
+		virtual const NumbatType * getType () const {return body.empty () ? nullptr : body.back ()->getType ();}
 		virtual size_t calculateWeight () const;
 		virtual string getIden () const {return "scope";}
 		virtual string toString (const string & indent = "") const;
