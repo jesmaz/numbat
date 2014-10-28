@@ -7,7 +7,7 @@
 ##Version 0.2##
  - [x] 'as' operator
  - [x] Enums
- - [ ] Function auto return
+ - [x] Function auto return
  - [x] if/else statement
  - [x] ptrint casting
    - [x] Arrays
