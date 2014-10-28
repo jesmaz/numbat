@@ -6,14 +6,18 @@ namespace parser {
 
 
 const bool OperatorDecleration::OperatorMatch::treeOrder (const OperatorMatch & lhs, const OperatorMatch & rhs) {
-	if (lhs.opp->precidance == rhs.opp->precidance) {
-		if (lhs.opp->ltr) {
-			return lhs.ptr > rhs.ptr;
+	if (lhs.level == rhs.level) {
+		if (lhs.opp->precidance == rhs.opp->precidance) {
+			if (lhs.opp->ltr) {
+				return lhs.ptr > rhs.ptr;
+			} else {
+				return lhs.ptr < rhs.ptr;
+			}
 		} else {
-			return lhs.ptr < rhs.ptr;
+			return lhs.opp->precidance > rhs.opp->precidance;
 		}
 	} else {
-		return lhs.opp->precidance > rhs.opp->precidance;
+		return lhs.level < rhs.level;
 	}
 }
 
@@ -47,24 +51,12 @@ OperatorDecleration::TYPE OperatorDecleration::calculateOperatorType (const stri
 	return type;
 }
 
-OperatorDecleration::OperatorDecleration (int precidance, bool ltr, const string & pattern, ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt)) : precidance (precidance), ltr (ltr), pattern (pattern), type (calculateOperatorType (pattern)), parser (parser) {
+OperatorDecleration::OperatorDecleration (int precidance, bool ltr, const string & pattern, ASTnode(*parser)(AbstractSyntaxTree *, const string &, const std::vector <tkitt> &, std::list <OperatorDecleration::OperatorMatch> &, tkitt), OperatorParser oppParser, DefaultImplementation defImp) : precidance (precidance), ltr (ltr), pattern (pattern), type (calculateOperatorType (pattern)), parser (parser), oppParser (oppParser), defImp (defImp) {
 	string buffer = "";
-	for (char c : pattern) {
-		if (buffer == "") {
-			buffer += c;
-		} else {
-			if (c == ' ') {
-				if (buffer != " ") {
-					symbols.push_back (buffer);
-					buffer = " ";
-				}
-			} else {
-				if (buffer == " ") {
-					symbols.push_back (buffer);
-					buffer = c;
-				}
-			}
-		}
+	size_t length = pattern.size(), pos=0;
+	const char * cptr = pattern.c_str();
+	while (pos < length) {
+		symbols.push_back (lexer::next (cptr, pos, length));
 	}
 	if (buffer != "")
 		symbols.push_back (buffer);

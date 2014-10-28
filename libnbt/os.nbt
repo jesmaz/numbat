@@ -8,8 +8,8 @@ extern def close @cstyle @local (int32 handle)
 extern def dup @cstyle @local (int32 handle) -> (int32 copy)
 extern def lseek @cstyle @local (int32 handle, uint64 offset, int32 whence) -> (uint64 pos)
 extern def open @cstyle @local (ptrint filename, int32 flags) -> (int32 handle)
-extern def read @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 read)
-extern def write @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 written)
+extern def read @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 bytes)
+extern def write @cstyle @local (int32 handle, ref int8 data, int64 length) -> (int64 bytes)
 
 # Socket system functions
 extern def accept @cstyle @local (int32 handle, ref int8 sockaddr, ref uint32 length) -> (int32 status)
@@ -26,28 +26,34 @@ extern def socket @cstyle @local (int32 domain, int32 type, int32 protocol) -> (
 
 
 # File handling wrapper functions
-#def close (ref filehandle handle)
+#def close (ref filehandle handle) -> () {
 #	close (handle.handle)
+#}
 
-def copy (ref filehandle handle) -> (filehandle copy)
+def copy (ref filehandle handle) -> (filehandle copy) {
 	filehandle ret
 	ret.status = handle.status
 	ret.handle = dup (handle.handle)
 	return ret
+}
 
-def lseek (ref filehandle handle, uint64 offset, int32 whence) -> (uint64 result)
+def lseek (ref filehandle handle, uint64 offset, int32 whence) -> (uint64 result) {
 	return lseek (handle.handle, offset, whence)
+}
 
-def open (const ref string filename, int32 flags) -> (filehandle handle)
+def open (const ref string filename, int32 flags) -> (filehandle handle) {
 	filehandle hand
 	#hand.handle = open (filename.cstring (), flags)
 	return hand
+}
 
-def read (ref filehandle handle, ref int8 [0] data) -> (int64 read)
+def read (ref filehandle handle, ref int8 [0] data) -> (int64 bytes) {
 	return read (handle.handle, data [0], data.length)
+}
 
-def write (ref filehandle handle, ref int8 [0] data) -> (int64 written)
+def write (ref filehandle handle, ref int8 [0] data) -> (int64 bytes) {
 	return write (handle.handle, data [0], data.length)
+}
 
 
 # Socket wrapper functions

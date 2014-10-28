@@ -5,6 +5,22 @@ namespace numbat {
 namespace parser {
 
 
+bool ASTtuplecall::isParsed () const {
+	
+	for (const shared_ptr <ASTcallable> & call : calls) {
+		if (!call->isParsed ()) return false;
+	}
+	for (const ASTnode & node : lhsArgs) {
+		if (!node->isParsed ()) return false;
+	}
+	for (const ASTnode & node : rhsArgs) {
+		if (!node->isParsed ()) return false;
+	}
+	return true;
+	
+}
+
+
 bool ASTtuplecall::isValid () const {
 	
 	for (const shared_ptr <ASTcallable> & call : calls) {

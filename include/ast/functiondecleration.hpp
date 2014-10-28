@@ -21,6 +21,8 @@ struct FunctionDecleration {
 		string toString (const string & indent = "");
 		void assignBody (ASTnode b) {body = b;}
 		
+		const bool operator == (const FunctionDecleration & func) {return false;}
+		
 		FunctionDecleration () {}
 		FunctionDecleration (const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags) : iden (iden), metaTags (metaTags), parameters (args), type (type) {}
 	private:

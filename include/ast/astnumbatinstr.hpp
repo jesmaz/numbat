@@ -14,8 +14,9 @@ class ASTnumbatInstr : public ASTbase {
 		const string & getInstr () const {return instr;}
 		const std::vector <ASTnode> getArgs () const {return args;}
 		virtual const ASTnode getASTType () const {return type;}
+		virtual bool isParsed () const {for (auto & arg : args ) if (!arg->isParsed ()) return false; return true;}
 		virtual bool isValid () const;
-		virtual shared_ptr <NumbatType> getType () const {return type->getType ();}
+		virtual const NumbatType * getType () const {return type->getType ();}
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}

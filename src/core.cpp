@@ -6,6 +6,11 @@ namespace parser {
 
 const std::map <string, string> instructions = [] {
 	std::map <string, string> mp;
+	mp ["- "] = "neg";
+	mp ["not "] = "lnot";
+	mp ["! "] = "lnot";
+	mp ["~ "] = "not";
+	
 	mp [" * "] = "mul";
 	mp [" / "] = "div";
 	mp [" % "] = "rem";
@@ -33,33 +38,19 @@ const std::map <string, string> instructions = [] {
 }();
 
 
-ASTnode defAddition (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+ASTnode defArithmetic (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
 	
-	if (lhs->getType ()->isArray ()) {
-		
-		return ASTnode (new ASTconcat (lhs, rhs));
-		
-	} else {
-		return defArithmetic (ast, func, lhs, rhs, end);
-	}
-	
-}
-
-ASTnode defArithmetic (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
-	
-	if (lhs->getType ()->isRaw ()) {
+	if (args [0]->getType () and args [0]->getType ()->isRaw ()) {
 		
 		auto itt = instructions.find (func);
-		string instr = (lhs->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		string instr = (args [0]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({args [0], createStaticCast (args [1], args [0], 1)}), args [0]));
 		
-		ASTnode trhs = rhs;
-		if (lhs->getType () != rhs->getType ()) {
-			trhs = ast->createStaticCast (std::vector <ASTnode> (1, rhs), std::vector <ASTnode> (1, lhs), 1) [0];
-		}
-		std::vector <ASTnode> args (2);
-		args [0] = lhs;
-		args [1] = trhs;
-		return ASTnode (new ASTnumbatInstr (instr, args, lhs));
+	} else if (args [1]->getType () and args [1]->getType ()->isRaw ()) {
+		
+		auto itt = instructions.find (func);
+		string instr = (args [1]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({createStaticCast (args [0], args [1], 1), args [1]}), args [1]));
 		
 	} else {
 		return ASTnode (new ASTerror ("No suitable function found"));
@@ -67,52 +58,32 @@ ASTnode defArithmetic (AbstractSyntaxTree * ast, const string & func, const ASTn
 	
 }
 
-ASTnode defAssign (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+ASTnode defAs (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
 	
-	ASTnode trhs = rhs;
-	if (lhs->getType () != rhs->getType ()) {
-		trhs = ast->createStaticCast (std::vector <ASTnode> (1, rhs), std::vector <ASTnode> (1, lhs), 1) [0];
-	}
-	
-	if (lhs->getType ()->isArray () and rhs->getType ()->isArray ()) {
-		
-		//TODO: Complex types
-		ASTnode rhstmp (new ASTvariable (shared_ptr <NumbatVariable> (new NumbatVariable (trhs, trhs, "temp", false, true))));
-		
-		ASTnode compare = defCompare (ast, " < ", ASTbase::getLength (lhs), ASTbase::getLength (rhstmp), end);
-		ASTnode allocate (new ASTallocate (ASTbase::getLength (rhstmp), rhstmp->getType ()));
-		std::vector <ASTnode> args (2);
-		args [0] = lhs;
-		args [1] = allocate;
-		ASTnode smv (new ASTnumbatInstr ("mov", args, allocate));
-		ASTnode branch (new ASTbranch (compare, smv));
-		args [0] = branch;
-		args [1] = ASTnode (new ASTmemcpy (lhs, rhstmp));
-		return ASTnode (new ASTbody (args));
-		
-	} else {
-		//TODO: Complex types
-		return ASTnode (new ASTmemcpy (lhs, trhs));
-	}
+	//TODO: determine is cast makes sense
+	ASTnode type (new ASTtype (!(args [1]->getType ()->isArray () or args [1]->getType ()->getIden () == "ptrint"), args [1]->isConst (), args [1]->getType ()));
+	return ASTnode (new ASTreinterpretCast (args [0], type, args [0]->getType ()->isArray () or args [0]->getType ()->getIden () == "ptrint"));
 	
 }
 
-ASTnode defCompare (AbstractSyntaxTree * ast, const string & func, const ASTnode & lhs, const ASTnode & rhs, tkitt end) {
+ASTnode defCompare (NumbatScope * scope, const string & func, const std::vector< ASTnode > & args) {
 	
-	if (lhs->getType ()->isRaw ()) {
+	const NumbatType * nType = getType (scope, "bool");
+	if (!nType) {
+		return ASTnode (new ASTerror ("'bool' is not declared"));
+	}
+	ASTnode type (new ASTtype (false, true, nType));
+	if (args [0]->getType () and args [0]->getType ()->isRaw ()) {
 		
 		auto itt = instructions.find (func);
-		string instr = (lhs->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		string instr = (args [0]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({args [0], createStaticCast (args [1], args [0], 1)}), type));
 		
-		ASTnode trhs = rhs;
-		if (lhs->getType () != rhs->getType ()) {
-			trhs = ast->createStaticCast (std::vector <ASTnode> (1, rhs), std::vector <ASTnode> (1, lhs), 1) [0];
-		}
-		std::vector <ASTnode> args (2);
-		args [0] = lhs;
-		args [1] = trhs;
-		auto typ = ast->types.find ("bool");
-		return ASTnode (new ASTnumbatInstr (instr, args, ASTnode (new ASTtype (false, true, typ->second))));
+	} else if (args [1]->getType () and args [1]->getType ()->isRaw ()) {
+		
+		auto itt = instructions.find (func);
+		string instr = (args [1]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({createStaticCast (args [0], args [1], 1), args [1]}), type));
 		
 	} else {
 		return ASTnode (new ASTerror ("No suitable function found"));
@@ -120,372 +91,391 @@ ASTnode defCompare (AbstractSyntaxTree * ast, const string & func, const ASTnode
 	
 }
 
+ASTnode defConcat (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
+	
+	return ASTnode (new ASTconcat (args [0], args [1]));
+	
+}
 
-ASTnode parseExpression (AbstractSyntaxTree * ast, tkitt end) {
-	tkitt scolon;
-	ASTnode exp = nullptr;
-	if ((scolon = ast->findToken (";", end)) != end) {
-		exp = ast->parseStatment (scolon);
-		ast->eatSemicolon (end);
+ASTnode defLogic (NumbatScope * scope, const string & func, const std::vector< ASTnode > & args) {
+	
+	return ASTnode (new ASTerror ("Logical operators are not yet implemented"));
+	
+}
+
+ASTnode defNegation (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
+	
+	if (args [0]->getType () and args [0]->getType ()->isRaw ()) {
+		auto itt = instructions.find (func);
+		string instr = (args [0]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
+		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({args [0]}), args [0]));
 	} else {
-		ast->itt = end;
+		return ASTnode (new ASTerror ("No suitable function found"));
 	}
-	return exp;
+	
 }
 
-ASTnode parseWhileLoop (AbstractSyntaxTree * ast, tkitt end) {
-	ast->nextToken (end);  // Eat 'while' token
-	ASTnode node = nullptr;
-	if (ast->itt->iden == "(") {
-		ast->nextToken (end);
-		tkitt cend = ast->findToken (")", end);
-		node = ast->parseStatment (cend);
-		ast->itt = cend;
-		ast->nextToken (end);
+
+ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	std::vector <ASTnode> dimentions;
+	switch (args.size ()) {
+		case 2:
+			dimentions.push_back (ASTnode (new ASTnil ()));
+			break;
+		case 3: {
+			Position pos = args [1];
+			while (Position exp = nextArg (pos)) {
+				if (exp) {
+					dimentions.push_back (parseExpression (exp, scope));
+				} else {
+					dimentions.push_back (ASTnode (new ASTnil ()));
+				}
+				pos += exp;
+			}
+			break;
+		}
+		default:
+			return ASTnode (new ASToperatorError ("Array decelerations require 2 or 3 arguments"));
+	}
+	
+	if (args.back ().itt->type != lexer::TOKEN::identifier) {
+		return generateOperatorError (args.back (), "Identifier expected");
+	}
+	if (args.back () + 1) {
+		return generateOperatorError (args.back () + 1, "Unexpected token: '" + (args.back () + 1).itt->iden + "'");
+	}
+	
+	const string & iden = args.back ().itt->iden;
+	ASTnode typeNode = parseExpression (args.front (), scope, *matches);
+	
+	if (typeid (*typeNode.get ()) != typeid (ASTtype)) {
+		return generateError (args.front (), "Type expected");
+	}
+	
+	ASTnode type (new ASTtype (typeNode->isAlias (), typeNode->isConst (), getArrayType (scope, typeNode->getType (), dimentions.size ())));
+	
+	bool nil = false;
+	for (ASTnode & node : dimentions) {
+		if (node->isNil ()) {
+			nil = true;
+			break;
+		}
+	}
+	
+	ASTnode init = nullptr;
+	if (!nil and !dimentions.empty ()) {
+		std::list <ASTnode> args;
+		args.push_back (dimentions [0]);
+		for (size_t i=1; i<dimentions.size (); ++i) {
+			args.push_back (ASTnode (new ASTnumbatInstr ("mul", {args.back (), dimentions [i]}, dimentions [0])));
+		}
+		args.push_front (ASTnode (new ASTallocate (args.back (), type->getType ())));
+		init = ASTnode (new ASTtuple (args));
+	}
+	NumbatVariable * var = createVariable (scope, type, init, iden, false, false);
+	if (!var) {
+		return generateError (args.back (), "'" + iden + "' already declared in this scope");
+	}
+	return ASTnode (new ASTvariable (var));
+	
+}
+
+ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	//TODO: type inference
+	//TODO: initialisation of variables
+	if (args.size () != 2) return ASTnode (new ASToperatorError ("Assignment operators require exactly two arguments"));
+	ASTnode lhs = parseExpression (args [0], scope, *matches);
+	ASTnode rhs = parseExpression (args [1], scope, *matches);
+	giveNode (scope, lhs);
+	giveNode (scope, rhs);
+	
+	if (lhs->isList ()) {
+		auto list = lhs->getList ();
+		if (list.size () == 1) {
+			lhs = list.front ();
+		}
+	}
+	
+	if (rhs->isList ()) {
+		auto list = rhs->getList ();
+		if (list.size () == 1) {
+			rhs = list.front ();
+		}
+	}
+	
+	if (!lhs->isValid () or !rhs->isValid () or !lhs->getType () or !rhs->getType ()) {
+		std::cout << typeid (*lhs.get ()).name () << " " << lhs->getType () << " " << lhs->toString () << std::endl;
+		std::cout << typeid (*rhs.get ()).name () << " " << rhs->getType () << " " << rhs->toString () << std::endl;
+		return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
+	}
+	
+	std::vector <FunctionDecleration *> candidates = lhs->getType ()->getMethods (func);
+	auto callable = findBestMatch (std::vector <ASTnode> {lhs, rhs}, candidates);
+	if (callable->isValid ()) {
+		return ASTnode (new ASTcall (callable, createStaticCast (std::vector <ASTnode> {lhs, rhs}, callable->getFunction ()->getType ())));
 	} else {
-		return ASTnode (new ASTerror ("Expected '('"));
-	}
-	node = ASTnode (new ASTwhileloop (node, ast->parseBody (end)));
-	return node;
-}
-
-
-ASTnode parseAdditionOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	return parseBinary (ast, func, oppLoc, matches, end, defAddition);
-}
-
-ASTnode parseArithmeticOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	return parseBinary (ast, func, oppLoc, matches, end, defArithmetic);
-}
-
-ASTnode parseArrayDecleration (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	
-	ASTnode dataType = ast->parseExpression (oppLoc [0]);
-	if (!dataType->isValid ()) {
-		ast->error (dataType->toString (), end);
-		return dataType;
+		return ASTnode (new ASTmemcpy (lhs, createStaticCast (rhs, lhs)));
 	}
 	
-	ast->itt = oppLoc [0];
-	ast->nextToken (oppLoc [1]);
-	auto dimentions = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
+}
+
+ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	if (1 < dimentions.size ()) {
-		return ASTnode (new ASTerror ("Multidimensional arrays are not yet supported"));
+	if (args.size () != 2) return ASTnode (new ASToperatorError ("Binary operators require exactly two arguments"));
+	
+	ASTnode lhs = parseExpression (args [0], scope, *matches);
+	ASTnode rhs = parseExpression (args [1], scope, *matches);
+	
+	giveNode (scope, lhs);
+	giveNode (scope, rhs);
+	
+	if (lhs->isList ()) {
+		auto list = lhs->getList ();
+		if (list.size () == 1) {
+			lhs = list.front ();
+		}
 	}
 	
-	ast->itt = oppLoc [1];
-	ast->nextToken (end);
-	const string & iden = ast->itt->iden;
-	ast->nextToken (end);
+	if (rhs->isList ()) {
+		auto list = rhs->getList ();
+		if (list.size () == 1) {
+			rhs = list.front ();
+		}
+	}
 	
-	if (ast->itt != end) {
-		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
-	} else {
-		
-		ASTnode type = ast->createArrayType (dataType, dimentions.size ());
-		ASTnode var (new ASTvariable (ast->variables [iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (type, iden))));
-		ASTnode size;
-		
-		bool zero = false;
-		for (const ASTnode & n : dimentions) {
-			if (ASTconstantInt * ci = dynamic_cast <ASTconstantInt *> (n.get ())) {
-				zero |= !ci->getValue ();
+	if (!lhs->isValid () or !rhs->isValid () or !lhs->getType () or !rhs->getType ()) {
+		if (lhs->getType ()) std::cout << lhs->getType ()->toString () << std::endl;
+		if (rhs->getType ()) std::cout << rhs->getType ()->toString () << std::endl;
+		std::cout << typeid (*lhs.get ()).name () << " " << lhs->toString () << std::endl;
+		std::cout << typeid (*rhs.get ()).name () << " " << rhs->toString () << std::endl;
+		std::cout << std::boolalpha << lhs->isValid () << std::endl;
+		std::cout << std::boolalpha << rhs->isValid () << std::endl;
+		std::cout << func << std::endl;
+		if (ASTcallindex * index = dynamic_cast <ASTcallindex *> (lhs.get ())) {
+			std::cout << typeid (*(index->getCall ())).name () << " " << index->getCall ()->toString () << std::endl;
+			if (ASTcall * call = dynamic_cast <ASTcall *> (index->getCall ())) {
+				std::cout << typeid (*(call->getCallee ().get ())).name () << " " << call->getCallee ()->toString () << std::endl;
 			}
 		}
-		
-		std::vector <ASTnode> bodyvec (2);
-		
-		if (dimentions.empty ()) {
-			return var;
-		} else if (dimentions.size () == 1) {
-			size = dimentions [0];
-		} else {
-			size = ASTnode (new ASTnumbatInstr ("mul", dimentions, dimentions [0]));
+		if (ASTcallindex * index = dynamic_cast <ASTcallindex *> (rhs.get ())) {
+			std::cout << typeid (*(index->getCall ())).name () << index->getCall ()->isValid () << std::endl;
 		}
-		
-		if (zero) {
-			return var;
-		} else {
-			
-			ASTnode alloc (new ASTallocate (size, type->getType ()));
-			std::vector <ASTnode> movvec (2);
-			movvec [0] = var;
-			movvec [1] = alloc;
-			
-			bodyvec [0] = ASTnode (new ASTnumbatInstr ("mov", movvec, var));
-			
-		}
-		
-		std::vector <ASTnode> movvec (2);
-		movvec [0] = ASTnode (new ASTstructIndex (0, var));;
-		movvec [1] = size;
-		bodyvec [1] = ASTnode (new ASTnumbatInstr ("mov", movvec, size));
-		
-		return ASTnode (new ASTbody (bodyvec));
-		
+		return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
 	}
-}
-
-ASTnode parseAssignmentOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
 	
-	return parseBinary (ast, func, oppLoc, matches, end, defAssign);
+	std::vector <FunctionDecleration *> candidates = lhs->getType ()->getMethods (func), rhsCand = rhs->getType ()->getMethods (func);
+	std::copy (rhsCand.begin (), rhsCand.end (), std::back_inserter (candidates));
+	auto callable = findBestMatch (std::vector <ASTnode> {lhs, rhs}, candidates);
 	
-}
-
-ASTnode parseBinary (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end, defBinaryImp defImpl) {
-	
-	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
-	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
-	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
-	ast->itt = oppLoc [0];
-	ast->nextToken (end);
-	ASTnode rhs = ast->parseExpression (matches, end);
-	return ast->createBinaryCall (func, lhs, rhs, end, defImpl);
+	std::cout << callable->toString () <<std::endl;
+	if (callable->isValid ()) {
+		giveNode (scope, callable);
+		return callable->getList ().front ();
+	} else if (defImp) {
+		return defImp (scope, func , std::vector <ASTnode> ({lhs, rhs}));
+	} else {
+		return ASTnode (new ASTerror ("Something went wrong"));
+	}
 	
 }
 
-ASTnode parseComparisonOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	return parseBinary (ast, func, oppLoc, matches, end, defCompare);
+ASTnode parseBlockOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	switch (args.size ()) {
+		case 0:
+			return ASTnode (new ASTnil);
+		case 1:
+			std::cout << '\n';
+			for (tkitt itt = args[0].itt; itt != args[0].end; ++itt)
+				std::cout << itt->iden;
+			std::cout << std::endl;
+			return parseBody (args [0], scope);
+		default:
+			return ASTnode (new ASTerror ("Something went wrong"));
+	}
+	
 }
 
-ASTnode parseElementReferenceOperator (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+ASTnode parseCall (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	std::cout << "CALL: ";
+	for (auto arg : args) {
+		for (auto itt = arg.itt; itt != arg.end; ++itt) {
+			std::cout << "'" << itt->iden << "'";
+		}
+	}
+	std::cout << std::endl;
+	std::vector <ASTnode> params;
+	ASTnode exp;
+	std::vector <FunctionDecleration *> candidates;
+	std::shared_ptr <ASTcallable> callable;
+	switch (args.size ()) {
+		case 2:
+			params = parseArgs (args [1], scope);
+		case 1:
+			exp = parseExpression (args [0], scope, *matches);
+			if (!exp->isValid ()) return exp;
+			if (typeid (*exp.get ()) == typeid (ASTfunctionlist)) {
+				candidates = static_cast <ASTfunctionlist *> (exp.get ())->getElements ();
+			} else if (exp->getType ()) {
+				candidates = exp->getType ()->getMethods (func);
+			} else {
+				return ASTnode (new ASTerror ("Something went wrong"));
+			}
+			return findBestMatch (params, candidates);
+		default:
+			return ASTnode (new ASTerror ("Something went wrong"));
+	}
+	
+}
+
+ASTnode parseComma (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	if (args.size () != 2) return ASTnode (new ASToperatorError ("Comma operator requires exactly two arguments"));
+	
+	ASTnode lhs = parseExpression (args [0], scope, *matches);
+	ASTnode rhs = parseExpression (args [1], scope, *matches);
+	
+	return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
+	
+}
+
+ASTnode parseIfStatment (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	if (args.size () < 2 or args.size () > 3) return ASTnode (new ASToperatorError ("If statements require a body"));
+	NumbatScope * child = createChild (scope);
+	ASTnode cond = parseExpression (args.front (), child);
+	ASTnode body = parseExpression (args [1], child);
+	if (args.size () == 3) {
+		ASTnode alt = parseExpression (args.back (), child);
+		return ASTnode (new ASTbranch (cond, body, alt));
+	} else {
+		return ASTnode (new ASTbranch (cond, body));
+	}
+	
+}
+
+ASTnode parseIndex (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	std::vector <ASTnode> params;
+	ASTnode exp;
+	std::vector <FunctionDecleration *> candidates;
+	std::shared_ptr <ASTcallable> callable;
+	switch (args.size ()) {
+		case 2:
+			params = parseArgs (args [1], scope);
+		case 1:
+			exp = parseExpression (args [0], scope, *matches);
+			if (exp->getType ()) {
+				if (exp->getType ()->isArray ()) {
+					return ASTnode (new ASTgep (exp, params[0]));
+				} else {
+					candidates = exp->getType ()->getMethods (func);
+					callable = findBestMatch (params, candidates);
+					if (callable->isValid ()) {
+						return ASTnode (new ASTcall (callable, createStaticCast (params, callable->getFunction ()->getType ())));
+					} else {
+						return ASTnode (new ASTerror ("TODO: print candidates for functions in parseCall"));
+					}
+				}
+			} else {
+				return generateError (args [0], "Expected a variable");
+			}
+		default:
+			return ASTnode (new ASTerror ("Something went wrong"));
+	}
+	
+}
+
+ASTnode parseRedirectOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	return ASTnode (new ASTerror ("Redirection is not yet implemented"));
+	
+}
+
+ASTnode parseReferenceOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	if  (args.size () != 2)return ASTnode (new ASToperatorError ("Reference operator requires exactly two arguments"));
+	
+	Position lhsPos = args [0];
 	
 	bool constTkn=false, ref=false;
-	while (ast->itt->type == lexer::TOKEN::typemodifier) {
-		if (ast->itt->iden == "ref") {
+	while (lhsPos.itt->type == lexer::TOKEN::typemodifier) {
+		if (lhsPos.itt->iden == "ref") {
 			ref = true;
-		} else if (ast->itt->iden == "const") {
+		} else if (lhsPos.itt->iden == "const") {
 			constTkn = true;
 		}
-		ast->nextToken (end);
+		++lhsPos;
 	}
 	
-	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
-	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
-	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
-	ast->itt = oppLoc [0];
-	ast->nextToken (end);
-	ASTnode ret = ast->resolveSymbol (ast->itt->iden, lhs);
-	if (!ret->isValid ()) {
-		ast->error (ret->toString (), end);
-	}
-	ast->nextToken (end);
+	ASTnode lhs = parseExpression (lhsPos, scope, *matches);
 	
-	if (ASTtype * type = dynamic_cast <ASTtype *> (ret.get ())) {
-		*type = ASTtype (ref, constTkn, type->getType ());
+	Position pos = args [1];
+	ASTnode ret = resolveSymbol (scope, pos.itt->iden, lhs);
+	
+	if (typeid (*ret.get ()) == typeid (ASTtype)) {
+		*static_cast <ASTtype *> (ret.get ()) = ASTtype (ref, constTkn, ret->getType ());
 	}
 	
-	if (ast->itt != end) {
-		if (ast->itt->type == lexer::TOKEN::identifier) {
-			ret = ASTnode (new ASTvariable (ast->variables [ast->itt->iden] = std::shared_ptr <NumbatVariable> (new NumbatVariable (ret, ast->itt->iden))));
+	if (++pos) {
+		if (pos.itt->type == lexer::TOKEN::identifier) {
+			ret = ASTnode (new ASTvariable (createVariable (scope, ret, nullptr, pos.itt->iden, false, false)));
 		} else {
-			ret = ASTnode (new ASTerror ("Identifier expected"));
+			ret = generateOperatorError (pos, "Identifier expected");
 		}
-		ast->nextToken (end);
+		++pos;
 	}
 	
 	return ret;
 	
 }
 
-ASTnode parseFunctionCall (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
+ASTnode parseSubExpression (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
-	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
-	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
-	ast->itt = oppLoc [0];
-	std::vector <ASTnode> params;
-	if (oppLoc.size () == 2) {
-		ast->nextToken (oppLoc [1]);
-		params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
-		ast->itt = oppLoc [1];
+	switch (args.size ()) {
+		case 0:
+			return ASTnode (new ASTnil);
+		case 1:
+			return ASTnode (new ASTsubexp (parseExpression (args [0], scope)));
+		default:
+			return ASTnode (new ASTerror ("Something went wrong"));
+	}
+	
+}
+
+ASTnode parseUnary (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
+	
+	if (args.size () != 1) return ASTnode (new ASToperatorError ("Unary operators require exactly one argument"));
+	ASTnode arg = parseExpression (args [0], scope, *matches);
+	
+	if (!arg->getType ()) return arg;
+	
+	std::vector <FunctionDecleration *> candidates = arg->getType ()->getMethods (func);
+	auto callable = findBestMatch ({arg}, candidates);
+	
+	if (callable->isValid ()) {
+		return ASTnode (new ASTcall (callable, createStaticCast ({arg}, callable->getFunction ()->getType ())));
+	} else if (defImp) {
+		return defImp (scope, func , {arg});
 	} else {
-		ast->nextToken (end);
-	}
-	ast->nextToken (end);
-	
-	if (ast->itt != end) {
-		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
-	}
-	
-	shared_ptr <ASTfunctionlist> flist = std::dynamic_pointer_cast <ASTfunctionlist> (lhs);
-	ASTnode ret;
-	
-	if (flist) {
-		
-		ret = findBestMatch (ast, params, flist->getElements ());
-		
-		if (!ret->isValid ()) {
-			ast->error ("No suitable function found", end);
-		}
-		
-	} else if (ASTtype * type = dynamic_cast <ASTtype *> (lhs.get ())) {
-		
-		ret = findBestMatch (ast, params, type->getType ()->getConstructors ());
-		if (!ret->isValid ()) {
-			ast->error ("No suitable constructor found", end);
-		}
-		
-	} else {
-		//function object
-		//TODO: function objects
-		ret = ASTnode (new ASTerror ("Function objects are not yet implemented"));
-		ast->error ("Function objects are not yet implemented", end);
-	}
-	
-	return ret;
-	
-}
-
-ASTnode parseGenericArray (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
-	
-	ast->itt = oppLoc [0];
-	ast->nextToken (oppLoc [1]);
-	auto args = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
-	return ast->createCallNode (ast->findFunction (func, args), args);
-	
-}
-
-ASTnode parseGenericBinary (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
-	
-	return parseBinary (ast, func, oppLoc, matches, end, nullptr);
-	
-}
-
-ASTnode parseGenericIndexCall (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	
-	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
-	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
-	std::vector <ASTnode> args (1, ast->parseExpression (lhsMatches, oppLoc [0]));
-	ast->itt = oppLoc [0];
-	ast->nextToken (oppLoc [1]);
-	auto params = ast->parseArgs (&AbstractSyntaxTree::parseExpression, oppLoc [1]);
-	ast->itt = oppLoc [1];
-	ast->nextToken (end);
-	
-	if (!args [0]->getType ()) {
-		return ASTnode (new ASTerror ("Invalid type"));
-	}
-	
-	if (args [0]->isArray ()) {
-		return ASTnode (new ASTgep (args [0], params [0]));
-	}
-	
-	args.insert (args.end (), params.begin (), params.end ());
-	if (ast->itt != end) {
-		return ASTnode (new ASTerror ("Unexpected token: '" + ast->itt->iden + "'"));
-	} else {
-		return ast->createCallNode (ast->findFunction (func, args), args);
+		return ASTnode (new ASTerror ("Something went wrong"));
 	}
 	
 }
 
-ASTnode parseGenericTernary (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end){
+ASTnode parseWhileLoop (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	std::vector <ASTnode> args (3);
-	std::list <OperatorDecleration::OperatorMatch> lhs, mid;
-	splitListAboutTkn (lhs, matches, oppLoc [0]);
-	args [0] = ast->parseExpression (lhs, oppLoc [0]);
-	ast->itt = oppLoc [0];
-	ast->nextToken (end);
-	splitListAboutTkn (mid, matches, oppLoc [1]);
-	args [1] = ast->parseExpression (mid, oppLoc [1]);
-	ast->itt = oppLoc [1];
-	ast->nextToken (end);
-	args [2] = ast->parseExpression (matches, end);
-	return ast->createCallNode (ast->findFunction (func, args), args);
+	if (args.size () != 2) return ASTnode (new ASToperatorError ("While loops require a condition and a body"));
+	NumbatScope * child = createChild (scope);
+	ASTnode cond = parseExpression (args.front (), child);
+	ASTnode body = parseExpression (args.back (), child);
+	return ASTnode (new ASTwhileloop (cond, body));
 	
 }
 
-ASTnode parseGenericUnaryPrefix (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	
-	ast->itt = oppLoc [0];
-	ast->nextToken (end);
-	std::vector <ASTnode> args (1, ast->parseExpression (matches, end));
-	return ast->createCallNode (ast->findFunction (func, args), args);
-	
-}
-
-ASTnode parseGenericUnaryPostfix (AbstractSyntaxTree * ast, const string & func, const std::vector <tkitt> & oppLoc, std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end) {
-	
-	std::vector <ASTnode> args (1, ast->parseExpression (matches, oppLoc [0]));
-	return ast->createCallNode (ast->findFunction (func, args), args);
-	
-}
-
-ASTnode parseRedirectOperator (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
-	
-	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
-	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
-	std::vector <ASTnode> args (2);
-	args [0] = ast->parseExpression (lhsMatches, oppLoc [0]);
-	ast->itt = oppLoc [0];
-	ast->nextToken (end);
-	args [1] = ast->parseExpression (matches, end);
-	return ASTnode (new ASTnumbatInstr ("redir", args, args [0]));
-	
-}
-
-ASTnode parseTupleOperator (AbstractSyntaxTree * ast, const string & func, const std::vector< tkitt > & oppLoc, std::list< OperatorDecleration::OperatorMatch > & matches, tkitt end) {
-	
-	std::list <OperatorDecleration::OperatorMatch> lhsMatches;
-	splitListAboutTkn (lhsMatches, matches, oppLoc [0]);
-	ASTnode lhs = ast->parseExpression (lhsMatches, oppLoc [0]);
-	ast->itt = oppLoc [0];
-	ast->nextToken (end);
-	ASTnode rhs = ast->parseExpression (matches, end); 
-	return ast->createTuple (lhs, rhs);
-	
-}
-
-
-shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree * ast, const std::vector <ASTnode> & args, const std::vector <shared_ptr <FunctionDecleration>> & candidates, int maxDepth) {
-	
-	shared_ptr <FunctionDecleration> func = nullptr;
-	std::vector <ASTnode> params (args);
-	size_t weight = __UINT64_MAX__ - 1;
-	for (auto & fdef : candidates) {
-		if (fdef->getArgs ().size () == args.size ()) {
-			std::vector <ASTnode> cast = ast->createStaticCast (args, fdef->getArgs (), maxDepth);
-			size_t w = 0;
-			for (const ASTnode & node : cast) {
-				if (node->isValid ()) {
-					w += node->calculateWeight ();
-				} else {
-					w = __UINT64_MAX__;
-					break;
-				}
-			}
-			if (w < weight) {
-				weight = w;
-				func = fdef;
-				params = cast;
-			}	
-		}
-	}
-	if (func) {
-		return shared_ptr <ASTcallable> (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (func)), params));
-	} else {
-		string err = "\n\tTarget is: (";
-		for (auto & arg : args) {
-			if (!arg->isValid ()) {
-				return shared_ptr <ASTcallable> (new ASTcallerror (arg->toString ()));
-			}
-			err += arg->getType ()->getIden () + ", ";
-		}
-		err += ")\n\tCandidates are:";
-		for (auto & fdef : candidates) {
-			err += "\n\t\t(";
-			for (auto & arg : fdef->getArgs ()) {
-				err += arg->getType ()->getIden () + ", ";
-			}
-			err += ")";
-		}
-		return shared_ptr <ASTcallable> (new ASTcallerror (err));
-	}
-	
-}
 
 };
 };

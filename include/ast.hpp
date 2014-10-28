@@ -1,38 +1,43 @@
 #ifndef ABSTRACT_SYNTAX_TREE_HPP
 #define ABSTRACT_SYNTAX_TREE_HPP
 
-#include "ast/astallocate.hpp"
-#include "ast/astbody.hpp"
-#include "ast/astbranch.hpp"
-#include "ast/astcall.hpp"
-#include "ast/astcallerror.hpp"
-#include "ast/astcallindex.hpp"
-#include "ast/astconcat.hpp"
-#include "ast/astconstantfpint.hpp"
-#include "ast/astconstantint.hpp"
-#include "ast/astconstantcstring.hpp"
 #include "ast/asterror.hpp"
 #include "ast/astfunctionlist.hpp"
-#include "ast/astfunctionpointer.hpp"
-#include "ast/astgep.hpp"
-#include "ast/astmemcpy.hpp"
 #include "ast/astmodule.hpp"
 #include "ast/astnil.hpp"
 #include "ast/astnumbatinstr.hpp"
-#include "ast/astparamater.hpp"
-#include "ast/astrawdata.hpp"
-#include "ast/astreturn.hpp"
-#include "ast/aststructindex.hpp"
-#include "ast/asttuple.hpp"
+#include "ast/astoperatorerror.hpp"
+#include "ast/astsubexp.hpp"
+#include "ast/memory/astparamater.hpp"
 #include "ast/asttuplecall.hpp"
-#include "ast/asttype.hpp"
-#include "ast/astvariable.hpp"
-#include "ast/astwhileloop.hpp"
+#include "ast/callable/astcall.hpp"
+#include "ast/callable/astcallerror.hpp"
+#include "ast/callable/astfunctionpointer.hpp"
+#include "ast/control/astbody.hpp"
+#include "ast/control/astbranch.hpp"
+#include "ast/control/astreturn.hpp"
+#include "ast/control/astwhileloop.hpp"
+#include "ast/constant/astconstantfpint.hpp"
+#include "ast/constant/astconstantint.hpp"
+#include "ast/constant/astconstantcstring.hpp"
 #include "ast/functiondecleration.hpp"
-#include "ast/numbatpointertype.hpp"
-#include "ast/numbatrawtype.hpp"
-#include "ast/numbattype.hpp"
-#include "ast/numbatvariable.hpp"
+#include "ast/memory/astallocate.hpp"
+#include "ast/memory/astcallindex.hpp"
+#include "ast/memory/astconcat.hpp"
+#include "ast/memory/astgep.hpp"
+#include "ast/memory/astmemcpy.hpp"
+#include "ast/memory/aststructindex.hpp"
+#include "ast/memory/astvariable.hpp"
+#include "ast/memory/numbatvariable.hpp"
+#include "ast/numbatscope.hpp"
+#include "ast/type/astrawdata.hpp"
+#include "ast/type/astreinterpretcast.hpp"
+#include "ast/type/asttuple.hpp"
+#include "ast/type/asttype.hpp"
+#include "ast/type/numbatenumtype.hpp"
+#include "ast/type/numbatpointertype.hpp"
+#include "ast/type/numbatrawtype.hpp"
+#include "ast/type/numbattype.hpp"
 #include "ast/operatordecleration.hpp"
 #include "lexer.hpp"
 #include "module.hpp"
@@ -65,7 +70,7 @@ typedef ASTnode (*defBinaryImp)(AbstractSyntaxTree * ast, const string & func, c
 typedef lexer::tkstring::const_iterator tkitt;
 
 
-struct AbstractSyntaxTree {
+class AbstractSyntaxTree : public NumbatScope {
 	
 	public:
 		const bool buildSuccessfull () const {return !buildFail;}
@@ -77,15 +82,47 @@ struct AbstractSyntaxTree {
 		const std::vector <ASTnode> getBody () const {return body;}
 		string toString (const string & indent = "") const {
 			string str="";
-			for (auto & itt : types) {
+			for (auto & itt : extTypes) {
 				str += itt.first + " : " + itt.second->toString (indent) + "\n";
 			}
 			str += '\n';
-			for (auto & itt : functions) {
+			for (auto & itt : extFunctions) {
 				str += indent + "'" + itt.first + "' " + itt.second->toString (indent);
 			}
+			str += "\n" + NumbatScope::toString (indent);
 			return str;
 		}
+		
+		FunctionDecleration * MallocFunc () {
+			if (mallocFunc) return mallocFunc;
+			for (auto mod : dependencies) {
+				for (auto func : mod->getAST ()->functions) {
+					if (func.second->hasTag ("malloc")) return mallocFunc = func.second.get ();
+				}
+			}
+			for (auto func : functions) {
+				if (func.second->hasTag ("malloc")) return mallocFunc = func.second.get ();
+			}
+			return mallocFunc;
+		}
+		
+		FunctionDecleration * FreeFunc () {
+			if (freeFunc) return freeFunc;
+			for (auto mod : dependencies) {
+				for (auto func : mod->getAST ()->functions) {
+					if (func.second->hasTag ("free")) return freeFunc = func.second.get ();
+				}
+			}
+			for (auto func : functions) {
+				if (func.second->hasTag ("free")) return freeFunc = func.second.get ();
+			}
+			return freeFunc;
+		}
+		
+		virtual AbstractSyntaxTree * getAST () {return this;}
+		virtual ASTnode resolveSymbol (const string & iden) const;
+		
+		void importModule (const shared_ptr <Module> & module, bool extention);
 		
 		friend ASTnode defArithmetic (AbstractSyntaxTree *, const string &, const ASTnode &, const ASTnode &, tkitt);
 		friend ASTnode defAssign (AbstractSyntaxTree *, const string &, const ASTnode &, const ASTnode &, tkitt);
@@ -109,8 +146,12 @@ struct AbstractSyntaxTree {
 		
 		friend shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree *, const std::vector <ASTnode> &, const std::vector <shared_ptr <FunctionDecleration>> &, int);
 		
-		AbstractSyntaxTree () {}
+		AbstractSyntaxTree () : NumbatScope (&context) {}
 		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "", const string & file = "");
+		
+	protected:
+		
+		virtual const NumbatType * getType (const string & iden);
 		
 	private:
 		
@@ -120,7 +161,7 @@ struct AbstractSyntaxTree {
 		ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth=1);
 		ASTnode createTuple (const ASTnode & lhs, const ASTnode & rhs);
 		ASTnode parseAssembly (const string & type, const string & code);
-		ASTnode parseBody (tkitt end); // TODO: needs template info parem
+		ASTnode parseBody (tkitt end); // TODO: needs template info parameter?
 		ASTnode parseExpression (tkitt end);
 		ASTnode parseExpression (std::list <OperatorDecleration::OperatorMatch> & matches, tkitt end, const std::vector <ASTnode> * args = nullptr);
 		ASTnode parseNumericliteral (tkitt end);
@@ -130,7 +171,7 @@ struct AbstractSyntaxTree {
 		ASTnode parsePrimaryExpression (tkitt end, const std::vector <ASTnode> * args);
 		ASTnode parseStatment (tkitt end);
 		ASTnode parseType (tkitt end);
-		ASTnode resolveSymbol (const string & iden, ASTnode parent=nullptr);
+		//ASTnode resolveSymbol (const string & iden, ASTnode parent=nullptr);
 		
 		bool eatSemicolon (tkitt end) {if (itt->type == lexer::TOKEN::semicolon) return nextToken (end); return false;}
 		bool flushLine (tkitt end);
@@ -170,8 +211,8 @@ struct AbstractSyntaxTree {
 		
 		void addOperator (const string & pattern, const OperatorDecleration & oppdec);
 		void error (const string & message, tkitt end) {printError (message); flushLine (end);}
-		void importModule (const shared_ptr <Module> & module, bool extention);
 		void printError (const string & message) {buildFail = true; std::cerr << file << " >> error on line " << line << ": " << message << '\n';}
+		void parseEnum (tkitt end);
 		void parseImport (tkitt end);
 		void parseOperatorDecleration (tkitt end);
 		void parseTypeDef (tkitt end);
@@ -189,11 +230,11 @@ struct AbstractSyntaxTree {
 		
 		string path, file;
 		
-		std::map <string, shared_ptr <NumbatType>> types;
-		std::map <string, shared_ptr <NumbatVariable>> variables;
+		//std::map <string, shared_ptr <NumbatType>> types;
+		//std::map <string, shared_ptr <NumbatVariable>> variables;
 		std::map <string, shared_ptr <OperatorDecleration>> operators;
 		
-		std::multimap <string, shared_ptr <FunctionDecleration>> functions;
+		//std::multimap <string, shared_ptr <FunctionDecleration>> functions;
 		std::multimap <string, shared_ptr <OperatorDecleration>> operatorsByFirstToken;
 		
 		std::set <shared_ptr <Module>> dependencies;
@@ -204,6 +245,14 @@ struct AbstractSyntaxTree {
 		std::unordered_set <string> parenOpperators, oppTokens, ternaryStart;
 		
 		std::vector <ASTnode> body;
+		
+		ParsingContext context;
+		
+		std::map <string, NumbatType *> extTypes;
+		std::map <string, NumbatVariable *> extVariables;
+		std::multimap <string, FunctionDecleration *> extFunctions;
+		
+		FunctionDecleration * mallocFunc=nullptr, * freeFunc=nullptr;
 		
 };
 

@@ -24,30 +24,32 @@ struct mn {ref int64 t}
 extern def strlen @cstyle (ref int8 str) -> (int32)
 extern def sin @cstyle (double d) -> (double)
 
-def ' < ' @cstyle (int8 lhs, int8 rhs) -> (bool)
-	return asm 'numbat' : 'cmplt lhs, rhs'
 
-
-def redir (ref mn a, ref int64 t)
+def redir (ref mn a, ref int64 t) {
 	a.t => t
 	return
+}
 
-def func (int8 num) -> (int8)
+def func (int8 num) -> (int8) {
 	return num
+}
 
-def max (int8 a, int8 b) -> (int8)
+def max (int8 a, int8 b) -> (int8) {
 	bool cond = a < b
 	while (cond) {
 		return b
 	}
 	return a
+}
 
-def test () -> (int8)
+def test () -> (int8) {
 	int8 n = 90
 	return n
+}
 
-def swap (int8 lhs, int8 rhs) -> (int8, int8)
+def swap (int8 lhs, int8 rhs) -> (int8, int8) {
 	return rhs, lhs
+}
 
 def testFunc (int8 lhs, int8 rhs) -> (int8) {
 	#vec2 $<int8> vec
@@ -108,13 +110,14 @@ def cCallbackTest @cstyle () -> (int64) {
 extern def exit @cstyle (int32 e)
 
 int64 global = 10
+#enum ENUM : string {A="A", B="B", C="C"}
 
 def _start @cstyle () -> (int32) {
 	uint64 a = 3
 	while (0 < a) {
 		uint64 b = 3
 		while (0 < b) {
-			io.print ("(" + a + ", " + b + ")")
+			io.print ("(" ~ a ~ ", " ~ b ~ ")")
 			b = b - 1
 		}
 		a = a - 1
@@ -138,17 +141,17 @@ def _start @cstyle () -> (int32) {
 	os.write (fh, arr)
 	#os.write (0, "Text\n\n", 6)
 	string str
-	str = "Hello again\n" + "and again\n"
+	str = "Hello again\n" ~ "and again\n"
 	string k
 	k = "totally a string: "
 	string l
-	#str = "Hello again\n" + "and again\n"
-	#io.print ("Hello again\n" + "and again\n")
-	io.print (string ("string\n" + "Another string\n"))
-	l = k + str
+	#str = "Hello again\n" ~ "and again\n"
+	#io.print ("Hello again\n" ~ "and again\n")
+	io.print (string ("string\n" ~ "Another string\n"))
+	l = k ~ str
 	io.print ("just a raw string\n")
-	io.print (k + str)
-	io.print (l + 42 + "\n")
+	io.print (k ~ str)
+	io.print (l ~ 42 ~ "\n")
 	#strlib.string ("str\n")
 	#io.print (str)
 	exit (0)
@@ -156,4 +159,6 @@ def _start @cstyle () -> (int32) {
 	return l
 }
 
+io.print ("Test string" ~ " more letters")
+io.print (io.scan () ~ "\n")
 _start ()

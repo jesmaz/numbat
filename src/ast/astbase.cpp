@@ -1,9 +1,34 @@
-#include "../include/ast/astbody.hpp"
-#include "../include/ast/aststructindex.hpp"
+#include "../include/ast/asterror.hpp"
+#include "../include/ast/control/astbody.hpp"
+#include "../include/ast/memory/aststructindex.hpp"
 
 namespace numbat {
 namespace parser {
 
+
+ASTnode ASTbase::resolveSymbol (const string & iden, const ASTnode & exp) {
+	ASTnode val = nullptr;
+	auto type = exp->getType ();
+	if (type) {
+		auto index = type->findMember (iden);
+		if (0 <= index) {
+			ASTnode mem = type->getMembers() [index];
+			if (mem->isGlobal ()) {
+				val = mem;
+			} else {
+				val = ASTnode (new ASTstructIndex (index, exp));
+			}
+		}
+	}
+	if (!val) {
+		val = exp->resolveSymbol (iden);
+	}
+	return val;
+}
+
+ASTnode ASTbase::resolveSymbol (const string & iden) const {
+	return ASTnode (new ASTerror ("'" + iden + "' could not be resolved"));
+}
 
 const ASTnode ASTbase::getLength (const ASTnode & exp) {
 	

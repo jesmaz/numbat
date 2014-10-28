@@ -61,8 +61,6 @@ class Numbat {
 		void loadFromCode (const std::string & code);
 		void loadFromFile (const std::string & file);
 		void loadFromModule (const shared_ptr <parser::Module> & mod);
-		void loadFromStream (std::istream & is);
-		void loadFromTokenStr (const tkstring & tkns);
 		
 		template <typename T>
 		void registerFunction (FunctionType * ft, const std::string & name, T funcPtr) {engine->addGlobalMapping (Function::Create (ft, Function::ExternalLinkage, name, module), reinterpret_cast <void *> (funcPtr));}
