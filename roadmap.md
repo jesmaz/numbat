@@ -7,13 +7,11 @@
 ##Version 0.2##
  - [x] 'as' operator
  - [x] Enums
- - [ ] File I/O
  - [ ] Function auto return
  - [x] if/else statement
  - [x] ptrint casting
    - [x] Arrays
    - [x] References
- - [ ] Socket I/O (TCP and UDP only)
  - [x] Type meta data
 
 ##Version 0.2.1##
@@ -27,6 +25,8 @@
 
 ##Version 0.3##
  - [ ] Destructors
+ - [ ] File I/O
+ - [ ] Socket I/O (TCP and UDP only)
  - [ ] Smart pointers (reference counting)
 
 ##Version 0.3.1##
