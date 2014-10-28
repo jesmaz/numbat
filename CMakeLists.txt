@@ -18,6 +18,7 @@ set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -pthread ${LLVM_FLAGS}")
 
 
 set(sources ${sources} "src/ast.cpp")
+set(sources ${sources} "src/cast.cpp")
 set(sources ${sources} "src/core.cpp")
 set(sources ${sources} "src/generator.cpp")
 set(sources ${sources} "src/lexer.cpp")
@@ -41,8 +42,10 @@ add_library(numbat-static STATIC ${sources})
 
 set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl)
 
-add_executable(numbat ${sources})
+add_executable(numbat ${sources} src/main.cpp)
+add_executable(parsertest ${sources} test/parserTest.cpp)
 target_link_libraries(numbat ${libs})
+target_link_libraries(parsertest ${libs})
 
 install(FILES numbat.xml DESTINATION /usr/share/kde4/apps/katepart/syntax/)
 install(DIRECTORY "libnbt/" DESTINATION /usr/include/numbat)
