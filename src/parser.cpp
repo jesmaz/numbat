@@ -428,8 +428,9 @@ void parseBodyInline (Position pos, NumbatScope * scope) {
 				break;
 				
 			case TOKEN::enumtkn:
-				//TODO: register enum
-				//TODO: future-parse enum body
+				if (void * data = parseEnumDecleration (exp, scope)) {
+					futureType.push_back (std::make_pair (futureEnum, data));
+				}
 				break;
 				
 			case TOKEN::externdef:
@@ -454,6 +455,11 @@ void parseBodyInline (Position pos, NumbatScope * scope) {
 				break;
 		}
 		pos += exp;
+	}
+	
+	
+	for (auto e : futureType) {
+		e.first (e.second);
 	}
 	
 	
@@ -482,11 +488,6 @@ void parseBodyInline (Position pos, NumbatScope * scope) {
 				break;
 		}
 		pos += exp;
-	}
-	
-	
-	for (auto e : futureType) {
-		e.first (e.second);
 	}
 	
 	for (auto e : futureBody) {
@@ -523,6 +524,50 @@ void parseModule (Position pos, NumbatScope * scope) {
 	parseBodyInline (pos, scope);
 }
 
+void * futureEnum (void * data) {
+	
+	std::tuple <Position, NumbatScope *, NumbatEnumType *> * params = reinterpret_cast <std::tuple <Position, NumbatScope *, NumbatEnumType *> *> (data);
+	Position pos = std::get <0> (*params);
+	NumbatScope * scope = std::get <1> (*params);
+	NumbatEnumType * enumType = std::get <2> (*params);
+	std::vector <ASTnode> args;
+	ASTnode type (new ASTtype (false, false, enumType->getBaseType ()));
+	ASTnode val (new ASTvariable (createVariable (scope, ASTnode (type), nullptr, "init value", true, true)));
+	while (Position exp = nextArg (pos)) {
+		//args.push_back (parseExpression (exp, scope));
+		string iden = exp.itt->iden;
+		++exp;
+		//TODO: string (regex?) initialisers
+		if (exp.itt->type == TOKEN::symbol and exp.itt->iden == "=") {
+			++exp;
+			val = createStaticCast (parseExpression (exp, scope), type);
+		}
+		ASTnode arg (new ASTvariable (createVariable (scope, ASTnode (new ASTtype (false, true, enumType->getBaseType ())), val, iden, true, false)));
+		args.push_back (arg);
+		pos += exp;
+		if (val->getType ()) {
+			auto methods = val->getType ()->getMethods ("++ ");
+			if (!methods.empty ()) {
+				val = findBestMatch ({val}, methods);
+			} else {
+				ASTnode num;
+				if (val->getType ()->isFloat ()) {
+					num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, val->getType ())), "1.0"));
+				} else {
+					num = ASTnode (new ASTconstantInt (ASTnode (new ASTtype (false, true, val->getType ())), 1));
+				}
+				auto methods = val->getType ()->getMethods (" + ");
+				if (!methods.empty ()) {
+					val = findBestMatch ({val, num}, methods);
+				} else {
+					val = defArithmetic (scope, " + ", {val, num});
+				}
+			}
+		}
+	}
+	enumType->buildData (args);
+	
+}
 
 void * futureFunc (void * data) {
 	
@@ -540,6 +585,47 @@ void * futureStruct (void * data) {
 	std::get <2> (*args)->buildData (parseArgs (std::get <0> (*args), std::get <1> (*args)));
 	delete args;
 	return nullptr;
+	
+}
+
+void * parseEnumDecleration (Position pos, NumbatScope * scope) {
+	
+	++pos;//eat enum token
+	if (pos.itt->type != TOKEN::identifier) {
+		std::cout << "Not an identifier" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
+	const string & iden = pos.itt->iden;
+	std::set <string> tags;
+	while (++pos and pos.itt->type == TOKEN::atsym) {
+		tags.insert ((++pos).itt->iden);
+	}
+	const NumbatType * type;
+	if (pos.itt->type == TOKEN::colon) {
+		++pos;
+		Position primPos (pos.itt, findToken (pos.itt, pos.end, TOKEN::symbol, "{"));
+		ASTnode primary = parseExpression (primPos, scope);
+		type = primary->getType ();
+		pos.itt = primPos.end;
+	} else {
+		type = getType (scope, "uint32");
+	}
+	if (pos.itt->type != TOKEN::symbol or pos.itt->iden != "{") {
+		std::cout << "Expected a '{'" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
+	tkitt end = findToken (pos.itt, pos.end, TOKEN::symbol, "}");
+	
+	NumbatEnumType * enumType = createEnum (scope, iden, type, tags);
+	if (enumType) {
+		return (void *) new std::tuple <Position, NumbatScope *, NumbatEnumType *> (Position (pos.itt + 1, end), createChild (scope), enumType);
+	} else {
+		std::cout << "Failed to register" << std::endl;
+		std::cout << "'" << pos.itt->iden << "'" << std::endl;
+		return nullptr;
+	}
 	
 }
 

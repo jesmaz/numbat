@@ -34,8 +34,10 @@ void parseImport (Position pos, NumbatScope * scope);
 void parseModule (Position pos, NumbatScope * scope);
 void parseTypeDef (Position pos, NumbatScope * scope);
 
+void * futureEnum (void *);
 void * futureFunc (void *);
 void * futureStruct (void *);
+void * parseEnumDecleration (Position pos, NumbatScope * scope);
 void * parseFunctionDecleration (Position pos, NumbatScope * scope);
 void * parseStructDecleration (Position pos, NumbatScope * scope);
 
