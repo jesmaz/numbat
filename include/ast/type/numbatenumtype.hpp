@@ -10,7 +10,7 @@ namespace parser {
 
 class NumbatEnumType : public NumbatType {
 	public:
-		const shared_ptr <NumbatType> & getBaseType () const {return baseType;}
+		const NumbatType * getBaseType () const {return baseType;}
 		virtual const ASTnode getArrayType () const {return baseType->getArrayType ();}
 		virtual const bool isArray () const {return false;}
 		virtual const bool isValid () const {return NumbatType::isValid () and baseType->isValid ();}
@@ -20,9 +20,9 @@ class NumbatEnumType : public NumbatType {
 		virtual string toString (const string & indent = "") const {return indent + "enum " + NumbatType::toString ();}
 		
 		NumbatEnumType () {}
-		NumbatEnumType (const string & iden, const shared_ptr <NumbatType> & baseType, const std::set <string> & meta, FunctionDecleration * mallocFunc, FunctionDecleration *  freeFunc) : NumbatType (iden, meta, mallocFunc, freeFunc), baseType (baseType) {}
+		NumbatEnumType (const string & iden, const NumbatType * baseType, const std::set <string> & meta, FunctionDecleration * mallocFunc, FunctionDecleration *  freeFunc) : NumbatType (iden, meta, mallocFunc, freeFunc), baseType (baseType) {}
 	private:
-		shared_ptr <NumbatType> baseType;
+		const NumbatType * baseType;
 };
 
 
