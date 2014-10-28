@@ -4,6 +4,7 @@
  - Global variables are now initialised correctly
 ###Features###
  - as operator added (overloading not supported yet)
+ - enums
  - if and else if statements added
  - ptrint reinterpret casting (using as operator)
  - Type meta data
