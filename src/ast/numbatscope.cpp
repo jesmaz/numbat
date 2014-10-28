@@ -76,6 +76,9 @@ bool NumbatScope::isValid () const {
 		for (const auto & n : children) {
 			valid &= n->isValid ();
 		}
+		for (const auto & n : types) {
+			valid &= n.second->isValid ();
+		}
 	} else {
 		return 0 < valid;
 	}
@@ -172,6 +175,19 @@ FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const stri
 		func = nullptr;
 	}
 	return func;
+	
+}
+
+NumbatEnumType * createEnum (NumbatScope * scope, const string & iden, const NumbatType * baseType, const std::set <string> & meta) {
+	
+	NumbatEnumType * nt = new NumbatEnumType (iden, baseType, meta, scope->getAST ()->MallocFunc (), scope->getAST ()->FreeFunc ());
+	if (!scope->registerSymbol (iden, nt)) {
+		delete nt;
+		nt = nullptr;
+	} else {
+		scope->enums.insert (nt);
+	}
+	return nt;
 	
 }
 

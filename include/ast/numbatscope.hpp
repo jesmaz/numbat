@@ -8,6 +8,7 @@
 #include "memory/astvariable.hpp"
 #include "memory/numbatvariable.hpp"
 #include "type/asttype.hpp"
+#include "type/numbatenumtype.hpp"
 #include "type/numbatpointertype.hpp"
 #include "type/numbatrawtype.hpp"
 #include "../context.hpp"
@@ -25,6 +26,7 @@ class NumbatScope : public ASTbase {
 	public:
 		
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
+		const std::set <NumbatEnumType *> & getEnums () const {return enums;}
 		const std::vector <ASTnode> & getBody () const {return body;}
 		
 		virtual AbstractSyntaxTree * getAST () {return parent->getAST();}
@@ -42,6 +44,7 @@ class NumbatScope : public ASTbase {
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
 		friend FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags);
+		friend NumbatEnumType * createEnum (NumbatScope * scope, const string & iden, const NumbatType * baseType, const std::set <string> & meta);
 		friend NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
 		friend NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set <string> & meta);
 		friend NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t dimentions);
@@ -76,6 +79,7 @@ class NumbatScope : public ASTbase {
 		
 	private:
 		std::set <ASTnode> nodes;
+		std::set <NumbatEnumType *> enums;
 		std::set <unique_ptr <NumbatScope>> children;
 		
 		std::vector <ASTnode> body;
@@ -95,6 +99,7 @@ inline ParsingContext * getContext (NumbatScope * scope) {return scope->context;
 std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 
 FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags);
+NumbatEnumType * createEnum (NumbatScope * scope, const string & iden, const NumbatType * baseType, const std::set <string> & meta);
 NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
 NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set <string> & meta);
 NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t dimentions);
