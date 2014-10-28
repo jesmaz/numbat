@@ -38,6 +38,7 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual bool isArray () const {return false;}
 		virtual bool isCallable () const {return false;}
 		virtual bool isConst () const {return false;}
+		virtual bool isGlobal () const {return false;}
 		virtual bool isList () const {return false;}
 		virtual bool isNil () const {return false;}
 		virtual bool isParsed () const=0;

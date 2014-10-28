@@ -12,7 +12,12 @@ ASTnode ASTbase::resolveSymbol (const string & iden, const ASTnode & exp) {
 	if (type) {
 		auto index = type->findMember (iden);
 		if (0 <= index) {
-			val = ASTnode (new ASTstructIndex (index, exp));
+			ASTnode mem = type->getMembers() [index];
+			if (mem->isGlobal ()) {
+				val = mem;
+			} else {
+				val = ASTnode (new ASTstructIndex (index, exp));
+			}
 		}
 	}
 	if (!val) {
