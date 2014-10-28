@@ -24,7 +24,8 @@ void Numbat::loadFromModule (const shared_ptr <parser::Module> & mod) {
 	mpm.add (createFunctionInliningPass ());
 	mpm.run (*module);
 	for (Function & func : module->getFunctionList ()) {
-		fpm.run (func);
+		//Commented out due to bug
+		//fpm.run (func);
 	}
 }
 
