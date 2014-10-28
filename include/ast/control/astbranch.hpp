@@ -16,6 +16,7 @@ class ASTbranch : public ASTbase {
 		const ASTnode & getBody () const {return body;}
 		const ASTnode & getAlt () const {return alt;}
 		virtual bool isParsed () const {return cond->isParsed () and body->isParsed () and alt->isParsed ();}
+		virtual bool isReturned () const {return body->isReturned () and alt->isReturned ();}
 		virtual bool isValid () const {return cond->isValid () and body->isValid () and alt->isValid ();}
 		virtual size_t calculateWeight () const {return cond->calculateWeight () + std::max (body->calculateWeight (), alt->calculateWeight ());}
 		virtual string getIden () const {return "branch";}

@@ -17,6 +17,7 @@ class ASTreturn : public ASTbase {
 		virtual bool isAlias () const {return expr->isAlias ();}
 		virtual bool isConst () const {return expr->isConst ();}
 		virtual bool isParsed () const {return expr->isParsed ();}
+		virtual bool isReturned () const {return true;}
 		virtual bool isValid () const {return expr->isValid ();}
 		virtual const NumbatType * getType () const {return expr->getType ();}
 		virtual size_t calculateWeight () const {return expr->calculateWeight ();}
@@ -34,6 +35,7 @@ class ASTreturnvoid : public ASTbase {
 	VISITABLE
 	public:
 		virtual bool isParsed () const {return true;}
+		virtual bool isReturned () const {return true;}
 		virtual bool isValid () const {return true;}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return 0;}

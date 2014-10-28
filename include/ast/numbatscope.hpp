@@ -33,6 +33,7 @@ class NumbatScope : public ASTbase {
 		virtual const ASTnode getASTType () const {return body.empty () ? nullptr : body.back ()->getASTType ();}
 		virtual ASTnode resolveSymbol (const string & iden) const;
 		virtual bool isParsed () const;
+		virtual bool isReturned () const {return body.empty () ? false : body.back ()->isReturned ();}
 		virtual bool isValid () const;
 		virtual const NumbatType * getType () const {return body.empty () ? nullptr : body.back ()->getType ();}
 		virtual size_t calculateWeight () const;
