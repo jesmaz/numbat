@@ -22,7 +22,7 @@ class ASTvariable : public ASTbase {
 		virtual bool isConst () const {return variable->isConst ();}
 		virtual bool isGlobal () const {return variable->isGlobal ();}
 		virtual bool isParsed () const {return true;}
-		virtual bool isValid () const {return variable->getType ()->isValid () and (!variable->getInit () or variable->getInit ()->isValid ());}
+		virtual bool isValid () const {return variable->getType () and variable->getType ()->isValid () and (!variable->getInit () or variable->getInit ()->isValid ());}
 		virtual const NumbatType * getType () const {return variable->getType ();}
 		virtual size_t calculateWeight () const {return 1;}
 		virtual size_t getBitSize () const {return variable->getSize ();}
