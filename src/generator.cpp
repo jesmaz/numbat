@@ -995,6 +995,12 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 
 void BodyGenerator::visit (NumbatScope & exp) {
 	
+	for (NumbatEnumType * et : exp.getEnums ()) {
+		for (const auto & node : et->getMembers ()) {
+			getValue (node);
+		}
+	}
+	
 	Value * val = nullptr;
 	for (const auto & node : exp.getBody ()) {
 		val = getValue (node);
