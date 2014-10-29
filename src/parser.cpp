@@ -36,28 +36,6 @@ ASTnode parseExpression (Position pos, NumbatScope * scope) {
 ASTnode parseExpression (Position pos, NumbatScope * scope, std::list <OperatorDecleration::OperatorMatch> matches) {
 	
 	matches.remove_if ([&pos](const OperatorDecleration::OperatorMatch & arg){return pos.itt > arg.ptrs.front() or arg.ptrs.back() >= pos.end;});
-	std::cout << pos.itt->line << ":";
-	for (auto itt = pos.itt; itt != pos.end; ++itt) {
-		bool t = false;
-		size_t i = 0;
-		for (auto match : matches) {
-			for (auto ptr : match.ptrs) {
-				t = t or ptr == itt;
-				if (ptr == itt) ++i;
-			}
-		}
-		if (t) {
-			std::cout << " " << i << itt->iden << i;
-		} else {
-			std::cout << " '" << itt->iden << "'";
-		}
-	}
-	std::cout << std::endl;
-	std::cout << pos.itt->line << ":";
-	for (auto match : matches) {
-		std::cout << " '" << match.opp->getPattern () << "'";
-	}
-	std::cout << std::endl;
 	if (matches.size () == 0) return parsePrimaryExpression (pos, scope);
 	
 	matches.sort (&OperatorDecleration::OperatorMatch::treeOrder);
@@ -70,7 +48,6 @@ ASTnode parseExpression (Position pos, NumbatScope * scope, std::list <OperatorD
 		if (node and node->isParsed ()) {
 			break;
 		}
-		std::cout << node->toString () << std::endl;
 		
 	}
 	

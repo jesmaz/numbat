@@ -206,8 +206,6 @@ ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const
 	}
 	
 	if (!lhs->isValid () or !rhs->isValid () or !lhs->getType () or !rhs->getType ()) {
-		std::cout << typeid (*lhs.get ()).name () << " " << lhs->getType () << " " << lhs->toString () << std::endl;
-		std::cout << typeid (*rhs.get ()).name () << " " << rhs->getType () << " " << rhs->toString () << std::endl;
 		return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
 	}
 	
@@ -246,22 +244,6 @@ ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector
 	}
 	
 	if (!lhs->isValid () or !rhs->isValid () or !lhs->getType () or !rhs->getType ()) {
-		if (lhs->getType ()) std::cout << lhs->getType ()->toString () << std::endl;
-		if (rhs->getType ()) std::cout << rhs->getType ()->toString () << std::endl;
-		std::cout << typeid (*lhs.get ()).name () << " " << lhs->toString () << std::endl;
-		std::cout << typeid (*rhs.get ()).name () << " " << rhs->toString () << std::endl;
-		std::cout << std::boolalpha << lhs->isValid () << std::endl;
-		std::cout << std::boolalpha << rhs->isValid () << std::endl;
-		std::cout << func << std::endl;
-		if (ASTcallindex * index = dynamic_cast <ASTcallindex *> (lhs.get ())) {
-			std::cout << typeid (*(index->getCall ())).name () << " " << index->getCall ()->toString () << std::endl;
-			if (ASTcall * call = dynamic_cast <ASTcall *> (index->getCall ())) {
-				std::cout << typeid (*(call->getCallee ().get ())).name () << " " << call->getCallee ()->toString () << std::endl;
-			}
-		}
-		if (ASTcallindex * index = dynamic_cast <ASTcallindex *> (rhs.get ())) {
-			std::cout << typeid (*(index->getCall ())).name () << index->getCall ()->isValid () << std::endl;
-		}
 		return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
 	}
 	
@@ -269,7 +251,6 @@ ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector
 	std::copy (rhsCand.begin (), rhsCand.end (), std::back_inserter (candidates));
 	auto callable = findBestMatch (std::vector <ASTnode> {lhs, rhs}, candidates);
 	
-	std::cout << callable->toString () <<std::endl;
 	if (callable->isValid ()) {
 		giveNode (scope, callable);
 		return callable->getList ().front ();
@@ -287,10 +268,6 @@ ASTnode parseBlockOperator (NumbatScope * scope, const string & func, const std:
 		case 0:
 			return ASTnode (new ASTnil);
 		case 1:
-			std::cout << '\n';
-			for (tkitt itt = args[0].itt; itt != args[0].end; ++itt)
-				std::cout << itt->iden;
-			std::cout << std::endl;
 			return parseBody (args [0], scope);
 		default:
 			return ASTnode (new ASTerror ("Something went wrong"));
@@ -300,13 +277,6 @@ ASTnode parseBlockOperator (NumbatScope * scope, const string & func, const std:
 
 ASTnode parseCall (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	std::cout << "CALL: ";
-	for (auto arg : args) {
-		for (auto itt = arg.itt; itt != arg.end; ++itt) {
-			std::cout << "'" << itt->iden << "'";
-		}
-	}
-	std::cout << std::endl;
 	std::vector <ASTnode> params;
 	ASTnode exp;
 	std::vector <FunctionDecleration *> candidates;
