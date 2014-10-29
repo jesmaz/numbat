@@ -532,7 +532,7 @@ void * futureEnum (void * data) {
 	NumbatEnumType * enumType = std::get <2> (*params);
 	std::vector <ASTnode> args;
 	ASTnode type (new ASTtype (false, false, enumType->getBaseType ()));
-	ASTnode val (new ASTvariable (createVariable (scope, ASTnode (type), nullptr, "init value", true, true)));
+	ASTnode val (new ASTvariable (createVariable (scope, type, nullptr, "init value", true, false)));
 	while (Position exp = nextArg (pos)) {
 		//args.push_back (parseExpression (exp, scope));
 		string iden = exp.itt->iden;
@@ -542,8 +542,8 @@ void * futureEnum (void * data) {
 			++exp;
 			val = createStaticCast (parseExpression (exp, scope), type);
 		}
-		ASTnode arg (new ASTvariable (createVariable (scope, ASTnode (new ASTtype (false, true, enumType->getBaseType ())), val, iden, true, false)));
-		args.push_back (arg);
+		val = ASTnode (new ASTvariable (createVariable (scope, type, val, iden, true, false)));
+		args.push_back (val);
 		pos += exp;
 		if (val->getType ()) {
 			auto methods = val->getType ()->getMethods ("++ ");
