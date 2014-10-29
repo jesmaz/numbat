@@ -15,7 +15,8 @@
  - [x] Type meta data
 
 ##Version 0.2.1##
- - [ ] Clean-up output
+ - [x] Clean-up output
+ - [x] Fix bug preventing enums being used in standalone executables
  - [ ] Print error nodes as errors and end compilation
 
 ##Version 0.2.2##
