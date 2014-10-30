@@ -30,9 +30,9 @@ class ASTreinterpretCast : public ASTbase {
 		virtual string getIden () const {return "AST reinterpret";}
 		virtual string toString (const string & indent = "") const {return indent + arg->toString () + " as " + type->toString ();}
 		
-		ASTreinterpretCast () {}
-		ASTreinterpretCast (const ASTnode & arg, const ASTnode & type) : arg (arg), type (type), loadSrc (false) {}
-		ASTreinterpretCast (const ASTnode & arg, const ASTnode & type, bool loadSource) : arg (arg), type (type), loadSrc (loadSource) {}
+		ASTreinterpretCast (size_t lineNo) : ASTbase (lineNo) {}
+		ASTreinterpretCast (size_t lineNo, const ASTnode & arg, const ASTnode & type) : ASTbase (lineNo), arg (arg), type (type), loadSrc (false) {}
+		ASTreinterpretCast (size_t lineNo, const ASTnode & arg, const ASTnode & type, bool loadSource) : ASTbase (lineNo), arg (arg), type (type), loadSrc (loadSource) {}
 	private:
 		ASTnode arg, type;
 		bool loadSrc;

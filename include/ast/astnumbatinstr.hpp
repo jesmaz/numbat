@@ -22,8 +22,8 @@ class ASTnumbatInstr : public ASTbase {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const;
 		
-		ASTnumbatInstr () {}
-		ASTnumbatInstr (const string & instr, const std::vector <ASTnode> & args, const ASTnode & type) : instr (instr), args (args), type (type) {}
+		ASTnumbatInstr (size_t lineNo) : ASTbase (lineNo) {}
+		ASTnumbatInstr (size_t lineNo, const string & instr, const std::vector <ASTnode> & args, const ASTnode & type)  : ASTbase (lineNo), instr (instr), args (args), type (type) {}
 	private:
 		string instr;
 		std::vector <ASTnode> args;

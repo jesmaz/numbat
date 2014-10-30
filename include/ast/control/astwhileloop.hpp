@@ -21,8 +21,8 @@ class ASTwhileloop : public ASTbase {
 		virtual string getIden () const {return "while";}
 		virtual string toString (const string & indent = "") const {return indent + "while " + condition->toString () + ":\n" + body->toString (indent + '\t');}
 		
-		ASTwhileloop () {}
-		ASTwhileloop (const ASTnode & condition, const ASTnode & body) : condition (condition), body (body) {}
+		ASTwhileloop (size_t lineNo) : ASTbase (lineNo) {}
+		ASTwhileloop (size_t lineNo, const ASTnode & condition, const ASTnode & body) : ASTbase (lineNo), condition (condition), body (body) {}
 	private:
 		ASTnode condition, body;
 };

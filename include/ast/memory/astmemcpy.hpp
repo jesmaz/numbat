@@ -27,8 +27,8 @@ class ASTmemcpy : public ASTbase {
 		virtual string getIden () const {return dest->getIden ();}
 		virtual string toString (const string & indent = "") const {return indent + dest->toString () + " = " + source->toString ();}
 		
-		ASTmemcpy () {}
-		ASTmemcpy (const ASTnode & dest, const ASTnode & source, const shared_ptr <ASTcallable> & conv = nullptr) :dest (dest),  source (source), conv (conv) {}
+		ASTmemcpy (size_t lineNo) : ASTbase (lineNo) {}
+		ASTmemcpy (size_t lineNo, const ASTnode & dest, const ASTnode & source, const shared_ptr <ASTcallable> & conv = nullptr) : ASTbase (lineNo), dest (dest),  source (source), conv (conv) {}
 	private:
 		ASTnode dest, source;
 		shared_ptr <ASTcallable> conv;

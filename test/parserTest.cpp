@@ -90,7 +90,7 @@ int main () {
 	if (!createRawType (ast, "int32", 32, NumbatRawType::SIGNED)) return 1;
 	if (!createRawType (ast, "uint64", 64, NumbatRawType::UNSIGNED)) return 1;
 	if (!createRawType (ast, "double", 64, NumbatRawType::FLOAT)) return 1;
-	ASTnode intType (new ASTtype (false, false, getType (ast, "int32")));
+	ASTnode intType (new ASTtype (0, false, false, getType (ast, "int32")));
 	for (char c = 'a'; c <= 'z'; ++c) {
 		createVariable (ast, intType, nullptr, (string () + c), false, false);
 	}

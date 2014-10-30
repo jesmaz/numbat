@@ -44,16 +44,16 @@ ASTnode defArithmetic (NumbatScope * scope, const string & func, const std::vect
 		
 		auto itt = instructions.find (func);
 		string instr = (args [0]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
-		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({args [0], createStaticCast (args [1], args [0], 1)}), args [0]));
+		return ASTnode (new ASTnumbatInstr (args [0]->getLineNo (), instr, std::vector <ASTnode> ({args [0], createStaticCast (args [1], args [0], 1)}), args [0]));
 		
 	} else if (args [1]->getType () and args [1]->getType ()->isRaw ()) {
 		
 		auto itt = instructions.find (func);
 		string instr = (args [1]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
-		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({createStaticCast (args [0], args [1], 1), args [1]}), args [1]));
+		return ASTnode (new ASTnumbatInstr (args [0]->getLineNo (), instr, std::vector <ASTnode> ({createStaticCast (args [0], args [1], 1), args [1]}), args [1]));
 		
 	} else {
-		return ASTnode (new ASTerror ("No suitable function found"));
+		return ASTnode (new ASTerror (args [0]->getLineNo (), "No suitable function found"));
 	}
 	
 }
@@ -61,8 +61,8 @@ ASTnode defArithmetic (NumbatScope * scope, const string & func, const std::vect
 ASTnode defAs (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
 	
 	//TODO: determine is cast makes sense
-	ASTnode type (new ASTtype (!(args [1]->getType ()->isArray () or args [1]->getType ()->getIden () == "ptrint"), args [1]->isConst (), args [1]->getType ()));
-	return ASTnode (new ASTreinterpretCast (args [0], type, args [0]->getType ()->isArray () or args [0]->getType ()->getIden () == "ptrint"));
+	ASTnode type (new ASTtype (args [0]->getLineNo (), !(args [1]->getType ()->isArray () or args [1]->getType ()->getIden () == "ptrint"), args [1]->isConst (), args [1]->getType ()));
+	return ASTnode (new ASTreinterpretCast (args [0]->getLineNo (), args [0], type, args [0]->getType ()->isArray () or args [0]->getType ()->getIden () == "ptrint"));
 	
 }
 
@@ -70,36 +70,36 @@ ASTnode defCompare (NumbatScope * scope, const string & func, const std::vector<
 	
 	const NumbatType * nType = getType (scope, "bool");
 	if (!nType) {
-		return ASTnode (new ASTerror ("'bool' is not declared"));
+		return ASTnode (new ASTerror (args [0]->getLineNo (), "'bool' is not declared"));
 	}
-	ASTnode type (new ASTtype (false, true, nType));
+	ASTnode type (new ASTtype (args [0]->getLineNo (), false, true, nType));
 	if (args [0]->getType () and args [0]->getType ()->isRaw ()) {
 		
 		auto itt = instructions.find (func);
 		string instr = (args [0]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
-		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({args [0], createStaticCast (args [1], args [0], 1)}), type));
+		return ASTnode (new ASTnumbatInstr (args [0]->getLineNo (), instr, std::vector <ASTnode> ({args [0], createStaticCast (args [1], args [0], 1)}), type));
 		
 	} else if (args [1]->getType () and args [1]->getType ()->isRaw ()) {
 		
 		auto itt = instructions.find (func);
 		string instr = (args [1]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
-		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({createStaticCast (args [0], args [1], 1), args [1]}), type));
+		return ASTnode (new ASTnumbatInstr (args [0]->getLineNo (), instr, std::vector <ASTnode> ({createStaticCast (args [0], args [1], 1), args [1]}), type));
 		
 	} else {
-		return ASTnode (new ASTerror ("No suitable function found"));
+		return ASTnode (new ASTerror (args [0]->getLineNo (), "No suitable function found"));
 	}
 	
 }
 
 ASTnode defConcat (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
 	
-	return ASTnode (new ASTconcat (args [0], args [1]));
+	return ASTnode (new ASTconcat (args [0]->getLineNo (), args [0], args [1]));
 	
 }
 
-ASTnode defLogic (NumbatScope * scope, const string & func, const std::vector< ASTnode > & args) {
+ASTnode defLogic (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
 	
-	return ASTnode (new ASTerror ("Logical operators are not yet implemented"));
+	return ASTnode (new ASTerror (args [0]->getLineNo (), "Logical operators are not yet implemented"));
 	
 }
 
@@ -108,9 +108,9 @@ ASTnode defNegation (NumbatScope * scope, const string & func, const std::vector
 	if (args [0]->getType () and args [0]->getType ()->isRaw ()) {
 		auto itt = instructions.find (func);
 		string instr = (args [0]->getType ()->isFloat () ? "f" : "") + (itt != instructions.end () ? itt->second : "");
-		return ASTnode (new ASTnumbatInstr (instr, std::vector <ASTnode> ({args [0]}), args [0]));
+		return ASTnode (new ASTnumbatInstr (args [0]->getLineNo (), instr, std::vector <ASTnode> ({args [0]}), args [0]));
 	} else {
-		return ASTnode (new ASTerror ("No suitable function found"));
+		return ASTnode (new ASTerror (args [0]->getLineNo (), "No suitable function found"));
 	}
 	
 }
@@ -121,7 +121,7 @@ ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const s
 	std::vector <ASTnode> dimentions;
 	switch (args.size ()) {
 		case 2:
-			dimentions.push_back (ASTnode (new ASTnil ()));
+			dimentions.push_back (ASTnode (new ASTnil (args [0].itt->line)));
 			break;
 		case 3: {
 			Position pos = args [1];
@@ -129,14 +129,14 @@ ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const s
 				if (exp) {
 					dimentions.push_back (parseExpression (exp, scope));
 				} else {
-					dimentions.push_back (ASTnode (new ASTnil ()));
+					dimentions.push_back (ASTnode (new ASTnil (args [0].itt->line)));
 				}
 				pos += exp;
 			}
 			break;
 		}
 		default:
-			return ASTnode (new ASToperatorError ("Array decelerations require 2 or 3 arguments"));
+			return ASTnode (new ASToperatorError (0, "Array decelerations require 2 or 3 arguments"));
 	}
 	
 	if (args.back ().itt->type != lexer::TOKEN::identifier) {
@@ -153,7 +153,7 @@ ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const s
 		return generateError (args.front (), "Type expected");
 	}
 	
-	ASTnode type (new ASTtype (typeNode->isAlias (), typeNode->isConst (), getArrayType (scope, typeNode->getType (), dimentions.size ())));
+	ASTnode type (new ASTtype (args [0].itt->line, typeNode->isAlias (), typeNode->isConst (), getArrayType (scope, typeNode->getType (), dimentions.size ())));
 	
 	bool nil = false;
 	for (ASTnode & node : dimentions) {
@@ -163,21 +163,22 @@ ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const s
 		}
 	}
 	
+	size_t line = args [0].itt->line;
 	ASTnode init = nullptr;
 	if (!nil and !dimentions.empty ()) {
 		std::list <ASTnode> args;
 		args.push_back (dimentions [0]);
 		for (size_t i=1; i<dimentions.size (); ++i) {
-			args.push_back (ASTnode (new ASTnumbatInstr ("mul", {args.back (), dimentions [i]}, dimentions [0])));
+			args.push_back (ASTnode (new ASTnumbatInstr (line, "mul", {args.back (), dimentions [i]}, dimentions [0])));
 		}
-		args.push_front (ASTnode (new ASTallocate (args.back (), type->getType ())));
-		init = ASTnode (new ASTtuple (args));
+		args.push_front (ASTnode (new ASTallocate (line, args.back (), type->getType ())));
+		init = ASTnode (new ASTtuple (line, args));
 	}
 	NumbatVariable * var = createVariable (scope, type, init, iden, false, false);
 	if (!var) {
 		return generateError (args.back (), "'" + iden + "' already declared in this scope");
 	}
-	return ASTnode (new ASTvariable (var));
+	return ASTnode (new ASTvariable (args [0].itt->line, var));
 	
 }
 
@@ -185,7 +186,7 @@ ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const
 	
 	//TODO: type inference
 	//TODO: initialisation of variables
-	if (args.size () != 2) return ASTnode (new ASToperatorError ("Assignment operators require exactly two arguments"));
+	if (args.size () != 2) return ASTnode (new ASToperatorError (0, "Assignment operators require exactly two arguments"));
 	ASTnode lhs = parseExpression (args [0], scope, *matches);
 	ASTnode rhs = parseExpression (args [1], scope, *matches);
 	giveNode (scope, lhs);
@@ -206,22 +207,22 @@ ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const
 	}
 	
 	if (!lhs->isValid () or !rhs->isValid () or !lhs->getType () or !rhs->getType ()) {
-		return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
+		return ASTnode (new ASTtuple (args [0].itt->line, std::list <ASTnode> {lhs, rhs}));
 	}
 	
 	std::vector <FunctionDecleration *> candidates = lhs->getType ()->getMethods (func);
 	auto callable = findBestMatch (std::vector <ASTnode> {lhs, rhs}, candidates);
 	if (callable->isValid ()) {
-		return ASTnode (new ASTcall (callable, createStaticCast (std::vector <ASTnode> {lhs, rhs}, callable->getFunction ()->getType ())));
+		return ASTnode (new ASTcall (args [0].itt->line, callable, createStaticCast (std::vector <ASTnode> {lhs, rhs}, callable->getFunction ()->getType ())));
 	} else {
-		return ASTnode (new ASTmemcpy (lhs, createStaticCast (rhs, lhs)));
+		return ASTnode (new ASTmemcpy (args [0].itt->line, lhs, createStaticCast (rhs, lhs)));
 	}
 	
 }
 
 ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	if (args.size () != 2) return ASTnode (new ASToperatorError ("Binary operators require exactly two arguments"));
+	if (args.size () != 2) return ASTnode (new ASToperatorError (0, "Binary operators require exactly two arguments"));
 	
 	ASTnode lhs = parseExpression (args [0], scope, *matches);
 	ASTnode rhs = parseExpression (args [1], scope, *matches);
@@ -244,7 +245,7 @@ ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector
 	}
 	
 	if (!lhs->isValid () or !rhs->isValid () or !lhs->getType () or !rhs->getType ()) {
-		return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
+		return ASTnode (new ASTtuple (0, std::list <ASTnode> {lhs, rhs}));
 	}
 	
 	std::vector <FunctionDecleration *> candidates = lhs->getType ()->getMethods (func), rhsCand = rhs->getType ()->getMethods (func);
@@ -257,7 +258,7 @@ ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector
 	} else if (defImp) {
 		return defImp (scope, func , std::vector <ASTnode> ({lhs, rhs}));
 	} else {
-		return ASTnode (new ASTerror ("Something went wrong"));
+		return ASTnode (new ASTerror (args [0].itt->line, "Something went wrong"));
 	}
 	
 }
@@ -266,11 +267,11 @@ ASTnode parseBlockOperator (NumbatScope * scope, const string & func, const std:
 	
 	switch (args.size ()) {
 		case 0:
-			return ASTnode (new ASTnil);
+			return ASTnode (new ASTnil (0));
 		case 1:
 			return parseBody (args [0], scope);
 		default:
-			return ASTnode (new ASTerror ("Something went wrong"));
+			return ASTnode (new ASTerror (args [0].itt->line, "Something went wrong"));
 	}
 	
 }
@@ -292,37 +293,37 @@ ASTnode parseCall (NumbatScope * scope, const string & func, const std::vector <
 			} else if (exp->getType ()) {
 				candidates = exp->getType ()->getMethods (func);
 			} else {
-				return ASTnode (new ASTerror ("Something went wrong"));
+				return ASTnode (new ASTerror (args [0].itt->line, "Something went wrong"));
 			}
 			return findBestMatch (params, candidates);
 		default:
-			return ASTnode (new ASTerror ("Something went wrong"));
+			return ASTnode (new ASTerror (0, "Something went wrong"));
 	}
 	
 }
 
 ASTnode parseComma (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	if (args.size () != 2) return ASTnode (new ASToperatorError ("Comma operator requires exactly two arguments"));
+	if (args.size () != 2) return ASTnode (new ASToperatorError (0, "Comma operator requires exactly two arguments"));
 	
 	ASTnode lhs = parseExpression (args [0], scope, *matches);
 	ASTnode rhs = parseExpression (args [1], scope, *matches);
 	
-	return ASTnode (new ASTtuple (std::list <ASTnode> {lhs, rhs}));
+	return ASTnode (new ASTtuple (args [0].end->line, std::list <ASTnode> {lhs, rhs}));
 	
 }
 
 ASTnode parseIfStatment (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	if (args.size () < 2 or args.size () > 3) return ASTnode (new ASToperatorError ("If statements require a body"));
+	if (args.size () < 2 or args.size () > 3) return ASTnode (new ASToperatorError (0, "If statements require a body"));
 	NumbatScope * child = createChild (scope);
 	ASTnode cond = parseExpression (args.front (), child);
 	ASTnode body = parseExpression (args [1], child);
 	if (args.size () == 3) {
 		ASTnode alt = parseExpression (args.back (), child);
-		return ASTnode (new ASTbranch (cond, body, alt));
+		return ASTnode (new ASTbranch (args [0].itt->line, cond, body, alt));
 	} else {
-		return ASTnode (new ASTbranch (cond, body));
+		return ASTnode (new ASTbranch (args [0].itt->line, cond, body));
 	}
 	
 }
@@ -340,34 +341,35 @@ ASTnode parseIndex (NumbatScope * scope, const string & func, const std::vector 
 			exp = parseExpression (args [0], scope, *matches);
 			if (exp->getType ()) {
 				if (exp->getType ()->isArray ()) {
-					return ASTnode (new ASTgep (exp, params[0]));
+					return ASTnode (new ASTgep (args [0].itt->line, exp, params[0]));
 				} else {
 					candidates = exp->getType ()->getMethods (func);
 					callable = findBestMatch (params, candidates);
 					if (callable->isValid ()) {
-						return ASTnode (new ASTcall (callable, createStaticCast (params, callable->getFunction ()->getType ())));
+						return ASTnode (new ASTcall (args [0].itt->line, callable, createStaticCast (params, callable->getFunction ()->getType ())));
 					} else {
-						return ASTnode (new ASTerror ("TODO: print candidates for functions in parseCall"));
+						return ASTnode (new ASTerror (args [0].itt->line, "TODO: print candidates for functions in parseCall"));
 					}
 				}
 			} else {
 				return generateError (args [0], "Expected a variable");
 			}
 		default:
-			return ASTnode (new ASTerror ("Something went wrong"));
+			return ASTnode (new ASTerror (0, "Something went wrong"));
 	}
 	
 }
 
 ASTnode parseRedirectOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	return ASTnode (new ASTerror ("Redirection is not yet implemented"));
+	size_t line = args.front ().itt->line;
+	return ASTnode (new ASTerror (line, "Redirection is not yet implemented"));
 	
 }
 
 ASTnode parseReferenceOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	if  (args.size () != 2)return ASTnode (new ASToperatorError ("Reference operator requires exactly two arguments"));
+	if  (args.size () != 2)return ASTnode (new ASToperatorError (0, "Reference operator requires exactly two arguments"));
 	
 	Position lhsPos = args [0];
 	
@@ -387,12 +389,12 @@ ASTnode parseReferenceOperator (NumbatScope * scope, const string & func, const 
 	ASTnode ret = resolveSymbol (scope, pos.itt->iden, lhs);
 	
 	if (typeid (*ret.get ()) == typeid (ASTtype)) {
-		*static_cast <ASTtype *> (ret.get ()) = ASTtype (ref, constTkn, ret->getType ());
+		*static_cast <ASTtype *> (ret.get ()) = ASTtype (args [1].itt->line, ref, constTkn, ret->getType ());
 	}
 	
 	if (++pos) {
 		if (pos.itt->type == lexer::TOKEN::identifier) {
-			ret = ASTnode (new ASTvariable (createVariable (scope, ret, nullptr, pos.itt->iden, false, false)));
+			ret = ASTnode (new ASTvariable (args [1].itt->line, createVariable (scope, ret, nullptr, pos.itt->iden, false, false)));
 		} else {
 			ret = generateOperatorError (pos, "Identifier expected");
 		}
@@ -405,20 +407,22 @@ ASTnode parseReferenceOperator (NumbatScope * scope, const string & func, const 
 
 ASTnode parseSubExpression (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
+	size_t line = args.front ().itt->line;
 	switch (args.size ()) {
 		case 0:
-			return ASTnode (new ASTnil);
+			return ASTnode (new ASTnil (line));
 		case 1:
-			return ASTnode (new ASTsubexp (parseExpression (args [0], scope)));
+			return ASTnode (new ASTsubexp (line, parseExpression (args [0], scope)));
 		default:
-			return ASTnode (new ASTerror ("Something went wrong"));
+			return ASTnode (new ASTerror (line, "Something went wrong"));
 	}
 	
 }
 
 ASTnode parseUnary (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	if (args.size () != 1) return ASTnode (new ASToperatorError ("Unary operators require exactly one argument"));
+	size_t line = args.front ().itt->line;
+	if (args.size () != 1) return ASTnode (new ASToperatorError (line, "Unary operators require exactly one argument"));
 	ASTnode arg = parseExpression (args [0], scope, *matches);
 	
 	if (!arg->getType ()) return arg;
@@ -427,22 +431,22 @@ ASTnode parseUnary (NumbatScope * scope, const string & func, const std::vector 
 	auto callable = findBestMatch ({arg}, candidates);
 	
 	if (callable->isValid ()) {
-		return ASTnode (new ASTcall (callable, createStaticCast ({arg}, callable->getFunction ()->getType ())));
+		return ASTnode (new ASTcall (line, callable, createStaticCast ({arg}, callable->getFunction ()->getType ())));
 	} else if (defImp) {
 		return defImp (scope, func , {arg});
 	} else {
-		return ASTnode (new ASTerror ("Something went wrong"));
+		return ASTnode (new ASTerror (line, "Something went wrong"));
 	}
 	
 }
 
 ASTnode parseWhileLoop (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
-	if (args.size () != 2) return ASTnode (new ASToperatorError ("While loops require a condition and a body"));
+	if (args.size () != 2) return ASTnode (new ASToperatorError (args.front ().itt->line, "While loops require a condition and a body"));
 	NumbatScope * child = createChild (scope);
 	ASTnode cond = parseExpression (args.front (), child);
 	ASTnode body = parseExpression (args.back (), child);
-	return ASTnode (new ASTwhileloop (cond, body));
+	return ASTnode (new ASTwhileloop (args.front ().itt->line, cond, body));
 	
 }
 

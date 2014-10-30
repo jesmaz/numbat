@@ -65,7 +65,7 @@ class NumbatScope : public ASTbase {
 		
 		virtual NumbatVariable * createVariable (const ASTnode & type, const ASTnode & init, const string & iden, bool global, bool temp);
 		
-		NumbatScope (ParsingContext * context) : context (context) {}
+		NumbatScope (size_t lineNo, ParsingContext * context) : ASTbase (lineNo), context (context) {}
 		
 	private:
 		

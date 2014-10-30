@@ -17,8 +17,8 @@ class ASTerror : public ASTbase {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + message;}
 		
-		ASTerror () {}
-		ASTerror (const string & message) : message (message) {}
+		ASTerror (size_t lineNo) : ASTbase (lineNo) {}
+		ASTerror (size_t lineNo, const string & message) : ASTbase (lineNo), message (message) {}
 	private:
 		string message;
 };

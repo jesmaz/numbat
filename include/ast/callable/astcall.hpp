@@ -23,8 +23,8 @@ class ASTcall : public ASTcallable {
 		virtual string getIden () const {return callee->getIden ();}
 		virtual string toString (const string & indent = "") const;
 		
-		ASTcall () {}
-		ASTcall (const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args) : callee (callee), args (args) {}
+		ASTcall (size_t lineNo) : ASTcallable (lineNo) {}
+		ASTcall (size_t lineNo, const shared_ptr <ASTcallable> & callee, const std::vector <ASTnode> & args) : ASTcallable (lineNo), callee (callee), args (args) {}
 	private:
 		shared_ptr <ASTcallable> callee;
 		std::vector <ASTnode> args;

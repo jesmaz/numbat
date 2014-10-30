@@ -53,7 +53,11 @@ class ASTbase : public visitor::BaseVisitable {
 		virtual string getIden () const=0;
 		virtual string toString (const string & indent = "") const=0;
 		virtual ssize_t getLengthIndex () const;
-		ASTbase () {}
+		size_t getLineNo () {return lineNo;}
+		ASTbase (size_t lineNo) : lineNo (lineNo) {}
+	protected:
+	private:
+		size_t lineNo;
 };
 
 class ASTlistInterface {

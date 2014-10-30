@@ -16,8 +16,8 @@ class ASToperatorError : public ASTerror {
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}
 		
-		ASToperatorError () {}
-		ASToperatorError (const string & message) : ASTerror (message) {}
+		ASToperatorError (size_t lineNo) : ASTerror (lineNo) {}
+		ASToperatorError (size_t lineNo, const string & message) : ASTerror (lineNo, message) {}
 	private:
 };
 

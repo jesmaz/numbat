@@ -24,8 +24,8 @@ class ASTtuplecall : public ASTbase {
 		virtual string getIden () const {return iden;}
 		virtual string toString (const string & indent = "") const;
 		
-		ASTtuplecall () {}
-		ASTtuplecall (const string & iden, const std::vector <shared_ptr <ASTcallable>> & calls, const std::list <ASTnode> & lhsArgs, const std::list <ASTnode> & rhsArgs) : iden (iden), calls (calls), lhsArgs (lhsArgs), rhsArgs (rhsArgs) {}
+		ASTtuplecall (size_t lineNo) : ASTbase (lineNo) {}
+		ASTtuplecall (size_t lineNo, const string & iden, const std::vector <shared_ptr <ASTcallable>> & calls, const std::list <ASTnode> & lhsArgs, const std::list <ASTnode> & rhsArgs) : ASTbase (lineNo), iden (iden), calls (calls), lhsArgs (lhsArgs), rhsArgs (rhsArgs) {}
 	private:
 		string iden;
 		std::vector <shared_ptr <ASTcallable>> calls;

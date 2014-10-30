@@ -26,9 +26,9 @@ class ASTallocate : public ASTbase {
 			return ss.str ();
 		}
 		
-		ASTallocate () {}
-		ASTallocate (const ASTnode & amount, const shared_ptr <NumbatType> & type) : amount (amount), type (type.get ()) {}
-		ASTallocate (const ASTnode & amount, const NumbatType * type) : amount (amount), type (type) {}
+		ASTallocate (size_t lineNo) : ASTbase (lineNo) {}
+		ASTallocate (size_t lineNo, const ASTnode & amount, const shared_ptr <NumbatType> & type) : ASTbase (lineNo), amount (amount), type (type.get ()) {}
+		ASTallocate (size_t lineNo, const ASTnode & amount, const NumbatType * type) : ASTbase (lineNo), amount (amount), type (type) {}
 	private:
 		ASTnode amount;
 		const NumbatType * type;

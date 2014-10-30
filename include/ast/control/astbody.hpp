@@ -20,9 +20,9 @@ class ASTbody : public ASTbase {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const;
 		
-		ASTbody () {}
-		ASTbody (std::vector <ASTnode> body) : body (body) {}
-		ASTbody (const ASTnode & body) : body (1, body) {}
+		ASTbody (size_t lineNo) : ASTbase (lineNo) {}
+		ASTbody (size_t lineNo, std::vector <ASTnode> body) : ASTbase (lineNo), body (body) {}
+		ASTbody (size_t lineNo, const ASTnode & body) : ASTbase (lineNo), body (1, body) {}
 	private:
 		std::vector <ASTnode> body;
 };

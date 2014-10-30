@@ -23,14 +23,14 @@ class ASTtuple : public ASTbase {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const;
 		
-		ASTtuple () {}
-		ASTtuple (const ASTnode & single) : elements (1, single) {}
-		ASTtuple (const ASTnode & lhs, const ASTnode & rhs) : elements () {elements.push_back (lhs); elements.push_back (rhs);}
-		ASTtuple (const ASTnode & lhs, const std::list <ASTnode> & lst) : elements (lst) {elements.push_front (lhs);}
-		ASTtuple (const std::list <ASTnode> & lst) : elements (lst) {}
-		ASTtuple (const std::list <ASTnode> & lst, const ASTnode & rhs) : elements (lst) {elements.push_back (rhs);}
-		ASTtuple (const std::list <ASTnode> & lhs, const std::list <ASTnode> & rhs) : elements (lhs) {elements.insert (elements.end (), rhs.begin (), rhs.end ());}
-		ASTtuple (const std::vector <ASTnode> & lst) : elements (lst.begin (), lst.end ()) {}
+		ASTtuple (size_t lineNo) : ASTbase (lineNo) {}
+		ASTtuple (size_t lineNo, const ASTnode & single) : ASTbase (lineNo), elements (1, single) {}
+		ASTtuple (size_t lineNo, const ASTnode & lhs, const ASTnode & rhs) : ASTbase (lineNo), elements () {elements.push_back (lhs); elements.push_back (rhs);}
+		ASTtuple (size_t lineNo, const ASTnode & lhs, const std::list <ASTnode> & lst) : ASTbase (lineNo), elements (lst) {elements.push_front (lhs);}
+		ASTtuple (size_t lineNo, const std::list <ASTnode> & lst) : ASTbase (lineNo), elements (lst) {}
+		ASTtuple (size_t lineNo, const std::list <ASTnode> & lst, const ASTnode & rhs) : ASTbase (lineNo), elements (lst) {elements.push_back (rhs);}
+		ASTtuple (size_t lineNo, const std::list <ASTnode> & lhs, const std::list <ASTnode> & rhs) : ASTbase (lineNo), elements (lhs) {elements.insert (elements.end (), rhs.begin (), rhs.end ());}
+		ASTtuple (size_t lineNo, const std::vector <ASTnode> & lst) : ASTbase (lineNo), elements (lst.begin (), lst.end ()) {}
 	private:
 		std::list <ASTnode> elements;
 };

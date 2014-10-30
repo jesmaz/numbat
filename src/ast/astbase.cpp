@@ -1,6 +1,7 @@
 #include "../include/ast/asterror.hpp"
 #include "../include/ast/control/astbody.hpp"
 #include "../include/ast/memory/aststructindex.hpp"
+#include "../include/ast/memory/astvariable.hpp"
 
 namespace numbat {
 namespace parser {
@@ -14,9 +15,14 @@ ASTnode ASTbase::resolveSymbol (const string & iden, const ASTnode & exp) {
 		if (0 <= index) {
 			ASTnode mem = type->getMembers() [index];
 			if (mem->isGlobal ()) {
-				val = mem;
+				ASTvariable * var = dynamic_cast <ASTvariable *> (mem.get ());
+				if (var) {
+					val = var->getVariable ()->getInit ();
+				} else {
+					val = mem;
+				}
 			} else {
-				val = ASTnode (new ASTstructIndex (index, exp));
+				val = ASTnode (new ASTstructIndex (0, index, exp));
 			}
 		}
 	}
@@ -27,7 +33,7 @@ ASTnode ASTbase::resolveSymbol (const string & iden, const ASTnode & exp) {
 }
 
 ASTnode ASTbase::resolveSymbol (const string & iden) const {
-	return ASTnode (new ASTerror ("'" + iden + "' could not be resolved"));
+	return ASTnode (new ASTerror (0, "'" + iden + "' could not be resolved"));
 }
 
 const ASTnode ASTbase::getLength (const ASTnode & exp) {
@@ -35,7 +41,7 @@ const ASTnode ASTbase::getLength (const ASTnode & exp) {
 	ASTnode val = nullptr;
 	ssize_t index = exp->getLengthIndex ();
 	if (0 <= index) {
-		val = ASTnode (new ASTstructIndex (index, exp));
+		val = ASTnode (new ASTstructIndex (0, index, exp));
 	}
 	return val;
 	

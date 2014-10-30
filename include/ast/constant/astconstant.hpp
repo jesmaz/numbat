@@ -24,8 +24,8 @@ class ASTconstant : public ASTbase {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + type->getIden ();}
 		
-		ASTconstant () {}
-		ASTconstant (const ASTnode & type) : type (type) {}
+		ASTconstant (size_t lineNo) : ASTbase (lineNo) {}
+		ASTconstant (size_t lineNo, const ASTnode & type) : ASTbase (lineNo), type (type) {}
 	private:
 		ASTnode type;
 };

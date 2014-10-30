@@ -25,8 +25,8 @@ class ASTgep : public ASTbase {
 		virtual string getIden () const {return ref->getIden ();}
 		virtual string toString (const string & indent = "") const {return ref->toString (indent) + " [" + index->toString () + "]";}
 		
-		ASTgep () {}
-		ASTgep (const ASTnode & ref, const ASTnode & index) : ref (ref), index (index) {}
+		ASTgep (size_t lineNo) : ASTbase (lineNo) {}
+		ASTgep (size_t lineNo, const ASTnode & ref, const ASTnode & index) : ASTbase (lineNo), ref (ref), index (index) {}
 	private:
 		ASTnode ref;
 		ASTnode index;

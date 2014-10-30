@@ -24,9 +24,9 @@ class ASTfunctionlist : public ASTbase {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + iden;}
 		
-		ASTfunctionlist () {}
-		ASTfunctionlist (const string & iden, const std::vector <shared_ptr <FunctionDecleration>> & ein) : iden (iden) {for (auto e : ein) {elements.push_back (e.get ());}}
-		ASTfunctionlist (const string & iden, const std::vector <FunctionDecleration *> & elements) : iden (iden), elements (elements) {}
+		ASTfunctionlist (size_t lineNo) : ASTbase (lineNo) {}
+		ASTfunctionlist (size_t lineNo, const string & iden, const std::vector <shared_ptr <FunctionDecleration>> & ein) : ASTbase (lineNo), iden (iden) {for (auto e : ein) {elements.push_back (e.get ());}}
+		ASTfunctionlist (size_t lineNo, const string & iden, const std::vector <FunctionDecleration *> & elements) : ASTbase (lineNo), iden (iden), elements (elements) {}
 		
 	private:
 		

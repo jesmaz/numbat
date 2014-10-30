@@ -41,7 +41,7 @@ const std::list <ASTnode> ASTcall::getList () const {
 	std::list <ASTnode> list;
 	size_t l = types.size ();
 	for (size_t i=0; i<l; ++i) {
-		list.push_back (ASTnode (new ASTcallindex (const_cast <ASTcall *> (this), i)));
+		list.push_back (ASTnode (new ASTcallindex (0, const_cast <ASTcall *> (this), i)));
 	}
 	return list;
 	

@@ -19,9 +19,9 @@ class ASTfunctionPointer : public ASTcallable {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + "'" + function->getIden () + "'";}
 		
-		ASTfunctionPointer () {}
-		ASTfunctionPointer (shared_ptr <FunctionDecleration> function) : function (function.get ()) {}
-		ASTfunctionPointer (FunctionDecleration * function) : function (function) {}
+		ASTfunctionPointer (size_t lineNo) : ASTcallable (lineNo) {}
+		ASTfunctionPointer (size_t lineNo, shared_ptr <FunctionDecleration> function) : ASTcallable (lineNo), function (function.get ()) {}
+		ASTfunctionPointer (size_t lineNo, FunctionDecleration * function) : ASTcallable (lineNo), function (function) {}
 		
 	private:
 		FunctionDecleration * function;

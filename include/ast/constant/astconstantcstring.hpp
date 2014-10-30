@@ -15,8 +15,8 @@ class ASTconstantCString : public ASTconstant <string> {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return ASTconstant::toString (indent) + " \"" + val + "\"";}
 		
-		ASTconstantCString () {}
-		ASTconstantCString (const ASTnode & type, const string & val) : ASTconstant (type), val (val) {}
+		ASTconstantCString (size_t lineNo) : ASTconstant (lineNo) {}
+		ASTconstantCString (size_t lineNo, const ASTnode & type, const string & val) : ASTconstant (lineNo, type), val (val) {}
 	private:
 		string val;
 };

@@ -10,11 +10,11 @@ ASTnode NumbatScope::resolveSymbol (const string & iden) const {
 	
 	auto var = variables.find (iden);
 	if (var != variables.end ()) {
-		return ASTnode (new ASTvariable (var->second));
+		return ASTnode (new ASTvariable (0, var->second));
 	}
 	auto typ = types.find (iden);
 	if (typ != types.end ()) {
-		return ASTnode (new ASTtype (false, false, typ->second));
+		return ASTnode (new ASTtype (0, false, false, typ->second));
 	}
 	//auto funcs = findFunctions (this, iden);
 	auto func_beg = functions.lower_bound (iden);
@@ -25,7 +25,7 @@ ASTnode NumbatScope::resolveSymbol (const string & iden) const {
 		++func_beg;
 	}
 	if (!funcs.empty ()) {
-		return ASTnode (new ASTfunctionlist (iden, funcs));
+		return ASTnode (new ASTfunctionlist (0, iden, funcs));
 	}
 	
 	return ASTbase::resolveSymbol (iden);
@@ -44,7 +44,7 @@ ASTnode resolveSymbol (const NumbatScope* scope, const string & iden, ASTnode pa
 		}
 	}
 	if (!ret) {
-		ret = ASTnode (new ASTerror ("'" + iden + "' is undefined within this scope."));
+		ret = ASTnode (new ASTerror (0, "'" + iden + "' is undefined within this scope."));
 	}
 	return ret;
 	
@@ -151,7 +151,7 @@ bool NumbatScope::symbolRegisted (const string & iden) {
 }
 
 NumbatScope * createChild (NumbatScope * scope) {
-	NumbatScope * child = new NumbatScope (scope->context);
+	NumbatScope * child = new NumbatScope (0, scope->context);
 	child->parent = scope; 
 	scope->children.insert (unique_ptr <NumbatScope> (child));
 	return child;
@@ -228,17 +228,17 @@ NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t 
 	if ((ptrType = type->arrayType [dimentions - 1])) {
 		return ptrType;
 	}
-	ASTnode rawDataType = ASTnode (new ASTtype (false, false, type));
+	ASTnode rawDataType = ASTnode (new ASTtype (0, false, false, type));
 	ptrType = type->arrayType [dimentions - 1] = new NumbatPointerType (type->getIden () + "[]", rawDataType, scope->getAST ()->MallocFunc (), scope->getAST ()->FreeFunc ());
 	std::vector <ASTnode> params (dimentions, nullptr);
-	ASTnode indexType (ASTnode (new ASTtype (false, false, getType (scope, "uint64"))));
+	ASTnode indexType (ASTnode (new ASTtype (0, false, false, getType (scope, "uint64"))));
 	for (size_t i=0; i<dimentions-1; ++i) {
 		//strig iden = 
 		std::ostringstream ss;
 		ss << i;
-		params [i] = ASTnode (new ASTmember (ss.str (), indexType));
+		params [i] = ASTnode (new ASTmember (0, ss.str (), indexType));
 	}
-	params [dimentions-1] = ASTnode (new ASTmember ("length", indexType));
+	params [dimentions-1] = ASTnode (new ASTmember (0, "length", indexType));
 	ptrType->buildData (params);
 	return ptrType;
 }

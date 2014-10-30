@@ -14,7 +14,7 @@ namespace parser {
 ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDepth) {
 	
 	if (!arg->getType () or !type->getType ()) {
-		return ASTnode (new ASTerror ("Invalid type"));
+		return ASTnode (new ASTerror (arg->getLineNo (), "Invalid type"));
 	}
 	
 	if (arg->getType () == type->getType ()) {
@@ -25,7 +25,7 @@ ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDept
 		if (arg->getType ()->getBitSize () != type->getType ()->getBitSize () or arg->getType ()->isFloat () != type->getType ()->isFloat ()) {
 			std::vector <ASTnode> args;
 			args.push_back (arg); args.push_back (type);
-			return ASTnode (new ASTnumbatInstr ("cast", args, type));
+			return ASTnode (new ASTnumbatInstr (arg->getLineNo (), "cast", args, type));
 		} else {
 			return arg;
 		}
@@ -34,13 +34,13 @@ ASTnode createStaticCast (const ASTnode & arg, const ASTnode & type, int maxDept
 	if (0 < maxDepth) {
 		shared_ptr <ASTcallable> func = findBestMatch (std::vector <ASTnode> ({arg}), type->getType ()->getMethods (type->getType ()->getIden ()), maxDepth-1);
 		if (func->isValid ()) {
-			return ASTnode (new ASTcallindex (func, 0));
+			return ASTnode (new ASTcallindex (arg->getLineNo (), func, 0));
 		}
 
 	}
 	
 	string s = "No suitable conversion, '" + type->getType ()->getIden () + "' required, found '" + arg->getType ()->getIden () + "'";
-	return ASTnode (new ASTerror (s));
+	return ASTnode (new ASTerror (arg->getLineNo (), s));
 	
 }
 
@@ -69,12 +69,12 @@ shared_ptr <ASTcallable> findBestMatch (const std::vector <ASTnode> & args, cons
 		}
 	}
 	if (func) {
-		return shared_ptr <ASTcallable> (new ASTcall (shared_ptr <ASTcallable> (new ASTfunctionPointer (func)), params));
+		return shared_ptr <ASTcallable> (new ASTcall (0, shared_ptr <ASTcallable> (new ASTfunctionPointer (0, func)), params));
 	} else {
 		string err = "\n\tTarget is: (";
 		for (auto & arg : args) {
 			if (!arg->isValid ()) {
-				return shared_ptr <ASTcallable> (new ASTcallerror (arg->toString ()));
+				return shared_ptr <ASTcallable> (new ASTcallerror (0, arg->toString ()));
 			}
 			if (arg->getType ())
 				err += arg->getType ()->getIden () + ", ";
@@ -88,7 +88,7 @@ shared_ptr <ASTcallable> findBestMatch (const std::vector <ASTnode> & args, cons
 			}
 			err += ")";
 		}
-		return shared_ptr <ASTcallable> (new ASTcallerror (err));
+		return shared_ptr <ASTcallable> (new ASTcallerror (0, err));
 	}
 	
 }
@@ -99,7 +99,7 @@ std::vector <ASTnode> createStaticCast (const std::vector <ASTnode> & args, cons
 	auto argItt = args.begin (), argEnd = args.end (), typeItt = types.begin (), typeEnd = types.end ();
 	for (auto resItt=result.begin (), resEnd=result.end (); typeItt != typeEnd and resItt != resEnd; ++argItt) {
 		if (argItt == argEnd) {
-			*resItt = ASTnode (new ASTerror (""));
+			*resItt = ASTnode (new ASTerror (0, ""));
 			++resItt, ++typeItt;
 		} else {
 			if (!(*argItt)->isValid ()) {

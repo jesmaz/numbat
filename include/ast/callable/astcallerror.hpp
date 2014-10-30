@@ -17,8 +17,8 @@ class ASTcallerror : public ASTcallable {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + message;}
 		
-		ASTcallerror () {}
-		ASTcallerror (const string & message) : message (message) {}
+		ASTcallerror (size_t lineNo) : ASTcallable (lineNo) {}
+		ASTcallerror (size_t lineNo, const string & message) : ASTcallable (lineNo), message (message) {}
 	private:
 		string message;
 };

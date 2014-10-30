@@ -24,8 +24,8 @@ class ASTconcat : public ASTbase {
 		virtual string getIden () const {return " + ";}
 		virtual string toString (const string & indent = "") const {return indent + lhs->toString () + " ~ " + rhs->toString ();}
 		
-		ASTconcat () {}
-		ASTconcat (const ASTnode & lhs, const ASTnode & rhs, const shared_ptr <ASTcallable> & conv = nullptr) : lhs (lhs), rhs (rhs), conv (conv) {}
+		ASTconcat (size_t lineNo) : ASTbase (lineNo) {}
+		ASTconcat (size_t lineNo, const ASTnode & lhs, const ASTnode & rhs, const shared_ptr <ASTcallable> & conv = nullptr) : ASTbase (lineNo), lhs (lhs), rhs (rhs), conv (conv) {}
 	private:
 		ASTnode lhs, rhs;
 		shared_ptr <ASTcallable> conv;

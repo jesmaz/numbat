@@ -32,8 +32,8 @@ class ASTsubexp : public ASTbase {
 		virtual string getIden () const {return exp->getIden();}
 		virtual string toString (const string & indent = "") const {return exp->toString(indent);}
 		virtual ssize_t getLengthIndex () const {return exp->getLengthIndex();}
-		ASTsubexp () {}
-		ASTsubexp (ASTnode exp) : exp (exp) {}
+		ASTsubexp (size_t lineNo) : ASTbase (lineNo) {}
+		ASTsubexp (size_t lineNo, ASTnode exp) : ASTbase (lineNo), exp (exp) {}
 	protected:
 	private:
 		ASTnode exp;

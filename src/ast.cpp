@@ -11,11 +11,11 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden) const {
 	if (!symb->isValid ()) {
 		auto var = extVariables.find (iden);
 		if (var != extVariables.end ()) {
-			return ASTnode (new ASTvariable (var->second));
+			return ASTnode (new ASTvariable (0, var->second));
 		}
 		auto typ = extTypes.find (iden);
 		if (typ != extTypes.end ()) {
-			return ASTnode (new ASTtype (false, false, typ->second));
+			return ASTnode (new ASTtype (0, false, false, typ->second));
 		}
 		//auto funcs = findFunctions (this, iden);
 		auto func_beg = extFunctions.lower_bound (iden);
@@ -26,7 +26,7 @@ ASTnode AbstractSyntaxTree::resolveSymbol (const string & iden) const {
 			++func_beg;
 		}
 		if (!funcs.empty ()) {
-			return ASTnode (new ASTfunctionlist (iden, funcs));
+			return ASTnode (new ASTfunctionlist (0, iden, funcs));
 		}
 	}
 	return symb;

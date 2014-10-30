@@ -26,9 +26,9 @@ class ASTtype : public ASTbase {
 			return indent + type->getIden ();
 		}
 		
-		ASTtype () {}
-		ASTtype (const bool ref, const bool constType, const shared_ptr <NumbatType> & type) : ref (ref), constType (constType), type (type.get ()) {}
-		ASTtype (const bool ref, const bool constType, const NumbatType * type) : ref (ref), constType (constType), type (type) {}
+		ASTtype (size_t lineNo) : ASTbase (lineNo) {}
+		ASTtype (size_t lineNo,const bool ref, const bool constType, const shared_ptr <NumbatType> & type ) : ASTbase (lineNo), ref (ref), constType (constType), type (type.get ()) {}
+		ASTtype (size_t lineNo, const bool ref, const bool constType, const NumbatType * type) : ASTbase (lineNo), ref (ref), constType (constType), type (type) {}
 	private:
 		bool ref, constType;
 		const NumbatType * type;
