@@ -104,6 +104,12 @@ const std::list <const ASTbase *> NumbatScope::getErrors () const {
 			list.splice (list.end (), ferr);
 		}
 	}
+	for (const auto & type : types) {
+		for (const auto & m : type.second->getMembers ()) {
+			auto merr = m->getErrors ();
+			list.splice (list.end (), merr);
+		}
+	}
 	for (const auto & arg : body) {
 		auto aerr = arg->getErrors ();
 		list.splice (list.end (), aerr);
