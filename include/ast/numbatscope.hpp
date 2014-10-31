@@ -36,6 +36,7 @@ class NumbatScope : public ASTbase {
 		virtual bool isReturned () const {return body.empty () ? false : body.back ()->isReturned ();}
 		virtual bool isValid () const;
 		virtual const NumbatType * getType () const {return body.empty () ? nullptr : body.back ()->getType ();}
+		virtual const std::list <const ASTbase *> getErrors () const;
 		virtual size_t calculateWeight () const;
 		virtual string getIden () const {return "scope";}
 		virtual string toString (const string & indent = "") const;

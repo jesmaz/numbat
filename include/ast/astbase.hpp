@@ -50,10 +50,11 @@ class ASTbase : public visitor::BaseVisitable {
 		//DEPRECATED
 		virtual size_t getBitSize () const {return 0;}
 		virtual const std::list <ASTnode> getList () const {return std::list <ASTnode> ();}
+		virtual const std::list <const ASTbase *> getErrors () const {return std::list <const ASTbase *> ();}
 		virtual string getIden () const=0;
 		virtual string toString (const string & indent = "") const=0;
 		virtual ssize_t getLengthIndex () const;
-		size_t getLineNo () {return lineNo;}
+		size_t getLineNo () const {return lineNo;}
 		ASTbase (size_t lineNo) : lineNo (lineNo) {}
 	protected:
 	private:

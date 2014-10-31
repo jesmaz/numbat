@@ -17,6 +17,7 @@ class ASTnumbatInstr : public ASTbase {
 		virtual bool isParsed () const {for (auto & arg : args ) if (!arg->isParsed ()) return false; return true;}
 		virtual bool isValid () const;
 		virtual const NumbatType * getType () const {return type->getType ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto t = type->getErrors (); for (const auto & arg : args) {auto a = arg->getErrors (); t.splice (t.begin (), a);} return t;}
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "";}

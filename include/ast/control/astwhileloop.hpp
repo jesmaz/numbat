@@ -16,6 +16,7 @@ class ASTwhileloop : public ASTbase {
 		virtual bool isParsed () const {return condition->isParsed () and body->isParsed ();}
 		virtual bool isReturned () const {return body->isReturned ();}
 		virtual bool isValid () const {return condition->isValid () and body->isValid ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto c = condition->getErrors (), b = body->getErrors (); c.splice (c.end (), b); return b;}
 		virtual size_t calculateWeight () const {return condition->calculateWeight () + body->calculateWeight () + 2;}//The extra 2 is for jumps
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "while";}

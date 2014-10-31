@@ -15,6 +15,7 @@ class ASTbody : public ASTbase {
 		virtual bool isParsed () const;
 		virtual bool isReturned () const {return body.empty () ? false : body.back ()->isReturned ();}
 		virtual bool isValid () const;
+		virtual const std::list <const ASTbase *> getErrors () const {std::list <const ASTbase *> err; for (const auto & e : body) {auto r = e->getErrors (); err.splice (err.end (), r);} return err;}
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}

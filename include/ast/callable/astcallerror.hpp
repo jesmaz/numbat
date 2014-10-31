@@ -12,6 +12,7 @@ class ASTcallerror : public ASTcallable {
 		virtual bool isParsed () const {return true;}
 		virtual bool isValid () const {return false;}
 		virtual const FunctionDecleration * getFunction () const {return nullptr;}
+		virtual const std::list <const ASTbase *> getErrors () const {return std::list <const ASTbase *> ({this});}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual size_t getBitSize () const {return 0;}
 		virtual string getIden () const {return "";}

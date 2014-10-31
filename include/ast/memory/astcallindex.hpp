@@ -21,6 +21,7 @@ class ASTcallindex : public ASTbase {
 		virtual bool isParsed () const {return (callp ? callp : call.get ())->isParsed ();}
 		virtual bool isValid () const {return (callp ? callp : call.get ())->isValid ();}
 		virtual const NumbatType * getType () const {return ref->getType ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto c = (callp ? callp : call.get ())->getErrors (), r = ref->getErrors (); c.splice (c.end (), r); return c;}
 		virtual size_t calculateWeight () const {return (callp ? callp : call.get ())->calculateWeight ();}
 		virtual size_t getBitSize () const {return ref->getBitSize ();}
 		virtual string getIden () const {return ref->getIden ();}

@@ -29,6 +29,7 @@ class ASTsubexp : public ASTbase {
 		//DEPRECATED
 		virtual size_t getBitSize () const {return exp->getBitSize();}
 		virtual const std::list <ASTnode> getList () const {return exp->getList();}
+		virtual const std::list <const ASTbase *> getErrors () const {return exp->getErrors ();}
 		virtual string getIden () const {return exp->getIden();}
 		virtual string toString (const string & indent = "") const {return exp->toString(indent);}
 		virtual ssize_t getLengthIndex () const {return exp->getLengthIndex();}

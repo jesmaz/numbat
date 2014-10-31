@@ -20,6 +20,7 @@ class ASTgep : public ASTbase {
 		virtual bool isConst () const {return ref->isConst ();}
 		virtual bool isParsed () const {return ref->isParsed () and index->isParsed ();}
 		virtual bool isValid () const {return ref->isValid () and index->isValid ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto r = ref->getErrors (), i = index->getErrors (); r.splice (r.end (), i); return r;}
 		virtual const NumbatType * getType () const {if (const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (ref->getType ())) {return type->getDataType ()->getType ();} return nullptr;}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual string getIden () const {return ref->getIden ();}

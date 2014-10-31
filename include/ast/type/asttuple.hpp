@@ -20,6 +20,7 @@ class ASTtuple : public ASTbase {
 		virtual size_t calculateWeight () const;
 		virtual size_t getBitSize () const {return 0;}
 		virtual const std::list <ASTnode> getList () const {return elements;}
+		virtual const std::list <const ASTbase *> getErrors () const {std::list <const ASTbase *> err; for (const auto & e : elements) {auto r = e->getErrors (); err.splice (err.end (), r);} return err;}
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const;
 		

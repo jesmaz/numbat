@@ -18,6 +18,7 @@ class ASTallocate : public ASTbase {
 		virtual bool isParsed () const {return amount->isParsed ();}
 		virtual bool isValid () const {return amount->isValid ();}
 		virtual const NumbatType * getType () const {return type;}
+		virtual const std::list <const ASTbase *> getErrors () const {return amount->getErrors ();}
 		virtual size_t calculateWeight () const {return 32;}//This is honestly just an arbitrary number.
 		virtual size_t getBitSize () const {return 64;}
 		virtual string getIden () const {return "";}

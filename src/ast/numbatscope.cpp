@@ -87,6 +87,31 @@ bool NumbatScope::isValid () const {
 	return v;
 }
 
+const std::list <const ASTbase *> NumbatScope::getErrors () const {
+	
+	std::list <const ASTbase *> list;
+	for (const auto & func : functions) {
+		for (const auto & arg : func.second->getArgs ()) {
+			auto aerr = arg->getErrors ();
+			list.splice (list.end (), aerr);
+		}
+		for (const auto & t : func.second->getType ()) {
+			auto terr = t->getErrors ();
+			list.splice (list.end (), terr);
+		}
+		if (func.second->getBody ()) {
+			auto ferr = func.second->getBody ()->getErrors ();
+			list.splice (list.end (), ferr);
+		}
+	}
+	for (const auto & arg : body) {
+		auto aerr = arg->getErrors ();
+		list.splice (list.end (), aerr);
+	}
+	return list;
+	
+}
+
 size_t NumbatScope::calculateWeight() const {
 	return 0;
 }

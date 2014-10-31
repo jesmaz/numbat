@@ -25,6 +25,7 @@ class ASTreinterpretCast : public ASTbase {
 		virtual bool isRaw () const {return type->isRaw ();}
 		virtual bool isValid () const {return arg->isValid () and type->isValid ();}
 		virtual const NumbatType * getType () const {return type->getType ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto a = arg->getErrors (), t = type->getErrors (); a.splice (a.end (), t); return a;}
 		virtual size_t calculateWeight () const {return arg->calculateWeight ();}
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "AST reinterpret";}
