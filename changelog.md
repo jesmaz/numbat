@@ -2,6 +2,7 @@
  - Removed leftover debug output
 ###Bug Fixes###
  - Fixed a bug that occurs when using enums in standalone executables
+ - Function auto-returning actually work
 
 ##Version 0.2##
  - Re-wrote parser
