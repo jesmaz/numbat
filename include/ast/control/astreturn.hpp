@@ -25,8 +25,8 @@ class ASTreturn : public ASTbase {
 		virtual string getIden () const {return expr->getIden ();}
 		virtual string toString (const string & indent = "") const {return indent + "return " + expr->toString ();}
 		
-		ASTreturn () {}
-		ASTreturn (const ASTnode expr) : expr (expr) {}
+		ASTreturn (size_t lineNo) : ASTbase (lineNo) {}
+		ASTreturn (size_t lineNo, const ASTnode expr) : ASTbase (lineNo), expr (expr) {}
 	private:
 		ASTnode expr;
 };
@@ -42,7 +42,7 @@ class ASTreturnvoid : public ASTbase {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {return indent + "return void";}
 		
-		ASTreturnvoid () {}
+		ASTreturnvoid (size_t lineNo) : ASTbase (lineNo) {}
 	private:
 };
 

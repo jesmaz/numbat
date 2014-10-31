@@ -15,13 +15,20 @@
  - [x] Type meta data
 
 ##Version 0.2.1##
- - [ ] Clean-up output
- - [ ] Print error nodes as errors and end compilation
+ - [x] Clean-up output
+ - [x] Fix bug preventing enums being used in standalone executables
+ - [x] Print error nodes as errors and end compilation
 
 ##Version 0.2.2##
  - [ ] Compilation problems should cause a gracious failure
  - [ ] Debug symbol generation
  - [ ] Formal documentation on the memory model including when destructors are called
+
+##Version 0.2.3##
+ - [ ] Ensure unambiguous error messages
+ - [ ] Make errors display line and file data correctly
+ - [ ] Remove duplicate errors from output
+ - [ ] Remove redundant errors from output
 
 ##Version 0.3##
  - [ ] Destructors

@@ -23,8 +23,8 @@ class ASTmodule : public ASTbase {
 		virtual string getIden () const {return "module";}
 		virtual string toString (const string & indent = "") const {return indent + "module";}
 		
-		ASTmodule () {}
-		ASTmodule (const shared_ptr <Module> & module) : module (module) {}
+		ASTmodule () : ASTbase (0) {}
+		ASTmodule (const shared_ptr <Module> & module) : ASTbase (0), module (module) {}
 	private:
 		shared_ptr <Module> module;
 };

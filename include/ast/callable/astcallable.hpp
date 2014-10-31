@@ -13,6 +13,7 @@ class ASTcallable : public ASTbase {
 	public:
 		virtual bool isCallable () const {return true;}
 		virtual const FunctionDecleration * getFunction () const=0;
+		ASTcallable (size_t lineNo) : ASTbase (lineNo) {}
 };
 
 

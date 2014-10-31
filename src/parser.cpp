@@ -8,15 +8,11 @@ namespace parser {
 
 
 ASTnode generateError (const Position & pos, const string & message) {
-	std::ostringstream ss;
-	ss << pos.itt->line << ": " << message;
-	return ASTnode (new ASTerror (ss.str ()));
+	return ASTnode (new ASTerror (pos.itt->line, message));
 }
 
 ASTnode generateOperatorError (const Position & pos, const string & message) {
-	std::ostringstream ss;
-	ss << pos.itt->line << ": " << message;
-	return ASTnode (new ASToperatorError (ss.str ()));
+	return ASTnode (new ASToperatorError (pos.itt->line, message));
 }
 
 
@@ -36,28 +32,6 @@ ASTnode parseExpression (Position pos, NumbatScope * scope) {
 ASTnode parseExpression (Position pos, NumbatScope * scope, std::list <OperatorDecleration::OperatorMatch> matches) {
 	
 	matches.remove_if ([&pos](const OperatorDecleration::OperatorMatch & arg){return pos.itt > arg.ptrs.front() or arg.ptrs.back() >= pos.end;});
-	std::cout << pos.itt->line << ":";
-	for (auto itt = pos.itt; itt != pos.end; ++itt) {
-		bool t = false;
-		size_t i = 0;
-		for (auto match : matches) {
-			for (auto ptr : match.ptrs) {
-				t = t or ptr == itt;
-				if (ptr == itt) ++i;
-			}
-		}
-		if (t) {
-			std::cout << " " << i << itt->iden << i;
-		} else {
-			std::cout << " '" << itt->iden << "'";
-		}
-	}
-	std::cout << std::endl;
-	std::cout << pos.itt->line << ":";
-	for (auto match : matches) {
-		std::cout << " '" << match.opp->getPattern () << "'";
-	}
-	std::cout << std::endl;
 	if (matches.size () == 0) return parsePrimaryExpression (pos, scope);
 	
 	matches.sort (&OperatorDecleration::OperatorMatch::treeOrder);
@@ -70,7 +44,6 @@ ASTnode parseExpression (Position pos, NumbatScope * scope, std::list <OperatorD
 		if (node and node->isParsed ()) {
 			break;
 		}
-		std::cout << node->toString () << std::endl;
 		
 	}
 	
@@ -103,13 +76,13 @@ ASTnode parseNumericliteral (const Position & pos, NumbatScope * scope) {
 		size_t l = std::stoull (str);
 		ftype = getType (scope, "uint64");
 		if (ftype) {
-			num = ASTnode (new ASTconstantInt (ASTnode (new ASTtype (false, true, ftype)), l));
+			num = ASTnode (new ASTconstantInt (pos.itt->line, ASTnode (new ASTtype (pos.itt->line, false, true, ftype)), l));
 		}
 	}
 	
 	if (!num) {
 		if (ftype) {
-			num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, ftype)), fStr));
+			num = ASTnode (new ASTconstantFPInt (pos.itt->line, ASTnode (new ASTtype (pos.itt->line, false, true, ftype)), fStr));
 		} else {
 			num = generateError (pos, "There is no type available for this kind of literal");
 		}
@@ -194,17 +167,17 @@ ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
 	ASTnode symb = nullptr;
 	switch (pos.itt->type) {
 		case TOKEN::chararrayliteral:
-			return ASTnode (new ASTerror ("NYI"));
+			return ASTnode (new ASTerror (pos.itt->line, "NYI"));
 			break;
 		case TOKEN::nil:
-			return ASTnode (new ASTnil ());
+			return ASTnode (new ASTnil (pos.itt->line));
 			break;
 		case TOKEN::numericliteral:
 			return parseNumericliteral (pos, scope);
 			break;
 		case TOKEN::stringliteral:
 			if (pos+1) return generateOperatorError (pos+1, "Unexpected token: '" + (pos+1).itt->iden + "'");
-			return ASTnode (new ASTconstantCString (ASTnode (new ASTtype (false, true, getType (scope, "string"))), parseString (pos)));
+			return ASTnode (new ASTconstantCString (pos.itt->line, ASTnode (new ASTtype (pos.itt->line, false, true, getType (scope, "string"))), parseString (pos)));
 			break;
 		case TOKEN::symbol:
 			return generateOperatorError (pos, "Unexpected symbol: '" + pos.itt->iden + "'");
@@ -224,7 +197,7 @@ ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
 		if (++pos) {
 			NumbatVariable * var = createVariable (scope, symb, nullptr, pos.itt->iden, false, false);
 			if (var) {
-				symb = ASTnode (new ASTvariable (var));
+				symb = ASTnode (new ASTvariable (pos.itt->line, var));
 			} else {
 				symb = generateError (pos, "'" + pos.itt->iden + "' already declared in this scope");
 			}
@@ -241,6 +214,7 @@ ASTnode parsePrimaryExpression (Position pos, NumbatScope * scope) {
 ASTnode parseType (Position * pos, NumbatScope * scope) {
 	
 	bool ref=false, constTkn=false;
+	size_t line = pos->itt->line;
 	while (*pos and pos->itt->type == TOKEN::typemodifier) {
 		if (pos->itt->iden == "ref") {
 			ref = true;
@@ -255,7 +229,7 @@ ASTnode parseType (Position * pos, NumbatScope * scope) {
 		if (!type) {
 			return generateError (*pos, "'" + pos->itt->iden + "' is not a type");
 		}
-		return ASTnode (new ASTtype (ref, constTkn, type));
+		return ASTnode (new ASTtype (line, ref, constTkn, type));
 	}
 	return generateError (*pos, "Expected identifier");
 	
@@ -477,9 +451,9 @@ void parseBodyInline (Position pos, NumbatScope * scope) {
 				
 			case TOKEN::ret:
 				if (++exp) {
-					addToBody (scope, ASTnode (new ASTreturn (parseExpression (exp, scope))));
+					addToBody (scope, ASTnode (new ASTreturn (exp.itt->line, parseExpression (exp, scope))));
 				} else {
-					addToBody (scope, ASTnode (new ASTreturnvoid ()));
+					addToBody (scope, ASTnode (new ASTreturnvoid (exp.itt->line)));
 				}
 				break;
 				
@@ -531,8 +505,8 @@ void * futureEnum (void * data) {
 	NumbatScope * scope = std::get <1> (*params);
 	NumbatEnumType * enumType = std::get <2> (*params);
 	std::vector <ASTnode> args;
-	ASTnode type (new ASTtype (false, false, enumType->getBaseType ()));
-	ASTnode val (new ASTvariable (createVariable (scope, ASTnode (type), nullptr, "init value", true, true)));
+	ASTnode type (new ASTtype (pos.itt->line, false, false, enumType->getBaseType ()));
+	ASTnode val (new ASTvariable (pos.itt->line, createVariable (scope, type, nullptr, "init value", true, false)));
 	while (Position exp = nextArg (pos)) {
 		//args.push_back (parseExpression (exp, scope));
 		string iden = exp.itt->iden;
@@ -542,8 +516,8 @@ void * futureEnum (void * data) {
 			++exp;
 			val = createStaticCast (parseExpression (exp, scope), type);
 		}
-		ASTnode arg (new ASTvariable (createVariable (scope, ASTnode (new ASTtype (false, true, enumType->getBaseType ())), val, iden, true, false)));
-		args.push_back (arg);
+		val = ASTnode (new ASTvariable (pos.itt->line, createVariable (scope, type, val, iden, true, false)));
+		args.push_back (val);
 		pos += exp;
 		if (val->getType ()) {
 			auto methods = val->getType ()->getMethods ("++ ");
@@ -552,9 +526,9 @@ void * futureEnum (void * data) {
 			} else {
 				ASTnode num;
 				if (val->getType ()->isFloat ()) {
-					num = ASTnode (new ASTconstantFPInt (ASTnode (new ASTtype (false, true, val->getType ())), "1.0"));
+					num = ASTnode (new ASTconstantFPInt (pos.itt->line, ASTnode (new ASTtype (pos.itt->line, false, true, val->getType ())), "1.0"));
 				} else {
-					num = ASTnode (new ASTconstantInt (ASTnode (new ASTtype (false, true, val->getType ())), 1));
+					num = ASTnode (new ASTconstantInt (pos.itt->line, ASTnode (new ASTtype (pos.itt->line, false, true, val->getType ())), 1));
 				}
 				auto methods = val->getType ()->getMethods (" + ");
 				if (!methods.empty ()) {
@@ -573,7 +547,15 @@ void * futureFunc (void * data) {
 	
 	std::tuple <Position, NumbatScope *, FunctionDecleration *> * args = reinterpret_cast <std::tuple <Position, NumbatScope *, FunctionDecleration *> *> (data);
 	Position body = nextBody (std::get <0> (*args));
-	std::get <2> (*args)->assignBody (parseBody (body ? body : std::get <0> (*args), std::get <1> (*args)));
+	ASTnode b = parseBody (body ? body : std::get <0> (*args), std::get <1> (*args));
+	if (!b->isReturned ()) {
+		if (std::get <2> (*args)->getType ().empty ()) {
+			b = ASTnode (new ASTbody (body.end->line, {b, ASTnode (new ASTreturnvoid (body.end->line))}));
+		} else {
+			b = ASTnode (new ASTreturn (body.end->line, b));
+		}
+	}
+	std::get <2> (*args)->assignBody (b);
 	delete args;
 	return nullptr;
 	

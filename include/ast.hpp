@@ -146,7 +146,7 @@ class AbstractSyntaxTree : public NumbatScope {
 		
 		friend shared_ptr <ASTcallable> findBestMatch (AbstractSyntaxTree *, const std::vector <ASTnode> &, const std::vector <shared_ptr <FunctionDecleration>> &, int);
 		
-		AbstractSyntaxTree () : NumbatScope (&context) {}
+		AbstractSyntaxTree () : NumbatScope (0, &context) {}
 		AbstractSyntaxTree (tkitt beg, tkitt end, const string & path = "", const string & file = "");
 		
 	protected:

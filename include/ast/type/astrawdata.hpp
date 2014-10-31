@@ -27,9 +27,9 @@ class ASTrawdata : public ASTbase {
 			return indent + type->getIden ();
 		}
 		
-		ASTrawdata () {}
-		ASTrawdata (const bool ref, const bool constType, const shared_ptr <NumbatType> & type, const std::set <string> & metaTags) : ref (ref), constType (constType), type (type.get ()), metaTags (metaTags) {}
-		ASTrawdata (const bool ref, const bool constType, const NumbatType * type, const std::set <string> & metaTags) : ref (ref), constType (constType), type (type), metaTags (metaTags) {}
+		ASTrawdata (size_t lineNo) : ASTbase (lineNo) {}
+		ASTrawdata (size_t lineNo, const bool ref, const bool constType, const shared_ptr <NumbatType> & type, const std::set <string> & metaTags) : ASTbase (lineNo), ref (ref), constType (constType), type (type.get ()), metaTags (metaTags) {}
+		ASTrawdata (size_t lineNo, const bool ref, const bool constType, const NumbatType * type, const std::set <string> & metaTags) : ASTbase (lineNo), ref (ref), constType (constType), type (type), metaTags (metaTags) {}
 	private:
 		bool ref, constType;
 		const NumbatType * type;

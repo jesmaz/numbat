@@ -15,8 +15,8 @@ class ASTconstantFPInt : public ASTconstant <string> {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {std::stringstream ss; ss << ASTconstant::toString (indent) << val; return ss.str ();}
 		
-		ASTconstantFPInt () {}
-		ASTconstantFPInt (const ASTnode & type, const string & str) : ASTconstant (type), val (str) {}
+		ASTconstantFPInt (size_t lineNo) : ASTconstant (lineNo) {}
+		ASTconstantFPInt (size_t lineNo, const ASTnode & type, const string & str) : ASTconstant (lineNo, type), val (str) {}
 	private:
 		string val;
 };

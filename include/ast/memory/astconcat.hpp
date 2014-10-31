@@ -19,13 +19,14 @@ class ASTconcat : public ASTbase {
 		virtual bool isParsed () const {return lhs->isParsed () and rhs->isParsed () and (!conv or conv->isParsed ());}
 		virtual bool isValid () const {return lhs->isValid () and rhs->isValid () and (!conv or conv->isValid ());}
 		virtual const NumbatType * getType () const {return lhs->getType ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto l=lhs->getErrors (), r=rhs->getErrors (); l.splice (l.end (), r); if (conv) {auto c=conv->getErrors (); l.splice (l.end (), c);} return l;}
 		virtual size_t calculateWeight () const {return lhs->calculateWeight () + rhs->calculateWeight () + (conv ? conv->calculateWeight () : 0);}
 		virtual size_t getBitSize () const {return lhs->getBitSize ();}
 		virtual string getIden () const {return " + ";}
 		virtual string toString (const string & indent = "") const {return indent + lhs->toString () + " ~ " + rhs->toString ();}
 		
-		ASTconcat () {}
-		ASTconcat (const ASTnode & lhs, const ASTnode & rhs, const shared_ptr <ASTcallable> & conv = nullptr) : lhs (lhs), rhs (rhs), conv (conv) {}
+		ASTconcat (size_t lineNo) : ASTbase (lineNo) {}
+		ASTconcat (size_t lineNo, const ASTnode & lhs, const ASTnode & rhs, const shared_ptr <ASTcallable> & conv = nullptr) : ASTbase (lineNo), lhs (lhs), rhs (rhs), conv (conv) {}
 	private:
 		ASTnode lhs, rhs;
 		shared_ptr <ASTcallable> conv;

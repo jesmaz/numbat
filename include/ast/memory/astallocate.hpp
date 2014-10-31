@@ -18,6 +18,7 @@ class ASTallocate : public ASTbase {
 		virtual bool isParsed () const {return amount->isParsed ();}
 		virtual bool isValid () const {return amount->isValid ();}
 		virtual const NumbatType * getType () const {return type;}
+		virtual const std::list <const ASTbase *> getErrors () const {return amount->getErrors ();}
 		virtual size_t calculateWeight () const {return 32;}//This is honestly just an arbitrary number.
 		virtual size_t getBitSize () const {return 64;}
 		virtual string getIden () const {return "";}
@@ -26,9 +27,9 @@ class ASTallocate : public ASTbase {
 			return ss.str ();
 		}
 		
-		ASTallocate () {}
-		ASTallocate (const ASTnode & amount, const shared_ptr <NumbatType> & type) : amount (amount), type (type.get ()) {}
-		ASTallocate (const ASTnode & amount, const NumbatType * type) : amount (amount), type (type) {}
+		ASTallocate (size_t lineNo) : ASTbase (lineNo) {}
+		ASTallocate (size_t lineNo, const ASTnode & amount, const shared_ptr <NumbatType> & type) : ASTbase (lineNo), amount (amount), type (type.get ()) {}
+		ASTallocate (size_t lineNo, const ASTnode & amount, const NumbatType * type) : ASTbase (lineNo), amount (amount), type (type) {}
 	private:
 		ASTnode amount;
 		const NumbatType * type;

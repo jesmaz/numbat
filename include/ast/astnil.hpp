@@ -21,7 +21,7 @@ class ASTnil : public ASTbase {
 		virtual string getIden () const {return "nil";}
 		virtual string toString (const string & indent = "") const {return indent + "nil";}
 		
-		ASTnil () {}
+		ASTnil (size_t lineNo) : ASTbase (lineNo) {}
 	private:
 };
 

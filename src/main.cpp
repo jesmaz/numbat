@@ -185,13 +185,28 @@ int main (int argl, char ** args) {
 	
 	createType ("ptrint", numbat.getEngine ()->getDataLayout ()->getPointerSizeInBits (), parser::NumbatRawType::UNSIGNED);
 	
+	std::list <const parser::ASTbase *> errors;
+	bool success = true;
+	
 	for (const string & file : files) {
 		shared_ptr <parser::Module> mod = parser::Module::createFromFile (file);
 		if (!mod->validate ()) {
-			std::cerr << "Build failed" << std::endl;
-			return 0;
+			success = false;
+		} else {
+			numbat.loadFromModule (mod);
 		}
-		numbat.loadFromModule (mod);
+		std::list <const parser::ASTbase *> errors = mod->getAST ()->getErrors ();
+		if (!errors.empty ()) {
+			errors.sort ([](const parser::ASTbase * lhs, const parser::ASTbase * rhs){return lhs->getLineNo () < rhs->getLineNo ();});
+			for (const parser::ASTbase * err : errors) {
+				std::cerr << getContext (mod->getAST ())->path << '/' << getContext (mod->getAST ())->file << ' ' << err->getLineNo () << ": " << err->toString () << std::endl;
+			}
+		}
+	}
+	
+	if (!success) {
+		std::cerr << "Build failed" << std::endl;
+		return 1;
 	}
 	
 	if (jit) {

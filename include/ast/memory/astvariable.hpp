@@ -29,9 +29,9 @@ class ASTvariable : public ASTbase {
 		virtual string getIden () const {return variable->getIden ();}
 		virtual string toString (const string & indent = "") const {return indent + variable->getIden ();}
 		
-		ASTvariable () {}
-		ASTvariable (const std::shared_ptr <NumbatVariable> & variable) : variable (variable.get ()) {}
-		ASTvariable (const NumbatVariable * variable) : variable (variable) {}
+		ASTvariable (size_t lineNo) : ASTbase (lineNo) {}
+		ASTvariable (size_t lineNo, const std::shared_ptr <NumbatVariable> & variable) : ASTbase (lineNo), variable (variable.get ()) {}
+		ASTvariable (size_t lineNo, const NumbatVariable * variable) : ASTbase (lineNo), variable (variable) {}
 	private:
 		const NumbatVariable * variable;
 };

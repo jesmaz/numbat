@@ -15,8 +15,8 @@ class ASTconstantInt : public ASTconstant <size_t> {
 		virtual string getIden () const {return "";}
 		virtual string toString (const string & indent = "") const {std::stringstream ss; ss << ASTconstant::toString (indent) << val; return ss.str ();}
 		
-		ASTconstantInt () {}
-		ASTconstantInt (const ASTnode & type, const size_t val) : ASTconstant (type), val (val) {}
+		ASTconstantInt (size_t lineNo) : ASTconstant (lineNo) {}
+		ASTconstantInt (size_t lineNo, const ASTnode & type, const size_t val) : ASTconstant (lineNo, type), val (val) {}
 	private:
 		size_t val;
 };

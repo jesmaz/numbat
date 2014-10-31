@@ -28,9 +28,9 @@ class ASTparamater : public ASTbase {
 			return variable->getType ()->toString (indent) + " " + variable->getIden ();
 		}
 		
-		ASTparamater () {}
-		ASTparamater (const std::shared_ptr <NumbatVariable> & variable) : variable (variable.get ()) {}
-		ASTparamater (const NumbatVariable * variable) : variable (variable) {}
+		ASTparamater (size_t lineNo) : ASTbase (lineNo) {}
+		ASTparamater (size_t lineNo, const std::shared_ptr <NumbatVariable> & variable) : ASTbase (lineNo), variable (variable.get ()) {}
+		ASTparamater (size_t lineNo, const NumbatVariable * variable) : ASTbase (lineNo), variable (variable) {}
 	private:
 		const NumbatVariable * variable;
 };

@@ -26,8 +26,8 @@ class ASTstructIndex : public ASTbase {
 		virtual string getIden () const {return expr->getType ()->getMembers ()[index]->getIden ();}
 		virtual string toString (const string & indent = "") const {return expr->toString (indent) + "." + expr->getType ()->getMembers ()[index]->getIden ();}
 		
-		ASTstructIndex () {}
-		ASTstructIndex (size_t index, const ASTnode & expr) : index (index), expr (expr) {}
+		ASTstructIndex (size_t lineNo) : ASTbase (lineNo) {}
+		ASTstructIndex (size_t lineNo, size_t index, const ASTnode & expr) : ASTbase (lineNo), index (index), expr (expr) {}
 	private:
 		size_t index;
 		ASTnode expr;

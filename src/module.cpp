@@ -97,9 +97,9 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	parseModule (Position (tks.begin (), lexer::findEOF (tks.begin (), tks.end ())), ast);
 	if (debugMode) {
 		std::cerr << ast->toString () << std::endl;
-		std::cerr << ASTnode (new ASTbody (ast->getBody ()))->toString ("") << std::endl;
+		std::cerr << ASTnode (new ASTbody (0, ast->getBody ()))->toString ("") << std::endl;
 	}
-	main.push_back (ASTnode (new ASTbody (ast->getBody ())));
+	main.push_back (ASTnode (new ASTbody (0, ast->getBody ())));
 	allModules [file]->ast = ast;
 	checkForBuiltins (*allModules [file]);
 	return allModules [file];
@@ -177,7 +177,7 @@ ASTnode ASTmodule::resolveSymbol (const string & iden) const {
 }
 
 
-Module::Module() {
+Module::Module () {
 	ast = new AbstractSyntaxTree ();
 }
 

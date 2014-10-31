@@ -20,13 +20,14 @@ class ASTgep : public ASTbase {
 		virtual bool isConst () const {return ref->isConst ();}
 		virtual bool isParsed () const {return ref->isParsed () and index->isParsed ();}
 		virtual bool isValid () const {return ref->isValid () and index->isValid ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto r = ref->getErrors (), i = index->getErrors (); r.splice (r.end (), i); return r;}
 		virtual const NumbatType * getType () const {if (const NumbatPointerType * type = dynamic_cast <const NumbatPointerType *> (ref->getType ())) {return type->getDataType ()->getType ();} return nullptr;}
 		virtual size_t calculateWeight () const {return 0;}
 		virtual string getIden () const {return ref->getIden ();}
 		virtual string toString (const string & indent = "") const {return ref->toString (indent) + " [" + index->toString () + "]";}
 		
-		ASTgep () {}
-		ASTgep (const ASTnode & ref, const ASTnode & index) : ref (ref), index (index) {}
+		ASTgep (size_t lineNo) : ASTbase (lineNo) {}
+		ASTgep (size_t lineNo, const ASTnode & ref, const ASTnode & index) : ASTbase (lineNo), ref (ref), index (index) {}
 	private:
 		ASTnode ref;
 		ASTnode index;

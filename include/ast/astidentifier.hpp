@@ -17,8 +17,8 @@ class ASTidentifier : public ASTbase {
 		virtual string getIden () const {return iden;}
 		virtual string toString (const string & indent = "") const {return indent + iden;}
 		
-		ASTidentifier () {}
-		ASTidentifier (const string & iden) : iden (iden) {}
+		ASTidentifier () : ASTbase (0) {}
+		ASTidentifier (const string & iden) : ASTbase (0), iden (iden) {}
 	private:
 		string iden;
 };

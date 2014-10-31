@@ -25,14 +25,15 @@ class ASTreinterpretCast : public ASTbase {
 		virtual bool isRaw () const {return type->isRaw ();}
 		virtual bool isValid () const {return arg->isValid () and type->isValid ();}
 		virtual const NumbatType * getType () const {return type->getType ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto a = arg->getErrors (), t = type->getErrors (); a.splice (a.end (), t); return a;}
 		virtual size_t calculateWeight () const {return arg->calculateWeight ();}
 		virtual size_t getBitSize () const {return type->getBitSize ();}
 		virtual string getIden () const {return "AST reinterpret";}
 		virtual string toString (const string & indent = "") const {return indent + arg->toString () + " as " + type->toString ();}
 		
-		ASTreinterpretCast () {}
-		ASTreinterpretCast (const ASTnode & arg, const ASTnode & type) : arg (arg), type (type), loadSrc (false) {}
-		ASTreinterpretCast (const ASTnode & arg, const ASTnode & type, bool loadSource) : arg (arg), type (type), loadSrc (loadSource) {}
+		ASTreinterpretCast (size_t lineNo) : ASTbase (lineNo) {}
+		ASTreinterpretCast (size_t lineNo, const ASTnode & arg, const ASTnode & type) : ASTbase (lineNo), arg (arg), type (type), loadSrc (false) {}
+		ASTreinterpretCast (size_t lineNo, const ASTnode & arg, const ASTnode & type, bool loadSource) : ASTbase (lineNo), arg (arg), type (type), loadSrc (loadSource) {}
 	private:
 		ASTnode arg, type;
 		bool loadSrc;

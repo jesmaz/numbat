@@ -21,14 +21,15 @@ class ASTcallindex : public ASTbase {
 		virtual bool isParsed () const {return (callp ? callp : call.get ())->isParsed ();}
 		virtual bool isValid () const {return (callp ? callp : call.get ())->isValid ();}
 		virtual const NumbatType * getType () const {return ref->getType ();}
+		virtual const std::list <const ASTbase *> getErrors () const {auto c = (callp ? callp : call.get ())->getErrors (), r = ref->getErrors (); c.splice (c.end (), r); return c;}
 		virtual size_t calculateWeight () const {return (callp ? callp : call.get ())->calculateWeight ();}
 		virtual size_t getBitSize () const {return ref->getBitSize ();}
 		virtual string getIden () const {return ref->getIden ();}
 		virtual string toString (const string & indent = "") const {return (callp ? callp : call.get ())->toString (indent) + " " + ref->toString ();}
 		
-		ASTcallindex () {}
-		ASTcallindex (const shared_ptr <ASTcallable> & call, const size_t index) : ref (call->getFunction ()->getType () [index]), call (call), callp (nullptr), index (index) {}
-		ASTcallindex (ASTcallable * call, const size_t index) : ref (call->getFunction ()->getType () [index]), callp (call), index (index) {}
+		ASTcallindex (size_t lineNo) : ASTbase (lineNo) {}
+		ASTcallindex (size_t lineNo, const shared_ptr <ASTcallable> & call, const size_t index) : ASTbase (lineNo), ref (call->getFunction ()->getType () [index]), call (call), callp (nullptr), index (index) {}
+		ASTcallindex (size_t lineNo, ASTcallable * call, const size_t index) : ASTbase (lineNo), ref (call->getFunction ()->getType () [index]), callp (call), index (index) {}
 	private:
 		ASTnode ref;
 		shared_ptr <ASTcallable> call;

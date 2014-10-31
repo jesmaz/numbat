@@ -21,14 +21,15 @@ class ASTmemcpy : public ASTbase {
 		virtual bool isConst () const {return dest->isConst ();}
 		virtual bool isParsed () const {return source->isParsed () and dest->isParsed () and (!conv or conv->isParsed ());}
 		virtual bool isValid () const {return source->isValid () and dest->isValid () and (!conv or conv->isValid ());}
+		virtual const std::list <const ASTbase *> getErrors () const {auto d = dest->getErrors (), s = source->getErrors (); d.splice (d.end (), s); return d;}
 		virtual const NumbatType * getType () const {return dest->getType ();}
 		virtual size_t calculateWeight () const {return dest->calculateWeight () + source->calculateWeight () + (conv ? conv->calculateWeight () : 0);}
 		virtual size_t getBitSize () const {return dest->getBitSize ();}
 		virtual string getIden () const {return dest->getIden ();}
 		virtual string toString (const string & indent = "") const {return indent + dest->toString () + " = " + source->toString ();}
 		
-		ASTmemcpy () {}
-		ASTmemcpy (const ASTnode & dest, const ASTnode & source, const shared_ptr <ASTcallable> & conv = nullptr) :dest (dest),  source (source), conv (conv) {}
+		ASTmemcpy (size_t lineNo) : ASTbase (lineNo) {}
+		ASTmemcpy (size_t lineNo, const ASTnode & dest, const ASTnode & source, const shared_ptr <ASTcallable> & conv = nullptr) : ASTbase (lineNo), dest (dest),  source (source), conv (conv) {}
 	private:
 		ASTnode dest, source;
 		shared_ptr <ASTcallable> conv;
