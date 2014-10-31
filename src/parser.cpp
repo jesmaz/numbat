@@ -547,7 +547,15 @@ void * futureFunc (void * data) {
 	
 	std::tuple <Position, NumbatScope *, FunctionDecleration *> * args = reinterpret_cast <std::tuple <Position, NumbatScope *, FunctionDecleration *> *> (data);
 	Position body = nextBody (std::get <0> (*args));
-	std::get <2> (*args)->assignBody (parseBody (body ? body : std::get <0> (*args), std::get <1> (*args)));
+	ASTnode b = parseBody (body ? body : std::get <0> (*args), std::get <1> (*args));
+	if (!b->isReturned ()) {
+		if (std::get <2> (*args)->getType ().empty ()) {
+			b = ASTnode (new ASTbody (body.end->line, {b, ASTnode (new ASTreturnvoid (body.end->line))}));
+		} else {
+			b = ASTnode (new ASTreturn (body.end->line, b));
+		}
+	}
+	std::get <2> (*args)->assignBody (b);
 	delete args;
 	return nullptr;
 	
