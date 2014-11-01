@@ -431,12 +431,11 @@ void BodyGenerator::visit (ASTallocate & exp) {
 
 void BodyGenerator::visit (ASTbody & exp) {
 	
+	Value * val;
 	for (const ASTnode & node : exp.getBody ()) {
-		node->accept (*this);
-		while (stack.size ()) {
-			stack.pop ();
-		}
+		val = getValue (node);
 	}
+	stack.push (val);
 	
 }
 
@@ -951,6 +950,7 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 	
 	continueBlock = oldCont;
 	breakBlock = oldBreak;
+	stack.push (createTemp (builder.getInt (APInt (1, 0))));
 	
 }
 
