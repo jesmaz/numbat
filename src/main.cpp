@@ -211,6 +211,7 @@ int main (int argl, char ** args) {
 	
 	if (jit) {
 		numbat.getFunction <int> ("__entry__") ();
+		return 0;
 	}
 	
 	Module * mod = numbat.getModule ();
