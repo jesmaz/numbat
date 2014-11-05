@@ -1,0 +1,69 @@
+#This file contains code that is syntactically and semantically correct
+
+
+
+# Literals
+10
+10.5f
+30.4
+22f
+9q
+9.4q
+#"string"
+#"another string"
+#"s\tri\ng with speci\al chars"
+#"string with 'single' quotes"
+#"string with \"double\" quotes"
+#'character array literal'
+
+
+
+# Variables and assignment
+
+#basic
+int64 a = 100
+int64 b = 40
+a = b
+b = a
+int32 c
+c = a
+double d = 60.3
+#int8 d (c) TODO
+
+#complex
+
+
+
+
+# Arithmatic
+3 + 6
+4 + 6
+6 * 5 + 4
+2 + 6 / 3
+8 * 9 / 3 + 10.0
+(5+6) * 372 / 56
+3 % 10
+
+
+
+# Strings
+string s1 = "String"
+string s2 = "String too"
+string s3 = s1 ~ s2
+
+
+
+
+# Functions
+def f1 () -> () {
+	# takes 0 args, returns 0 values
+}
+
+def f2 (double a) -> (double) {
+	a * 30
+	# automatically returns a * 30
+}
+
+def f3 (double a) -> (double) a * 30
+
+# TODO: def f4 (double a) -> (a * 30)
