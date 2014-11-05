@@ -8,6 +8,7 @@
 #include <llvm/IR/Function.h>
 #include <llvm/IR/DataLayout.h>
 #include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/InlineAsm.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
@@ -70,8 +71,9 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		virtual void visit (ASTwhileloop & exp);
 		virtual void visit (NumbatScope & exp);
 		void visit (const shared_ptr <Module> & module);
+		void finalize () {diBuilder.finalize ();}
 		//std::vector <Value *> operator () (AbstractSyntaxTree & ast) {tree = &ast; ast.getBody ().accept (*this); return body;}
-		BodyGenerator (llvm::Module * mod, const DataLayout * dataLayout, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), dataLayout (dataLayout), activeFunction (nullptr), main (nullptr), memalloc (nullptr), memfree (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
+		BodyGenerator (llvm::Module * mod, const DataLayout * dataLayout, FunctionPassManager * fpm=nullptr) : breakBlock (nullptr), continueBlock (nullptr), dataLayout (dataLayout), diBuilder (*mod), activeFunction (nullptr), main (nullptr), memalloc (nullptr), memfree (nullptr), builder (getGlobalContext ()), context (getGlobalContext ()), module (mod), fpm (fpm) {}
 	protected:
 	private:
 		
@@ -88,6 +90,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 			stackVal (Value * ptr) : type (VALUE), valuePtr (ptr) {}
 		};
 		
+		DIFile getDIFile (const ParsingContext * context);
 		Function * getFunction (const FunctionDecleration * func);
 		Type * getType (const ASTnode & node);
 		Type * getType (const NumbatType * type);
@@ -104,6 +107,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		AbstractSyntaxTree * tree;
 		BasicBlock * breakBlock, * continueBlock;
 		const DataLayout * dataLayout;
+		DIBuilder diBuilder;
 		Function * activeFunction, * main, * memalloc, * memfree;
 		const FunctionDecleration * activeFunctionDecleration;
 		IRBuilder<> builder;
@@ -113,6 +117,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		std::map <const ASTbase *, Value *> tempValues;
 		std::map <const ASTbase *, Value *> values;
 		std::map <const FunctionDecleration *, Function *> functions;
+		std::map <const ParsingContext *, DIFile> diFiles;
 		std::map <const NumbatType *, Type *> structures;
 		std::map <const NumbatVariable *, Value *> namedValues;
 		std::map <string, Value *> strConstants;
@@ -121,6 +126,12 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		std::stack <Value *> stack;
 		std::vector <Value *> body;
 		//CallMeta callmeta;
+		struct {
+			DICompileUnit cu;
+			DIDescriptor scope;
+			DIFile file;
+			size_t line;
+		} debugContext;
 };
 
 
