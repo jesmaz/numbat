@@ -506,7 +506,7 @@ void * futureEnum (void * data) {
 	NumbatEnumType * enumType = std::get <2> (*params);
 	std::vector <ASTnode> args;
 	ASTnode type (new ASTtype (pos.itt->line, false, false, enumType->getBaseType ()));
-	ASTnode val (new ASTvariable (pos.itt->line, createVariable (scope, type, nullptr, "init value", true, false)));
+	ASTnode val (new ASTvariable (pos.itt->line, createVariable (scope, type, nullptr, "init value", true, true)));
 	while (Position exp = nextArg (pos)) {
 		//args.push_back (parseExpression (exp, scope));
 		string iden = exp.itt->iden;
