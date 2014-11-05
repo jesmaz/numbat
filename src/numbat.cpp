@@ -27,6 +27,7 @@ void Numbat::loadFromModule (const shared_ptr <parser::Module> & mod) {
 		//Commented out due to bug
 		//fpm.run (func);
 	}
+	generator.finalize ();
 }
 
 Numbat::Numbat() : module (new Module ("main", getGlobalContext ())) {
