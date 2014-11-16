@@ -1,3 +1,7 @@
+##Version 0.2.2##
+###Features###
+ - Basic debug symbol generation
+
 ##Version 0.2.1##
  - Removed leftover debug output
 ###Bug Fixes###
