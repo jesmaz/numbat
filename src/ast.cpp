@@ -83,7 +83,11 @@ void AbstractSyntaxTree::importModule (const shared_ptr <Module> & module, bool 
 		}
 	}
 	if (context.operators.empty ()) {
+		string file = context.file;
+		string path = context.path;
 		context = module->getAST ()->context;
+		context.file = file;
+		context.path = path;
 	}
 	
 }

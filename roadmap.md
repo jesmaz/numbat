@@ -20,8 +20,8 @@
  - [x] Print error nodes as errors and end compilation
 
 ##Version 0.2.2##
- - [ ] Compilation problems should cause a gracious failure
- - [ ] Debug symbol generation
+ - [x] Compilation problems should cause a gracious failure
+ - [x] Debug symbol generation
  - [ ] Formal documentation on the memory model including when destructors are called
 
 ##Version 0.2.3##

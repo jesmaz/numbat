@@ -75,7 +75,9 @@ const shared_ptr <Module> Module::createEmpty (const string & id) {
 	if (itt != allModules.end ()) {
 		return itt->second;
 	}
-	return allModules [id] = shared_ptr <Module> (new Module);
+	Module * mod = new Module;
+	getContext (mod->getAST ())->file = id;
+	return allModules [id] = shared_ptr <Module> (mod);
 	
 }
 
@@ -94,6 +96,13 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	size_t pos = file.find_last_of ("/");
 	allModules [file] = shared_ptr <Module> (new Module);
 	AbstractSyntaxTree * ast = allModules [file]->ast;
+	if (pos == string::npos) {
+		getContext (ast)->file = file;
+		getContext (ast)->path = "";
+	} else {
+		getContext (ast)->file = file.substr (pos+1);
+		getContext (ast)->path = file.substr (0, pos);
+	}
 	parseModule (Position (tks.begin (), lexer::findEOF (tks.begin (), tks.end ())), ast);
 	if (debugMode) {
 		std::cerr << ast->toString () << std::endl;

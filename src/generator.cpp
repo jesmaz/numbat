@@ -15,6 +15,14 @@ AllocaInst * createEntryBlockAlloc (Function * func, Type * type, const std::str
 	return tmp.CreateAlloca (type, arraySize, name.c_str ());
 }
 
+DIFile BodyGenerator::getDIFile (const ParsingContext * context) {
+	auto itt = diFiles.find (context);
+	if (itt != diFiles.end ()) {
+		return itt->second;
+	}
+	return diFiles [context] = diBuilder.createFile (context->file, context->path);
+}
+
 Type * BodyGenerator::getType (const ASTnode & node) {
 	
 	Type * t = getType (node->getType ());
@@ -140,6 +148,11 @@ Value * BodyGenerator::createTemp (Value * val) {
 
 Value * BodyGenerator::getValue (ASTbase * node,  bool ref) {
 	
+	DebugLoc oldLoc = builder.getCurrentDebugLocation ();
+	if (node->getLineNo () and debugContext.line != node->getLineNo ()) {
+		debugContext.line = node->getLineNo ();
+		builder.SetCurrentDebugLocation (DebugLoc::get (debugContext.line, 0, debugContext.scope));
+	}
 	auto itt = values.find (node);
 	Value * val = nullptr;
 	if (itt != values.end ()) {
@@ -154,6 +167,7 @@ Value * BodyGenerator::getValue (ASTbase * node,  bool ref) {
 	if (!ref and node->isAlias () and typeid (*node) == typeid (ASTvariable)) {
 		val = builder.CreateLoad (val);
 	}
+	builder.SetCurrentDebugLocation (oldLoc);
 	return val;
 	
 }
@@ -367,11 +381,19 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 	functions [func] = f;
 	ASTnode body = func->getBody ();
 	if (body and !body->isNil ()) {
+		auto oldDBC = debugContext;
 		Function * prev = activeFunction;
 		const FunctionDecleration * decl = activeFunctionDecleration;
 		BasicBlock * block = builder.GetInsertBlock ();
 		activeFunction = f;
 		activeFunctionDecleration = func;
+		debugContext.file = getDIFile (func->getContext ());
+		DIArray params;
+		DICompositeType ftype = diBuilder.createSubroutineType (debugContext.file, params);
+		size_t line = func->getBody ()->getLineNo ();
+		line = line ? line : 1;
+		debugContext.scope = diBuilder.createFunction (debugContext.cu, func->getIden (), f->getName (), debugContext.file, line, ftype, false, true, 0, 0, false, f);
+		debugContext.line = 0;
 		builder.SetInsertPoint (BasicBlock::Create (context, "entry", activeFunction));
 		auto beg = activeFunction->arg_begin ();
 		auto end = activeFunction->arg_end ();
@@ -387,6 +409,7 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 		activeFunction = prev;
 		builder.SetInsertPoint (block);
 		activeFunctionDecleration = decl;
+		debugContext = oldDBC;
 	}
 	return f;
 	
@@ -405,6 +428,16 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 		FunctionType * ft = FunctionType::get (Type::getVoidTy (context), false);
 		main = Function::Create (ft, Function::ExternalLinkage, "__entry__", module);
 		builder.SetInsertPoint (BasicBlock::Create (context, "entry", main));
+		
+		debugContext.cu = diBuilder.createCompileUnit (dwarf::DW_LANG_C99, "numbat", "/usr/local/bin", string ("numbat-0.2.2"), true, string (""), 0);
+		debugContext.file = diBuilder.createFile ("numbat", "/usr/local/bin");
+		
+		DIArray params;
+		DICompositeType ftype = diBuilder.createSubroutineType (debugContext.file, params);
+		debugContext.scope = diBuilder.createFunction (debugContext.cu, "__entry__", main->getName (), debugContext.file, 0, ftype, false, true, 0, 0, false, main);
+		debugContext.scope = diBuilder.createLexicalBlock (debugContext.scope, debugContext.file, 0, 0, 0);
+	} else {
+		debugContext.scope = diBuilder.createLexicalBlockFile (debugContext.scope, debugContext.file = getDIFile (getContext (&ast)));
 	}
 	activeFunction = main;
 	
@@ -431,12 +464,11 @@ void BodyGenerator::visit (ASTallocate & exp) {
 
 void BodyGenerator::visit (ASTbody & exp) {
 	
+	Value * val;
 	for (const ASTnode & node : exp.getBody ()) {
-		node->accept (*this);
-		while (stack.size ()) {
-			stack.pop ();
-		}
+		val = getValue (node);
 	}
+	stack.push (val);
 	
 }
 
@@ -951,6 +983,7 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 	
 	continueBlock = oldCont;
 	breakBlock = oldBreak;
+	stack.push (createTemp (builder.getInt (APInt (1, 0))));
 	
 }
 
@@ -976,6 +1009,9 @@ void BodyGenerator::visit (NumbatScope & exp) {
 
 void BodyGenerator::visit (const shared_ptr <Module> & nbtMod) {
 	
+	//std::cerr << getContext (nbtMod->getAST ())->file << std::endl;
+	//debugContext.scope = diBuilder.createCompileUnit (dwarf::DW_LANG_C99, getContext (nbtMod->getAST ())->file, getContext (nbtMod->getAST ())->path, string ("numbat-0.2.2"), true, string (""), 0);
+	//debugContext.scope = diBuilder.createFile (getContext (nbtMod->getAST ())->file, getContext (nbtMod->getAST ())->path);
 	auto itt = builtModules.find (nbtMod.get ());
 	if (itt != builtModules.end ()) return;
 	builtModules.insert (nbtMod.get ());
