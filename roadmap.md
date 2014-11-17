@@ -26,7 +26,7 @@
 
 ##Version 0.2.3##
  - [ ] Ensure unambiguous error messages
- - [ ] Make errors display line and file data correctly
+ - [x] Make errors display line and file data correctly
  - [ ] Remove duplicate errors from output
  - [ ] Remove redundant errors from output
 
