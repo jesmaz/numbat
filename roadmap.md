@@ -25,7 +25,6 @@
  - [x] Formal documentation on the memory model including when destructors are called
 
 ##Version 0.2.3##
- - [ ] Ensure unambiguous error messages
  - [x] Make errors display line and file data correctly
  - [ ] Remove duplicate errors from output
  - [ ] Remove redundant errors from output
