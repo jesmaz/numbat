@@ -850,6 +850,14 @@ void BodyGenerator::visit (ASTparamater & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTredirect & exp) {
+	
+	Value * target = getValue (exp.getLhs ().get (), true);
+	Value * source = getValue (exp.getRhs ().get ());
+	builder.CreateStore (source, target);
+	
+}
+
 void BodyGenerator::visit (ASTreinterpretCast & exp) {
 	
 	Type * target = getType (exp.getASTType ());
@@ -997,7 +1005,7 @@ void BodyGenerator::visit (NumbatScope & exp) {
 	
 	Value * val = nullptr;
 	for (const auto & node : exp.getBody ()) {
-		val = getValue (node);
+		if (!node->isNil ()) val = getValue (node);
 	}
 	
 	for (const auto & func : exp.getFunctions ()) {

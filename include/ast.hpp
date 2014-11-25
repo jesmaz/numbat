@@ -26,6 +26,7 @@
 #include "ast/memory/astconcat.hpp"
 #include "ast/memory/astgep.hpp"
 #include "ast/memory/astmemcpy.hpp"
+#include "ast/memory/astredirect.hpp"
 #include "ast/memory/aststructindex.hpp"
 #include "ast/memory/astvariable.hpp"
 #include "ast/memory/numbatvariable.hpp"
