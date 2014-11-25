@@ -187,8 +187,10 @@ ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const
 	//TODO: type inference
 	//TODO: initialisation of variables
 	if (args.size () != 2) return ASTnode (new ASToperatorError (0, "Assignment operators require exactly two arguments"));
-	ASTnode lhs = parseExpression (args [0], scope, *matches);
 	ASTnode rhs = parseExpression (args [1], scope, *matches);
+	if (!rhs->isValid ()) return rhs;
+	ASTnode lhs = parseExpression (args [0], scope, *matches);
+	if (!lhs->isValid ()) return rhs;
 	giveNode (scope, lhs);
 	giveNode (scope, rhs);
 	
@@ -362,8 +364,16 @@ ASTnode parseIndex (NumbatScope * scope, const string & func, const std::vector 
 
 ASTnode parseRedirectOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp) {
 	
+	if (args.size () != 2) return ASTnode (new ASToperatorError (0, "Redirect operator requires exactly two arguments"));
 	size_t line = args.front ().itt->line;
-	return ASTnode (new ASTerror (line, "Redirection is not yet implemented"));
+	ASTnode rhs = parseExpression (args [1], scope, *matches);
+	if (!rhs->isValid ()) return rhs;
+	if (!rhs->getType ()) return ASTnode (new ASTerror (line, rhs->getIden () + " has no type"));
+	ASTnode lhs = parseExpression (args [0], scope, *matches);
+	if (!lhs->isValid ()) return lhs;
+	if (!lhs->getType ()) return ASTnode (new ASTerror (line, lhs->getIden () + " has no type"));
+	if (lhs->getType () != rhs->getType ()) return ASTnode (new ASTerror (line, "Can not redirect ref " + lhs->getType ()->getIden () + " to " + rhs->getType ()->getIden ()));
+	return ASTnode (new ASTredirect (line, lhs, rhs));
 	
 }
 
