@@ -24,14 +24,10 @@
  - [x] Debug symbol generation
  - [x] Formal documentation on the memory model including when destructors are called
 
-##Version 0.2.3##
- - [x] Make errors display line and file data correctly
- - [ ] Remove duplicate errors from output
- - [ ] Remove redundant errors from output
-
 ##Version 0.3##
  - [ ] Destructors
  - [ ] File I/O
+ - [x] Make errors display line and file data correctly
  - [ ] Socket I/O (TCP and UDP only)
  - [ ] Smart pointers (reference counting)
 
