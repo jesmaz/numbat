@@ -654,7 +654,8 @@ void * parseFunctionDecleration (Position pos, NumbatScope * scope) {
 		++pos;
 	}
 	
-	FunctionDecleration * funcDec = createFunctionDecleration (scope, iden, param, type, tags);
+	FunctionDecleration * funcDec = createFunctionDecleration (scope, iden, param, type, tags, fScope);
+	setFunction (fScope, funcDec);
 	if (funcDec) {
 		std::set <const NumbatType *> types;
 		for (ASTnode & a : param) {
