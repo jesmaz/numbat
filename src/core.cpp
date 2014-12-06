@@ -105,7 +105,9 @@ ASTnode defCompare (NumbatScope * scope, const string & func, const std::vector<
 
 ASTnode defConcat (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
 	
-	return ASTnode (new ASTconcat (args [0]->getLineNo (), args [0], args [1]));
+	ASTnode init = ASTnode (new ASTconcat (args [0]->getLineNo (), args [0], args [1]));
+	NumbatVariable * var = createVariable (scope, args [0]->getASTType (), init, "concat", false, true);
+	return ASTnode (new ASTvariable (args [0]->getLineNo (), var));
 	
 }
 
