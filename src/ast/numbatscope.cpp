@@ -184,6 +184,7 @@ bool NumbatScope::symbolRegisted (const string & iden) {
 NumbatScope * createChild (NumbatScope * scope) {
 	NumbatScope * child = new NumbatScope (0, scope->context);
 	child->parent = scope; 
+	child->func = scope->func;
 	scope->children.insert (unique_ptr <NumbatScope> (child));
 	return child;
 }
@@ -198,9 +199,9 @@ const NumbatType * getType (NumbatScope * scope, const string & iden) {
 	
 }
 
-FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags) {
+FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags, const NumbatScope * fScope) {
 	
-	FunctionDecleration * func = new FunctionDecleration (iden, args, type, metaTags, getContext (scope));
+	FunctionDecleration * func = new FunctionDecleration (iden, args, type, metaTags, getContext (scope), fScope);
 	if (!scope->registerSymbol (iden, func)) {
 		delete func;
 		func = nullptr;

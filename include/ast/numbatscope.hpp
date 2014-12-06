@@ -47,7 +47,8 @@ class NumbatScope : public ASTbase {
 		friend ParsingContext * getContext (NumbatScope * scope);
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
-		friend FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags);
+		friend FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags, const NumbatScope * fScope);
+		friend FunctionDecleration * getFunction (NumbatScope * scope);
 		friend NumbatEnumType * createEnum (NumbatScope * scope, const string & iden, const NumbatType * baseType, const std::set <string> & meta);
 		friend NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
 		friend NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set <string> & meta);
@@ -59,6 +60,7 @@ class NumbatScope : public ASTbase {
 		
 		friend void addToBody (NumbatScope * scope, ASTnode n);
 		friend void giveNode (NumbatScope * scope, ASTnode n);
+		friend void setFunction (NumbatScope * scope, FunctionDecleration * funcDec);
 		
 	protected:
 		
@@ -89,7 +91,8 @@ class NumbatScope : public ASTbase {
 		std::vector <ASTnode> body;
 		std::vector <std::map <void *, unique_ptr <NumbatPointerType>>> arrayTypes;
 		
-		NumbatScope * parent=nullptr;;
+		NumbatScope * parent=nullptr;
+		FunctionDecleration * func=nullptr;
 		ParsingContext * context;
 		mutable int valid = -1;
 		
@@ -103,6 +106,7 @@ inline ParsingContext * getContext (NumbatScope * scope) {return scope->context;
 std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 
 FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags);
+inline FunctionDecleration * getFunction (NumbatScope * scope) {return scope->func;}
 NumbatEnumType * createEnum (NumbatScope * scope, const string & iden, const NumbatType * baseType, const std::set <string> & meta);
 NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
 NumbatType * createStruct (NumbatScope * scope, const string & iden, const std::set <string> & meta);
@@ -114,6 +118,7 @@ const NumbatVariable * getVariable (NumbatScope * scope, const string & iden);
 
 inline void addToBody (NumbatScope * scope, ASTnode n) {scope->body.push_back (n);}
 inline void giveNode (NumbatScope * scope, ASTnode n) {scope->nodes.insert (n);}
+inline void setFunction (NumbatScope * scope, FunctionDecleration * funcDec) {scope->func = funcDec;}
 
 
 }
