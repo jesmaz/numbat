@@ -66,6 +66,18 @@ ASTnode defAs (NumbatScope * scope, const string & func, const std::vector <ASTn
 	
 }
 
+ASTnode defAssign (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args) {
+	
+	std::vector <FunctionDecleration *> candidates = args [0]->getType ()->getMethods (func);
+	auto callable = findBestMatch (std::vector <ASTnode> {args [0], args [1]}, candidates);
+	if (callable->isValid ()) {
+		return ASTnode (new ASTcall (args [0]->getLineNo (), callable, createStaticCast (std::vector <ASTnode> {args [0], args [1]}, callable->getFunction ()->getType ())));
+	} else {
+		return ASTnode (new ASTmemcpy (args [0]->getLineNo (), args [0], createStaticCast (args [1], args [0])));
+	}
+	
+}
+
 ASTnode defCompare (NumbatScope * scope, const string & func, const std::vector< ASTnode > & args) {
 	
 	const NumbatType * nType = getType (scope, "bool");
@@ -212,13 +224,7 @@ ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const
 		return ASTnode (new ASTtuple (args [0].itt->line, std::list <ASTnode> {lhs, rhs}));
 	}
 	
-	std::vector <FunctionDecleration *> candidates = lhs->getType ()->getMethods (func);
-	auto callable = findBestMatch (std::vector <ASTnode> {lhs, rhs}, candidates);
-	if (callable->isValid ()) {
-		return ASTnode (new ASTcall (args [0].itt->line, callable, createStaticCast (std::vector <ASTnode> {lhs, rhs}, callable->getFunction ()->getType ())));
-	} else {
-		return ASTnode (new ASTmemcpy (args [0].itt->line, lhs, createStaticCast (rhs, lhs)));
-	}
+	return defAssign (scope, func, {lhs, rhs});
 	
 }
 
