@@ -43,6 +43,7 @@ class NumbatScope : public ASTbase {
 		
 		friend ASTnode collectDestructors (const NumbatScope * scope);
 		friend ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent=nullptr, bool cascade=true, bool local=true);
+		friend const NumbatScope * getParent (const NumbatScope * scope);
 		friend NumbatScope * createChild (NumbatScope * scope);
 		friend ParsingContext * getContext (NumbatScope * scope);
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
@@ -101,6 +102,7 @@ class NumbatScope : public ASTbase {
 
 ASTnode collectDestructors (const NumbatScope * scope);
 ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent, bool cascade, bool local);
+inline const NumbatScope * getParent (const NumbatScope * scope) {return scope->parent;}
 NumbatScope * createChild (NumbatScope * scope);
 inline ParsingContext * getContext (NumbatScope * scope) {return scope->context;}
 std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
