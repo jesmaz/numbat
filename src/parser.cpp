@@ -451,7 +451,9 @@ void parseBodyInline (Position pos, NumbatScope * scope) {
 				
 			case TOKEN::ret:
 				if (++exp) {
-					addToBody (scope, ASTnode (new ASTreturn (exp.itt->line, parseExpression (exp, scope))));
+					size_t line = exp.itt->line;
+					ASTnode lhs = getFunction (scope)->getType () [0];
+					addToBody (scope, ASTnode (new ASTreturn (line, defAssign (scope, " = ", {lhs, parseExpression (exp, scope)}))));
 				} else {
 					addToBody (scope, ASTnode (new ASTreturnvoid (exp.itt->line)));
 				}
@@ -650,6 +652,14 @@ void * parseFunctionDecleration (Position pos, NumbatScope * scope) {
 		}
 		end = findToken (pos.itt, pos.end, TOKEN::symbol, ")");
 		type = parseArgs (Position (pos.itt + 1, end), fScope);
+		size_t index = 0;
+		for (ASTnode & e : type) {
+			if (typeid (*e.get ()) != typeid (ASTvariable)) {
+				NumbatVariable * var = createVariable (fScope, e, nullptr, iden + " " + e->getIden () + " " + std::to_string (index), false, false);
+				e = ASTnode (new ASTvariable (e->getLineNo (), var));
+			}
+			++index;
+		}
 		pos.itt = end;
 		++pos;
 	}
