@@ -275,6 +275,17 @@ NumbatType * getArrayType (NumbatScope * scope, const NumbatType * type, size_t 
 	return ptrType;
 }
 
+const NumbatVariable * getVariable (NumbatScope * scope, const string & iden) {
+	
+	auto itt = scope->variables.find (iden);
+	if (itt != scope->variables.end ()) {
+		return itt->second.get ();
+	} else {
+		return nullptr;
+	}
+	
+}
+
 const NumbatType * NumbatScope::getType (const string & iden) {
 	
 	auto itt = types.find (iden);
