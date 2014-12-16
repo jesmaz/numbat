@@ -25,6 +25,7 @@ class NumbatScope : public ASTbase {
 	VISITABLE
 	public:
 		
+		const std::map <string, shared_ptr <NumbatVariable>> & getVariables () const {return variables;}
 		const std::multimap <string, shared_ptr <FunctionDecleration>> & getFunctions () const {return functions;}
 		const std::set <NumbatEnumType *> & getEnums () const {return enums;}
 		const std::vector <ASTnode> & getBody () const {return body;}
