@@ -71,9 +71,39 @@ ASTnode defAssign (NumbatScope * scope, const string & func, const std::vector <
 	std::vector <FunctionDecleration *> candidates = args [0]->getType ()->getMethods (func);
 	auto callable = findBestMatch (std::vector <ASTnode> {args [0], args [1]}, candidates);
 	if (callable->isValid ()) {
-		return ASTnode (new ASTcall (args [0]->getLineNo (), callable, createStaticCast (std::vector <ASTnode> {args [0], args [1]}, callable->getFunction ()->getType ())));
+		return callable;
 	} else {
-		return ASTnode (new ASTmemcpy (args [0]->getLineNo (), args [0], createStaticCast (args [1], args [0])));
+		ASTnode lhs = args [0], rhs = createStaticCast (args [1], args [0]);
+		if (lhs->getType ()->isSimple () or lhs->getType ()->isArray ()) {
+			return ASTnode (new ASTmemcpy (lhs->getLineNo (), lhs, rhs));
+		} else {
+			NumbatScope * fScope = createChild (scope);
+			ASTnode lhstype (new ASTtype (lhs->getLineNo (), true, false, lhs->getType ()));
+			ASTnode rhstype (new ASTtype (lhs->getLineNo (), true, true, lhs->getType ()));
+			ASTnode rettype (new ASTtype (lhs->getLineNo (), false, false, lhs->getType ()));
+			ASTnode varLhs (new ASTvariable (lhs->getLineNo (), createVariable (fScope, lhstype, nullptr, "lhs", false, false)));
+			ASTnode varRhs (new ASTvariable (lhs->getLineNo (), createVariable (fScope, rhstype, nullptr, "rhs", false, false)));
+			ASTnode varRet (new ASTvariable (lhs->getLineNo (), createVariable (fScope, rettype, nullptr, "ret", false, false)));
+			FunctionDecleration * funcDec = createFunctionDecleration (scope, func, {varLhs, varRhs}, {varRet}, {}, fScope);
+			setFunction (fScope, funcDec);
+			
+			if (funcDec) {
+				const NumbatVariable * var = getVariable (fScope, "lhs");
+				auto & members = var->getType ()->getMembers ();
+				size_t i=0, l=members.size ();
+				ASTnode tmpLhs (fScope->resolveSymbol ("lhs"));
+				ASTnode tmpRhs (fScope->resolveSymbol ("rhs"));
+				for (; i<l; ++i) {
+					addToBody (fScope, defAssign (fScope, func, {ASTnode (new ASTstructIndex (tmpLhs->getLineNo (), i, tmpLhs)), ASTnode (new ASTstructIndex (tmpRhs->getLineNo (), i, tmpRhs))}));
+				}
+				addToBody (fScope, ASTnode (new ASTreturn (lhs->getLineNo (), fScope->resolveSymbol ("lhs"))));
+				const_cast <NumbatType *> (lhs->getType ())->addMethod (func, funcDec);
+				funcDec->assignBody (* new ASTnode (fScope));
+				return defAssign (scope, func, args);
+			} else {
+				return ASTnode (new ASTerror (lhs->getLineNo (), "Unable to create a default assignment operator for '" + lhs->getASTType ()->getIden () + "'"));
+			}
+		}
 	}
 	
 }
