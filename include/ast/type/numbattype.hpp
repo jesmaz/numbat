@@ -32,6 +32,7 @@ class NumbatType {
 		virtual const bool isFloat () const {return false;}
 		virtual const bool isRaw () const {return false;}
 		virtual const bool isSigned () const {return false;}
+		virtual const bool isSimple () const {bool simple = true; for (const ASTnode & m : members) simple &= m->getType ()->isSimple (); return simple;}
 		virtual const bool isValid () const;
 		virtual const size_t getBitSize () const;
 		virtual const ssize_t getLengthIndex () const {return -1;}

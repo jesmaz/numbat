@@ -13,6 +13,7 @@ class NumbatPointerType : public NumbatType {
 		const ASTnode & getDataType () const {return dataType;}
 		virtual const ASTnode getArrayType () const {return dataType;}
 		virtual const bool isArray () const {return true;}
+		virtual const bool isSimple () const {return false;}
 		virtual const bool isValid () const;
 		virtual const size_t getBitSize () const {return 64;}
 		virtual const ssize_t getLengthIndex () const {return 0;}
