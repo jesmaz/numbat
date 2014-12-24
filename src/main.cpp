@@ -94,6 +94,7 @@ int main (int argl, char ** args) {
 	//core->addOperator (200, true, "[ ] ", parser::parseTemplate);
 	core->addOperator (200, true, " []", parser::parseIndex);
 	core->addOperator (200, true, " [ ]", parser::parseIndex);
+	core->addOperator (200, true, " [] ", parser::parseArrayDecleration);
 	core->addOperator (200, true, " [ ] ", parser::parseArrayDecleration);
 	core->addOperator (200, true, " . ", parser::parseReferenceOperator);
 	
