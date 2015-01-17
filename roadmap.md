@@ -26,6 +26,10 @@
 
 ##Version 0.3##
  - [ ] Destructors
+   - [ ] Freeing arrays
+   - [ ] Overloading
+   - [ ] Recursive struct destructors
+   - [ ] Temporary variables
  - [ ] File I/O
  - [x] Make errors display line and file data correctly
  - [ ] Socket I/O (TCP and UDP only)
