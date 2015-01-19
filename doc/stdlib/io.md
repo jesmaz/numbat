@@ -96,10 +96,10 @@ def write (OPipe pipe, const ref uint8 [] data) -> (uint64 length)=0
 
 ###OStream
 
-Extends 'IPipe'
+Extends 'OPipe'
 
 ```
-interface IStream : IPipe
+interface OStream : OPipe
 ```
 
 ####print
@@ -130,13 +130,45 @@ interface Stream : IStream, OStream
 
 ##Data Types
 
+###FileDescriptor
+
 ```
 struct FileDescriptor : Descriptor
+```
+
+###IFile
+
+```
 struct IFile : IPipe
+```
+
+###BasicIStream
+
+```
 struct BasicIStream : IStream
+```
+
+###OFile
+
+```
 struct OFile : OPipe
+```
+
+###BasicOStream
+
+```
 struct BasicOStream : OStream
+```
+
+###File
+
+```
 struct File : Pipe
+```
+
+###BasicStream
+
+```
 struct BasicStream : Stream
 ```
 
