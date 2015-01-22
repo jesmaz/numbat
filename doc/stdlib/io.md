@@ -10,9 +10,11 @@ import io
 ```
 
 
+
 ##Interfaces
 
 **_Note: Interfaces have not been specified, the example code in this section is subject to change._**
+
 
 ###Descriptor
 
@@ -36,6 +38,7 @@ Abstract function that returns the current state of the Descriptor.
 def state (Descriptor descriptor) -> (State state)=0
 ```
 
+
 ###IPipe
 
 Extends 'Descriptor'
@@ -51,6 +54,7 @@ Abstract function that returns an array of up to 'length' bytes read from the un
 ```
 def read (IPipe pipe, uint64 length) -> (uint8 [] data)=0
 ```
+
 
 ###IStream
 
@@ -78,6 +82,7 @@ Returns a the next token, the stream's new position is the first character after
 def scan (IStream pipe) -> (string token)
 ```
 
+
 ###OPipe
 
 Extends 'Descriptor'
@@ -93,6 +98,7 @@ Abstract function that writes the contents of the 'data' argument to the underly
 ```
 def write (OPipe pipe, const ref uint8 [] data) -> (uint64 length)=0
 ```
+
 
 ###OStream
 
@@ -110,6 +116,7 @@ Writes the formatted bytes in a string to the underlying descriptor in utf-8. Th
 def print (IStream pipe, const ref string str) -> ()
 ```
 
+
 ###Pipe
 
 Extends 'IPipe' and 'OPipe'
@@ -117,6 +124,7 @@ Extends 'IPipe' and 'OPipe'
 ```
 interface Pipe : IPipe, OPipe
 ```
+
 
 ###Stream
 
@@ -130,49 +138,74 @@ interface Stream : IStream, OStream
 
 ##Data Types
 
+
 ###FileDescriptor
 
+Implements 'Descriptor'
+
 ```
-struct FileDescriptor : Descriptor
+struct FileDescriptor
 ```
+
 
 ###IFile
 
+Implements 'IPipe'
+
 ```
-struct IFile : IPipe
+struct IFile
 ```
+
 
 ###BasicIStream
 
+Implements 'IStream'
+
 ```
-struct BasicIStream : IStream
+struct BasicIStream
 ```
+
 
 ###OFile
 
+Implements 'OPipe'
+
 ```
-struct OFile : OPipe
+struct OFile
 ```
+
 
 ###BasicOStream
 
+Implements 'OStream'
+
 ```
-struct BasicOStream : OStream
+struct BasicOStream
 ```
+
 
 ###File
 
+Implements 'Pipe'
+
 ```
-struct File : Pipe
+struct File
 ```
+
 
 ###BasicStream
 
+Implements 'Stream'
+
 ```
-struct BasicStream : Stream
+struct BasicStream
 ```
 
+
+
+
 ##Functions
+
 
 ###print
 
@@ -180,6 +213,7 @@ Calls print on the stdout stream.
 
 ```
 def print (const ref string str) -> ()
+
 
 ###scan
 
