@@ -207,6 +207,23 @@ struct File
 ```
 
 
+###FileMode
+
+Describes the mode for opening file descriptors
+
+```
+enum @flags FileMode
+```
+
+####Values
+ - Append
+ - Nonblock
+ - Read
+ - Sync
+ - Truncate
+ - Write
+
+
 ###BasicStream
 
 Implements 'Stream'
@@ -223,12 +240,20 @@ struct BasicStream
 ##Functions
 
 
+###open
+
+```
+def open (string path, FileMode mode=Append|Read|Write) -> (FileDescriptor fd)
+```
+
+
 ###print
 
 Calls print on the stdout stream.
 
 ```
 def print (const ref string str) -> ()
+```
 
 
 ###scan
