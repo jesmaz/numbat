@@ -151,6 +151,39 @@ Provides low level file access.
 struct FileDescriptor
 ```
 
+####close
+
+Closes the file, returning any freed resources to the operating system. Subsequent calls to either read or write will fail regardless of the mode the file was initially opened with. Attempting to close a FileDescriptor that has already been closed has no effect.
+
+```
+def close (ref FileDescriptor fd) -> ()
+```
+
+####read
+
+Reads up to 'length' bytes from the file and returns them in an array.
+
+```
+def read (ref FileDescriptor fd, uint64 length) -> (uint8 [] data)
+```
+
+####state
+
+Returns the current state of the Descriptor.
+
+```
+def state (const ref FileDescriptor fd) -> (State state)
+```
+
+####write
+
+Writes the contents of the 'data' argument to the file. The number of successfully written bytes is returned. Writing to a file in read-only mode will automatically fail.
+
+```
+def write (ref FileDescriptor fd, const ref uint8 [] data) -> (uint64 length)
+```
+
+
 
 ###IFile
 
