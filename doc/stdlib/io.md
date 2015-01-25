@@ -2,6 +2,8 @@
 
 This document specifies the API exposed by the io library.
 
+
+
 ##Usage
 
 The io library can be accessed with the following import statement.
@@ -143,6 +145,8 @@ interface Stream : IStream, OStream
 
 Implements 'Descriptor'
 
+Provides low level file access.
+
 ```
 struct FileDescriptor
 ```
@@ -151,6 +155,8 @@ struct FileDescriptor
 ###IFile
 
 Implements 'IPipe'
+
+Provides low level access to files in input mode.
 
 ```
 struct IFile
@@ -161,6 +167,8 @@ struct IFile
 
 Implements 'IStream'
 
+Provides high level support for input operations on character streams.
+
 ```
 struct BasicIStream
 ```
@@ -169,6 +177,8 @@ struct BasicIStream
 ###OFile
 
 Implements 'OPipe'
+
+Provides low level access to files in output mode.
 
 ```
 struct OFile
@@ -179,6 +189,8 @@ struct OFile
 
 Implements 'OStream'
 
+Provides high level support for output operations on character streams.
+
 ```
 struct BasicOStream
 ```
@@ -188,6 +200,8 @@ struct BasicOStream
 
 Implements 'Pipe'
 
+Provides low level access to files in input and output mode.
+
 ```
 struct File
 ```
@@ -196,6 +210,8 @@ struct File
 ###BasicStream
 
 Implements 'Stream'
+
+Provides high level support for input and output operations on character streams.
 
 ```
 struct BasicStream
