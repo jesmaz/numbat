@@ -44,10 +44,10 @@
    - [ ] Copying
    - [ ] Destruction
    - [ ] Initialisation
- - [ ] Replace ASTnumbatInstruction with a more robust solution
 
 ##Version 0.4##
  - [ ] High level optimisation pass
+ - [ ] Replace ASTnumbatInstruction with a more robust solution
  - [ ] Rewrite parser
    - [ ] Parser should be bottom up
    - [ ] Parser should not handle semantics, only syntax
