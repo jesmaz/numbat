@@ -299,6 +299,77 @@ Value * BodyGenerator::pointerTypeGEP (Value * val, const NumbatPointerType * pt
 	
 }
 
+void BodyGenerator::buildCleanup (const NumbatScope * scope, bool cascade) {
+	if (!scope) return;
+	if (scope == activeFunctionDecleration->getScope ()) {
+		for (const ASTnode & e : activeFunctionDecleration->getArgs ()) {
+			if (!e->isAlias ()) {
+				buildDestructor (getValue (e), e->getType ());
+			}
+		}
+	} else {
+		for (const auto & var : scope->getVariables ()) {
+			if (namedValues.find (var.second.get ()) == namedValues.end ()) return;
+			if (!var.second->isAlias ()) {
+				buildDestructor (builder.CreateLoad (getVariableHandle (var.second.get ())), var.second->getType ());
+			}
+		}
+		if (cascade) {
+			buildCleanup (getParent (scope), true);
+		}
+	}
+}
+
+void BodyGenerator::buildDestructor (Value * val, const NumbatType * type) {
+	
+	bool ptrType = typeid (*type) == typeid (NumbatPointerType);
+	BasicBlock * resume = nullptr;
+	
+	if (ptrType) {
+		
+		BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
+		resume = BasicBlock::Create (context, "resume", activeFunction);
+		
+		Value * cond = builder.CreateICmpNE (initialise (type), val);
+		
+		builder.CreateCondBr (cond, body, resume);
+		builder.SetInsertPoint (body);
+	}
+	
+	size_t index=0;
+	for (const ASTnode & m : type->getMembers ()) {
+		if (!m->isAlias ()) {
+			if (ptrType) {
+				buildDestructor (builder.CreateLoad (pointerTypeGEP (val, static_cast <const NumbatPointerType *> (type), index)), m->getType ());
+			} else {
+				buildDestructor (builder.CreateExtractValue (val, {uint32_t (index)}), m->getType ());
+			}
+		}
+		++index;
+	}
+	
+	if (ptrType) {
+		
+		const NumbatPointerType * pType = static_cast <const NumbatPointerType *> (type);
+		size_t mdsize=0;
+		for (auto & t : pType->getMembers ()) {
+			mdsize += dataLayout->getTypeAllocSize (getType (t));
+		}
+		
+		//TODO: iterate over array and call buildDestructor in loop
+		Value * ptrint = builder.CreateSub (builder.CreatePtrToInt (val, Type::getInt64Ty (context)), builder.getInt64 (mdsize));
+		Value * call = builder.CreateCall (getFunction (pType->getDataType ()->getType ()->getFree ()), std::vector <Value *> (1, ptrint));
+		//std::cerr << " Free: "; val->dump ();
+		
+	}
+	
+	if (resume) {
+		builder.CreateBr (resume);
+		builder.SetInsertPoint (resume);
+	}
+	
+}
+
 void BodyGenerator::createMemCpy (Value * dest, Value * source, Value * length, const shared_ptr <ASTcallable> & conv) {
 	
 	if (!conv) {
@@ -452,6 +523,7 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 	if (builder.GetInsertBlock ()->getTerminator ()) builder.GetInsertBlock ()->getTerminator ()->eraseFromParent ();
 	
 	visit (static_cast <NumbatScope &> (ast));
+	scope = &ast;
 	
 	builder.CreateRetVoid ();
 	verifyFunction (*activeFunction);
@@ -491,9 +563,11 @@ void BodyGenerator::visit (ASTbranch & exp) {
 	builder.CreateCondBr (cond, body, alt);
 	builder.SetInsertPoint (body);
 	exp.getBody ()->accept (*this);
+	bool reta = returned; returned = false;
 	builder.CreateBr (resume);
 	builder.SetInsertPoint (alt);
 	exp.getAlt ()->accept (*this);
+	returned = reta and returned;
 	builder.CreateBr (resume);
 	builder.SetInsertPoint (resume);
 	
@@ -880,6 +954,8 @@ void BodyGenerator::visit (ASTreinterpretCast & exp) {
 void BodyGenerator::visit (ASTreturn & exp) {
 	
 	Value * ret, * val = getValue (exp.getExpr ());
+	buildCleanup (scope, true);
+	returned = true;
 	if (val->getType ()->isStructTy ()) {
 		if (activeFunctionDecleration->hasTag ("cstyle")) {
 			val = builder.CreateExtractValue (val, {0});
@@ -897,6 +973,8 @@ void BodyGenerator::visit (ASTreturn & exp) {
 }
 
 void BodyGenerator::visit (ASTreturnvoid & exp) {
+	buildCleanup (scope, true);
+	returned = true;
 	stack.push (builder.CreateRetVoid ());
 }
 
@@ -991,11 +1069,14 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 	continueBlock = oldCont;
 	breakBlock = oldBreak;
 	stack.push (createTemp (builder.getInt (APInt (1, 0))));
+	returned = false;
 	
 }
 
 void BodyGenerator::visit (NumbatScope & exp) {
 	
+	returned = false;
+	scope = &exp;
 	for (NumbatEnumType * et : exp.getEnums ()) {
 		for (const auto & node : et->getMembers ()) {
 			getValue (node);
@@ -1004,13 +1085,16 @@ void BodyGenerator::visit (NumbatScope & exp) {
 	
 	Value * val = nullptr;
 	for (const auto & node : exp.getBody ()) {
+		//if (returned) break;//TODO: throw dead code warning
 		if (!node->isNil ()) val = getValue (node);
 	}
+	if (!returned) buildCleanup (&exp, false);
+	stack.push (val);
 	
 	for (const auto & func : exp.getFunctions ()) {
 		getFunction (func.second.get ());
 	}
-	stack.push (val);
+	scope = getParent (&exp);
 	
 }
 
