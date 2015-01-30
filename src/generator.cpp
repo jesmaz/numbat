@@ -657,21 +657,12 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 	Value * length = nullptr;
 	
 	if (ASTnode len = ASTbase::getLength (exp.getDest ())) {
-		Value * llen = builder.CreateLoad (getValue (len));
 		ASTnode rlen = ASTbase::getLength (exp.getSource ());
-		
-		BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
-		BasicBlock * resume = BasicBlock::Create (context, "resume", activeFunction);
 		
 		Value * srclen = builder.CreateLoad (getValue (rlen));
 		
-		Value * cond = builder.CreateICmpULT (llen, srclen);
-		
-		builder.CreateCondBr (cond, body, resume);
-		builder.SetInsertPoint (body);
+		buildDestructor (builder.CreateLoad (dest), exp.getDest ()->getType ());
 		builder.CreateStore (builder.CreateLoad (allocteArray (srclen, dynamic_cast <const NumbatPointerType *> (exp.getDest ()->getType ()))), dest);
-		builder.CreateBr (resume);
-		builder.SetInsertPoint (resume);
 		length = srclen;
 	} else if (exp.getDest ()->isArray ()) {
 		dest = builder.CreateLoad (dest);
