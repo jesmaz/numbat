@@ -201,15 +201,23 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 			if (var->getType ()->isArray ()) {
 				const NumbatPointerType * pType = static_cast <const NumbatPointerType *> (var->getType ());
 				Value * val = getValue (init);
-				Value * arrayPtr = builder.CreateLoad (builder.CreateExtractValue (val, {0}));
-				for (size_t i=0; i<pType->getMembers ().size (); ++i) {
-					Value * dest = pointerTypeGEP (arrayPtr, pType, i), * source = builder.CreateLoad (builder.CreateExtractValue (val, {i+1}));
-					builder.CreateStore (source, dest);
-				}
-				if (var->isAlias ()) {
-					builder.CreateStore (builder.CreateExtractValue (val, {0}), hand);
+				if (val->getType ()->isStructTy ()) {
+					Value * arrayPtr = builder.CreateLoad (builder.CreateExtractValue (val, {0}));
+					for (size_t i=0; i<pType->getMembers ().size (); ++i) {
+						Value * dest = pointerTypeGEP (arrayPtr, pType, i), * source = builder.CreateLoad (builder.CreateExtractValue (val, {i+1}));
+						builder.CreateStore (source, dest);
+					}
+					if (var->isAlias ()) {
+						builder.CreateStore (builder.CreateExtractValue (val, {0}), hand);
+					} else {
+						builder.CreateStore (arrayPtr, hand);
+					}
 				} else {
-					builder.CreateStore (arrayPtr, hand);
+					if (var->isAlias ()) {
+						builder.CreateStore (val, hand);
+					} else {
+						builder.CreateStore (builder.CreateLoad (val), hand);
+					}
 				}
 			} else {
 				builder.CreateStore (builder.CreateLoad (getValue (init)), hand);

@@ -102,6 +102,8 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		Value * initialise (const NumbatType * var);
 		Value * makeCompare (Value * val);
 		Value * pointerTypeGEP (Value * ptr, const NumbatPointerType * ptrType, size_t index);
+		void buildCleanup (const NumbatScope * scope, bool cascade);
+		void buildDestructor (Value * val, const NumbatType * var);
 		void createMemCpy (Value * dest, Value * source, Value * length, const shared_ptr <ASTcallable> & conv);
 		Value * makeCompare (const ASTnode & exp);
 		
@@ -111,6 +113,8 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		DIBuilder diBuilder;
 		Function * activeFunction, * main, * memalloc, * memfree;
 		const FunctionDecleration * activeFunctionDecleration;
+		const NumbatScope * scope;
+		bool returned;
 		IRBuilder<> builder;
 		LLVMContext & context;
 		llvm::Module * module;
