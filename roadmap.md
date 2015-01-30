@@ -31,9 +31,27 @@
    - [ ] Recursive struct destructors
    - [ ] Temporary variables
  - [ ] File I/O
+   - [ ] Document a specification
+   - [ ] Reference implementation
  - [x] Make errors display line and file data correctly
  - [ ] Socket I/O (TCP and UDP only)
+   - [ ] Document a specification
+   - [ ] Reference implementation
  - [ ] Smart pointers (reference counting)
 
 ##Version 0.3.1##
+ - [ ] Array of complex data types
+   - [ ] Copying
+   - [ ] Destruction
+   - [ ] Initialisation
  - [ ] Replace ASTnumbatInstruction with a more robust solution
+
+##Version 0.4##
+ - [ ] High level optimisation pass
+ - [ ] Rewrite parser
+   - [ ] Parser should be bottom up
+   - [ ] Parser should not handle semantics, only syntax
+   - [ ] Parser should still accept arbitrary operators
+ - [ ] Separate the Abstract syntax tree from the concrete syntax tree
+ - [ ] Verification pass
+   - [ ] Define what situations result in error/warning in documentation
