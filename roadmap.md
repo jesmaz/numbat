@@ -55,3 +55,19 @@
  - [ ] Separate the Abstract syntax tree from the concrete syntax tree
  - [ ] Verification pass
    - [ ] Define what situations result in error/warning in documentation
+
+##Version TBD##
+ - [ ] File I/O
+   - [ ] Full implementation
+     - Requires flagged enums, Interfaces and templates
+ - [ ] Flagged enums
+ - [ ] Full I/O library
+     - Requires file I/O, socket I/O, flagged enums, Interfaces and templates
+ - [ ] Interfaces
+ - [ ] Socket I/O
+   - [ ] Full implementation
+     - Requires flagged enums, Interfaces and templates
+   - [ ] Protocols other than TCP/UDP
+     - Must decide if this will be a low level api
+ - [ ] Templates
+   - Requires V0.4 rewrite
