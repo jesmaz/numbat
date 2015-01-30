@@ -26,12 +26,12 @@
 
 ##Version 0.3##
  - [ ] Destructors
-   - [ ] Freeing arrays
+   - [x] Freeing arrays
    - [ ] Overloading
-   - [ ] Recursive struct destructors
+   - [x] Recursive struct destructors
    - [ ] Temporary variables
  - [ ] File I/O
-   - [ ] Document a specification
+   - [x] Document a specification
    - [ ] Reference implementation
  - [x] Make errors display line and file data correctly
  - [ ] Socket I/O (TCP and UDP only)
