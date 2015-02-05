@@ -461,6 +461,7 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 	ASTnode body = func->getBody ();
 	if (body and !body->isNil ()) {
 		auto oldDBC = debugContext;
+		auto oldRet = returned;
 		Function * prev = activeFunction;
 		const FunctionDecleration * decl = activeFunctionDecleration;
 		BasicBlock * block = builder.GetInsertBlock ();
@@ -481,6 +482,9 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 			builder.CreateStore (beg, v);
 			++beg;
 		}
+		for (const ASTnode & node : func->getType ()) {
+			Value * v = getValue (node.get (), true);
+		}
 		getValue (body);
 		verifyFunction (*activeFunction);
 		if (fpm)
@@ -489,6 +493,7 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 		builder.SetInsertPoint (block);
 		activeFunctionDecleration = decl;
 		debugContext = oldDBC;
+		returned = oldRet;
 	}
 	return f;
 	
