@@ -4,6 +4,14 @@ namespace numbat {
 namespace parser {
 
 
+ASTnode makeFunctionCall (NumbatScope * scope, const std::shared_ptr <ASTcallable> & callable) {
+	static size_t count = 0;
+	ASTnode callIndex = ASTnode (new ASTcallindex (callable->getLineNo (), callable, 0));
+	NumbatVariable * var = createVariable (scope, callIndex->getASTType (), callIndex, callable->getIden () + " " + std::to_string (count++), false, true);
+	return ASTnode (new ASTvariable (callIndex->getLineNo (), var));
+}
+
+
 const std::map <string, string> instructions = [] {
 	std::map <string, string> mp;
 	mp ["- "] = "neg";
@@ -71,7 +79,7 @@ ASTnode defAssign (NumbatScope * scope, const string & func, const std::vector <
 	std::vector <FunctionDecleration *> candidates = args [0]->getType ()->getMethods (func);
 	auto callable = findBestMatch (std::vector <ASTnode> {args [0], args [1]}, candidates);
 	if (callable->isValid ()) {
-		return ASTnode (new ASTcallindex (callable->getLineNo (), callable, 0));
+		return makeFunctionCall (scope, callable);
 	} else {
 		ASTnode lhs = args [0], rhs = createStaticCast (args [1], args [0]);
 		if (lhs->getType ()->isSimple () or lhs->getType ()->isArray ()) {
@@ -293,7 +301,7 @@ ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector
 	auto callable = findBestMatch (std::vector <ASTnode> {lhs, rhs}, candidates);
 	
 	if (callable->isValid ()) {
-		return ASTnode (new ASTcallindex (callable->getLineNo (), callable, 0));
+		return makeFunctionCall (scope, callable);
 	} else if (defImp) {
 		return defImp (scope, func , std::vector <ASTnode> ({lhs, rhs}));
 	} else {
@@ -337,7 +345,7 @@ ASTnode parseCall (NumbatScope * scope, const string & func, const std::vector <
 			{
 				auto callable = findBestMatch (params, candidates);
 				if (callable->isValid () and !callable->getFunction ()->getType ().empty ()) {
-					return ASTnode (new ASTcallindex (callable->getLineNo (), callable, 0));
+					return makeFunctionCall (scope, callable);
 				} else {
 					return callable;
 				}
@@ -392,7 +400,7 @@ ASTnode parseIndex (NumbatScope * scope, const string & func, const std::vector 
 					candidates = exp->getType ()->getMethods (func);
 					callable = findBestMatch (params, candidates);
 					if (callable->isValid ()) {
-						return ASTnode (new ASTcallindex (callable->getLineNo (), callable, 0));
+						return makeFunctionCall (scope, callable);
 					} else {
 						return ASTnode (new ASTerror (args [0].itt->line, "TODO: print candidates for functions in parseCall"));
 					}
@@ -485,7 +493,7 @@ ASTnode parseUnary (NumbatScope * scope, const string & func, const std::vector 
 	auto callable = findBestMatch ({arg}, candidates);
 	
 	if (callable->isValid ()) {
-		return ASTnode (new ASTcallindex (callable->getLineNo (), callable, 0));
+		return makeFunctionCall (scope, callable);
 	} else if (defImp) {
 		return defImp (scope, func , {arg});
 	} else {
