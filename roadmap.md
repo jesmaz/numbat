@@ -25,16 +25,16 @@
  - [x] Formal documentation on the memory model including when destructors are called
 
 ##Version 0.3##
- - [ ] Destructors
+ - [x] Destructors
    - [x] Freeing arrays
-   - [ ] Overloading
+   - [x] Overloading
    - [x] Recursive struct destructors
    - [x] Temporary variables
- - [ ] File I/O
+ - [ ] File I/O basic
    - [x] Document a specification
    - [ ] Reference implementation
  - [x] Make errors display line and file data correctly
- - [ ] Socket I/O (TCP and UDP only)
+ - [ ] Socket I/O (TCP and UDP only) basic
    - [ ] Document a specification
    - [ ] Reference implementation
  - [ ] Smart pointers (reference counting)
