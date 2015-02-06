@@ -29,7 +29,7 @@
    - [x] Freeing arrays
    - [ ] Overloading
    - [x] Recursive struct destructors
-   - [ ] Temporary variables
+   - [x] Temporary variables
  - [ ] File I/O
    - [x] Document a specification
    - [ ] Reference implementation
