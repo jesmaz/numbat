@@ -311,7 +311,7 @@ void BodyGenerator::buildCleanup (const NumbatScope * scope, bool cascade) {
 		for (const auto & var : scope->getVariables ()) {
 			if (namedValues.find (var.second.get ()) == namedValues.end ()) return;
 			if (!var.second->isAlias ()) {
-				buildDestructor (builder.CreateLoad (getVariableHandle (var.second.get ())), var.second->getType ());
+				buildDestructor (getVariableHandle (var.second.get ()), var.second->getType ());
 			}
 		}
 		if (cascade) {
@@ -320,10 +320,20 @@ void BodyGenerator::buildCleanup (const NumbatScope * scope, bool cascade) {
 	}
 }
 
-void BodyGenerator::buildDestructor (Value * val, const NumbatType * type) {
+void BodyGenerator::buildDestructor (Value * valPtr, const NumbatType * type) {
 	
+	//valPtr->dump ();
+	Value * val = builder.CreateLoad (valPtr);
 	bool ptrType = typeid (*type) == typeid (NumbatPointerType);
 	BasicBlock * resume = nullptr;
+	
+	auto destroy = type->getMethods ("__destroy__");
+	for (FunctionDecleration * func : destroy) {
+		auto args = func->getArgs ();
+		if (args.size () == 1 and args [0]->getType () == type) {
+			Value * call = builder.CreateCall (getFunction (func), std::vector <Value *> (1, valPtr));
+		}
+	}
 	
 	if (ptrType) {
 		
@@ -340,9 +350,12 @@ void BodyGenerator::buildDestructor (Value * val, const NumbatType * type) {
 	for (const ASTnode & m : type->getMembers ()) {
 		if (!m->isAlias ()) {
 			if (ptrType) {
-				buildDestructor (builder.CreateLoad (pointerTypeGEP (val, static_cast <const NumbatPointerType *> (type), index)), m->getType ());
+				buildDestructor (pointerTypeGEP (val, static_cast <const NumbatPointerType *> (type), index), m->getType ());
 			} else {
-				buildDestructor (builder.CreateExtractValue (val, {uint32_t (index)}), m->getType ());
+				Value * a = builder.getInt64 (0), * b = builder.getInt32 (index);
+				Value * v = builder.CreateGEP (valPtr, std::vector <Value *> ({a, b}));
+				buildDestructor (v, m->getType ());
+				//buildDestructor (builder.CreateExtractValue (val, {uint32_t (index)}), m->getType ());
 			}
 		}
 		++index;
@@ -740,7 +753,7 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 		
 		Value * srclen = builder.CreateLoad (getValue (rlen));
 		
-		buildDestructor (builder.CreateLoad (dest), exp.getDest ()->getType ());
+		buildDestructor (dest, exp.getDest ()->getType ());
 		builder.CreateStore (builder.CreateLoad (allocteArray (srclen, dynamic_cast <const NumbatPointerType *> (exp.getDest ()->getType ()))), dest);
 		length = srclen;
 	} else if (exp.getDest ()->isArray ()) {
