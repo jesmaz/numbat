@@ -268,6 +268,49 @@ struct BasicStream
 ```
 
 
+###Socket###
+
+Implements 'Descriptor'
+
+Provides low level socket access.
+
+```
+struct Socket
+```
+
+####close
+
+Closes the socket, returning any freed resources to the operating system. Subsequent calls to either read or write will fail. Attempting to close a Socket that has already been closed has no effect.
+
+```
+def close (ref Socket fd) -> ()
+```
+
+####read
+
+Reads up to 'length' bytes from the socket and returns them in an array.
+
+```
+def read (ref Socket fd, uint64 length) -> (uint8 [] data)
+```
+
+####state
+
+Returns the current state of the Socket.
+
+```
+def state (const ref Socket fd) -> (State state)
+```
+
+####write
+
+Writes the contents of the 'data' argument to the socket. The number of successfully written bytes is returned.
+
+```
+def write (ref Socket fd, const ref uint8 [] data) -> (uint64 length)
+```
+
+
 
 
 ##Functions
