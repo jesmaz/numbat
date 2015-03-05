@@ -316,6 +316,13 @@ def write (ref Socket fd, const ref uint8 [] data) -> (uint64 length)
 ##Functions
 
 
+###listen
+
+```
+def listen (uint16 port, undecided) -> (Socket sock)
+```
+
+
 ###open
 
 ```

@@ -34,9 +34,6 @@
    - [x] Document a specification
    - [ ] Reference implementation
  - [x] Make errors display line and file data correctly
- - [ ] Socket I/O (TCP and UDP only) basic
-   - [ ] Document a specification
-   - [ ] Reference implementation
  - [ ] Smart pointers (reference counting)
 
 ##Version 0.3.1##
@@ -64,6 +61,9 @@
  - [ ] Full I/O library
      - Requires file I/O, socket I/O, flagged enums, Interfaces and templates
  - [ ] Interfaces
+ - [ ] Socket I/O (TCP and UDP only) basic
+   - [ ] Document a specification
+   - [ ] Reference implementation
  - [ ] Socket I/O
    - [ ] Full implementation
      - Requires flagged enums, Interfaces and templates
