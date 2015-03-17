@@ -88,7 +88,7 @@ ASTnode defAssign (NumbatScope * scope, const string & func, const std::vector <
 			NumbatScope * fScope = createChild (scope);
 			ASTnode lhstype (new ASTtype (lhs->getLineNo (), true, false, lhs->getType ()));
 			ASTnode rhstype (new ASTtype (lhs->getLineNo (), true, true, lhs->getType ()));
-			ASTnode rettype (new ASTtype (lhs->getLineNo (), false, false, lhs->getType ()));
+			ASTnode rettype (new ASTtype (lhs->getLineNo (), true, true, lhs->getType ()));
 			ASTnode varLhs (new ASTvariable (lhs->getLineNo (), createVariable (fScope, lhstype, nullptr, "lhs", false, false)));
 			ASTnode varRhs (new ASTvariable (lhs->getLineNo (), createVariable (fScope, rhstype, nullptr, "rhs", false, false)));
 			ASTnode varRet (new ASTvariable (lhs->getLineNo (), createVariable (fScope, rettype, nullptr, "ret", false, false)));
