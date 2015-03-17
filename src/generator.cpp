@@ -980,7 +980,9 @@ void BodyGenerator::visit (ASTreturn & exp) {
 		}
 		ret = builder.CreateRet (val);
 	} else {
-		val = builder.CreateLoad (val);
+		if (!activeFunctionDecleration->getType () [0]->isAlias ()) {
+			val = builder.CreateLoad (val);
+		}
 		if (activeFunctionDecleration->hasTag ("cstyle")) {
 			ret = builder.CreateRet (val);
 		} else {
