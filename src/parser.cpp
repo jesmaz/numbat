@@ -554,7 +554,7 @@ void * futureFunc (void * data) {
 		if (std::get <2> (*args)->getType ().empty ()) {
 			b = ASTnode (new ASTbody (body.end->line, {b, ASTnode (new ASTreturnvoid (body.end->line))}));
 		} else {
-			b = ASTnode (new ASTreturn (body.end->line, b));
+			b = ASTnode (new ASTreturn (body.end->line, defAssign (std::get <1> (*args), " = ", {getFunction (std::get <1> (*args))->getType () [0], b})));
 		}
 	}
 	std::get <2> (*args)->assignBody (b);
