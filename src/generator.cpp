@@ -572,21 +572,19 @@ void BodyGenerator::visit (ASTbody & exp) {
 
 void BodyGenerator::visit (ASTbranch & exp) {
 	
-	BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
-	BasicBlock * alt = BasicBlock::Create (context, "alt", activeFunction);
-	BasicBlock * resume = BasicBlock::Create (context, "alt", activeFunction);
+	BasicBlock * body = BasicBlock::Create (context, "branch body", activeFunction);
+	BasicBlock * alt = BasicBlock::Create (context, "branch alt", activeFunction);
+	BasicBlock * resume = BasicBlock::Create (context, "branch resume", activeFunction);
 	exp.getCond ()->accept (*this);
 	Value * cond = makeCompare (builder.CreateLoad (stack.top ()));
 	stack.pop ();
 	builder.CreateCondBr (cond, body, alt);
 	builder.SetInsertPoint (body);
 	exp.getBody ()->accept (*this);
-	bool reta = returned; returned = false;
-	builder.CreateBr (resume);
+	if (!exp.getBody ()->isReturned ()) builder.CreateBr (resume);
 	builder.SetInsertPoint (alt);
 	exp.getAlt ()->accept (*this);
-	returned = reta and returned;
-	builder.CreateBr (resume);
+	if (!exp.getAlt ()->isReturned ()) builder.CreateBr (resume);
 	builder.SetInsertPoint (resume);
 	
 }
@@ -1108,7 +1106,7 @@ void BodyGenerator::visit (NumbatScope & exp) {
 		//if (returned) break;//TODO: throw dead code warning
 		if (!node->isNil ()) val = getValue (node);
 	}
-	if (!returned) buildCleanup (&exp, false);
+	if (!exp.isReturned ()) buildCleanup (&exp, false);
 	stack.push (val);
 	
 	for (const auto & func : exp.getFunctions ()) {
