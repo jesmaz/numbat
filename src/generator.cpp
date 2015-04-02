@@ -201,15 +201,23 @@ Value * BodyGenerator::getVariableHandle (const NumbatVariable * var) {
 			if (var->getType ()->isArray ()) {
 				const NumbatPointerType * pType = static_cast <const NumbatPointerType *> (var->getType ());
 				Value * val = getValue (init);
-				Value * arrayPtr = builder.CreateLoad (builder.CreateExtractValue (val, {0}));
-				for (size_t i=0; i<pType->getMembers ().size (); ++i) {
-					Value * dest = pointerTypeGEP (arrayPtr, pType, i), * source = builder.CreateLoad (builder.CreateExtractValue (val, {i+1}));
-					builder.CreateStore (source, dest);
-				}
-				if (var->isAlias ()) {
-					builder.CreateStore (builder.CreateExtractValue (val, {0}), hand);
+				if (val->getType ()->isStructTy ()) {
+					Value * arrayPtr = builder.CreateLoad (builder.CreateExtractValue (val, {0}));
+					for (size_t i=0; i<pType->getMembers ().size (); ++i) {
+						Value * dest = pointerTypeGEP (arrayPtr, pType, i), * source = builder.CreateLoad (builder.CreateExtractValue (val, {i+1}));
+						builder.CreateStore (source, dest);
+					}
+					if (var->isAlias ()) {
+						builder.CreateStore (builder.CreateExtractValue (val, {0}), hand);
+					} else {
+						builder.CreateStore (arrayPtr, hand);
+					}
 				} else {
-					builder.CreateStore (arrayPtr, hand);
+					if (var->isAlias ()) {
+						builder.CreateStore (val, hand);
+					} else {
+						builder.CreateStore (builder.CreateLoad (val), hand);
+					}
 				}
 			} else {
 				builder.CreateStore (builder.CreateLoad (getValue (init)), hand);
@@ -288,6 +296,90 @@ Value * BodyGenerator::pointerTypeGEP (Value * val, const NumbatPointerType * pt
 	Type * type = getType (members [index]);
 	Value * dataiptr = builder.CreateSub (iptr, oset);
 	return builder.CreateIntToPtr (dataiptr, type->getPointerTo ());
+	
+}
+
+void BodyGenerator::buildCleanup (const NumbatScope * scope, bool cascade) {
+	if (!scope) return;
+	if (scope == activeFunctionDecleration->getScope ()) {
+		for (const ASTnode & e : activeFunctionDecleration->getArgs ()) {
+			if (!e->isAlias ()) {
+				buildDestructor (getValue (e), e->getType ());
+			}
+		}
+	} else {
+		for (const auto & var : scope->getVariables ()) {
+			if (namedValues.find (var.second.get ()) == namedValues.end ()) return;
+			if (!var.second->isAlias ()) {
+				buildDestructor (getVariableHandle (var.second.get ()), var.second->getType ());
+			}
+		}
+		if (cascade) {
+			buildCleanup (getParent (scope), true);
+		}
+	}
+}
+
+void BodyGenerator::buildDestructor (Value * valPtr, const NumbatType * type) {
+	
+	//valPtr->dump ();
+	Value * val = builder.CreateLoad (valPtr);
+	bool ptrType = typeid (*type) == typeid (NumbatPointerType);
+	BasicBlock * resume = nullptr;
+	
+	auto destroy = type->getMethods ("__destroy__");
+	for (FunctionDecleration * func : destroy) {
+		auto args = func->getArgs ();
+		if (args.size () == 1 and args [0]->getType () == type) {
+			Value * call = builder.CreateCall (getFunction (func), std::vector <Value *> (1, valPtr));
+		}
+	}
+	
+	if (ptrType) {
+		
+		BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
+		resume = BasicBlock::Create (context, "resume", activeFunction);
+		
+		Value * cond = builder.CreateICmpNE (initialise (type), val);
+		
+		builder.CreateCondBr (cond, body, resume);
+		builder.SetInsertPoint (body);
+	}
+	
+	size_t index=0;
+	for (const ASTnode & m : type->getMembers ()) {
+		if (!m->isAlias ()) {
+			if (ptrType) {
+				buildDestructor (pointerTypeGEP (val, static_cast <const NumbatPointerType *> (type), index), m->getType ());
+			} else {
+				Value * a = builder.getInt64 (0), * b = builder.getInt32 (index);
+				Value * v = builder.CreateGEP (valPtr, std::vector <Value *> ({a, b}));
+				buildDestructor (v, m->getType ());
+				//buildDestructor (builder.CreateExtractValue (val, {uint32_t (index)}), m->getType ());
+			}
+		}
+		++index;
+	}
+	
+	if (ptrType) {
+		
+		const NumbatPointerType * pType = static_cast <const NumbatPointerType *> (type);
+		size_t mdsize=0;
+		for (auto & t : pType->getMembers ()) {
+			mdsize += dataLayout->getTypeAllocSize (getType (t));
+		}
+		
+		//TODO: iterate over array and call buildDestructor in loop
+		Value * ptrint = builder.CreateSub (builder.CreatePtrToInt (val, Type::getInt64Ty (context)), builder.getInt64 (mdsize));
+		Value * call = builder.CreateCall (getFunction (pType->getDataType ()->getType ()->getFree ()), std::vector <Value *> (1, ptrint));
+		//std::cerr << " Free: "; val->dump ();
+		
+	}
+	
+	if (resume) {
+		builder.CreateBr (resume);
+		builder.SetInsertPoint (resume);
+	}
 	
 }
 
@@ -382,6 +474,7 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 	ASTnode body = func->getBody ();
 	if (body and !body->isNil ()) {
 		auto oldDBC = debugContext;
+		auto oldRet = returned;
 		Function * prev = activeFunction;
 		const FunctionDecleration * decl = activeFunctionDecleration;
 		BasicBlock * block = builder.GetInsertBlock ();
@@ -402,6 +495,9 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 			builder.CreateStore (beg, v);
 			++beg;
 		}
+		for (const ASTnode & node : func->getType ()) {
+			Value * v = getValue (node.get (), true);
+		}
 		getValue (body);
 		verifyFunction (*activeFunction);
 		if (fpm)
@@ -410,6 +506,7 @@ Function * BodyGenerator::getFunction (const FunctionDecleration * func) {
 		builder.SetInsertPoint (block);
 		activeFunctionDecleration = decl;
 		debugContext = oldDBC;
+		returned = oldRet;
 	}
 	return f;
 	
@@ -444,6 +541,7 @@ void BodyGenerator::visit (AbstractSyntaxTree & ast) {
 	if (builder.GetInsertBlock ()->getTerminator ()) builder.GetInsertBlock ()->getTerminator ()->eraseFromParent ();
 	
 	visit (static_cast <NumbatScope &> (ast));
+	scope = &ast;
 	
 	builder.CreateRetVoid ();
 	verifyFunction (*activeFunction);
@@ -474,19 +572,19 @@ void BodyGenerator::visit (ASTbody & exp) {
 
 void BodyGenerator::visit (ASTbranch & exp) {
 	
-	BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
-	BasicBlock * alt = BasicBlock::Create (context, "alt", activeFunction);
-	BasicBlock * resume = BasicBlock::Create (context, "alt", activeFunction);
+	BasicBlock * body = BasicBlock::Create (context, "branch body", activeFunction);
+	BasicBlock * alt = BasicBlock::Create (context, "branch alt", activeFunction);
+	BasicBlock * resume = BasicBlock::Create (context, "branch resume", activeFunction);
 	exp.getCond ()->accept (*this);
 	Value * cond = makeCompare (builder.CreateLoad (stack.top ()));
 	stack.pop ();
 	builder.CreateCondBr (cond, body, alt);
 	builder.SetInsertPoint (body);
 	exp.getBody ()->accept (*this);
-	builder.CreateBr (resume);
+	if (!exp.getBody ()->isReturned ()) builder.CreateBr (resume);
 	builder.SetInsertPoint (alt);
 	exp.getAlt ()->accept (*this);
-	builder.CreateBr (resume);
+	if (!exp.getAlt ()->isReturned ()) builder.CreateBr (resume);
 	builder.SetInsertPoint (resume);
 	
 }
@@ -649,21 +747,12 @@ void BodyGenerator::visit (ASTmemcpy & exp) {
 	Value * length = nullptr;
 	
 	if (ASTnode len = ASTbase::getLength (exp.getDest ())) {
-		Value * llen = builder.CreateLoad (getValue (len));
 		ASTnode rlen = ASTbase::getLength (exp.getSource ());
-		
-		BasicBlock * body = BasicBlock::Create (context, "body", activeFunction);
-		BasicBlock * resume = BasicBlock::Create (context, "resume", activeFunction);
 		
 		Value * srclen = builder.CreateLoad (getValue (rlen));
 		
-		Value * cond = builder.CreateICmpULT (llen, srclen);
-		
-		builder.CreateCondBr (cond, body, resume);
-		builder.SetInsertPoint (body);
+		buildDestructor (dest, exp.getDest ()->getType ());
 		builder.CreateStore (builder.CreateLoad (allocteArray (srclen, dynamic_cast <const NumbatPointerType *> (exp.getDest ()->getType ()))), dest);
-		builder.CreateBr (resume);
-		builder.SetInsertPoint (resume);
 		length = srclen;
 	} else if (exp.getDest ()->isArray ()) {
 		dest = builder.CreateLoad (dest);
@@ -850,6 +939,14 @@ void BodyGenerator::visit (ASTparamater & exp) {
 	
 }
 
+void BodyGenerator::visit (ASTredirect & exp) {
+	
+	Value * target = getValue (exp.getLhs ().get (), true);
+	Value * source = getValue (exp.getRhs ().get ());
+	builder.CreateStore (source, target);
+	
+}
+
 void BodyGenerator::visit (ASTreinterpretCast & exp) {
 	
 	Type * target = getType (exp.getASTType ());
@@ -873,13 +970,17 @@ void BodyGenerator::visit (ASTreinterpretCast & exp) {
 void BodyGenerator::visit (ASTreturn & exp) {
 	
 	Value * ret, * val = getValue (exp.getExpr ());
+	buildCleanup (scope, true);
+	returned = true;
 	if (val->getType ()->isStructTy ()) {
 		if (activeFunctionDecleration->hasTag ("cstyle")) {
 			val = builder.CreateExtractValue (val, {0});
 		}
 		ret = builder.CreateRet (val);
 	} else {
-		val = builder.CreateLoad (val);
+		if (!activeFunctionDecleration->getType () [0]->isAlias ()) {
+			val = builder.CreateLoad (val);
+		}
 		if (activeFunctionDecleration->hasTag ("cstyle")) {
 			ret = builder.CreateRet (val);
 		} else {
@@ -890,6 +991,8 @@ void BodyGenerator::visit (ASTreturn & exp) {
 }
 
 void BodyGenerator::visit (ASTreturnvoid & exp) {
+	buildCleanup (scope, true);
+	returned = true;
 	stack.push (builder.CreateRetVoid ());
 }
 
@@ -984,11 +1087,14 @@ void BodyGenerator::visit (numbat::parser::ASTwhileloop & exp) {
 	continueBlock = oldCont;
 	breakBlock = oldBreak;
 	stack.push (createTemp (builder.getInt (APInt (1, 0))));
+	returned = false;
 	
 }
 
 void BodyGenerator::visit (NumbatScope & exp) {
 	
+	returned = false;
+	scope = &exp;
 	for (NumbatEnumType * et : exp.getEnums ()) {
 		for (const auto & node : et->getMembers ()) {
 			getValue (node);
@@ -997,13 +1103,16 @@ void BodyGenerator::visit (NumbatScope & exp) {
 	
 	Value * val = nullptr;
 	for (const auto & node : exp.getBody ()) {
-		val = getValue (node);
+		//if (returned) break;//TODO: throw dead code warning
+		if (!node->isNil ()) val = getValue (node);
 	}
+	if (!exp.isReturned ()) buildCleanup (&exp, false);
+	stack.push (val);
 	
 	for (const auto & func : exp.getFunctions ()) {
 		getFunction (func.second.get ());
 	}
-	stack.push (val);
+	scope = getParent (&exp);
 	
 }
 

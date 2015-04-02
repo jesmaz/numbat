@@ -39,7 +39,7 @@ using namespace llvm;
 using visitor::Visitor;
 
 
-class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTallocate>, public Visitor <ASTbody>, public Visitor <ASTbranch>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconcat>, public Visitor <ASTconstantFPInt>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTgep>, public Visitor <ASTmemcpy>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTreinterpretCast>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuple>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop>, public Visitor <NumbatScope> {
+class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTallocate>, public Visitor <ASTbody>, public Visitor <ASTbranch>, public Visitor <ASTcall>, public Visitor <ASTcallindex>, public Visitor <ASTconcat>, public Visitor <ASTconstantFPInt>, public Visitor <ASTconstantInt>, public Visitor <ASTconstantCString>, public Visitor <ASTfunctionPointer>, public Visitor <ASTgep>, public Visitor <ASTmemcpy>, public Visitor <ASTparamater>, public Visitor <ASTrawdata>, public Visitor <ASTredirect>, public Visitor <ASTreinterpretCast>, public Visitor <ASTreturn>, public Visitor <ASTreturnvoid>, public Visitor <ASTstructIndex>, public Visitor <ASTtuple>, public Visitor <ASTtuplecall>, public Visitor <ASTtype>, public Visitor <ASTvariable>, public Visitor <ASTwhileloop>, public Visitor <NumbatScope> {
 	public:
 		Value * getValue (const ASTnode & node) {return getValue (node.get ());}
 		Value * getValue (ASTbase * node, bool ref=false);
@@ -60,6 +60,7 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		virtual void visit (ASTnumbatInstr & exp);
 		virtual void visit (ASTparamater & exp);
 		virtual void visit (ASTrawdata & exp) {}
+		virtual void visit (ASTredirect & exp);
 		virtual void visit (ASTreinterpretCast & exp);
 		virtual void visit (ASTreturn & exp);
 		virtual void visit (ASTreturnvoid & exp);
@@ -101,6 +102,8 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		Value * initialise (const NumbatType * var);
 		Value * makeCompare (Value * val);
 		Value * pointerTypeGEP (Value * ptr, const NumbatPointerType * ptrType, size_t index);
+		void buildCleanup (const NumbatScope * scope, bool cascade);
+		void buildDestructor (Value * val, const NumbatType * var);
 		void createMemCpy (Value * dest, Value * source, Value * length, const shared_ptr <ASTcallable> & conv);
 		Value * makeCompare (const ASTnode & exp);
 		
@@ -110,6 +113,8 @@ class BodyGenerator : public Visitor <ASTnumbatInstr>, public Visitor <ASTalloca
 		DIBuilder diBuilder;
 		Function * activeFunction, * main, * memalloc, * memfree;
 		const FunctionDecleration * activeFunctionDecleration;
+		const NumbatScope * scope;
+		bool returned;
 		IRBuilder<> builder;
 		LLVMContext & context;
 		llvm::Module * module;

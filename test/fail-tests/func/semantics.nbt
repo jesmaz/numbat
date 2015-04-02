@@ -1,0 +1,8 @@
+# Symbol already declared
+def a () -> () {}
+int32 b
+struct c {}
+
+def a () -> () {}
+def b () -> () {}
+def c () -> () {}

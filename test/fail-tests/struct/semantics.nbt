@@ -1,0 +1,10 @@
+# Symbol alredy declared
+def a ()->(){}
+int32 b
+struct c {}
+
+struct a {}
+struct b {}
+struct c {}
+
+# 

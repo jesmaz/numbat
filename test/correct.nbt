@@ -43,6 +43,7 @@ double d = 60.3
 8 * 9 / 3 + 10.0
 (5+6) * 372 / 56
 3 % 10
+5 + 6 * 372 / 56
 
 
 
@@ -67,3 +68,26 @@ def f2 (double a) -> (double) {
 def f3 (double a) -> (double) a * 30
 
 # TODO: def f4 (double a) -> (a * 30)
+
+def f5 () -> () {
+	string a
+	a = s1
+}
+
+def f6 (const ref int8 [0] lhs, const ref int8 [0] rhs) -> () {
+	int8 [100] arr
+}
+
+
+
+# Memory
+{
+	int64 a
+	ref int64 b => a
+	#ref int32 b => new 4
+	#ref int32 c => new 4 + 67
+	#ref int32 d => new int32 (32)
+	# ref int32 = 32 # Attemting to write too nil, invalid
+	# NYI # Object obj => 30 # heap
+	# NYI # Object ob2 (a) # heap
+}

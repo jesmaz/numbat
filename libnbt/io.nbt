@@ -1,6 +1,69 @@
 import os
 
 
+#TODO: change to enum
+struct State {uint32 value}
+
+struct FileDescriptor {os.filehandle handle, State state}
+struct Socket {os.sockethandle handle, State state}
+
+
+#TODO: turn these into streams and expose
+FileDescriptor stdin
+FileDescriptor stdout
+FileDescriptor stderr
+
+
+stdin.handle.handle = 0
+stdout.handle.handle = 1
+stderr.handle.handle = 2
+
+
+def close (ref FileDescriptor fd) -> () {
+	os.close (fd.handle)
+}
+
+def open (const ref string path) -> (FileDescriptor fd) {
+	fd.handle = os.open (path, 2)
+	fd
+}
+
+def print (const ref string str) -> (int64 length) {
+	write (stdout, str.data)
+}
+
+def read (ref FileDescriptor fd, uint64 length) -> (int8 [] data) {
+	int8 [length] arr
+	int64 len = os.read (fd.handle, arr)
+	if (len < 0) {
+		int8 [] a
+		arr = a
+	} else {
+		arr.length = len
+	}
+	data = arr
+}
+
+def seek (ref FileDescriptor fd, int64 length) -> (uint64 pos) {
+	seek (fd, length, 0)
+}
+
+def seek (ref FileDescriptor fd, int64 length, int32 whence) -> (int64 pos) {
+	os.lseek (fd.handle, length, whence)
+}
+
+def state (const ref FileDescriptor fd) -> (State state) {
+	fd.state
+}
+
+def write (ref FileDescriptor fd, const ref int8 [] arr) -> (uint64 length) {
+	os.write (fd.handle.handle, arr as ptrint, arr.length)
+}
+
+def __destroy__ (ref FileDescriptor fd) -> () {
+	close (fd)
+}
+
 struct ifstream {os.filehandle handle, int8 [0] buffer, int64 pos, int64 back}
 struct ofstream {os.filehandle handle, int8 [0] buffer, int64 pos, int64 back}
 struct fstream {os.filehandle handle, int8 [0] buffer, int64 pos, int64 back}
@@ -15,7 +78,7 @@ stderr.handle = 2
 
 
 def print (const ref string str) -> (int64 length) {
-	int64 l = os.write (stdout, str.data)
+	int64 l = os.write (stdout.handle, str.data as ptrint, str.data.length)
 	return l
 }
 
@@ -28,16 +91,46 @@ int8 [1024] buffer
 int64 pos = 0
 int64 back = 0
 
+def testToString (uint64 num) -> (string) {
+	print ("ts: a\n")
+	while (num == 0) {
+		return "0"
+	}
+	print ("ts: b\n")
+	string str
+	uint64 tmp = num
+	int8 [1] arr
+	print ("ts: c\n")
+	while (0 < tmp) {
+		print ("ts: 1\n")
+		arr [0] = (tmp % 10) + 48
+		print ("ts: 2\n")
+		tmp = tmp / 10
+		print ("ts: 3\n")
+		str.data = arr ~ str.data
+	}
+	print ("ts: d\n")
+	return str
+}
+
 def next @local () -> (int8) {
+	print ("a\n")
 	while (pos == back) {
+		print ("1\n")
 		back = 0
 		pos = 0
-		print ("length: " ~ buffer.length ~ "\n")
+		print ("2\n")
+		print ("3\n")
+		print (buffer.length)
+		print (" 4\n")
 		back = os.read (stdin, buffer)
-		print ("b\n")
+		print ("5\n")
 	}
+	print ("b\n")
 	int8 char = buffer [pos]
+	print ("c\n")
 	pos = pos + 1
+	print ("d\n")
 	return char
 }
 
@@ -61,14 +154,11 @@ def in @local (int8 char, const ref int8 [0] data) -> (bool) {
 
 def scan (const ref string term) -> (string token) {
 	int8 [1024] buff
-	print ("1")
 	string s
 	int8 char = next ()
 	int64 pos = 0
 	bool cont = 1
-	print ("2")
 	while (cont) {
-		print ("3")
 		buff [pos] = char
 		pos = pos + 1
 		char = next ()
@@ -77,9 +167,4 @@ def scan (const ref string term) -> (string token) {
 	buff.length = pos
 	s.data = buff
 	return s
-}
-
-
-def add (double x, double y) -> (double) {
-	return x + y
 }

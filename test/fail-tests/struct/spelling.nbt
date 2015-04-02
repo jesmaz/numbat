@@ -1,0 +1,4 @@
+struc a {}
+struct b {}
+truct c {}
+structure d {}
