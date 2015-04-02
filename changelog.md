@@ -1,3 +1,12 @@
+##Version 0.2.3##
+###Features###
+ - Destructors
+  - Freeing arrays
+  - Overloading
+  - Recursive struct destructors
+  - Temporary variables
+ - Errors display line and file data correctly
+
 ##Version 0.2.2##
 ###Features###
  - Basic debug symbol generation
