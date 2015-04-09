@@ -1,22 +1,30 @@
 ```
-Arguments			=>	'(' [ExpressionList] ')'
+BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'as' | 'is' | 'or' | ',' | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
 ```
 ```
-Array				=>	'[' [Expression] [ ',' [expression] ] ']'
+Body				=>	Expression ; BodyCont
+					|	;
 ```
 ```
-Associativity		=>	'ltr'
-					|	'rtl'
+BodyCont			=>	Expression ; BodyCont
+					|	ε
 ```
 ```
-BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'or' | ',' | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
+BracketCurvy		=>	'{' '}'
+					|	'{' Body '}'
+					|	'{' Expression '}'
 ```
 ```
-Block				=>	'{' (TopLevelExpression;)* '}'
+BracketRound		=>	'(' ')'
+					|	'(' Body ')'
+					|	'(' Expression ')'
 ```
 ```
-Call				=>	Arguments
-					|	Lvalue [Template] Arguments
+BracketSquare		=>	'[' ']'
+					|	'[' Expression ']'
+```
+```
+Call				=>	Template Expression BracketRound
 					|	PrefixUnaryOp Expression
 					|	Expression PostfixUnaryOp
 					|	Expression BinaryOp Expression
@@ -26,21 +34,21 @@ Call				=>	Arguments
 CharArrayLiteral	=>	<string single quotes>
 ```
 ```
-Decl				=>	ExternDecl
+Decl				=>	Expression ;
+					|	ExternDecl
 					|	FunctionDecl
-					|	OperatorDecl
 					|	StructDecl
-					|	VariableDecl
+					|	TypeDef
 ```
 ```
-Expression			=>	Call
-					|	VariableDecl
-					|	Literal
+Expression			=>	BracketCurvy
+					|	BracketRound
+					|	Call
 					|	Identifier
-					|	'(' Expression ')'
-```
-```
-ExpressionList		=>	Expression [',' Expression]*
+					|	LambdaExpression
+					|	Literal
+					|	Type
+					|	VariableDecl
 ```
 ```
 ExternDecl			=>	'extern' FunctionDecl
@@ -49,11 +57,13 @@ ExternDecl			=>	'extern' FunctionDecl
 FloatLiteral		=>	['0' ... '9']* '.' ('0' ... '9')+ [('e' | 'E') ['+' | '-'] ('0' ... '9')+] ['f' | 'F' | 'h' | 'H' | 'q' | 'Q']
 ```
 ```
-FunctionDecl		=>	'def' [Template] ['~'] FunctionID MetaTag* Paramaters ['->' Paramaters] Block
+FunctionDecl		=>	'def' Template FunctionID LambdaExpression ;
 ```
 ```
-FunctionID			=>	Identifier
+FunctionID			=>	'~' CharArrayLiteral
+					|	'~' Identifier
 					|	CharArrayLiteral
+					|	Identifier
 ```
 ```
 Identifier			=>	ID_start [ID_continue]*
@@ -73,24 +83,22 @@ IntLiteral			=>	['1' ... '9'] ('0' ... '9')+
 					|	'0' ('x' | 'X') ('0' ... '9' | 'a' ... 'f' | 'A' ... 'F')+
 ```
 ```
+LambdaExpression	=>	BracketRound BracketCurvy
+					|	BracketRound '->' BracketRound
+					|	BracketRound '->' BracketRound BracketCurvy
+```
+```
 Literal				=>	CharArrayLiteral
 					|	FloatLiteral
 					|	IntLiteral
 					|	StringLiteral
 ```
 ```
-Lvalue				=>	Identifier
-					|	Call
-```
-```
 MetaTag				=>	'@'Identifier
 ```
 ```
-##DEPRECATED##
-OperatorDecl		=>	'operator' CharArrayLiteral ':' IntLiteral Associativity
-```
-```
-Paramaters			=>	'(' [TypedArgsList] ')'
+MetaTagList			=>	MetaTag MetaTagList
+					|	ε
 ```
 ```
 PostfixUnaryOp		=>	'++' | '--'
@@ -103,38 +111,37 @@ TopLevelExpression	=>	Expression
 					|	ReturnExpression
 ```
 ```
-Program				=>	Decl+
+Program				=>	Decl Program
+					|	ε
 ```
 ```
-ReturnExpression	=>	'return' [Expression]
+ReturnExpression	=>	'return'
+					|	'return' Expression
 ```
 ```
 StringLiteral		=>	<string double quotes>
 ```
 ```
-StructDecl			=>	struct Identifier MetaTag* [Template] TypeParamaters ;
+StructDecl			=>	struct Template Identifier MetaTagList BracketCurvy ;
 ```
 ```
-Template			=>	'[' [ TypedArgsList ] ']'
+Template			=>	BracketSquare
+					|	ε
 ```
 ```
-Type				=>	[Template] Type [Array]
+Type				=>	BracketCurvy
+					|	BracketRound '->' BracketRound
 					|	Identifier
-					|	'{' TypedArgsList '}'
 					|	'type'
 					|	TypeModifier Type
-					|	TypeParamaters Paramaters
 ```
 ```
-TypedArgsList		=>	VariableDecl (',' VariableDecl)*
+TypeDef				=>	'typedef' VariableDecl
 ```
 ```
 TypeModifier		=>	'ref'
 					|	'atomic'
 					|	'const'
-```
-```
-TypeParamaters		=>	'{' [TypedArgsList] '}'
 ```
 ```
 VariableDecl		=>	Type Identifier
