@@ -83,9 +83,9 @@ IntLiteral			=>	['1' ... '9'] ('0' ... '9')+
 					|	'0' ('x' | 'X') ('0' ... '9' | 'a' ... 'f' | 'A' ... 'F')+
 ```
 ```
-LambdaExpression	=>	BracketRound BracketCurvy
+LambdaExpression	=>	BracketRound '{' Program '}'
 					|	BracketRound '->' BracketRound
-					|	BracketRound '->' BracketRound BracketCurvy
+					|	BracketRound '->' BracketRound '{' Program '}'
 ```
 ```
 Literal				=>	CharArrayLiteral
