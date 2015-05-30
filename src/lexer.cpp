@@ -95,81 +95,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 	while ((buffer = next (source, pos, length)) != "\n") {
 		//std::cout << buffer << std::endl;
 		if (buffer.length ()) {
-			token t;
-			t.iden = buffer;
-			if (isdigit (buffer [0])) {
-				t.type = TOKEN::numericliteral;
-			} else if (buffer [0] == '\'') {
-				t.iden = buffer.substr (1, buffer.length ()-2);
-				t.type = TOKEN::chararrayliteral;
-			} else if (buffer [0] == '"') {
-				t.iden = buffer.substr (1, buffer.length ()-2);
-				t.type = TOKEN::stringliteral;
-			} else if (buffer == "@") {
-				t.type = TOKEN::atsym;
-			} else if (buffer == ":") {
-				t.type = TOKEN::colon;
-			} else if (buffer == "ref") {
-				t.type = TOKEN::typemodifier;
-			} else if (buffer == "as") {
-				t.type = TOKEN::as;
-			} else if (buffer == "asm") {
-				t.type = TOKEN::assembly;
-			} else if (buffer == "binary") {
-				t.type = TOKEN::binary;
-			} else if (buffer == "case") {
-				t.type = TOKEN::casetkn;
-			} else if (buffer == "const") {
-				t.type = TOKEN::typemodifier;
-			} else if (buffer == "def") {
-				t.type = TOKEN::def;
-			} else if (buffer == "else") {
-				t.type = TOKEN::elsetkn;
-			} else if (buffer == "end") {
-				t.type = TOKEN::end;
-			} else if (buffer == "enum") {
-				t.type = TOKEN::enumtkn;
-			} else if (buffer == "extern") {
-				t.type = TOKEN::externdef;
-			} else if (buffer == "if") {
-				t.type = TOKEN::iftkn;
-			} else if (buffer == "import") {
-				t.type = TOKEN::import;
-			} else if (buffer == "interface") {
-				t.type = TOKEN::interface;
-			} else if (buffer == "nil") {
-				t.type = TOKEN::nil;
-			} else if (buffer == "operator") {
-				t.type = TOKEN::operatortkn;
-			} else if (buffer == "raw") {
-				t.type = TOKEN::raw;
-			} else if (buffer == "rawf") {
-				t.type = TOKEN::rawf;
-			} else if (buffer == "return") {
-				t.type = TOKEN::ret;
-			} else if (buffer == "struct") {
-				t.type = TOKEN::structure;
-			} else if (buffer == "switch") {
-				t.type = TOKEN::switchtkn;
-			} else if (buffer == "type") {
-				t.type = TOKEN::typetkn;
-			} else if (buffer == "typedef") {
-				t.type = TOKEN::typedeftkn;
-			} else if (buffer == "ternary") {
-				t.type = TOKEN::ternary;
-			} else if (buffer == "unary") {
-				t.type = TOKEN::unary;
-			} else if (buffer == "while") {
-				t.type = TOKEN::whiletkn;
-			} else if (buffer == ";") {
-				t.type = TOKEN::semicolon;
-			} else if (isalpha (buffer [0]) or buffer [0] == '_') {
-				t.type = TOKEN::identifier;
-			} else if (isspace (buffer [0])) {
-				t.type = TOKEN::whitespace;
-			} else {
-				t.type = TOKEN::symbol;
-			}
+			token t = lexToken (buffer);
 			t.line = line;
 			str += t;
 		}
@@ -189,7 +115,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 		case TOKEN::stringliteral:
 			token t;
 			t.type = TOKEN::semicolon;
-			t.iden = ";";
+			t.iden = "";
 			t.line = line;
 			str += t;
 	}
@@ -199,6 +125,90 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 	return str;
 }
 
+token lexToken (const std::string & source) {
+	token t;
+	t.iden = source;
+	if (isdigit (source [0])) {
+		t.type = TOKEN::numericliteral;
+	} else if (source [0] == '\'') {
+		t.iden = source.substr (1, source.length ()-2);
+		t.type = TOKEN::chararrayliteral;
+	} else if (source [0] == '"') {
+		t.iden = source.substr (1, source.length ()-2);
+		t.type = TOKEN::stringliteral;
+	} else if (source == "@") {
+		t.type = TOKEN::atsym;
+	} else if (source == ":") {
+		t.type = TOKEN::colon;
+	} else if (source == "ref") {
+		t.type = TOKEN::typemodifier;
+	} else if (source == "as") {
+		t.type = TOKEN::as;
+	} else if (source == "asm") {
+		t.type = TOKEN::assembly;
+	} else if (source == "binary") {
+		t.type = TOKEN::binary;
+	} else if (source == "case") {
+		t.type = TOKEN::casetkn;
+	} else if (source == "const") {
+		t.type = TOKEN::typemodifier;
+	} else if (source == "def") {
+		t.type = TOKEN::def;
+	} else if (source == "else") {
+		t.type = TOKEN::elsetkn;
+	} else if (source == "end") {
+		t.type = TOKEN::end;
+	} else if (source == "enum") {
+		t.type = TOKEN::enumtkn;
+	} else if (source == "extern") {
+		t.type = TOKEN::externdef;
+	} else if (source == "for") {
+		t.type = TOKEN::fortkn;
+	} else if (source == "if") {
+		t.type = TOKEN::iftkn;
+	} else if (source == "import") {
+		t.type = TOKEN::import;
+	} else if (source == "interface") {
+		t.type = TOKEN::interface;
+	} else if (source == "nil") {
+		t.type = TOKEN::nil;
+	} else if (source == "operator") {
+		t.type = TOKEN::operatortkn;
+	} else if (source == "raw") {
+		t.type = TOKEN::raw;
+	} else if (source == "rawf") {
+		t.type = TOKEN::rawf;
+	} else if (source == "return") {
+		t.type = TOKEN::ret;
+	} else if (source == "struct") {
+		t.type = TOKEN::structure;
+	} else if (source == "switch") {
+		t.type = TOKEN::switchtkn;
+	} else if (source == "type") {
+		t.type = TOKEN::typetkn;
+	} else if (source == "typedef") {
+		t.type = TOKEN::typedeftkn;
+	} else if (source == "ternary") {
+		t.type = TOKEN::ternary;
+	} else if (source == "unary") {
+		t.type = TOKEN::unary;
+	} else if (source == "while") {
+		t.type = TOKEN::whiletkn;
+	} else if (source == ";") {
+		t.type = TOKEN::semicolon;
+	}else if (source == "and" or source == "or" or source == "in" or source == "var" or source == "val") {
+		t.type = TOKEN::symbol;
+	} else if (isalpha (source [0]) or source [0] == '_') {
+		t.type = TOKEN::identifier;
+	} else if (isspace (source [0])) {
+		t.type = TOKEN::whitespace;
+	} else {
+		t.type = TOKEN::symbol;
+	}
+	return t;
+}
+
 
 };
 };
+
