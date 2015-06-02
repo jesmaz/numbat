@@ -16,7 +16,7 @@ class ParseTreeOperator : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump () {string s = "operator ("; for (size_t i=0; i+1<args.size (); ++i) s += args [i]->toString () + ", "; return s + args.back ()->toString () + ")";}
+		virtual string strDump () {string s = "("; for (size_t i=0; i+1<args.size (); ++i) s += args [i]->toString () + " "; return s + args.back ()->toString () + ")";}
 		
 		std::vector <PTNode> args;
 		
