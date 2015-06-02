@@ -29,6 +29,16 @@ PTNode Stack::accumulate (char rep, int count, int offset, PTNode(*builder)(std:
 	
 }
 
+PTNode Stack::pop () {
+	
+	if (nodes.empty ()) return nullptr;
+	PTNode node = nodes.top ();
+	nodes.pop ();
+	s.pop_back ();
+	return node;
+	
+}
+
 void Stack::push (char c, const lexer::token & tkn) {
 	
 	s.push_back (c);
