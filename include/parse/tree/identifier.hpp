@@ -9,12 +9,12 @@ class ParseTreeIdentifier : public ParseTreeNode {
 	
 	public:
 		
-		ParseTreeIdentifier (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
+		ParseTreeIdentifier (uint32_t line, uint32_t pos, const string & iden) : ParseTreeNode (line, pos), iden (iden) {}
 		
 	protected:
 	private:
 		
-		virtual string strDump () {return "identifier";}
+		virtual string strDump () {return iden;}
 		
 		string iden;
 		
