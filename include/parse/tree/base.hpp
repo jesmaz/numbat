@@ -17,9 +17,13 @@ class ParseTreeNode {
 		uint32_t getPos () {return pos;}
 		
 		ParseTreeNode (uint32_t line, uint32_t pos) : line (line), pos (pos) {}
+		virtual ~ParseTreeNode () {}
 		
 	protected:
 	private:
+		
+		ParseTreeNode (ParseTreeNode & other) {}
+		virtual ParseTreeNode & operator = (const ParseTreeNode & rhs) {return *this;}
 		
 		virtual string strDump ()=0;
 		

@@ -12,6 +12,7 @@ class ParseTreeOperator : public ParseTreeNode {
 	public:
 		
 		ParseTreeOperator (const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
+		virtual ~ParseTreeOperator () {for (PTNode n : args) delete n;}
 		
 	protected:
 	private:
