@@ -40,7 +40,8 @@
    - [ ] Parser should be bottom up
    - [ ] Parser should not handle semantics, only syntax
    - [ ] Parser should still accept arbitrary operators
- - [ ] Separate the Abstract syntax tree from the concrete syntax tree
+   - [ ] Testing, lots of testing
+ - [ ] Separate semantics from the Abstract syntax tree
  - [ ] Verification pass
    - [ ] Define what situations result in error/warning in documentation
 
