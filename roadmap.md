@@ -37,9 +37,9 @@
  - [ ] Replace ASTnumbatInstruction with a more robust solution
  - [ ] Rewrite (and properly document) code generator
  - [ ] Rewrite parser
-   - [ ] Parser should be bottom up
-   - [ ] Parser should not handle semantics, only syntax
-   - [ ] Parser should still accept arbitrary operators
+   - [x] Parser should be bottom up
+   - [x] Parser should not handle semantics, only syntax
+   - [x] Parser should still accept arbitrary operators
    - [ ] Testing, lots of testing
  - [ ] Separate semantics from the Abstract syntax tree
  - [ ] Verification pass
