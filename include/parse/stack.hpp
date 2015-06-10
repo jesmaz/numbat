@@ -9,6 +9,7 @@
 #include "tree/symbol.hpp"
 #include "tree.hpp"
 
+#include <functional>
 #include <stack>
 
 
@@ -22,7 +23,7 @@ struct Stack {
 		
 		const string & getS () const {return s;}
 		
-		PTNode accumulate (char rep, int count, int offset, PTNode(*builder)(std::vector <PTNode>)=nullptr);
+		PTNode accumulate (char rep, int count, int offset, const std::function <PTNode (const std::vector <PTNode> &)> * builder=nullptr);
 		PTNode pop ();
 		PTNode top () {return nodes.empty () ? nullptr : nodes.top ();}
 		

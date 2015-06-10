@@ -151,13 +151,13 @@ PTNode Parser::parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::l
 	parser::Stack stack;
 	char next=getCode (*itt);
 	
-	auto reduce = [&] (const string & rule, char c) {
+	auto reduce = [&] (const string & rule, char c, std::function <PTNode (const std::vector <PTNode> &)> * builder) {
 		size_t pos = stack.getS ().find_last_of (rule);
 		if (!c) abort ();
 		if (pos == string::npos) {
 			std::cerr << "Fatal error: No match for selected rule '" << rule << "' in '" << stack.getS () << "'" << std::endl; exit (1);
 		}
-		stack.accumulate (c, rule.length (), stack.getS ().length () - (pos + 1));
+		stack.accumulate (c, rule.length (), stack.getS ().length () - (pos + 1), builder);
 	};
 	
 	auto skip = [&] () {
@@ -219,7 +219,7 @@ PTNode Parser::parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::l
 				case 'S':
 					return 0;
 				case 'R':
-					reduce (*(leaf->s), leaf->r);
+					reduce (*(leaf->s), leaf->r, leaf->ptr);
 					return 1;
 				case 'X':
 					node = new ParseTreeError ((itt+1)->line, 0, "Unexpected token: '" + (itt+1)->iden + "'");

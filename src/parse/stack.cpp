@@ -4,7 +4,7 @@ namespace numbat {
 namespace parser {
 
 
-PTNode Stack::accumulate (char rep, int count, int offset, PTNode(*builder)(std::vector <PTNode>)) {
+PTNode Stack::accumulate (char rep, int count, int offset, const std::function <PTNode (const std::vector <PTNode> &)> * builder) {
 	
 	string suffix = s.substr (s.length () - offset);
 	s = s.substr (0, s.length () - offset - count + 1);
@@ -17,7 +17,7 @@ PTNode Stack::accumulate (char rep, int count, int offset, PTNode(*builder)(std:
 	}
 	PTNode n;
 	if (builder) {
-		n = builder (args);
+		n = (*builder) (args);
 	} else if (args.size () == 1) {
 		n = args.front ();
 	} else {
