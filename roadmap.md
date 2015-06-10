@@ -33,7 +33,10 @@
  - [x] Make errors display line and file data correctly
 
 ##Version 0.3##
+ - [ ] Analysis pass
+   - [ ] Side effect propagation
  - [ ] High level optimisation pass
+   - [ ] Static code evaluation
  - [ ] Replace ASTnumbatInstruction with a more robust solution
  - [ ] Rewrite (and properly document) code generator
  - [ ] Rewrite parser
@@ -41,7 +44,8 @@
    - [x] Parser should not handle semantics, only syntax
    - [x] Parser should still accept arbitrary operators
    - [ ] Testing, lots of testing
- - [ ] Separate semantics from the Abstract syntax tree
+ - [ ] Semantic analysis pass
+   - [ ] Transforms the parse tree into the abstract syntax tree
  - [ ] Verification pass
    - [ ] Define what situations result in error/warning in documentation
 
