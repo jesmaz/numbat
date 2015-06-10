@@ -16,6 +16,8 @@ class ParseTreeNode {
 		uint32_t getLine () {return line;}
 		uint32_t getPos () {return pos;}
 		
+		virtual bool isAggregate () {return false;}
+		
 		ParseTreeNode (uint32_t line, uint32_t pos) : line (line), pos (pos) {}
 		virtual ~ParseTreeNode () {}
 		
