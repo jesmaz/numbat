@@ -9,8 +9,8 @@ cd `dirname "${BASH_SOURCE[0]}"`
 
 for i in $( find parser/*.nbt ); do
 	
-	lines=`diff -EZby --suppress-common-lines "$i.out" <(cat "$i" | ../build/parsertest) | grep '^'`
-	fail=`echo -n "$lines" | wc -l`
+	lines=`diff -EZby --suppress-common-lines "$i.out" <(cat "$i" | ../build/parsertest)`
+	fail=`echo -n "$lines" | grep '^' | wc -l`
 	lcount=`cat "$i.out" | grep '^' | wc -l`
 	
 	if [ $fail -gt 0 ]
