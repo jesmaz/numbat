@@ -9,6 +9,7 @@
 
 #include <bitset>
 #include <cstring>
+#include <functional>
 #include <iostream>
 #include <list>
 #include <map>
@@ -29,7 +30,7 @@ struct Parser {
 		struct Rule {
 			struct Args {
 				string s;
-				void * ptr;
+				std::function <PTNode (const std::vector <PTNode> &)> * ptr;
 				int prec;
 				RuleType type;
 			};
@@ -39,9 +40,9 @@ struct Parser {
 		union RuleLeaf {
 			RuleLeaf () {memset ((void*)(this), 0, sizeof(RuleLeaf));}
 			struct {
-				char r;
-				void * ptr;
+				std::function <PTNode (const std::vector <PTNode> &)> * ptr;
 				string * s;
+				char r;
 			};
 			char next [256];
 		};
@@ -59,8 +60,8 @@ struct Parser {
 		PTNode parseBody (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const;
 		PTNode parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const;
 		
-		void addRule (const string & rule, const string & ptn, int16_t prec=0, RuleType ruleType=NONE, void * ptr=nullptr);
-		void addRules (const string & rule, const std::vector <string> & ptn, int16_t prec=0, int ruleType=NONE, void * ptr=nullptr);
+		void addRule (const string & rule, const string & ptn, int16_t prec=0, RuleType ruleType=NONE, std::function <PTNode (const std::vector <PTNode> &)> ptr=nullptr);
+		void addRules (const string & rule, const std::vector <string> & ptn, int16_t prec=0, int ruleType=NONE, std::function <PTNode (const std::vector <PTNode> &)> ptr=nullptr);
 		void buildRules ();
 		
 		Parser ();

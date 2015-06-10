@@ -260,7 +260,7 @@ PTNode Parser::parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::l
 }
 
 
-void Parser::addRule (const string & rule, const string & ptn, int16_t prec, RuleType ruleType, void * ptr) {
+void Parser::addRule (const string & rule, const string & ptn, int16_t prec, RuleType ruleType, std::function <PTNode (const std::vector <PTNode> &)> ptr) {
 	
 	auto tks = lexer::lex (ptn);
 	char rc = registerRule (lexer::lexToken(rule));
@@ -279,11 +279,12 @@ void Parser::addRule (const string & rule, const string & ptn, int16_t prec, Rul
 		}
 	}
 	
-	rules [rc].expantions.push_back ({pattern, ptr, prec, ruleType});
+	auto builder = ptr ? new std::function <PTNode (const std::vector <PTNode> &)> (ptr) : nullptr;
+	rules [rc].expantions.push_back ({pattern, builder, prec, ruleType});
 	
 }
 
-void Parser::addRules (const string & rule, const std::vector <string> & ptn, int16_t prec, int ruleType, void * ptr) {
+void Parser::addRules (const string & rule, const std::vector <string> & ptn, int16_t prec, int ruleType, std::function <PTNode (const std::vector <PTNode> &)> ptr) {
 	for (const string & s : ptn) {
 		addRule (rule, s, prec, RuleType (ruleType), ptr);
 	}
