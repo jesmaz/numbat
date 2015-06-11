@@ -152,12 +152,12 @@ PTNode Parser::parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::l
 	char next=getCode (*itt);
 	
 	auto reduce = [&] (const string & rule, char c, std::function <PTNode (const std::vector <PTNode> &)> * builder) {
-		size_t pos = stack.getS ().find_last_of (rule);
+		size_t pos = stack.getS ().rfind (rule);
 		if (!c) abort ();
 		if (pos == string::npos) {
 			std::cerr << "Fatal error: No match for selected rule '" << rule << "' in '" << stack.getS () << "'" << std::endl; exit (1);
 		}
-		stack.accumulate (c, rule.length (), stack.getS ().length () - (pos + 1), builder);
+		stack.accumulate (c, rule.length (), pos, builder);
 	};
 	
 	auto skip = [&] () {

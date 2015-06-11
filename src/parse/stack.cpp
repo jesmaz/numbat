@@ -6,12 +6,12 @@ namespace parser {
 
 PTNode Stack::accumulate (char rep, int count, int offset, const std::function <PTNode (const std::vector <PTNode> &)> * builder) {
 	
-	string suffix = s.substr (s.length () - offset);
-	s = s.substr (0, s.length () - offset - count + 1);
+	string suffix = s.substr (offset + count);
+	s = s.substr (0, offset + 1);
 	s.back () = rep;
 	s += suffix;
-	std::vector <PTNode> args (count), tmp (offset);
-	for (size_t i=offset; i>0;) tmp[--i]=nodes.top (), nodes.pop ();
+	std::vector <PTNode> args (count), tmp (suffix.size ());
+	for (size_t i=tmp.size (); i>0;) tmp[--i]=nodes.top (), nodes.pop ();
 	while (count) {
 		args [--count] = nodes.top (); nodes.pop ();
 	}
