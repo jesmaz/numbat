@@ -12,7 +12,7 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("BracketRound", {"()", "(E)"});
 	parser.addRules ("BracketSquare", {"[]", "[E]"});
 	//parser.addRules ("InitList", {"Init"});
-	parser.addRules ("Range", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]"});
+	parser.addRules ("Range", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "[IDENTIFIER in E]"});
 	//parser.addRules ("E", {"E I", "val I", "var I"});
 	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare", "MetaTag MetaTag"}, -1, Parser::LTR);
 	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag"}, 0, Parser::LTR);
@@ -26,7 +26,7 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("E", {"E BracketRound"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E BracketSquare"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E Range"}, 100, Parser::LTR);
-	parser.addRules ("IDENTIFIER", {"E.IDENTIFIER", "E.MetaTag"}, 100, Parser::LTR);
+	parser.addRules ("E", {"E.IDENTIFIER", "E.MetaTag"}, 100, Parser::LTR);
 	
 	parser.addRules ("E", {"E++", "E--"}, 200, Parser::LTR);
 	
