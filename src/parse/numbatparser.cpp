@@ -9,7 +9,19 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("BLOCK", {"{}"});
 	
 	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "BracketRound", "Range"});
-	parser.addRules ("BracketRound", {"()", "(E)"});
+	parser.addRules ("BracketRound", {"()", "(E)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
+		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
+		delete args.front ();
+		delete args.back ();
+		switch (args.size ()) {
+			case 2:
+				return new ParseTreeOperator (l, p);
+			case 3:
+				if (args [1]->isAggregate ()) return args [1];
+			default:
+				return new ParseTreeOperator ({args.begin ()+1, args.end ()-1});
+		}
+	});
 	parser.addRules ("BracketSquare", {"[]", "[E]"});
 	//parser.addRules ("InitList", {"Init"});
 	parser.addRules ("Range", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "[IDENTIFIER in E]"});
