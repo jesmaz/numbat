@@ -7,9 +7,16 @@
 
 using std::string;
 
+struct Function;
+struct Struct;
+
 class ParseTreeNode {
 	
 	public:
+		
+		enum class NodeType {EXPRESSION, FUNCTION, STRUCT};
+		
+		NodeType getType () {return type;}
 		
 		string toString () {if (this) return strDump (); else return "nullptr";}
 		
@@ -17,8 +24,11 @@ class ParseTreeNode {
 		uint32_t getPos () {return pos;}
 		
 		virtual bool isAggregate () {return false;}
+		virtual Function * asFunction () {return nullptr;}
+		virtual Struct * asStruct () {return nullptr;}
 		
-		ParseTreeNode (uint32_t line, uint32_t pos) : line (line), pos (pos) {}
+		ParseTreeNode (uint32_t line, uint32_t pos) : type (NodeType::EXPRESSION), line (line), pos (pos) {}
+		ParseTreeNode (NodeType nodeType, uint32_t line, uint32_t pos) : type (nodeType), line (line), pos (pos) {}
 		virtual ~ParseTreeNode () {}
 		
 	protected:
@@ -29,6 +39,7 @@ class ParseTreeNode {
 		
 		virtual string strDump ()=0;
 		
+		NodeType type;
 		uint32_t line, pos;
 		
 };
