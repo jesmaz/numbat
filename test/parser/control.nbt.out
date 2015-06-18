@@ -1,0 +1,6 @@
+{((block test) : a);}
+{((block test) : b);}
+(if (a) b)
+(if (a) b else c)
+(if (a) {b;})
+(if (a) {b;} else {c;})
