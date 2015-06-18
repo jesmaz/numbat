@@ -148,6 +148,7 @@ PTNode Parser::parseBody (numbat::lexer::tkstring::const_iterator itt, numbat::l
 
 PTNode Parser::parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const {
 	
+	if (itt == end) return nullptr;
 	parser::Stack stack;
 	char next=getCode (*itt);
 	
