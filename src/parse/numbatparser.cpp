@@ -8,7 +8,7 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("BLOCK", {"{}"});
 	
-	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "BracketRound", "Range"});
+	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "Lambda", "BracketRound", "Range"});
 	parser.addRules ("BracketRound", {"()", "(E)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
 		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
 		delete args.front ();
@@ -26,11 +26,14 @@ NumbatParser::NumbatParser () {
 	//parser.addRules ("InitList", {"Init"});
 	parser.addRules ("Range", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "[IDENTIFIER in E]"});
 	//parser.addRules ("E", {"E I", "val I", "var I"});
-	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare", "MetaTag MetaTag"}, -1, Parser::LTR);
+	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare"}, -1, Parser::LTR);
 	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag"}, 0, Parser::LTR);
 	parser.addRules ("Variable", {"BracketSquare Variable", "Variable BracketSquare", "IDENTIFIER IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER"}, 0, Parser::LTR);
 	
-	parser.addRules ("E", {"BracketRound->BracketRound"}, 0, Parser::LTR);
+	parser.addRules ("Lambda", {"BracketRound->BracketRound", "BracketRound->BracketRound E"}, 0, Parser::LTR);
+	parser.addRules ("Function", {"def IDENTIFIER Lambda", "def IDENTIFIER BracketRound E"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
+	parser.addRules ("Struct", {"struct IDENTIFIER BLOCK"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Struct (args);});
+	parser.addRules ("T", {"extern Function", "Function"});
 	//parser.addRules ("E", {"E->E"}, 1800, Parser::LTR);
 	
 	
