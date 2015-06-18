@@ -120,10 +120,17 @@ PTNode Parser::parseBody (numbat::lexer::tkstring::const_iterator itt, numbat::l
 	auto reduce = [&] () {
 		PTNode node = parseExpr (last, itt);
 		if (node) {
-			list.push_back (node);
-#ifdef DEBUG
-			std::cout << (node->toString ()) << std::endl;
-#endif
+			switch (node->getType ()) {
+				case ParseTreeNode::NodeType::EXPRESSION:
+					list.push_back (node);
+					break;
+				case ParseTreeNode::NodeType::FUNCTION:
+					funcs.push_back (node->asFunction ());
+					break;
+				case ParseTreeNode::NodeType::STRUCT:
+					structs.push_back (node->asStruct ());
+					break;
+			}
 		}
 		
 		return last = next;

@@ -8,6 +8,20 @@ void printHelp (char * cmd) {
 	std::cerr << "Usage: " << cmd << " [Option]... [File...]\n";
 }
 
+void print (PTNode node) {
+	ParseTree * ptree = dynamic_cast <ParseTree *> (node);
+	if (ptree) {
+		for (Struct * t : ptree->getStructs ()) {
+			std::cout << t->toString () << std::endl;
+		}
+		for (Function * func : ptree->getFunctions ()) {
+			std::cout << func->toString () << std::endl;
+		}
+		for (PTNode n : ptree->getBody ()) {
+			std::cout << n->toString () << std::endl;
+		}
+	}
+}
 
 int main (int argl, char ** argc) {
 	
@@ -32,13 +46,13 @@ int main (int argl, char ** argc) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				parser.parse (prog);
+				print (parser.parse (prog));
 				std::cout << std::endl;
 				prog = line;
 			}
 		}
 		if (not prog.empty()) {
-			parser.parse (prog);
+			print (parser.parse (prog));
 		}
 		
 	} else {
