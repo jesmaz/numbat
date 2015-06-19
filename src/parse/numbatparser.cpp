@@ -79,6 +79,9 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("E", {"if BracketRound E", "if BracketRound E else E", "if MetaTag E", "for Range E", "while BracketRound E"}, 1700, Parser::LTR);
 	
+	parser.addRules ("Import", {"import IDENTIFIER", "import LITERAL", "Import.IDENTIFIER", "Import.LITERAL"}, 1800, Parser::LTR);
+	parser.addRules ("T", {"Import", "Import as IDENTIFIER"}, 1800, Parser::LTR);
+	
 	parser.buildRules ();
 	
 }
