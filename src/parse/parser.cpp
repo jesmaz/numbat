@@ -137,7 +137,7 @@ PTNode Parser::parseBody (numbat::lexer::tkstring::const_iterator itt, numbat::l
 	};
 	
 	while (itt != end and itt->type != lexer::TOKEN::eof) {
-		if (!brace and itt->type == lexer::TOKEN::semicolon and (itt->iden == ";" or (next->type != lexer::TOKEN::elsetkn and next->iden != "{") or prev->iden == "}") and itt != last) {
+		if (!brace and itt->type == lexer::TOKEN::semicolon and (itt->iden == ";" or (next->type != lexer::TOKEN::elsetkn and (prev->iden != ")" or next->iden != "{"))) and itt != last) {
 			reduce ();
 			shift ();
 		} else {
