@@ -12,7 +12,7 @@ struct NumbatParser {
 	
 	public:
 		
-		void parse (const string & prog) {parser.parse (prog);}
+		PTNode parse (const string & prog) {return parser.parse (prog);}
 		
 		NumbatParser ();
 		
