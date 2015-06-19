@@ -4,3 +4,5 @@
 (if (a) b else c)
 (if (a) {b;})
 (if (a) {b;} else {c;})
+{((block test) : c); ((c + d) > j);}
+{((block test) : d); {((nested block) : test); ((d - c) + (v * b));};}
