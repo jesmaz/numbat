@@ -8,7 +8,7 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("BLOCK", {"{}"});
 	
-	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "Lambda", "BracketRound", "Range"});
+	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "Lambda", "BracketRound", "Slice", "Each"});
 	parser.addRules ("BracketRound", {"()", "(E)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
 		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
 		delete args.front ();
@@ -24,11 +24,11 @@ NumbatParser::NumbatParser () {
 	});
 	parser.addRules ("BracketSquare", {"[]", "[E]"});
 	//parser.addRules ("InitList", {"Init"});
-	parser.addRules ("Range", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "[IDENTIFIER in E]"});
+	parser.addRules ("Slice", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "[Each]"});
 	//parser.addRules ("E", {"E I", "val I", "var I"});
 	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare"}, -1, Parser::LTR);
 	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag"}, 0, Parser::LTR);
-	parser.addRules ("Variable", {"BracketSquare Variable", "Variable BracketSquare", "IDENTIFIER IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER"}, 0, Parser::LTR);
+	parser.addRules ("Variable", {"BracketSquare Variable", "Variable BracketSquare", "IDENTIFIER IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER", "const Variable", "ref Variable"}, 0, Parser::LTR);
 	
 	parser.addRules ("Lambda", {"BracketRound->BracketRound", "BracketRound->BracketRound E"}, 0, Parser::LTR);
 	parser.addRules ("Function", {"def IDENTIFIER Lambda", "def IDENTIFIER BracketRound E"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
@@ -40,7 +40,7 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("E", {"E BracketRound"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E BracketSquare"}, 100, Parser::LTR);
-	parser.addRules ("E", {"E Range"}, 100, Parser::LTR);
+	parser.addRules ("Slice", {"E Slice"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E.IDENTIFIER", "E.MetaTag"}, 100, Parser::LTR);
 	
 	parser.addRules ("E", {"E++", "E--"}, 200, Parser::LTR);
@@ -49,6 +49,7 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("E", {"E as E"}, 400, Parser::LTR);
 	parser.addRules ("E", {"E in E"}, 450, Parser::LTR);
+	parser.addRules ("Each", {"IDENTIFIER in E"}, 450, Parser::LTR);
 	
 	parser.addRules ("E", {"E*E", "E/E", "E%E"}, 500, Parser::LTR);
 	
@@ -57,10 +58,13 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("E", {"E<<E", "E>>E"}, 700, Parser::LTR);
 	
 	parser.addRules ("E", {"E&E"}, 800, Parser::LTR);
+	parser.addRules ("Slice", {"Slice&Slice"}, 800, Parser::LTR);
 	
 	parser.addRules ("E", {"E^E"}, 900, Parser::LTR);
+	parser.addRules ("Slice", {"Slice^Slice"}, 900, Parser::LTR);
 	
 	parser.addRules ("E", {"E|E"}, 1000, Parser::LTR);
+	parser.addRules ("Slice", {"Slice|Slice"}, 1000, Parser::LTR);
 	
 	parser.addRules ("E", {"E<E", "E<=E", "E>E", "E>=E"}, 1100, Parser::LTR);
 	
@@ -77,7 +81,7 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("E", {"E?E:E", "E=E", "E+=E", "E-=E", "E~=E", "E*=E", "E/=E", "E%=E", "E<<=E", "E>>=E", "E&=E", "E^=E", "E|=E", "E=>E", "Variable=E"}, 1600, Parser::RTL);
 	
-	parser.addRules ("E", {"if BracketRound E", "if BracketRound E else E", "if MetaTag E", "for Range E", "while BracketRound E"}, 1700, Parser::LTR);
+	parser.addRules ("E", {"if BracketRound E", "if BracketRound E else E", "if MetaTag E", "for BracketSquare E", "for Slice E", "while BracketRound E"}, 1700, Parser::LTR);
 	
 	parser.addRules ("Import", {"import IDENTIFIER", "import LITERAL", "Import.IDENTIFIER", "Import.LITERAL"}, 1800, Parser::LTR);
 	parser.addRules ("T", {"Import", "Import as IDENTIFIER"}, 1800, Parser::LTR);
