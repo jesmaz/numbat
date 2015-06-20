@@ -20,15 +20,7 @@ class ParseTreeOperator : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) {
-			if (args.size ()) {
-				string s = "(";
-				for (size_t i=0; i+1<args.size (); ++i) s += args [i]->toString () + " ";
-				return s + args.back ()->toString () + ")";
-			} else {
-				return "()";
-			}
-		}
+		virtual string strDump (text::PrintMode mode);
 		
 		std::vector <PTNode> args;
 		

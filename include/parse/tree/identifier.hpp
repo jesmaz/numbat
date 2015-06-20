@@ -14,7 +14,7 @@ class ParseTreeIdentifier : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) {return iden;}
+		virtual string strDump (text::PrintMode mode);
 		
 		string iden;
 		

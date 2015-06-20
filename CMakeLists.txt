@@ -39,14 +39,27 @@ set(sources ${sources} "src/ast/numbatrawtype.cpp")
 set(sources ${sources} "src/ast/numbatscope.cpp")
 set(sources ${sources} "src/ast/numbattype.cpp")
 set(sources ${sources} "src/ast/operatordecleration.cpp")
+set(sources ${sources} "src/parse/numbatparser.cpp")
+set(sources ${sources} "src/parse/parser.cpp")
+set(sources ${sources} "src/parse/stack.cpp")
+set(sources ${sources} "src/parse/tree/error.cpp")
+set(sources ${sources} "src/parse/tree/function.cpp")
+set(sources ${sources} "src/parse/tree/identifier.cpp")
+set(sources ${sources} "src/parse/tree/literal.cpp")
+set(sources ${sources} "src/parse/tree/operator.cpp")
+set(sources ${sources} "src/parse/tree/struct.cpp")
+set(sources ${sources} "src/parse/tree/symbol.cpp")
 add_library(numbat-static STATIC ${sources})
 
 set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl z tinfo)
 
 add_executable(numbat ${sources} src/main.cpp)
-add_executable(parsertest ${sources} test/parserTest.cpp)
+add_executable(parsertest ${sources} test/parser.cpp)
+
 target_link_libraries(numbat ${libs})
 target_link_libraries(parsertest ${libs})
+
+set_target_properties(parsertest PROPERTIES COMPILE_FLAGS "-DDEBUG")
 
 install(FILES numbat.xml DESTINATION /usr/share/kde4/apps/katepart/syntax/)
 install(DIRECTORY "libnbt/" DESTINATION /usr/include/numbat)

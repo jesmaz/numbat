@@ -14,7 +14,7 @@ class ParseTreeSymbol : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) {return sym;}
+		virtual string strDump (text::PrintMode mode);
 		
 		string sym;
 		
