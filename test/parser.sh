@@ -9,7 +9,7 @@ cd `dirname "${BASH_SOURCE[0]}"`
 
 for i in $( find parser/*.nbt ); do
 	
-	lines=`diff -EZby --suppress-common-lines "$i.out" <(cat "$i" | ../build/parsertest)`
+	lines=`diff -EZby --suppress-common-lines "$i.out" <(cat "$i" | ../build/parsertest | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g")`
 	fail=`echo -n "$lines" | grep '^' | wc -l`
 	lcount=`cat "$i.out" | grep '^' | wc -l`
 	
