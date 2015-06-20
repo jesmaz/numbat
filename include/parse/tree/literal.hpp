@@ -14,7 +14,7 @@ class ParseTreeLiteral : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump (ParseTreeNode::PrintMode mode) {return literal;}
+		virtual string strDump (text::PrintMode mode) {return literal;}
 		
 		string literal;
 		
