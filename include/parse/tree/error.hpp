@@ -14,7 +14,7 @@ class ParseTreeError : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump () {return err;}
+		virtual string strDump (ParseTreeNode::PrintMode mode) {return err;}
 		
 		string err;
 		

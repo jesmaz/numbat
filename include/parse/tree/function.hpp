@@ -19,7 +19,7 @@ struct Function : ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump () {return "";}
+		virtual string strDump (ParseTreeNode::PrintMode mode) {return "";}
 		
 		std::vector <PTNode> tplate, tags, params, type;
 		string iden;

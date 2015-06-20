@@ -22,7 +22,7 @@ class ParseTree : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump () {if (body.size ()) {string s = "{"; for (size_t i=0; i+1<body.size (); ++i) s += body [i]->toString () + "; "; return s + body.back ()->toString () + ";}";} else {return "{}";}}
+		virtual string strDump (ParseTreeNode::PrintMode mode) {if (body.size ()) {string s = "{"; for (size_t i=0; i+1<body.size (); ++i) s += body [i]->toString () + "; "; return s + body.back ()->toString () + ";}";} else {return "{}";}}
 		
 		std::vector <PTNode> body;
 		std::vector <Function *> functions;

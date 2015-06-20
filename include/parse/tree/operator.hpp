@@ -20,7 +20,7 @@ class ParseTreeOperator : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump () {
+		virtual string strDump (ParseTreeNode::PrintMode mode) {
 			if (args.size ()) {
 				string s = "(";
 				for (size_t i=0; i+1<args.size (); ++i) s += args [i]->toString () + " ";

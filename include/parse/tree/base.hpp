@@ -1,7 +1,6 @@
 #ifndef PARSETREENODE_HPP
 #define PARSETREENODE_HPP
 
-
 #include <string>
 
 
@@ -15,10 +14,11 @@ class ParseTreeNode {
 	public:
 		
 		enum class NodeType {EXPRESSION, FUNCTION, STRUCT};
+		enum class PrintMode {PLAIN=0, COLOUR=1};
 		
 		NodeType getType () {return type;}
 		
-		string toString () {if (this) return strDump (); else return "nullptr";}
+		string toString (PrintMode mode=PrintMode::PLAIN) {if (this) return strDump (mode); else return "nullptr";}
 		
 		uint32_t getLine () {return line;}
 		uint32_t getPos () {return pos;}
@@ -37,7 +37,7 @@ class ParseTreeNode {
 		ParseTreeNode (ParseTreeNode & other) {}
 		virtual ParseTreeNode & operator = (const ParseTreeNode & rhs) {return *this;}
 		
-		virtual string strDump ()=0;
+		virtual string strDump (PrintMode mode)=0;
 		
 		NodeType type;
 		uint32_t line, pos;
