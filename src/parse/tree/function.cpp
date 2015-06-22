@@ -13,3 +13,9 @@ string Function::strDump (text::PrintMode mode) {
 	return s;
 	
 }
+
+Function::Function (const std::vector <PTNode> & args) : Function (args.empty () ? 0 : args.front ()->getLine (), args.empty () ? 0 : args.front ()->getPos ()) {
+	
+	
+	
+}

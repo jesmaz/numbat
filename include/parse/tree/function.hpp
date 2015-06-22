@@ -11,8 +11,11 @@ struct Function : ParseTreeNode {
 	
 	public:
 		
-		Function (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		Function (const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()) {}
+		
+		virtual Function * asFunction () {return this;}
+		
+		Function (uint32_t line, uint32_t pos) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), body (nullptr) {}
+		Function (const std::vector <PTNode> & args);
 		
 	protected:
 	private:
