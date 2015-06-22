@@ -7,8 +7,6 @@
 #include <vector>
 
 
-struct ParseTree;
-
 struct Function : ParseTreeNode {
 	
 	public:
@@ -23,7 +21,7 @@ struct Function : ParseTreeNode {
 		
 		std::vector <PTNode> tplate, tags, params, type;
 		string iden;
-		ParseTree * body;
+		PTNode body;
 		
 };
 
