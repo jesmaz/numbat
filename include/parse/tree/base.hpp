@@ -5,6 +5,7 @@
 #include "../../utility/text.hpp"
 
 #include <string>
+#include <vector>
 
 
 using std::string;
@@ -26,8 +27,12 @@ class ParseTreeNode {
 		uint32_t getPos () {return pos;}
 		
 		virtual bool isAggregate () {return false;}
+		virtual const std::vector <ParseTreeNode *> & getArgs () const {return defaultArgs;}
+		virtual const std::vector <ParseTreeNode *> & getTags () const {return defaultArgs;}
+		virtual const std::vector <ParseTreeNode *> & getTemplate () const {return defaultArgs;}
 		virtual Function * asFunction () {return nullptr;}
 		virtual Struct * asStruct () {return nullptr;}
+		virtual string getIden () const {return "";}
 		
 		ParseTreeNode (uint32_t line, uint32_t pos) : type (NodeType::EXPRESSION), line (line), pos (pos) {}
 		ParseTreeNode (NodeType nodeType, uint32_t line, uint32_t pos) : type (nodeType), line (line), pos (pos) {}
@@ -43,6 +48,7 @@ class ParseTreeNode {
 		
 		NodeType type;
 		uint32_t line, pos;
+		const static std::vector <ParseTreeNode *> defaultArgs;
 		
 };
 
