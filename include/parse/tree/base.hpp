@@ -17,7 +17,7 @@ class ParseTreeNode {
 	
 	public:
 		
-		enum class NodeType {EXPRESSION, FUNCTION, KEYWORD, STRUCT, SYMBOL};
+		enum class NodeType {EXPRESSION, FUNCTION, KEYWORD, LIST, STRUCT, SYMBOL};
 		
 		NodeType getType () {return type;}
 		
