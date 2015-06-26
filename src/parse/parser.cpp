@@ -405,9 +405,15 @@ void Parser::buildRules () {
 					RuleLeaf * l = getLeaf (r);
 					if (not l->s) l->s = new string (expan.s);
 					for (char s : map [(int)rule [index+1]]) {
-						if (l->next [(int)s] != 'S') l->next [(int)s] = 'R';
+						if (l->next [(int)s] != 'S') {
+							l->next [(int)s] = 'R';
+							l->ptr = leaf->ptr;
+						}
 					}
-					if (l->next [(int)rule [index+1]] != 'S') l->next [(int)rule [index+1]] = 'R';
+					if (l->next [(int)rule [index+1]] != 'S') {
+						l->next [(int)rule [index+1]] = 'R';
+						l->ptr = leaf->ptr;
+					}
 					if (not l->r) l->r = leaf->r;
 					++index;
 				}
