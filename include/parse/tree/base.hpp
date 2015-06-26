@@ -28,6 +28,7 @@ class ParseTreeNode {
 		
 		virtual bool isAggregate () {return false;}
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return defaultArgs;}
+		virtual const std::vector <ParseTreeNode *> & releaseArgs () const {return defaultArgs;}
 		virtual const std::vector <ParseTreeNode *> & getTags () const {return defaultArgs;}
 		virtual const std::vector <ParseTreeNode *> & getTemplate () const {return defaultArgs;}
 		virtual const string & getIden () const {return defaultStr;}
