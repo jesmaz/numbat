@@ -11,7 +11,7 @@ class ParseTreeList : public ParseTreeNode {
 		
 		virtual bool isAggregate () {return true;}
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
-		virtual const std::vector <ParseTreeNode *> & releaseArgs () const {auto a = args; args = std::vector <PTNode> (); return a;}
+		virtual const std::vector <ParseTreeNode *> releaseArgs () const {auto a = args; args = std::vector <PTNode> (); return a;}
 		
 		ParseTreeList (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos, ParseTreeNode::NodeType::LIST) {}
 		ParseTreeList (const std::vector <PTNode> & args) : ParseTreeList (args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
