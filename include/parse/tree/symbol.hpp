@@ -9,7 +9,7 @@ class ParseTreeSymbol : public ParseTreeNode {
 	
 	public:
 		
-		ParseTreeSymbol (uint32_t line, uint32_t pos, string sym) : ParseTreeNode (line, pos), sym (sym) {}
+		ParseTreeSymbol (uint32_t line, uint32_t pos, string sym) : ParseTreeNode (ParseTreeNode::NodeType::SYMBOL, line, pos), sym (sym) {}
 		
 	protected:
 	private:
