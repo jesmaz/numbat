@@ -15,7 +15,7 @@ class ParseTreeOperator : public ParseTreeNode {
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
 		
 		ParseTreeOperator (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeOperator (const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
+		ParseTreeOperator (const string & iden, const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()), iden (iden), args (args) {}
 		virtual ~ParseTreeOperator () {for (PTNode n : args) delete n;}
 		
 	protected:
@@ -23,6 +23,7 @@ class ParseTreeOperator : public ParseTreeNode {
 		
 		virtual string strDump (text::PrintMode mode);
 		
+		string iden;
 		std::vector <PTNode> args;
 		
 };

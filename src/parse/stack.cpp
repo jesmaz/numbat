@@ -21,7 +21,7 @@ PTNode Stack::accumulate (char rep, int count, int offset, const std::function <
 	} else if (args.size () == 1) {
 		n = args.front ();
 	} else {
-		n = new ParseTreeOperator (args);
+		n = new ParseTreeOperator ("", args);
 	}
 	nodes.push (n);
 	for (auto e : tmp) nodes.push (e);
