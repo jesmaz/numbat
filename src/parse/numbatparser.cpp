@@ -4,6 +4,27 @@
 namespace numbat {
 
 
+void oppRules (Parser & parser, string rule, std::vector <string> ptns, int16_t prec, numbat::Parser::RuleType type) {
+	for (const string & p : ptns) {
+		string iden = p;
+		for (char & c : iden) {
+			if (c == 'E') c = ' ';
+		}
+		parser.addRule (rule, p, prec, type, [=](const std::vector <PTNode> & args) -> PTNode {
+			std::vector <PTNode> nargs;
+			nargs.reserve (args.size ());
+			for (size_t i=0; i<args.size (); ++i) {
+				if (size_t (args[i]->getType ()) & (size_t (ParseTreeNode::NodeType::KEYWORD) | size_t (ParseTreeNode::NodeType::SYMBOL))) {
+					delete args[i];
+					continue;
+				}
+				nargs.push_back (args[i]);
+			}
+			return new ParseTreeOperator (iden, nargs);
+		});
+	}
+}
+
 NumbatParser::NumbatParser () {
 	
 	parser.addRules ("BLOCK", {"{}"});
@@ -45,36 +66,36 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("Slice", {"E Slice"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E.IDENTIFIER", "E.MetaTag"}, 100, Parser::LTR);
 	
-	parser.addRules ("E", {"E++", "E--"}, 200, Parser::LTR);
+	oppRules (parser, "E", {"E++", "E--"}, 200, Parser::LTR);
 	
-	parser.addRules ("E", {"++E", "--E", "-E", "!E", "not E", "~E"}, 300, Parser::RTL);
+	oppRules (parser, "E", {"++E", "--E", "-E", "!E", "not E", "~E"}, 300, Parser::RTL);
 	
-	parser.addRules ("E", {"E as E"}, 400, Parser::LTR);
-	parser.addRules ("E", {"E in E"}, 450, Parser::LTR);
+	oppRules (parser, "E", {"E as E"}, 400, Parser::LTR);
+	oppRules (parser, "E", {"E in E"}, 450, Parser::LTR);
 	parser.addRules ("Each", {"IDENTIFIER in E"}, 450, Parser::LTR);
 	
-	parser.addRules ("E", {"E*E", "E/E", "E%E"}, 500, Parser::LTR);
+	oppRules (parser, "E", {"E*E", "E/E", "E%E"}, 500, Parser::LTR);
 	
-	parser.addRules ("E", {"E+E", "E-E", "E~E"}, 600, Parser::LTR);
+	oppRules (parser, "E", {"E+E", "E-E", "E~E"}, 600, Parser::LTR);
 	
-	parser.addRules ("E", {"E<<E", "E>>E"}, 700, Parser::LTR);
+	oppRules (parser, "E", {"E<<E", "E>>E"}, 700, Parser::LTR);
 	
-	parser.addRules ("E", {"E&E"}, 800, Parser::LTR);
+	oppRules (parser, "E", {"E&E"}, 800, Parser::LTR);
 	parser.addRules ("Slice", {"Slice&Slice"}, 800, Parser::LTR);
 	
-	parser.addRules ("E", {"E^E"}, 900, Parser::LTR);
+	oppRules (parser, "E", {"E^E"}, 900, Parser::LTR);
 	parser.addRules ("Slice", {"Slice^Slice"}, 900, Parser::LTR);
 	
-	parser.addRules ("E", {"E|E"}, 1000, Parser::LTR);
+	oppRules (parser, "E", {"E|E"}, 1000, Parser::LTR);
 	parser.addRules ("Slice", {"Slice|Slice"}, 1000, Parser::LTR);
 	
-	parser.addRules ("E", {"E<E", "E<=E", "E>E", "E>=E"}, 1100, Parser::LTR);
+	oppRules (parser, "E", {"E<E", "E<=E", "E>E", "E>=E"}, 1100, Parser::LTR);
 	
-	parser.addRules ("E", {"E!=E", "E==E"}, 1200, Parser::LTR);
+	oppRules (parser, "E", {"E!=E", "E==E"}, 1200, Parser::LTR);
 	
-	parser.addRules ("E", {"E and E"}, 1300, Parser::LTR);
+	oppRules (parser, "E", {"E and E"}, 1300, Parser::LTR);
 	
-	parser.addRules ("E", {"E or E"}, 1400, Parser::LTR);
+	oppRules (parser, "E", {"E or E"}, 1400, Parser::LTR);
 	
 	parser.addRules ("E", {"Variable:E"}, 1450, Parser::RTL);
 	
@@ -90,7 +111,7 @@ NumbatParser::NumbatParser () {
 	});
 	//parser.addRules ("InitList", {"Init,Init", "Init,InitList", "Init,E"}, 1500, Parser::RTL);
 	
-	parser.addRules ("E", {"E?E:E", "E=E", "E+=E", "E-=E", "E~=E", "E*=E", "E/=E", "E%=E", "E<<=E", "E>>=E", "E&=E", "E^=E", "E|=E", "E=>E", "Variable=E"}, 1600, Parser::RTL);
+	oppRules (parser, "E", {"E?E:E", "E=E", "E+=E", "E-=E", "E~=E", "E*=E", "E/=E", "E%=E", "E<<=E", "E>>=E", "E&=E", "E^=E", "E|=E", "E=>E", "Variable=E"}, 1600, Parser::RTL);
 	
 	parser.addRules ("E", {"if BracketRound E", "if BracketRound E else E", "if MetaTag E", "for BracketSquare E", "for Slice E", "while BracketRound E"}, 1700, Parser::LTR);
 	
