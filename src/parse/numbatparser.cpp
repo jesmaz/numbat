@@ -15,11 +15,13 @@ NumbatParser::NumbatParser () {
 		delete args.back ();
 		switch (args.size ()) {
 			case 2:
-				return new ParseTreeOperator (l, p);
+				return new ParseTreeList (l, p);
 			case 3:
-				if (args [1]->isAggregate ()) return args [1];
+				if (args [1]->getType () == ParseTreeNode::NodeType::LIST) {
+					return args [1];
+				}
 			default:
-				return new ParseTreeOperator ({args.begin ()+1, args.end ()-1});
+				return new ParseTreeList ({args.begin ()+1, args.end ()-1});
 		}
 	});
 	parser.addRules ("BracketSquare", {"[]", "[E]"});
