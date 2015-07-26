@@ -78,7 +78,16 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("E", {"Variable:E"}, 1450, Parser::RTL);
 	
-	parser.addRules ("E", {"E,E"}, 1500, Parser::RTL);
+	parser.addRules ("E", {"E,E"}, 1500, Parser::LTR, [](const std::vector <PTNode> args){
+		if (args[0]->getType () == ParseTreeNode::NodeType::LIST) {
+			auto a = args[0]->releaseArgs ();
+			a.push_back (args [2]);
+			delete args [0];
+			return new ParseTreeList (a);
+		} else {
+			return new ParseTreeList ({args[0],args[2]});
+		}
+	});
 	//parser.addRules ("InitList", {"Init,Init", "Init,InitList", "Init,E"}, 1500, Parser::RTL);
 	
 	parser.addRules ("E", {"E?E:E", "E=E", "E+=E", "E-=E", "E~=E", "E*=E", "E/=E", "E%=E", "E<<=E", "E>>=E", "E&=E", "E^=E", "E|=E", "E=>E", "Variable=E"}, 1600, Parser::RTL);
