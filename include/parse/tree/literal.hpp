@@ -3,6 +3,7 @@
 
 
 #include "base.hpp"
+#include "../../token.hpp"
 
 
 class ParseTreeLiteral : public ParseTreeNode {
@@ -10,7 +11,7 @@ class ParseTreeLiteral : public ParseTreeNode {
 	public:
 		
 		ParseTreeLiteral (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeLiteral (uint32_t line, uint32_t pos, const string & literal) : ParseTreeNode (line, pos), literal (literal) {}
+		ParseTreeLiteral (uint32_t line, uint32_t pos, const string & literal, numbat::lexer::TOKEN tokenType) : ParseTreeNode (line, pos), literal (literal), tokenType(tokenType) {}
 		
 	protected:
 	private:
@@ -18,6 +19,7 @@ class ParseTreeLiteral : public ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		string literal;
+		numbat::lexer::TOKEN tokenType;
 		
 };
 

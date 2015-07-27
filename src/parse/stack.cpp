@@ -44,7 +44,7 @@ void Stack::push (char c, const lexer::token & tkn) {
 	s.push_back (c);
 	PTNode n;
 	if (c == literal) {
-		n = new ParseTreeLiteral (tkn.line, 0);
+		n = new ParseTreeLiteral (tkn.line, 0, tkn.iden, tkn.type);
 	} else if (c == identifier) {
 		n = new ParseTreeIdentifier (tkn.line, 0, tkn.iden);
 	} else {
