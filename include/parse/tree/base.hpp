@@ -2,8 +2,10 @@
 #define PARSETREENODE_HPP
 
 
+#include "../../ast/numbatscope.hpp"
 #include "../../utility/text.hpp"
 
+#include <cassert>
 #include <string>
 #include <vector>
 
@@ -34,6 +36,8 @@ class ParseTreeNode {
 		virtual const string & getIden () const {return defaultStr;}
 		virtual Function * asFunction () {return nullptr;}
 		virtual Struct * asStruct () {return nullptr;}
+		
+		virtual numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope) {std::cerr << "virtual 'build' not implemented for: " << typeid (*this).name () << std::endl; assert (0); return nullptr;}
 		
 		ParseTreeNode (uint32_t line, uint32_t pos) : type (NodeType::EXPRESSION), line (line), pos (pos) {}
 		ParseTreeNode (NodeType nodeType, uint32_t line, uint32_t pos) : type (nodeType), line (line), pos (pos) {}
