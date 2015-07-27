@@ -3,6 +3,8 @@
 
 
 #include "parser.hpp"
+#include "tree/list.hpp"
+#include "tree/variable.hpp"
 
 
 namespace numbat {

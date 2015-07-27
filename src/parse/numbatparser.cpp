@@ -51,7 +51,15 @@ NumbatParser::NumbatParser () {
 	//parser.addRules ("E", {"E I", "val I", "var I"});
 	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare"}, -1, Parser::LTR);
 	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag"}, 0, Parser::LTR);
-	parser.addRules ("Variable", {"Variable BracketSquare", "IDENTIFIER IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER", "const Variable", "ref Variable"}, 0, Parser::LTR);
+	parser.addRules ("Variable", {"IDENTIFIER IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		return new ParseTreeVariable (args[0], args[1]);
+	});
+	parser.addRules ("Variable", {"const Variable", "ref Variable"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		return args [1];
+	});
+	parser.addRules ("Variable", {"Variable BracketSquare"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		return args [0];
+	});
 	
 	parser.addRules ("Lambda", {"BracketRound->BracketRound", "BracketRound->BracketRound E"}, 0, Parser::LTR);
 	parser.addRules ("Function", {"def IDENTIFIER Lambda", "def IDENTIFIER BracketRound E"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
@@ -97,7 +105,15 @@ NumbatParser::NumbatParser () {
 	
 	oppRules (parser, "E", {"E or E"}, 1400, Parser::LTR);
 	
-	parser.addRules ("E", {"Variable:E"}, 1450, Parser::RTL);
+	parser.addRules ("E", {"Variable:E"}, 1450, Parser::RTL, [](const std::vector <PTNode> args) -> PTNode {
+		assert (typeid (*args[0]) == typeid (ParseTreeVariable));
+		ParseTreeVariable * var = reinterpret_cast <ParseTreeVariable *> (args[0]);
+		assert(not var->releaseInst ());
+		PTNode vt = var->releaseVType (), id = var->releaseIden ();
+		delete var;
+		delete args [1];
+		return new ParseTreeVariable (vt, id, args [2]);
+	});
 	
 	parser.addRules ("E", {"E,E"}, 1500, Parser::LTR, [](const std::vector <PTNode> args){
 		if (args[0]->getType () == ParseTreeNode::NodeType::LIST) {
