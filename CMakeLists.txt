@@ -50,15 +50,19 @@ set(sources ${sources} "src/parse/tree/keyword.cpp")
 set(sources ${sources} "src/parse/tree/list.cpp")
 set(sources ${sources} "src/parse/tree/literal.cpp")
 set(sources ${sources} "src/parse/tree/operator.cpp")
+set(sources ${sources} "src/parse/tree/slice.cpp")
 set(sources ${sources} "src/parse/tree/struct.cpp")
 set(sources ${sources} "src/parse/tree/symbol.cpp")
+set(sources ${sources} "src/parse/tree/variable.cpp")
 add_library(numbat-static STATIC ${sources})
 
 set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl z tinfo)
 
+add_executable(console ${sources} src/console.cpp)
 add_executable(numbat ${sources} src/main.cpp)
 add_executable(parsertest ${sources} test/parser.cpp)
 
+target_link_libraries(console ${libs})
 target_link_libraries(numbat ${libs})
 target_link_libraries(parsertest ${libs})
 
