@@ -108,7 +108,7 @@ NumbatScope * createChild (NumbatScope * scope);
 inline ParsingContext * getContext (NumbatScope * scope) {return scope->context;}
 std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 
-FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags);
+FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags, const NumbatScope * fScope);
 inline FunctionDecleration * getFunction (NumbatScope * scope) {return scope->func;}
 NumbatEnumType * createEnum (NumbatScope * scope, const string & iden, const NumbatType * baseType, const std::set <string> & meta);
 NumbatType * createRawType (NumbatScope * scope, const string & iden, size_t size, NumbatRawType::Type type);
