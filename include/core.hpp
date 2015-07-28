@@ -17,6 +17,8 @@ ASTnode defConcat (NumbatScope * scope, const string & func, const std::vector <
 ASTnode defLogic (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args);
 ASTnode defNegation (NumbatScope * scope, const string & func, const std::vector <ASTnode> & args);
 
+ASTnode makeFunctionCall (NumbatScope * scope, const std::shared_ptr <ASTcallable> & callable);
+
 ASTnode parseArrayDecleration (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp);
 ASTnode parseAssignmentOperator (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp);
 ASTnode parseBinary (NumbatScope * scope, const string & func, const std::vector <Position> & args, std::list <OperatorDecleration::OperatorMatch> * matches, OperatorDecleration::DefaultImplementation defImp);
