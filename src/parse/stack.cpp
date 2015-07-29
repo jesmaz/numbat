@@ -48,7 +48,11 @@ void Stack::push (char c, const lexer::token & tkn) {
 	} else if (c == identifier) {
 		n = new ParseTreeIdentifier (tkn.line, 0, tkn.iden);
 	} else {
-		n = new ParseTreeSymbol (tkn.line, 0, tkn.iden);
+		if (tkn.iden.length () > 1) {
+			n = new ParseTreeKeyword (tkn.line, 0, tkn.iden);
+		} else {
+			n = new ParseTreeSymbol (tkn.line, 0, tkn.iden);
+		}
 	}
 	nodes.push (n);
 	

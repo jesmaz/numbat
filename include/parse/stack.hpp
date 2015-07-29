@@ -4,6 +4,7 @@
 
 #include "../lexer.hpp"
 #include "tree/identifier.hpp"
+#include "tree/keyword.hpp"
 #include "tree/literal.hpp"
 #include "tree/operator.hpp"
 #include "tree/symbol.hpp"
