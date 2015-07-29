@@ -196,7 +196,7 @@ token lexToken (const std::string & source) {
 		t.type = TOKEN::whiletkn;
 	} else if (source == ";") {
 		t.type = TOKEN::semicolon;
-	}else if (source == "and" or source == "or" or source == "in" or source == "var" or source == "val") {
+	}else if (source == "and" or source == "in" or source == "not" or source == "or" or source == "var" or source == "val") {
 		t.type = TOKEN::symbol;
 	} else if (isalpha (source [0]) or source [0] == '_') {
 		t.type = TOKEN::identifier;
