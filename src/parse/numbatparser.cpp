@@ -6,9 +6,11 @@ namespace numbat {
 
 void oppRules (Parser & parser, string rule, std::vector <string> ptns, int16_t prec, numbat::Parser::RuleType type) {
 	for (const string & p : ptns) {
-		string iden = p;
-		for (char & c : iden) {
+		string iden;
+		for (char c : p) {
+			if (c == ' ') continue;
 			if (c == 'E') c = ' ';
+			iden.push_back (c);
 		}
 		parser.addRule (rule, p, prec, type, [=](const std::vector <PTNode> & args) -> PTNode {
 			std::vector <PTNode> nargs;
