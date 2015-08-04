@@ -49,7 +49,14 @@ NumbatParser::NumbatParser () {
 	});
 	parser.addRules ("BracketSquare", {"[]", "[E]"});
 	//parser.addRules ("InitList", {"Init"});
-	parser.addRules ("Slice", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "[Each]"});
+	parser.addRules ("Slice", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "Range", "[Each]"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		switch (args.size ()) {
+			case 1:
+				return args [0];
+			default:
+				return new ParseTreeSlice ({args.begin ()+1, args.end ()-1});
+		}
+	});
 	//parser.addRules ("E", {"E I", "val I", "var I"});
 	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare"}, -1, Parser::LTR);
 	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag"}, 0, Parser::LTR);
@@ -63,11 +70,12 @@ NumbatParser::NumbatParser () {
 		return args [0];
 	});
 	
-	parser.addRules ("Lambda", {"BracketRound->BracketRound", "BracketRound->BracketRound E"}, 0, Parser::LTR);
+	parser.addRules ("Lambda", {"BracketRound->BracketRound", "BracketRound->BracketRound E"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
 	parser.addRules ("Function", {"def IDENTIFIER Lambda", "def IDENTIFIER BracketRound E"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
 	parser.addRules ("Struct", {"struct IDENTIFIER BLOCK"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Struct (args);});
 	parser.addRules ("T", {"extern Function", "Function"});
 	//parser.addRules ("E", {"E->E"}, 1800, Parser::LTR);
+	//parser.addRules ("Range", {"[E<E<E]", "[E<=E<E]", "[E<E<=E]", "[E<=E<=E]"});
 	
 	
 	
