@@ -12,13 +12,13 @@ void print (PTNode node) {
 	ParseTree * ptree = dynamic_cast <ParseTree *> (node);
 	if (ptree) {
 		for (Struct * t : ptree->getStructs ()) {
-			std::cout << t->toString () << std::endl;
+			std::cout << t->toString (text::COLOUR) << std::endl;
 		}
 		for (Function * func : ptree->getFunctions ()) {
-			std::cout << func->toString () << std::endl;
+			std::cout << func->toString (text::COLOUR) << std::endl;
 		}
 		for (PTNode n : ptree->getBody ()) {
-			std::cout << n->toString () << std::endl;
+			std::cout << n->toString (text::COLOUR) << std::endl;
 		}
 	}
 }
