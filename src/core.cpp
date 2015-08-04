@@ -456,7 +456,12 @@ ASTnode parseReferenceOperator (NumbatScope * scope, const string & func, const 
 	
 	if (++pos) {
 		if (pos.itt->type == lexer::TOKEN::identifier) {
-			ret = ASTnode (new ASTvariable (args [1].itt->line, createVariable (scope, ret, nullptr, pos.itt->iden, false, false)));
+			NumbatVariable * var = createVariable (scope, ret, nullptr, pos.itt->iden, false, false);
+			if (!var) {
+				ret = generateOperatorError (pos, "'" + pos.itt->iden + "' has already been defined");
+			} else {
+				ret = ASTnode (new ASTvariable (args [1].itt->line, var));
+			}
 		} else {
 			ret = generateOperatorError (pos, "Identifier expected");
 		}
