@@ -16,6 +16,8 @@ class ParseTree : public ParseTreeNode {
 		const std::vector <PTNode> & getBody () const {return body;}
 		const std::vector <Struct *> & getStructs () const {return structs;}
 		
+		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
+		
 		ParseTree (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		ParseTree (const std::vector <PTNode> & body) : ParseTreeNode (body.front ()->getLine (), body.front ()->getPos ()), body (body) {}
 		
