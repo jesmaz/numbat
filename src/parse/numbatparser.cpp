@@ -16,7 +16,7 @@ void oppRules (Parser & parser, string rule, std::vector <string> ptns, int16_t 
 			std::vector <PTNode> nargs;
 			nargs.reserve (args.size ());
 			for (size_t i=0; i<args.size (); ++i) {
-				if (size_t (args[i]->getType ()) & (size_t (ParseTreeNode::NodeType::KEYWORD) | size_t (ParseTreeNode::NodeType::SYMBOL))) {
+				if (args[i]->getType () == ParseTreeNode::NodeType::KEYWORD or args[i]->getType () == ParseTreeNode::NodeType::SYMBOL) {
 					delete args[i];
 					continue;
 				}
