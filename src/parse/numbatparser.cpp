@@ -141,8 +141,31 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("E", {"if BracketRound E", "if BracketRound E else E", "if MetaTag E", "for BracketSquare E", "for Slice E", "while BracketRound E"}, 1700, Parser::LTR);
 	
-	parser.addRules ("Import", {"import IDENTIFIER", "import LITERAL", "Import.IDENTIFIER", "Import.LITERAL"}, 1800, Parser::LTR);
-	parser.addRules ("T", {"Import", "Import as IDENTIFIER"}, 1800, Parser::LTR);
+	parser.addRules ("Module", {"import IDENTIFIER", "import LITERAL", "Module.IDENTIFIER", "Module.LITERAL"}, 1800, Parser::LTR, [](const std::vector <PTNode> args){
+		switch (args.size ()) {
+			case 2:
+				delete args [0];
+				return new ParseTreeImportPath ({args[1]});
+			case 3: {
+				auto a = args[0]->releaseArgs ();
+				a.push_back (args [2]);
+				delete args [0];
+				delete args [1];
+				return new ParseTreeImportPath (a);
+			}
+			default:
+				return assert ("Incorrect number of arguments" == nullptr), (ParseTreeImportPath*)nullptr;
+				break;
+		}
+	});
+	parser.addRules ("Import", {"Module", "Module as IDENTIFIER"}, 1800, Parser::LTR, [](const std::vector <PTNode> args){
+		if (args.size () > 2) {
+			delete args [1];
+			return new ParseTreeImport (args [0], args[2]);
+		} else {
+			return new ParseTreeImport (args [0]);
+		}
+	});
 	
 	parser.buildRules ();
 	

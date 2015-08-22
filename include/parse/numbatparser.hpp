@@ -3,6 +3,7 @@
 
 
 #include "parser.hpp"
+#include "tree/import.hpp"
 #include "tree/list.hpp"
 #include "tree/slice.hpp"
 #include "tree/variable.hpp"
