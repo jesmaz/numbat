@@ -39,6 +39,8 @@ class ParseTreeNode {
 		
 		virtual numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope) {std::cerr << "virtual 'build' not implemented for: " << typeid (*this).name () << std::endl; assert (0); return nullptr;}
 		
+		virtual void declare (numbat::parser::NumbatScope * scope) {std::cerr << "virtual 'declare' not implemented for: " << typeid (*this).name () << std::endl; assert (0);}
+		
 		ParseTreeNode (uint32_t line, uint32_t pos) : type (NodeType::EXPRESSION), line (line), pos (pos) {}
 		ParseTreeNode (NodeType nodeType, uint32_t line, uint32_t pos) : type (nodeType), line (line), pos (pos) {}
 		virtual ~ParseTreeNode () {}
