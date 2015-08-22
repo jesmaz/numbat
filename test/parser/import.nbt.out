@@ -1,0 +1,4 @@
+import 'a'
+import 'b'
+import 'foo/bar'
+import 'foo/bar' as foo
