@@ -70,8 +70,6 @@ NumbatParser::NumbatParser () {
 		return args [0];
 	});
 	
-	parser.addRules ("Lambda", {"BracketRound->BracketRound", "BracketRound->BracketRound E"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
-	parser.addRules ("Function", {"def IDENTIFIER Lambda", "def IDENTIFIER BracketRound E"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
 	parser.addRules ("Struct", {"struct IDENTIFIER BLOCK"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Struct (args);});
 	parser.addRules ("T", {"extern Function", "Function"});
 	//parser.addRules ("E", {"E->E"}, 1800, Parser::LTR);
@@ -169,6 +167,10 @@ NumbatParser::NumbatParser () {
 			return new ParseTreeImport (args [0]);
 		}
 	});
+	
+	parser.addRules ("E", {"Lambda E"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
+	parser.addRules ("Lambda", {"BracketRound->BracketRound"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
+	parser.addRules ("Function", {"def IDENTIFIER Lambda", "def IDENTIFIER Lambda E", "def IDENTIFIER BracketRound E", "def IDENTIFIER BracketRound"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
 	
 	parser.buildRules ();
 	
