@@ -17,7 +17,7 @@ class ParseTreeImport : public ParseTreeNode {
 		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
 		
 		ParseTreeImport (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos), path (nullptr), iden (nullptr) {}
-		ParseTreeImport (PTNode path, PTNode iden=nullptr) : ParseTreeNode (path->getLine (), path->getPos ()), path (path), iden (iden) {}
+		ParseTreeImport (PTNode path, PTNode iden=nullptr) : ParseTreeNode (ParseTreeNode::NodeType::IMPORT, path->getLine (), path->getPos ()), path (path), iden (iden) {}
 		virtual ~ParseTreeImport () {delete path; delete iden;}
 		
 	protected:
