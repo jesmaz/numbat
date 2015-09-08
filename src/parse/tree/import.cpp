@@ -12,19 +12,24 @@ string joinPath (const std::vector <PTNode> & path) {
 	return relPath;
 }
 
+numbat::parser::ASTnode ParseTreeImport::build (numbat::parser::NumbatScope * scope) {
+	if (!var) declare (scope);
+	return numbat::parser::ASTnode (new numbat::parser::ASTvariable (getLine (), var));
+}
+
 string ParseTreeImport::strDump (text::PrintMode mode) {
 	return "import " + path->toString (mode) + (iden ? " as " + iden->toString (mode) : "");
 }
 
 string ParseTreeImportPath::strDump (text::PrintMode mode) {
-	return joinPath (path);
+	return "'" + joinPath (path) + "'";
 }
 
 void ParseTreeImport::declare (numbat::parser::NumbatScope * scope) {
 	
 	using namespace numbat::parser;
 	
-	auto & args =path->getArgs ();
+	auto & args = path->getArgs ();
 	string relPath = joinPath (args);
 	
 	auto module = Module::import (getContext (scope)->path, relPath);
@@ -32,6 +37,6 @@ void ParseTreeImport::declare (numbat::parser::NumbatScope * scope) {
 	
 	string modIden = iden ? iden->getIden () : args.back ()->getIden ();
 	
-	createVariable (scope, type, nullptr, modIden, false, false);
+	var = createVariable (scope, type, nullptr, modIden, false, false);
 	
 }

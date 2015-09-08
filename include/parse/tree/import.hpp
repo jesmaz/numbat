@@ -14,6 +14,7 @@ class ParseTreeImport : public ParseTreeNode {
 		virtual const string & getIden () const {return iden->getIden ();}
 		
 		void declare (numbat::parser::NumbatScope * scope);
+		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
 		
 		ParseTreeImport (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos), path (nullptr), iden (nullptr) {}
 		ParseTreeImport (PTNode path, PTNode iden=nullptr) : ParseTreeNode (path->getLine (), path->getPos ()), path (path), iden (iden) {}
@@ -25,6 +26,7 @@ class ParseTreeImport : public ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		PTNode path, iden;
+		numbat::parser::NumbatVariable * var=nullptr;
 		
 };
 
@@ -33,6 +35,7 @@ class ParseTreeImportPath : public ParseTreeNode {
 	public:
 		
 		virtual bool isAggregate () {return true;}
+		virtual const std::vector <ParseTreeNode *> releaseArgs () {auto a = path; path = std::vector <PTNode> (); return a;}
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return path;}
 		
 		ParseTreeImportPath (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
