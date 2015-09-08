@@ -1,6 +1,7 @@
 #include "../include/parse/parser.hpp"
 #include "../include/parse/numbatparser.hpp"
 
+#include <fstream>
 #include <iostream>
 
 
@@ -11,12 +12,6 @@ void printHelp (char * cmd) {
 void print (PTNode node) {
 	ParseTree * ptree = dynamic_cast <ParseTree *> (node);
 	if (ptree) {
-		for (Struct * t : ptree->getStructs ()) {
-			std::cout << t->toString (text::COLOUR) << std::endl;
-		}
-		for (Function * func : ptree->getFunctions ()) {
-			std::cout << func->toString (text::COLOUR) << std::endl;
-		}
 		for (PTNode n : ptree->getBody ()) {
 			std::cout << n->toString (text::COLOUR) << std::endl;
 		}
@@ -56,7 +51,14 @@ int main (int argl, char ** argc) {
 		}
 		
 	} else {
-		std::cerr << "Reading from files not yet supported\n";
+		for (char * f : files) {
+			std::ifstream fin (f);
+			string buff, prog;
+			while (std::getline (fin, buff)) prog += buff + "\n";
+			std::cout << "########" << f << "########" << std::endl;
+			print (parser.parse (prog));
+			std::cout << "########" << f << "########" << std::endl;
+		}
 	}
 	
 	return 0;
