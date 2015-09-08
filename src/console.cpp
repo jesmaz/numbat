@@ -36,10 +36,10 @@ int main (int argc, char ** args) {
 	
 	createType ("ptrint", numbat.getEngine ()->getDataLayout ()->getPointerSizeInBits (), numbat::parser::NumbatRawType::UNSIGNED);
 	
+	auto module = numbat::parser::Module::import ("core util");
 	numbat::NumbatParser parser;
 	string line;
-	numbat::parser::AbstractSyntaxTree ast;
-	ast.importModule (core, true);
+	numbat::parser::AbstractSyntaxTree * ast = module->getAST ();
 	//numbat::parser::BodyGenerator generator;
 	//ast->accept (generator);
 	for (;;) {
@@ -48,7 +48,7 @@ int main (int argc, char ** args) {
 		PTNode parseTree = parser.parse (line);
 		assert (typeid (*parseTree) == typeid (ParseTree));
 		for (PTNode n : reinterpret_cast <ParseTree*> (parseTree)->getBody ()) {
-			numbat::parser::ASTnode node = n->build (&ast);
+			numbat::parser::ASTnode node = n->build (ast);
 			//node->accept (generator);
 			if (node) {
 				std::cout << node->toString () << '\n';
