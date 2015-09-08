@@ -47,7 +47,17 @@ NumbatParser::NumbatParser () {
 				return new ParseTreeList ({args.begin ()+1, args.end ()-1});
 		}
 	});
-	parser.addRules ("BracketSquare", {"[]", "[E]"});
+	parser.addRules ("BracketSquare", {"[]", "[E]"}, 0, Parser::NONE, [](const std::vector <PTNode> args) -> PTNode {
+		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
+		delete args.front ();
+		delete args.back ();
+		switch (args.size ()) {
+			case 2:
+				return new ParseTreeIndex (l, p);
+			default:
+				return new ParseTreeIndex (args [1]);
+		}
+	});
 	//parser.addRules ("InitList", {"Init"});
 	parser.addRules ("Slice", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "Range", "[Each]"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
 		switch (args.size ()) {
