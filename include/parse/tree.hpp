@@ -18,6 +18,9 @@ class ParseTree : public ParseTreeNode {
 		
 		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
 		
+		void declare (numbat::parser::NumbatScope * scope);
+		void declareInline ();
+		
 		ParseTree (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		template <typename container>
 		ParseTree (container nodes) : ParseTreeNode (nodes.front ()->getLine (), nodes.front ()->getPos ()) {
@@ -43,11 +46,13 @@ class ParseTree : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) {if (body.size ()) {string s = "{"; for (size_t i=0; i+1<body.size (); ++i) s += body [i]->toString () + "; "; return s + body.back ()->toString () + ";}";} else {return "{}";}}
+		virtual string strDump (text::PrintMode mode);
 		
 		std::vector <PTNode> body, import;
 		std::vector <Function *> functions;
 		std::vector <Struct *> structs;
+		
+		numbat::parser::NumbatScope * treeScope=nullptr;
 		
 };
 
