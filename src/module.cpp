@@ -1,6 +1,6 @@
 #include "../include/ast.hpp"
 #include "../include/module.hpp"
-#include "../include/parser.hpp"
+#include "../include/parse/numbatparser.hpp"
 
 #include <fstream>
 
@@ -15,17 +15,19 @@ std::map <string, shared_ptr <Module>> Module::allModules;
 std::set <string> Module::includeDirs;
 std::vector <ASTnode> Module::main;
 
-tkstring loadFromStream (std::istream & is) {
+NumbatParser numbatparser;
+
+PTNode loadFromStream (std::istream & is) {
 	std::string out;
 	std::string buffer;
 	while (std::getline (is, buffer))
 		out += buffer + "\n";
-	return lexer::lexFile (out);
+	return numbatparser.parse (out);
 }
 
-tkstring loadFromFile (const std::string & file) {
+PTNode loadFromFile (const std::string & file) {
 	std::ifstream fin (file);
-	tkstring ret;
+	PTNode ret = nullptr;
 	if (fin.is_open ()) {
 		ret = loadFromStream (fin);
 		fin.close ();
@@ -87,15 +89,11 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 	if (itt != allModules.end ()) {
 		return itt->second;
 	}
-	tkstring tks = loadFromFile (file);
-	if (tks.empty ()) {
-		Module * m = new Module;
-		m->valid = -2;
-		return shared_ptr <Module> (m);
-	}
+	
 	size_t pos = file.find_last_of ("/");
-	allModules [file] = shared_ptr <Module> (new Module);
-	AbstractSyntaxTree * ast = allModules [file]->ast;
+	const shared_ptr <Module> thisMod = shared_ptr <Module> (new Module);
+	allModules [file] = thisMod;
+	AbstractSyntaxTree * ast = thisMod->ast;
 	if (pos == string::npos) {
 		getContext (ast)->file = file;
 		getContext (ast)->path = "";
@@ -103,15 +101,35 @@ const shared_ptr <Module> Module::createFromFile (const string & file) {
 		getContext (ast)->file = file.substr (pos+1);
 		getContext (ast)->path = file.substr (0, pos);
 	}
-	parseModule (Position (tks.begin (), lexer::findEOF (tks.begin (), tks.end ())), ast);
+	
+	auto impMod = [&](const shared_ptr <Module> module, bool ext) {
+		if (module.get () != thisMod.get ()) {
+			ast->importModule (module, ext);
+		}
+	};
+	
+	impMod (Module::createEmpty ("numbat core"), true);
+	impMod (Module::import (getContext (ast)->path, "core util"), false);
+	PTNode node = loadFromFile (file);
+	if (node) {
+		node->declare (ast);
+		//NOTE: This block can be deferred and put in a thread
+		{
+			node->build (ast);
+			delete node;
+		}
+	} else {
+		thisMod->valid = -2;
+	}
+	
 	if (debugMode) {
 		std::cerr << ast->toString () << std::endl;
 		std::cerr << ASTnode (new ASTbody (0, ast->getBody ()))->toString ("") << std::endl;
 	}
 	main.push_back (ASTnode (new ASTbody (0, ast->getBody ())));
-	allModules [file]->ast = ast;
-	checkForBuiltins (*allModules [file]);
-	return allModules [file];
+	thisMod->ast = ast;
+	checkForBuiltins (*thisMod);
+	return thisMod;
 	
 }
 
