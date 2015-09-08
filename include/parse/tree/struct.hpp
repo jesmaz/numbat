@@ -11,6 +11,8 @@ struct Struct : ParseTreeNode {
 	
 	public:
 		
+		void declare (numbat::parser::NumbatScope * scope);
+		
 		Struct (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		Struct (const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()) {}
 		
@@ -20,6 +22,7 @@ struct Struct : ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		std::vector <PTNode> tplate, tags, type;
+		numbat::parser::NumbatScope * sscope;
 		
 };
 
