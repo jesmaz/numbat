@@ -1,12 +1,14 @@
-struct string @export {int8 [0] data}
-
 extern def malloc @cstyle @malloc @local (uint64 size) -> (ptrint)
 extern def free @cstyle @free @local (ptrint ptr)
+
+struct string @export {int8 [0] data}
 
 
 def string (const ref int8 [0] data) -> (string) {
 	string str
-	str.data = data
+	int8 [data.length + 1] buff = data
+	str.data = buff
+	str.data.length = data.length
 	return str
 }
 
@@ -20,18 +22,18 @@ def string (uint64 num) -> (string) {
 	while (num == 0) {
 		return "0"
 	}
-	string str
+	string str = ""
 	uint64 tmp = num
 	int8 [1] arr
 	while (0 < tmp) {
 		arr [0] = (tmp % 10) + 48
 		tmp = tmp / 10
-		str.data = arr ~ str.data
+		str = arr ~ str
 	}
 	return str
 }
 
-def " ~ " (const ref string lhs, const ref string rhs) -> (string) {
+def ' ~ ' (const ref string lhs, const ref string rhs) -> (string) {
 	string str
 	str.data = lhs.data ~ rhs.data
 	return str

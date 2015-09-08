@@ -1,3 +1,4 @@
+import io
 #This file contains code that is syntactically and semantically correct
 
 
@@ -77,6 +78,39 @@ def f5 () -> () {
 def f6 (const ref int8 [0] lhs, const ref int8 [0] rhs) -> () {
 	int8 [100] arr
 }
+
+def f7 (ref string a) -> () {
+	f3 (f2 (0))
+	f7 ("a")
+	#io.print (io.scan () ~ "\n")
+}
+
+def f8 () -> () {
+	io.scan ()
+	f9 ()
+}
+
+def f9 () -> (string) {
+	string s = f11 ()
+	return s
+}
+
+def f10 () -> () {
+	#io.scan ()
+}
+
+def f11 () -> (string) {
+	io.scan (" \n\r\t")
+}
+
+def write @local (int32 handle, ptrint data, int64 length) -> (int64 bytes) 0
+
+def f12 (ref int8 [] array) -> () {
+	write (1, array as ptrint, array.length)
+}
+
+io.print (f11 ())
+f12 ("".data)
 
 
 

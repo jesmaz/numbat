@@ -95,6 +95,7 @@ Literal				=>	CharArrayLiteral
 ```
 ```
 MetaTag				=>	'@'Identifier
+					|	'@(' Expression ')'
 ```
 ```
 MetaTagList			=>	MetaTag MetaTagList
@@ -122,7 +123,7 @@ ReturnExpression	=>	'return'
 StringLiteral		=>	<string double quotes>
 ```
 ```
-StructDecl			=>	struct Template Identifier MetaTagList BracketCurvy ;
+StructDecl			=>	'struct' Template Identifier MetaTagList BracketCurvy ;
 ```
 ```
 Template			=>	BracketSquare
