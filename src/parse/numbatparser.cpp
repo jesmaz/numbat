@@ -32,7 +32,7 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("BLOCK", {"{}"});
 	
 	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "Lambda", "BracketRound", "Slice", "Each"});
-	parser.addRules ("BracketRound", {"()", "(E)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
+	parser.addRules ("BracketRound", {"()", "(E)", "(List)", "(Variable)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
 		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
 		delete args.front ();
 		delete args.back ();
@@ -125,7 +125,8 @@ NumbatParser::NumbatParser () {
 		return new ParseTreeVariable (vt, id, args [2]);
 	});
 	
-	parser.addRules ("E", {"E,E"}, 1500, Parser::LTR, [](const std::vector <PTNode> args){
+	auto createList = [](const std::vector <PTNode> args){
+		delete args [1];
 		if (args[0]->getType () == ParseTreeNode::NodeType::LIST) {
 			auto a = args[0]->releaseArgs ();
 			a.push_back (args [2]);
@@ -134,7 +135,9 @@ NumbatParser::NumbatParser () {
 		} else {
 			return new ParseTreeList ({args[0],args[2]});
 		}
-	});
+	};
+	parser.addRules ("E", {"E,E"}, 1500, Parser::LTR, createList);
+	parser.addRules ("List", {"E,Variable", "Variable,E", "Variable,Variable", "List,E", "List,Variable"}, 1500, Parser::LTR, createList);
 	//parser.addRules ("InitList", {"Init,Init", "Init,InitList", "Init,E"}, 1500, Parser::RTL);
 	
 	oppRules (parser, "E", {"E?E:E", "E=E", "E+=E", "E-=E", "E~=E", "E*=E", "E/=E", "E%=E", "E<<=E", "E>>=E", "E&=E", "E^=E", "E|=E", "E=>E", "Variable=E"}, 1600, Parser::RTL);
