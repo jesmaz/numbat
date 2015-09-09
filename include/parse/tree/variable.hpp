@@ -24,7 +24,7 @@ class ParseTreeVariable : public ParseTreeNode {
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		PTNode vType, iden, inst;
+		PTNode vType=nullptr, iden=nullptr, inst=nullptr;
 		
 };
 
