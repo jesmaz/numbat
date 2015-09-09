@@ -69,15 +69,12 @@ NumbatParser::NumbatParser () {
 	});
 	//parser.addRules ("E", {"E I", "val I", "var I"});
 	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare"}, -1, Parser::LTR);
-	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag"}, 0, Parser::LTR);
+	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag", "val MetaTag", "val MetaTag", "IDENTIFIER BracketSquare", "var MetaTag", "val BracketSquare"}, 0, Parser::LTR);
 	parser.addRules ("Variable", {"IDENTIFIER IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
 		return new ParseTreeVariable (args[0], args[1]);
 	});
 	parser.addRules ("Variable", {"const Variable", "ref Variable"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
 		return args [1];
-	});
-	parser.addRules ("Variable", {"Variable BracketSquare"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
-		return args [0];
 	});
 	
 	parser.addRules ("Struct", {"struct IDENTIFIER BLOCK"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Struct (args);});
@@ -89,7 +86,7 @@ NumbatParser::NumbatParser () {
 	
 	parser.addRules ("E", {"E BracketRound"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E BracketSquare"}, 100, Parser::LTR);
-	parser.addRules ("Slice", {"E Slice"}, 100, Parser::LTR);
+	parser.addRules ("Slice", {"E Slice", "IDENTIFIER Slice"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E.IDENTIFIER", "E.MetaTag"}, 100, Parser::LTR);
 	
 	oppRules (parser, "E", {"E++", "E--"}, 200, Parser::LTR);
