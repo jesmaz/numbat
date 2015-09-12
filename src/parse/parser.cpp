@@ -440,6 +440,14 @@ void Parser::buildRules () {
 				}
 			}
 			
+			if (expan.s.back () != leaf->r) {
+				for (auto match : rules [expan.s.back ()].expantions) {
+					if (match.s.size () > 1 and match.s.front () == expan.s.back ()) {
+						leaf->next [(int)match.s [1]] = 'S';
+					}
+				}
+			}
+			
 			for (size_t c=' '; c<128; ++c) {
 				if (leaf->next [(int)c] != 'S') {
 					leaf->next [(int)c] = 'R';
