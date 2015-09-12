@@ -100,6 +100,10 @@ NumbatParser::NumbatParser () {
 	oppRules (parser, "E", {"E*E", "E/E", "E%E"}, 500, Parser::LTR);
 	
 	oppRules (parser, "E", {"E+E", "E-E", "E~E"}, 600, Parser::LTR);
+	parser.addRules ("E", {"BracketRound-E"}, 600, Parser::LTR, [](const std::vector <PTNode> & args) -> PTNode {
+			delete args[1];
+			return new ParseTreeOperator (" - ", {args[0], args[2]});
+	});
 	
 	oppRules (parser, "E", {"E<<E", "E>>E"}, 700, Parser::LTR);
 	
