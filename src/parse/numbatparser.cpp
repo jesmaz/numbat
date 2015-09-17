@@ -32,7 +32,7 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("BLOCK", {"{}"});
 	
 	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "Lambda", "BracketRound", "Slice", "Each"});
-	parser.addRules ("BracketRound", {"()", "(E)", "(List)", "(Variable)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
+	parser.addRules ("BracketRound", {"()", "(E)", "(List)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
 		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
 		delete args.front ();
 		delete args.back ();
@@ -147,6 +147,7 @@ NumbatParser::NumbatParser () {
 	};
 	parser.addRules ("E", {"E,E"}, 1500, Parser::LTR, createList);
 	parser.addRules ("List", {"E,Variable", "Variable,E", "Variable,Variable", "List,E", "List,Variable"}, 1500, Parser::LTR, createList);
+	parser.addRules ("List", {"Variable"}, 1500, Parser::LTR);
 	//parser.addRules ("InitList", {"Init,Init", "Init,InitList", "Init,E"}, 1500, Parser::RTL);
 	
 	oppRules (parser, "E", {"E?E:E", "E=E", "E+=E", "E-=E", "E~=E", "E*=E", "E/=E", "E%=E", "E<<=E", "E>>=E", "E&=E", "E^=E", "E|=E", "E=>E", "Variable=E"}, 1600, Parser::RTL);
@@ -179,9 +180,10 @@ NumbatParser::NumbatParser () {
 		}
 	});
 	
-	parser.addRules ("E", {"Lambda E"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
+	parser.addRules ("E", {"Lambda BLOCK"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
 	parser.addRules ("Lambda", {"BracketRound->BracketRound"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
-	parser.addRules ("Function", {"def IDENTIFIER Lambda", "def IDENTIFIER Lambda E", "def IDENTIFIER BracketRound E", "def IDENTIFIER BracketRound"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
+	parser.addRules ("Function", {"def IDENTIFIER BracketRound->BracketRound", "def IDENTIFIER BracketRound->BracketRound E", "def IDENTIFIER BracketRound E", "def IDENTIFIER BracketRound"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
+	parser.addRules ("Lambda", {"List->E"}, 2000);
 	
 	parser.buildRules ();
 	
