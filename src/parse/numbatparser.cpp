@@ -180,10 +180,42 @@ NumbatParser::NumbatParser () {
 		}
 	});
 	
-	parser.addRules ("E", {"Lambda BLOCK"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
-	parser.addRules ("Lambda", {"BracketRound->BracketRound"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
-	parser.addRules ("Function", {"def IDENTIFIER BracketRound->BracketRound", "def IDENTIFIER BracketRound->BracketRound E", "def IDENTIFIER BracketRound E", "def IDENTIFIER BracketRound"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){return new Function (args);});
-	parser.addRules ("Lambda", {"List->E"}, 2000);
+	parser.addRules ("E", {"Lambda BLOCK"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
+		args [0]->asFunction ()->setBody (args[1]);
+		return args [0];
+	});
+	parser.addRules ("Lambda", {
+		"BracketRound->BracketRound",
+		"List->E"
+	}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
+		delete args [1];
+		delete args [2];
+		return new Function (nullptr, args [0], args [3], nullptr);
+	});
+	parser.addRules ("Function", {
+		"def IDENTIFIER BracketRound",
+		"def IDENTIFIER BracketRound E",
+		"def IDENTIFIER BracketRound->BracketRound",
+		"def IDENTIFIER BracketRound->BracketRound E"
+	}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
+		delete args [0];
+		switch (args.size ()) {
+			case 3:
+				return new Function (args [1], args [2], nullptr, nullptr);
+			case 4:
+				return new Function (args [1], args [2], nullptr, args[3]);
+			case 6:
+				delete args [3];
+				delete args [4];
+				return new Function (args [1], args [2], args [5], nullptr);
+			case 7:
+				delete args [3];
+				delete args [4];
+				return new Function (args [1], args [2], args [5], args [6]);
+			default:
+				assert (false);
+		}
+	});
 	
 	parser.buildRules ();
 	

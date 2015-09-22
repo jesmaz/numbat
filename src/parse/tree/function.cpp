@@ -9,13 +9,26 @@ string Function::strDump (text::PrintMode mode) {
 		s += "@[" + text::listPtrToStr (tplate.begin (), tplate.end (), mode) + "]";
 	s += "(" + text::listPtrToStr (params.begin (), params.end (), mode) + ")";
 	s += "->(" + text::listPtrToStr (type.begin (), type.end (), mode) + ")";
-	s += body->toString ();
+	s += body ? body->toString (mode) : "";
 	return s;
 	
 }
 
-Function::Function (const std::vector <PTNode> & args) : Function (args.empty () ? 0 : args.front ()->getLine (), args.empty () ? 0 : args.front ()->getPos ()) {
-	
-	
-	
+Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (params->getLine (), params->getPos ()) {
+	if (iden){
+		this->iden = iden->getIden ();
+	}
+	if (params->isList ()) {
+		this->params = params->getArgs ();
+	} else {
+		this->params.push_back (params);
+	}
+	if (type) {
+		if (type->isList ()) {
+			this->type = type->getArgs ();
+		} else {
+			this->type.push_back (type);
+		}
+	}
+	this->body = body;
 }
