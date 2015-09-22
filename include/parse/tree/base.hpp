@@ -29,6 +29,7 @@ class ParseTreeNode {
 		uint32_t getPos () {return pos;}
 		
 		virtual bool isAggregate () {return false;}
+		virtual bool isList () {return false;}
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return defaultArgs;}
 		virtual const std::vector <ParseTreeNode *> releaseArgs () {return defaultArgs;}
 		virtual const std::vector <ParseTreeNode *> & getTags () const {return defaultArgs;}

@@ -10,6 +10,7 @@ class ParseTreeList : public ParseTreeNode {
 	public:
 		
 		virtual bool isAggregate () {return true;}
+		virtual bool isList () {return true;}
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
 		virtual const std::vector <ParseTreeNode *> releaseArgs () {auto a = args; args = std::vector <PTNode> (); return a;}
 		
