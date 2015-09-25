@@ -14,6 +14,9 @@ struct Function : ParseTreeNode {
 		const std::vector <PTNode> & getParams () const {return params;}
 		const std::vector <PTNode> & getType () const {return type;}
 		
+		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
+		
+		void declare (numbat::parser::NumbatScope * scope);
 		void setBody (PTNode b) {body = b;}
 		
 		virtual Function * asFunction () {return this;}
@@ -30,6 +33,8 @@ struct Function : ParseTreeNode {
 		std::vector <PTNode> tplate, tags, params, type;
 		string iden;
 		PTNode body;
+		
+		numbat::parser::NumbatScope * fScope=nullptr;
 		
 };
 

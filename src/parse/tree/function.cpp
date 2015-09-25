@@ -1,5 +1,41 @@
 #include "../../../include/parse/tree/function.hpp"
 
+auto convArgs = [](const std::vector <PTNode> & args, numbat::parser::NumbatScope * scope){
+	std::vector <numbat::parser::ASTnode> conv;
+	conv.reserve (args.size ());
+	for (auto & arg : args) {
+		assert (arg);
+		conv.push_back (arg->build (scope));
+		assert (conv.back ());
+	}
+	return conv;
+};
+
+numbat::parser::ASTnode Function::build (numbat::parser::NumbatScope * scope) {
+	
+	if (not fScope) {
+		//Must be anon
+		fScope = createChild (scope);
+		auto func = numbat::parser::createFunctionDecleration (fScope, iden, convArgs (params, fScope), convArgs (type, fScope), {}, fScope);
+		numbat::parser::setFunction (fScope, func);
+	}
+	
+	if (body) {
+		return body->build (fScope);
+	} else {
+		return nullptr;
+	}
+	
+}
+
+void Function::declare (numbat::parser::NumbatScope * scope) {
+	
+	fScope = createChild (scope);
+	auto func = numbat::parser::createFunctionDecleration (scope, iden, convArgs (params, fScope), convArgs (type, fScope), {}, fScope);
+	numbat::parser::setFunction (fScope, func);
+	
+}
+
 string Function::strDump (text::PrintMode mode) {
 	
 	string s = iden.empty () ? "" : "def ";
