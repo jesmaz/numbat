@@ -84,7 +84,11 @@ NumbatParser::NumbatParser () {
 	
 	
 	
-	parser.addRules ("E", {"E BracketRound", "IDENTIFIER BracketRound"}, 100, Parser::LTR);
+	parser.addRules ("E", {"E BracketRound", "IDENTIFIER BracketRound"}, 100, Parser::LTR, [](const std::vector <PTNode> & args) -> PTNode {
+		PTNode t = new ParseTreeCall (args [0], args [1]->releaseArgs ());
+		delete args [1];
+		return t;
+	});
 	parser.addRules ("E", {"E BracketSquare", "IDENTIFIER BracketSquare"}, 100, Parser::LTR);
 	parser.addRules ("Slice", {"E Slice", "IDENTIFIER Slice"}, 100, Parser::LTR);
 	parser.addRules ("E", {"E.IDENTIFIER", "E.MetaTag"}, 100, Parser::LTR);
