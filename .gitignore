@@ -1,0 +1,12 @@
+#object
+*.o
+a.out
+*.ko
+*.obj
+*.elf
+
+
+#ide
+build/*
+.cccc*
+.kdev*
