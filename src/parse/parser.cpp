@@ -1,4 +1,15 @@
 #include "../../include/parse/parser.hpp"
+//#define DEBUG_PARSER
+#ifdef DEBUG_PARSER
+#define PARSER_LOG(a) a
+#else
+#define PARSER_LOG(a)
+#endif
+
+
+#include <algorithm>
+
+
 
 namespace numbat {
 
@@ -17,7 +28,6 @@ char Parser::getCode (lexer::token tkn) const {
 	char c =0;
 	switch (tkn.type) {
 		case lexer::TOKEN::symbol:
-		case lexer::TOKEN::semicolon:
 			c = getCode (tkn.iden);
 			break;
 		case lexer::TOKEN::whitespace:
@@ -46,6 +56,7 @@ char tregisterCode (const K & key, char c, M & map, std::bitset <128 - ' '> & ch
 	} else {
 		int index = lastChar-' ';
 		while (charsUsed[index]) ++index, ++lastChar;
+		charsUsed [index] = true;
 		return map [key] = lastChar++;
 	}
 }
@@ -82,175 +93,135 @@ char Parser::registerRule (const lexer::token & tkn) {
 		registerCode (lexer::TOKEN::numericliteral, done);
 		registerCode (lexer::TOKEN::stringliteral, done);
 	}
+	PARSER_LOG(std::cout << "'" << done << "' : '" << s << "'" << std::endl;)
 	return done;
 }
 
 PTNode Parser::parse (const numbat::lexer::tkstring & prog) {
 	
-	if (!root) buildRules ();
+	if (states.empty ()) buildRules ();
 	
 	auto itt = prog.begin ();
 	auto end = prog.end ();
 	
-	return parseBody (itt, end);
+	return parse (itt, end);
 	
 }
 
-PTNode Parser::parseBody (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const {
+PTNode Parser::parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) const {
 	
-	auto last = itt;
-	std::list <PTNode> list;
-	auto next= itt + 1, prev = itt;
-	int brace = 0;
-	auto shift = [&] () {
-		prev = itt;
-		itt = next;
-		do {
-			if (next != end) ++next;
-		} while (next != end and (next->type == lexer::TOKEN::whitespace or next->type == lexer::TOKEN::indent));
-		if (itt->type == lexer::TOKEN::symbol) {
-			if (itt->iden [0] == '{') ++brace;
-			else if (itt->iden [0] == '}') --brace;
+	std::stack <const State *> stateStack;
+	parser::Stack stack;
+	stack.setIdentifier (getCode ("IDENTIFIER"));
+	stack.setLiteral (getCode ("LITERAL"));
+	const char programCode = getCode ("PROGRAM");
+	auto itt = start, tkn = start;
+	char c;
+	const auto next = [&]() {
+		while (itt != end and (itt->type == lexer::TOKEN::whitespace or itt->type == lexer::TOKEN::indent)) ++itt;
+		if (itt==end) return false;
+		c = getCode (*itt);
+		tkn = itt;
+		if (c) {
+			stack.push (c, *tkn);
+			PARSER_LOG (std::cout << "PEAKING: '" << c << "' (" << int(c) << ")(" << tkn->iden << ")" << std::endl);
 		}
-		return itt;
+		itt++;
+		return true;
 	};
 	
-	auto reduce = [&] () {
-		PTNode node = parseExpr (last, itt);
-		if (node) {
-			list.push_back (node);
+	const std::function <ssize_t(const State & state, size_t)> reduce = [&](const State & state, size_t depth) {
+		PARSER_LOG (std::cout << "REDUCING '" << state.ptn << "' to '"<< state.reduce << "' in '" << stack.getS () << "' NEXT: '" << c << "'" << std::endl);
+		size_t pos = stack.getS ().rfind (state.ptn, depth-2);
+		PARSER_LOG (std::cout << "         " << stack.getS ().size () << " " << depth << " " << pos << std::endl);
+		if (pos == string::npos) {
+			std::cerr << "Fatal error: No match for selected rule '" << state.ptn << "' in '" << stack.getS () << "'" << std::endl; exit (1);
+		}
+		assert (state.reduce);
+		stack.accumulate (state.reduce, state.ptn.size (), pos, state.ptr);
+		c = state.reduce;
+		return state.ptn.size ();
+	};
+	
+	assert (not states.empty ());
+	
+	const std::function <ssize_t(size_t, size_t)> parseState = [&](size_t index, size_t depth) -> ssize_t {
+		
+		const State & state = states [index];
+		if (depth > stack.size ()) {
+			next ();
+		} else {
+			c = stack.getS ().back ();
 		}
 		
-		return last = next;
-	};
-	
-	while (itt != end and itt->type != lexer::TOKEN::eof) {
-		if (!brace and itt->type == lexer::TOKEN::semicolon and (itt->iden == ";" or (next->type != lexer::TOKEN::elsetkn and (prev->iden != ")" or next->iden != "{"))) and itt != last) {
-			reduce ();
-			shift ();
-		} else {
-			shift ();
-		}
-	}
-	
-	reduce ();
-	ParseTree * pt;
-	if (list.empty () or not list.front ()) {
-		pt = new ParseTree (0, 0);
-	} else {
-		pt = new ParseTree (list);
-	}
-	return pt;
-	
-}
-
-PTNode Parser::parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const {
-	
-	if (itt == end) return nullptr;
-	parser::Stack stack;
-	char next=getCode (*itt);
-	
-	auto reduce = [&] (const string & rule, char c, std::function <PTNode (const std::vector <PTNode> &)> * builder) {
-		size_t pos = stack.getS ().rfind (rule);
-		if (!c) abort ();
-		if (pos == string::npos) {
-			std::cerr << "Fatal error: No match for selected rule '" << rule << "' in '" << stack.getS () << "'" << std::endl; exit (1);
-		}
-		stack.accumulate (c, rule.length (), pos, builder);
-	};
-	
-	auto skip = [&] () {
-		int brace = 0;
-		while (itt!=end and (brace or (itt->type != lexer::TOKEN::symbol or itt->iden [0] != '}'))) {
-			if (itt->type == lexer::TOKEN::symbol and itt->iden [0] == '{') ++brace;
-			++itt;
-			if (itt->type == lexer::TOKEN::symbol and itt->iden [0] == '}') --brace;
-		}
-		return itt;
-	};
-	
-	auto shift = [&] () {
-		if (next == '{') {
-			auto start = itt;
-			skip ();
-			while (start->type != lexer::TOKEN::symbol and start->iden[0] != '{') ++start;
-			stack.push (getCode ("BLOCK"), parseBody (++start, itt));
-			if (itt == end or itt+1 == end) return next =';';
-			return next = getCode (*(itt+1));
-		} else if (next and next != ';') {
-			stack.push (next, *(itt+1));
-		}
-		++itt;
-		if (itt == end) return next = ';', '\0';
-		if (itt+1 == end) return next = ';';
-		return next = getCode (*(itt+1));
-	};
-	
-	if (next == '{') {
-		shift ();
-	} else {
-		if (next) {
-			--itt;
-		} else {
-			if (itt != end and itt+1 != end) {
-				next=getCode (*(itt+1));
-			} else {
-				next=';';
+		while (true) {
+			
+			PARSER_LOG (std::cout << "STATE: " << state.reduce << " '" << state.ptn << "'" << std::endl);
+			
+			switch (state [c].action) {
+				case State::Action::ACCEPT:
+					return 0;
+				case State::Action::ERROR:
+					PARSER_LOG (std::cout << "ERROR: '" << state.ptn << "' unexpected: " << c << " " << stack.getS () << " (" << state.reduce << ")" << std::endl);
+					return -1;
+				case State::Action::REDUCE:
+					return reduce (state, depth)-1;
+					break;
+				case State::Action::SHIFT: {
+					PARSER_LOG (std::cout << "SHIFTING: '" << c << "' (" << int(c) << ")" << std::endl);
+					auto n = parseState (state [c].index, depth+1);
+					PARSER_LOG (std::cout << "STATE: " << state.reduce << " '" << state.ptn << "'" << std::endl);
+					PARSER_LOG (std::cout << "STACK: '" << stack.getS () << "'" << std::endl);
+					if (n) return n-1;
+					break;
+				}
+				case State::Action::TRYSHIFT: {
+					PARSER_LOG (std::cout << "SHIFTING: '" << c << "' (" << int(c) << ")" << std::endl);
+					size_t oldStack = stack.size ();
+					auto olditt = itt;
+					auto n = parseState (state [c].index, depth+1);
+					if (n < 0) {
+						for (size_t i=0, l=stack.size ()-oldStack; i<l; ++i) {
+							stack.pop ();
+						}
+						itt = olditt;
+						PARSER_LOG (std::cout << "STATE: " << state.reduce << " '" << state.ptn << "'" << std::endl);
+						PARSER_LOG (std::cout << "STACK: '" << stack.getS () << "'" << std::endl);
+						return reduce (state, depth)-1;
+					} else if (n) return n-1;
+					break;
+				}
 			}
 		}
-	}
-	
-	auto getLeaf = [] (const string & str, size_t pos, RuleBranch * branch) -> RuleLeaf * {
-		while (pos) {
-			--pos;
-			RuleBranch * child = (*branch) [str [pos]];
-			if (!child) break;
-			branch = child;
-		}
-		return branch->leaf;
+		return 0;
 	};
+	
+	while (true) {
+		parseState (initialState, 1);
+		if (stack.size () > 1) {
+			while (stack.getS ().back () != programCode and stack.size ()) {
+				stack.pop ();
+			}
+			while (itt != end and itt->type != lexer::TOKEN::semicolon) {
+				++itt;
+			}
+			if (itt != end) ++itt;
+			assert (stack.size () <= 1);
+		} else {
+			break;
+		}
+	}
 	
 	PTNode node;
-	auto attemptReduce = [&] () {
-		RuleLeaf * leaf;
-		if (next and (leaf = getLeaf (stack.getS (), stack.getS ().length (), root))) {
-			switch (leaf->next [int (next)]) {
-				case 'S':
-					return 0;
-				case 'R':
-					reduce (*(leaf->s), leaf->r, leaf->ptr);
-					return 1;
-				case 'X':
-					node = new ParseTreeError ((itt+1)->line, 0, "Unexpected token: '" + (itt+1)->iden + "'");
-					std::cout << "No rule for: '" << (leaf->s ? *(leaf->s) : "") << " " << next << "'\nStack: '" << stack.getS () << "'" << std::endl;
-					return -1;
-				default:
-					if (next != ';' and stack.getS () != "E") {
-						node = new ParseTreeError ((itt+1)->line, 0, "Unexpected token: '" + (itt+1)->iden + "'");
-						std::cout << "Unexpected token: '" << stack.getS () << " " << next << "' with rule: '" << (leaf->s ? *(leaf->s) : "") << "'" << std::endl;
-						return -2;
-					}
-					return 0;
-			}
-		} else {
-			return 0;
-		}
-	};
-	
-	while (itt != end) {
-		switch (attemptReduce ()) {
-			case -2:
-			case -1:
-				return node;
-			case 0:
-				shift ();
-		}
-	}
-	while (attemptReduce ());
-	
-	if (stack.size () > 1) {
+	if (stack.size () != 1) {
 		PTNode n = stack.top ();
-		node = new ParseTreeError (n->getLine (), n->getPos (), "Unexpected end of expression");
+		if (n) {
+			node = new ParseTreeError (n->getLine (), n->getPos (), "Unexpected end of expression");
+		} else {
+			node = new ParseTreeError (0, 0, "Expected expression");
+		}
+		std::cerr << "'" << stack.getS () << "'" << std::endl;
+		std::cerr << stack.size () << std::endl;
 	} else {
 		node = stack.pop ();
 	}
@@ -262,7 +233,7 @@ PTNode Parser::parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::l
 void Parser::addRule (const string & rule, const string & ptn, int16_t prec, RuleType ruleType, std::function <PTNode (const std::vector <PTNode> &)> ptr) {
 	
 	auto tks = lexer::lex (ptn);
-	char rc = registerRule (lexer::lexToken(rule));
+	char rc = registerRule (lexer::lexToken (rule));
 	string pattern;
 	
 	for (auto & tkn : tks) {
@@ -271,7 +242,7 @@ void Parser::addRule (const string & rule, const string & ptn, int16_t prec, Rul
 			case lexer::TOKEN::indent:
 				break;
 			case lexer::TOKEN::semicolon:
-				break;
+				if (tkn.iden != ";") break;
 			default:
 				pattern += registerRule (tkn);
 				break;
@@ -291,176 +262,294 @@ void Parser::addRules (const string & rule, const std::vector <string> & ptn, in
 
 void Parser::buildRules () {
 	
-	if (root) return;
-	root = new RuleBranch ();
+	std::map <string, ProductionRule> prod = generateKernals (), additional, existing;
 	
-	std::map <char, std::set <char>> map;
-	std::map <string, std::set <char>> shift;
-	std::set <string> allRules;
+	std::map <string, uint32_t> entries;
+	size_t i=0;
 	
-	for (auto rule : rules) {
-		for (auto expan : rule.second.expantions) {
-			allRules.insert (expan.s);
-			map [rule.first].insert (expan.s [0]);
-			for (size_t i=1; i<expan.s.length (); ++i) {
-				shift [expan.s.substr (0, i)].insert (expan.s [i]);
+	{
+		
+		assert (prod.count (""));
+		auto prodRules = prod.find ("")->second.expected;
+		assert (prodRules.size () == 1);
+		std::map <char, std::map <string, uint32_t>> indexes;
+		std::vector <State *> statePool;
+		for (auto & e : prodRules) {
+			initialState = stateIndex (' ', prod.find ("")->second, seperateKernals (prod), statePool, indexes);
+		}
+		for (State * s : statePool) {
+			states.push_back (*s);
+			delete s;
+		}
+		for (auto & index : indexes) {
+			for (auto & i : index.second) {
+				string s;
+				if (index.first) {
+					s = string () + index.first + " : " + i.first;
+				} else {
+					s = string () + "\\0: " + i.first;
+				}
+				entries [s] = i.second;
 			}
 		}
 	}
 	
-	bool dirty=true;
-	while (dirty) {
-		dirty = false;
-		for (auto & m : map) {
-			std::set <char> set = m.second;
-			for (char c : m.second) {
-				set.insert (map [c].begin (), map [c].end ());
+#ifdef DEBUG_PARSER
+	size_t m=0;
+	for (auto & entry : entries) {
+		if (not (m%32)) {
+			std::cout << "                      ";
+			for (size_t i=' '; i<128; ++i) {
+				if (charsUsed [i-' ']) {
+					std::cout << "  " << char (i) << ' ';
+				}
 			}
-			dirty = dirty or set != m.second;
-			m.second = set;
+			std::cout << "\n";
 		}
+		assert (entry.first.size () <= 16);
+		std::cout << entry.first;
+		for (size_t i=0; i<16-(entry.first.size ()); ++i) {
+			std::cout << " ";
+		}
+		std::cout << text::yel << "0x" << (entry.second > 0xff ? "" : (entry.second > 0xf ? "0" : "00")) << std::hex << entry.second << " ";
+		auto & state = states [entry.second];
+		size_t k=0;
+		for (size_t i=' '; i<128; ++i) {
+			//std::cout << " " <<  char (state [i].action);
+			if (charsUsed [i-' ']) {
+				std::cout << (k%4<=1 ? (k%4==0 ? text::cyn : text::mag) : (k%4==2 ? text::grn : text::blu)) << (state [i].index > 0xff ? "" : (state [i].index > 0xf ? "0" : "00")) << std::hex << state [i].index << char (state [i].action);
+				++k;
+			}
+		}
+		std::cout << text::normal << "\n";
+		++m;
+	}
+#endif
+	
+}
+
+size_t Parser::stateIndex (char reduction, const ProductionRule & rule, const std::map <char, std::map <string, ProductionRule>> & kernals, std::vector <State *> & statePool, std::map <char, std::map <string, uint32_t>> & indexes) {
+	
+	auto & specificIndex = indexes [reduction];
+	if (specificIndex.find (rule.seen) != specificIndex.end ()) {
+		return specificIndex [rule.seen];
 	}
 	
-	dirty = true;
-	while (dirty) {
-		dirty = false;
-		for (auto & s: shift) {
-			std::set <char> set = s.second;
-			for (char c : s.second) {
-				set.insert (map [c].begin (), map [c].end ());
-			}
-			dirty = dirty or set != s.second;
-			s.second = set;
-		}
-	}
+	size_t index = specificIndex [rule.seen] = statePool.size ();
+	State * state = new State;
+	statePool.push_back (state);
+	state->ptn = rule.seen;
 	
-	auto getLeafCstr = [&] (const char * str, size_t pos, RuleBranch * branch) -> RuleLeaf * {
-		while (pos) {
-			--pos;
-			RuleBranch * child = (*branch) [str [pos]];
-			if (!child) {(*branch) [str [pos]] = child = new RuleBranch ();}
-			branch = child;
+	
+	for (auto & expected : rule.expected) {
+		
+		auto & exp = expected.first;
+		if (exp.empty ()) {
+			if (expected.second.rule) state->ptr = expected.second.rule->ptr;
+			state->reduce = expected.second.reduce;
+			assert (state->reduce);
+			state->terminal = expected.second.accept;
+			continue;
 		}
-		if (branch->leaf) {
-			return branch->leaf;
+		
+		
+		auto & r = (*state) [exp.front ()];
+		if (r.action == State::Action::REDUCE) {
+			r.action = State::Action::TRYSHIFT;
 		} else {
-			return branch->leaf = new RuleLeaf ();
+			r.action = State::Action::SHIFT;
 		}
-	};
-	auto getLeaf = [&] (const string & ptn) {
-		return getLeafCstr (ptn.c_str (), ptn.length (), root);
-	};
-	
-	
-	for (auto & s : shift) {
-		RuleLeaf * leaf = getLeaf (s.first);
-		for (char c : s.second) {
-			leaf->next [(int)c] = 'S';
-			for (char m : map [c]) {
-				leaf->next [(int)m] = 'S';
-			}
-		}
-		for (size_t i=s.first.length()-1; i>0; --i) {
-			string sub = s.first.substr (i);
-			auto itt = shift.find (sub);
-			if (itt != shift.end ()) {
-				for (char c : itt->second) {
-					leaf->next [(int)c] = 'S';
-					for (char m : map [c]) {
-						leaf->next [(int)m] = 'S';
-					}
-				}
-			}
-		}
-	}
-	
-	for (auto rule : rules) {
-		for (auto expan : rule.second.expantions) {
-			RuleLeaf * leaf = getLeaf (expan.s);
-			leaf->r = rule.first;
-			leaf->ptr = expan.ptr;
-			leaf->s = new string (expan.s);
-			leaf->next [';'] = 'R';
+		assert (kernals.find (reduction) != kernals.end ());
+		assert (kernals.find (reduction)->second.find (rule.seen + exp.front ()) != kernals.find (reduction)->second.end ());
+		r.index = stateIndex (reduction, kernals.find (reduction)->second.find (rule.seen + exp.front ())->second, kernals, statePool, indexes);
+		
+		std::set <char> visited, current, queued = {exp.front ()};
+		while (not queued.empty ()) {
 			
-			auto createReduce = [&] (const string & rule, size_t index) {
-				char & c = leaf->next [(int)rule [index]];
-				if (c != 'S') {
-					c = 'R';
-				}
-				string r = expan.s;
-				while (index+1 < rule.length ()) {
-					r += rule [index];
-					RuleLeaf * l = getLeaf (r);
-					if (not l->s) l->s = new string (expan.s);
-					for (char s : map [(int)rule [index+1]]) {
-						if (l->next [(int)s] != 'S') {
-							l->next [(int)s] = 'R';
-							l->ptr = leaf->ptr;
-						}
-					}
-					if (l->next [(int)rule [index+1]] != 'S') {
-						l->next [(int)rule [index+1]] = 'R';
-						l->ptr = leaf->ptr;
-					}
-					if (not l->r) l->r = leaf->r;
-					++index;
-				}
-			};
+			current = queued;
+			queued.clear ();
 			
-			auto createShift = [&] (const string & rule, size_t index) {
-				leaf->next [(int)rule [index]] = 'S';
-				for (char s : map [(int)rule [index]]) {
-					leaf->next [(int)s] = 'S';
+			for (char c : current) {
+				
+				if (visited.count (c)) continue;
+				visited.insert (c);
+				if (rules.find (c) == rules.end ()) continue;
+				std::map <char, std::set <string>> expan;
+				
+				for (auto & rule : rules [c].expantions) {
+					
+					queued.insert (rule.s.front ());
+					expan [rule.s.front ()].insert (rule.s.substr (1));
+					
 				}
-				string r = expan.s;
-				while (index+1 < rule.length ()) {
-					r += rule [index];
-					RuleLeaf * l = getLeaf (r);
-					for (char s : map [(int)rule [index+1]]) {
-						l->next [(int)s] = 'S';
-					}
-					l->next [(int)rule [index+1]] = 'S';
-					++index;
-				}
-			};
-			
-			for (auto comp : rule.second.expantions) {
-				if (comp.s.length () >= 2 && comp.s [0] == rule.first) {
-					if (comp.prec == expan.prec) {
-						if (expan.type & LTR) {
-							createReduce (comp.s, 1);
-						} else {
-							createShift (comp.s, 1);
-						}
-					} else if (comp.prec > expan.prec) {
-						createReduce (comp.s, 1);
+				
+				for (auto e : expan) {
+					auto & r = (*state) [e.first];
+					if (r.action == State::Action::REDUCE) {
+						r.action = State::Action::TRYSHIFT;
+					} else if (r.action == State::Action::SHIFT) {
+						continue;
 					} else {
-						createShift (comp.s, 1);
+						r.action = State::Action::SHIFT;
+					}
+					assert (kernals.find (c) != kernals.end ());
+					assert (kernals.find (c)->second.find (string () + e.first) != kernals.find (c)->second.end ());
+					r.index = stateIndex (c, kernals.find (c)->second.find (string () + e.first)->second, kernals, statePool, indexes);
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	if (not rule.seen.empty ()) {
+		
+		for (auto & subRule : rules [rule.seen.back ()].expantions) {
+			
+			if (rule.seen.back () != subRule.s.front () or subRule.s.size () == 1) continue;
+			auto & r = (*state) [subRule.s [1]];
+			if (r.action != State::Action::ERROR) continue;
+			
+			if (not rule.rule or not state->reduce) {
+				r.action = State::Action::SHIFT;
+				
+			} else if (rule.rule->prec == 0) {
+				//0 is a special case
+				if (subRule.prec < 0) {
+					//-1 is also special, it means 'reduce if possible'
+					r.action = State::Action::REDUCE;
+				} else {
+					r.action = State::Action::SHIFT;
+				}
+				
+			} else if (rule.rule->prec > subRule.prec) {
+				//Lower precedence
+				r.action = State::Action::SHIFT;
+				
+			} else if (rule.rule->prec < subRule.prec) {
+				//Higher precedence
+				r.action = State::Action::REDUCE;
+				
+			} else if (rule.rule->type == LTR) {
+				//Left to Right associativity
+				r.action = State::Action::REDUCE;
+				
+			} else if (rule.rule->type == RTL) {
+				//Right to Left associativity
+				r.action = State::Action::SHIFT;
+				
+			} else {
+				abort ();
+			}
+			
+			char c = rule.seen.back ();
+			assert (kernals.find (c) != kernals.end ());
+			assert (kernals.find (c)->second.find (subRule.s.substr (0, 2)) != kernals.find (c)->second.end ());
+			r.index = stateIndex (c, kernals.find (c)->second.find (subRule.s.substr (0, 2))->second, kernals, statePool, indexes);
+			
+		}
+		
+	}
+	
+	
+	if (state->reduce and rule.rule) {
+		for (auto & r : state->rules) {
+			if (r.action == State::Action::ERROR) {
+				r.action = State::Action::REDUCE;
+			} else if (r.action == State::Action::SHIFT) {
+				r.action = State::Action::TRYSHIFT;
+			}
+		}
+		state->ptr = rule.rule->ptr;
+	}
+	
+	return index;
+	
+}
+
+std::map <char, std::map <string, Parser::ProductionRule>> Parser::seperateKernals (const std::map <string, ProductionRule> & kernals) const {
+	
+	std::map <char, std::set <char>> substitutions;
+	substitutions [' '].insert (' ');
+	substitutions [getCode ("PROGRAM")].insert (' ');
+	{
+		std::set <std::pair <char, char>> queue;
+		std::set <std::pair <char, char>> seen;
+		for (auto & r : rules) {
+			queue.insert (std::make_pair (r.first, r.first));
+		}
+		do {
+			for (auto q : queue) {
+				substitutions [q.first].insert (q.second);
+				seen.insert (q);
+			}
+			queue.clear ();
+			for (auto & s : substitutions) {
+				for (auto & e : s.second) {
+					if (rules.find (e) == rules.end ()) continue;
+					for (auto & x : rules.find (e)->second.expantions) {
+						auto p = std::make_pair (x.s.front (), s.first);
+						if (not seen.count (p)) queue.insert (std::make_pair (x.s.front (), s.first));
 					}
 				}
 			}
-			
-			if (expan.s.back () != leaf->r) {
-				for (auto match : rules [expan.s.back ()].expantions) {
-					if (match.s.size () > 1 and match.s.front () == expan.s.back ()) {
-						leaf->next [(int)match.s [1]] = 'S';
-					}
-				}
+		} while (not queue.empty ());
+	}
+	
+	std::map <char, std::map <string, Parser::ProductionRule>> sepK;
+	for (auto & k : kernals) {
+		for (auto & exp : k.second.expected) {
+			for (char c : substitutions [exp.second.reduce]) {
+				ProductionRule & pr = sepK [c][k.first];
+				assert (k.second.seen == k.first);
+				pr.rule = k.second.rule;
+				pr.seen = k.second.seen;
+				pr.expected.insert (exp);
+				assert (exp.second.reduce);
 			}
-			
-			for (size_t c=' '; c<128; ++c) {
-				if (leaf->next [(int)c] != 'S') {
-					leaf->next [(int)c] = 'R';
+		}
+	}
+	return sepK;
+	
+}
+
+std::map <string, Parser::ProductionRule> Parser::generateKernals () const {
+	
+	std::map <string, ProductionRule> map;
+	
+	ProductionRule start, stop;
+	start.rule = nullptr;
+	start.seen = "";
+	start.expected [start.seen + getCode ("PROGRAM")] = {nullptr, ' ', false};
+	map [""] = start;
+	stop.rule = nullptr;
+	stop.seen = start.seen + getCode ("PROGRAM");
+	stop.expected [""] = {nullptr, ' ', true};
+	map [stop.seen] = stop;
+	
+	for (auto & r : rules) {
+		for (auto & e : r.second.expantions) {
+			const string & s = e.s;
+			for (size_t i=0, l=s.size (); i<l; ++i) {
+				const string seen = s.substr (0, i+1);
+				ProductionRule & kernal = map [seen];
+				kernal.seen = seen;
+				kernal.expected [s.substr (i+1)] = {&e, r.first, false};
+				assert (r.first);
+				if (i+1 == l) {
+					assert (not kernal.rule);
+					kernal.rule = &e;
 				}
 			}
 		}
 	}
+	
+	return map;
 	
 }
 
 void Parser::pushJob (PTNode * result, numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const {
-	
-	*result = parseExpr (itt, end);
 	
 }
 

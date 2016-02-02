@@ -28,7 +28,7 @@ struct Parser {
 		enum RuleType {NONE=0, LTR=1, RTL=2, ACCUM=4};
 		
 		struct Rule {
-			struct Args {
+			struct Args	 {
 				string s;
 				std::function <PTNode (const std::vector <PTNode> &)> * ptr;
 				int prec;
@@ -55,14 +55,42 @@ struct Parser {
 			RuleBranch * branch [128 - ' '];
 		};
 		
+		struct ProductionRule {
+			struct Expected {
+				const Rule::Args * rule;
+				char reduce; bool accept;
+			};
+			string seen;
+			const Rule::Args * rule=nullptr;
+			std::map <string, Expected> expected;
+			bool operator < (const ProductionRule & rhs) const {return rule != rhs.rule ? rule < rhs.rule : seen < rhs.seen;}
+		};
+		
+		struct State {
+			enum class Action : uint16_t {ACCEPT='A', ERROR='.', REDUCE='R', SHIFT='S', TRYSHIFT='T'};
+			struct R {
+				uint32_t index=0;
+				Action action=Action::ERROR;
+				char c;
+			} rules [129 - ' '];
+			string ptn;
+			std::function <PTNode (const std::vector <PTNode> &)> * ptr=nullptr;
+			char reduce=0;
+			bool terminal=false;
+			R & operator [] (char c) {return (c < ' ' or c >= 128) ? rules [0] : rules [int (c - ' ' + 1)];}
+			const R & operator [] (char c) const {return (c < ' ' or c >= 128) ? rules [0] : rules [int (c - ' ' + 1)];}
+		};
+		
 		PTNode parse (const string & prog) {return parse (lexer::lexFile (prog));}
 		PTNode parse (const numbat::lexer::tkstring & prog);
-		PTNode parseBody (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const;
-		PTNode parseExpr (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const;
+		PTNode parse (numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const;
 		
 		void addRule (const string & rule, const string & ptn, int16_t prec=0, RuleType ruleType=NONE, std::function <PTNode (const std::vector <PTNode> &)> ptr=nullptr);
 		void addRules (const string & rule, const std::vector <string> & ptn, int16_t prec=0, int ruleType=NONE, std::function <PTNode (const std::vector <PTNode> &)> ptr=nullptr);
 		void buildRules ();
+		
+		std::map <char, std::map <string, ProductionRule>> seperateKernals (const std::map <string, ProductionRule> & kernals) const;
+		std::map <string, ProductionRule> generateKernals () const;
 		
 		Parser ();
 		
@@ -77,6 +105,8 @@ struct Parser {
 		char registerCode (const string & str, char c=0);
 		char registerRule (const lexer::token & tkn);
 		
+		size_t stateIndex (char reduction, const ProductionRule & rule, const std::map <char, std::map <string, ProductionRule>> & kernals, std::vector <State *> & statePool, std::map <char, std::map <string, uint32_t>> & indexes);
+		
 		void pushJob (PTNode * result, numbat::lexer::tkstring::const_iterator itt, numbat::lexer::tkstring::const_iterator end) const;
 		
 		RuleBranch * root = nullptr;
@@ -85,6 +115,8 @@ struct Parser {
 		std::bitset <128 - ' '> charsUsed;
 		char lastChar = ' '+1;
 		char tknIdMap [int (lexer::TOKEN::whitespace) + 1];
+		std::vector <State> states;
+		size_t initialState=0;
 		
 };
 
