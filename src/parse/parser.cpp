@@ -199,14 +199,14 @@ PTNode Parser::parse (numbat::lexer::tkstring::const_iterator start, numbat::lex
 	while (true) {
 		parseState (initialState, 1);
 		if (stack.size () > 1) {
-			while (stack.getS ().back () != programCode and stack.size ()) {
+			while (stack.size () > 1) {
 				stack.pop ();
 			}
+			if (stack.getS ().back () != programCode) stack.pop ();
 			while (itt != end and itt->type != lexer::TOKEN::semicolon) {
 				++itt;
 			}
 			if (itt != end) ++itt;
-			assert (stack.size () <= 1);
 		} else {
 			break;
 		}
