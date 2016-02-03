@@ -1,6 +1,5 @@
 #include "../../include/parse/parser.hpp"
-//#define DEBUG_PARSER
-#ifdef DEBUG_PARSER
+#ifdef DEBUG
 #define PARSER_LOG(a) a
 #else
 #define PARSER_LOG(a)
@@ -294,7 +293,7 @@ void Parser::buildRules () {
 		}
 	}
 	
-#ifdef DEBUG_PARSER
+#ifdef DEBUG
 	size_t m=0;
 	for (auto & entry : entries) {
 		if (not (m%32)) {
