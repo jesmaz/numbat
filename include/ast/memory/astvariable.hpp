@@ -29,7 +29,7 @@ class ASTvariable : public ASTbase {
 		virtual string getIden () const {return variable->getIden ();}
 		virtual string toString (const string & indent = "") const {if (variable->isTemp ()) {return indent + "temp (" + variable->getInit ()->toString () + ")";} else {return indent + variable->getIden ();}}
 		
-		ASTvariable (size_t lineNo) : ASTbase (lineNo) {}
+		ASTvariable (size_t lineNo) : ASTbase (lineNo), variable (nullptr) {}
 		ASTvariable (size_t lineNo, const std::shared_ptr <NumbatVariable> & variable) : ASTbase (lineNo), variable (variable.get ()) {}
 		ASTvariable (size_t lineNo, const NumbatVariable * variable) : ASTbase (lineNo), variable (variable) {}
 	private:
