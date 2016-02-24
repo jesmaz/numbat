@@ -46,7 +46,7 @@ class NumbatScope : public ASTbase {
 		friend ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent=nullptr, bool cascade=true, bool local=true);
 		friend const NumbatScope * getParent (const NumbatScope * scope);
 		friend NumbatScope * createChild (NumbatScope * scope);
-		friend ParsingContext * getContext (NumbatScope * scope);
+		friend ParsingContext * getContext (const NumbatScope * scope);
 		friend std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 		
 		friend FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags, const NumbatScope * fScope);
@@ -105,7 +105,7 @@ ASTnode collectDestructors (const NumbatScope * scope);
 ASTnode resolveSymbol (const NumbatScope * scope, const string & iden, ASTnode parent, bool cascade, bool local);
 inline const NumbatScope * getParent (const NumbatScope * scope) {return scope->parent;}
 NumbatScope * createChild (NumbatScope * scope);
-inline ParsingContext * getContext (NumbatScope * scope) {return scope->context;}
+inline ParsingContext * getContext (const NumbatScope * scope) {return scope->context;}
 std::vector <FunctionDecleration *> findFunctions (const NumbatScope * scope, const string & iden);
 
 FunctionDecleration * createFunctionDecleration (NumbatScope * scope, const string & iden, const std::vector <ASTnode> & args, const std::vector <ASTnode> & type, const std::set <string> metaTags, const NumbatScope * fScope);
