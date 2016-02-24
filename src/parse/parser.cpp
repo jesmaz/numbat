@@ -294,17 +294,7 @@ void Parser::buildRules () {
 	}
 	
 #ifdef DEBUG
-	size_t m=0;
 	for (auto & entry : entries) {
-		if (not (m%32)) {
-			std::cout << "                      ";
-			for (size_t i=' '; i<128; ++i) {
-				if (charsUsed [i-' ']) {
-					std::cout << "  " << char (i) << ' ';
-				}
-			}
-			std::cout << "\n";
-		}
 		assert (entry.first.size () <= 16);
 		std::cout << entry.first;
 		for (size_t i=0; i<16-(entry.first.size ()); ++i) {
@@ -314,14 +304,20 @@ void Parser::buildRules () {
 		auto & state = states [entry.second];
 		size_t k=0;
 		for (size_t i=' '; i<128; ++i) {
-			//std::cout << " " <<  char (state [i].action);
 			if (charsUsed [i-' ']) {
-				std::cout << (k%4<=1 ? (k%4==0 ? text::cyn : text::mag) : (k%4==2 ? text::grn : text::blu)) << (state [i].index > 0xff ? "" : (state [i].index > 0xf ? "0" : "00")) << std::hex << state [i].index << char (state [i].action);
+				std::cout << (k%4<=1 ? (k%4==0 ? text::cyn : text::mag) : (k%4==2 ? text::grn : text::blu)) << (state [i].index > 0xff ? "" : (state [i].index > 0xf ? "0" : "00")) << std::hex << state [i].index;
+				++k;
+			}
+		}
+		k=0;
+		std::cout << text::normal << "\n                      ";
+		for (size_t i=' '; i<128; ++i) {
+			if (charsUsed [i-' ']) {
+				std::cout << (k%4<=1 ? (k%4==0 ? text::cyn : text::mag) : (k%4==2 ? text::grn : text::blu)) << char (i) << ' ' << char (state [i].action);
 				++k;
 			}
 		}
 		std::cout << text::normal << "\n";
-		++m;
 	}
 #endif
 	
