@@ -1,4 +1,5 @@
 #include "../include/ast.hpp"
+#include "../include/ast/astmodule.hpp"
 #include "../include/module.hpp"
 #include "../include/parse/numbatparser.hpp"
 
