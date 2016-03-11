@@ -55,7 +55,7 @@ class Numbat {
 		};
 		
 		template <typename Ret, typename ... Args>
-		NumbatFunction <Ret, Args ...> getFunction (const std::string & func) {return NumbatFunction <Ret, Args ...> (engine->getPointerToFunction (module->getFunction (func)));}
+		NumbatFunction <Ret, Args ...> getFunction (const std::string & func) {return NumbatFunction <Ret, Args ...> (reinterpret_cast <void*> (engine->getFunctionAddress (func)));}
 		
 		void dump () {module->dump ();}
 		void loadFromCode (const std::string & code);
