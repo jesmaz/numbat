@@ -1,3 +1,4 @@
+#include "../include/ast.hpp"
 #include "../include/generator.hpp"
 
 namespace numbat {
