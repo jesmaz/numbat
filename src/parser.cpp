@@ -1,4 +1,13 @@
+#include "../include/ast/asterror.hpp"
 #include "../include/ast/astidentifier.hpp"
+#include "../include/ast/astmodule.hpp"
+#include "../include/ast/astnil.hpp"
+#include "../include/ast/astoperatorerror.hpp"
+#include "../include/ast/control/astreturn.hpp"
+#include "../include/ast/constant/astconstantcstring.hpp"
+#include "../include/ast/constant/astconstantfpint.hpp"
+#include "../include/ast/constant/astconstantint.hpp"
+#include "../include/ast/memory/aststructindex.hpp"
 #include "../include/core.hpp"
 #include "../include/parser.hpp"
 
