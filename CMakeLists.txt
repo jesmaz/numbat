@@ -64,12 +64,14 @@ set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl z t
 add_executable(console ${sources} src/console.cpp)
 add_executable(numbat ${sources} src/main.cpp)
 add_executable(parsertest ${sources} test/parser.cpp)
+add_executable(parsertest-dbg ${sources} test/parser.cpp)
 
 target_link_libraries(console ${libs})
 target_link_libraries(numbat ${libs})
 target_link_libraries(parsertest ${libs})
+target_link_libraries(parsertest-dbg ${libs})
 
-set_target_properties(parsertest PROPERTIES COMPILE_FLAGS "-DDEBUG")
+set_target_properties(parsertest-dbg PROPERTIES COMPILE_FLAGS "-DDEBUG")
 
 install(FILES numbat.xml DESTINATION /usr/share/katepart5/syntax/)
 install(DIRECTORY "libnbt/" DESTINATION /usr/include/numbat)
