@@ -16,7 +16,7 @@ execute_process(COMMAND llvm-config --cppflags OUTPUT_VARIABLE LLVM_FLAGS OUTPUT
 include_directories(${LLVM_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/include")
 link_directories(${LLVM_LIBRARY_DIRS})
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -g -pthread ${LLVM_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -DUSE_LLVM -std=c++14 -g -pthread -march=native ${LLVM_FLAGS}")
 
 set(sources ${sources} "src/ast.cpp")
 set(sources ${sources} "src/cast.cpp")
