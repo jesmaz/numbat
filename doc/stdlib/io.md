@@ -344,5 +344,6 @@ def print (const ref string str) -> ()
 Calls 'scan' on the stdin stream.
 
 ```
-def scan (const ref string str) -> ()
+def scan () -> (string str)
+def scan (const ref string terminators) -> (string str)
 ```
