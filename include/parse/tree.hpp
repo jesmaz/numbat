@@ -20,6 +20,7 @@ class ParseTree : public ParseTreeNode {
 		
 		void declare (numbat::parser::NumbatScope * scope);
 		void declareInline ();
+		void push_back (PTNode node);
 		
 		ParseTree (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		template <typename container>
