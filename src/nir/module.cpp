@@ -1,8 +1,9 @@
 #include "../../include/nir/function.hpp"
 #include "../../include/nir/module.hpp"
-#include "../../include/nir/inst/init.hpp"
 #include "../../include/nir/scope.hpp"
 #include "../../include/nir/type/number.hpp"
+
+#include <cassert>
 
 namespace nir {
 
