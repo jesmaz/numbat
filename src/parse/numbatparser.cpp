@@ -29,116 +29,28 @@ void oppRules (Parser & parser, string rule, std::vector <string> ptns, int16_t 
 
 NumbatParser::NumbatParser () {
 	
-	parser.addRules ("BLOCK", {"{}"});
-	
-	parser.addRules ("E", {"BLOCK", "IDENTIFIER", "LITERAL", "Lambda", "BracketRound", "Slice", "Each"});
-	parser.addRules ("BracketRound", {"()", "(E)", "(List)"}, 0, Parser::NONE, [](const std::vector <PTNode> & args) -> PTNode {
-		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
-		delete args.front ();
-		delete args.back ();
-		switch (args.size ()) {
-			case 2:
-				return new ParseTreeList (l, p);
-			case 3:
-				if (args [1]->getType () == ParseTreeNode::NodeType::LIST) {
-					return args [1];
-				}
-			default:
-				return new ParseTreeList ({args.begin ()+1, args.end ()-1});
+	auto createCall = [](const std::vector <PTNode> & args) -> PTNode {
+		PTNode t;
+		if (args.size () == 4) {
+			if (args [2]->isList ()) {
+				t = new ParseTreeCall (args [0], args [2]->releaseArgs ());
+				delete args [2];
+			} else {
+				t = new ParseTreeCall (args [0], {args [2]});
+			}
+			delete args [3];
+		} else {
+			t = new ParseTreeCall (args [0], {});
+			delete args [2];
 		}
-	});
-	parser.addRules ("BracketSquare", {"[]", "[E]"}, 0, Parser::NONE, [](const std::vector <PTNode> args) -> PTNode {
-		size_t l=args.front ()->getLine (), p=args.front ()->getPos ();
-		delete args.front ();
-		delete args.back ();
-		switch (args.size ()) {
-			case 2:
-				return new ParseTreeIndex (l, p);
-			default:
-				return new ParseTreeIndex (args [1]);
-		}
-	});
-	//parser.addRules ("InitList", {"Init"});
-	parser.addRules ("Slice", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "Range", "[Each]"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
-		switch (args.size ()) {
-			case 1:
-				return args [0];
-			default:
-				return new ParseTreeSlice ({args.begin ()+1, args.end ()-1});
-		}
-	});
-	//parser.addRules ("E", {"E I", "val I", "var I"});
-	parser.addRules ("MetaTag", {"@IDENTIFIER", "@BracketRound", "@BracketSquare"}, -1, Parser::LTR);
-	parser.addRules ("IDENTIFIER", {"IDENTIFIER MetaTag", "val MetaTag", "val MetaTag", "IDENTIFIER BracketSquare", "var MetaTag", "val BracketSquare"}, 0, Parser::LTR);
-	parser.addRules ("Variable", {"IDENTIFIER IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER", "Lambda IDENTIFIER"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
-		return new ParseTreeVariable (args[0], args[1]);
-	});
-	parser.addRules ("Variable", {"const Variable", "ref Variable"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
-		return args [1];
-	});
-	
-	parser.addRules ("Struct", {"struct IDENTIFIER BLOCK"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new Struct (args);});
-	parser.addRules ("T", {"extern Function", "Function"});
-	//parser.addRules ("E", {"E->E"}, 1800, Parser::LTR);
-	//parser.addRules ("Range", {"[E<E<E]", "[E<=E<E]", "[E<E<=E]", "[E<=E<=E]"});
-	
-	
-	
-	parser.addRules ("E", {"E BracketRound", "IDENTIFIER BracketRound"}, 100, Parser::LTR, [](const std::vector <PTNode> & args) -> PTNode {
-		PTNode t = new ParseTreeCall (args [0], args [1]->releaseArgs ());
 		delete args [1];
 		return t;
-	});
-	parser.addRules ("E", {"E BracketSquare", "IDENTIFIER BracketSquare"}, 100, Parser::LTR);
-	parser.addRules ("Slice", {"E Slice", "IDENTIFIER Slice"}, 100, Parser::LTR);
-	parser.addRules ("E", {"E.IDENTIFIER", "E.MetaTag"}, 100, Parser::LTR);
-	
-	oppRules (parser, "E", {"E++", "E--"}, 200, Parser::LTR);
-	
-	oppRules (parser, "E", {"++E", "--E", "-E", "!E", "not E", "~E"}, 300, Parser::RTL);
-	
-	oppRules (parser, "E", {"E as E"}, 400, Parser::LTR);
-	oppRules (parser, "E", {"E in E"}, 450, Parser::LTR);
-	parser.addRules ("Each", {"IDENTIFIER in E"}, 450, Parser::LTR);
-	
-	oppRules (parser, "E", {"E*E", "E/E", "E%E"}, 500, Parser::LTR);
-	
-	oppRules (parser, "E", {"E+E", "E-E", "E~E"}, 600, Parser::LTR);
-	parser.addRules ("E", {"BracketRound-E"}, 600, Parser::LTR, [](const std::vector <PTNode> & args) -> PTNode {
-			delete args[1];
-			return new ParseTreeOperator (" - ", {args[0], args[2]});
-	});
-	
-	oppRules (parser, "E", {"E<<E", "E>>E"}, 700, Parser::LTR);
-	
-	oppRules (parser, "E", {"E&E"}, 800, Parser::LTR);
-	parser.addRules ("Slice", {"Slice&Slice"}, 800, Parser::LTR);
-	
-	oppRules (parser, "E", {"E^E"}, 900, Parser::LTR);
-	parser.addRules ("Slice", {"Slice^Slice"}, 900, Parser::LTR);
-	
-	oppRules (parser, "E", {"E|E"}, 1000, Parser::LTR);
-	parser.addRules ("Slice", {"Slice|Slice"}, 1000, Parser::LTR);
-	
-	oppRules (parser, "E", {"E<E", "E<=E", "E>E", "E>=E"}, 1100, Parser::LTR);
-	
-	oppRules (parser, "E", {"E!=E", "E==E"}, 1200, Parser::LTR);
-	
-	oppRules (parser, "E", {"E and E"}, 1300, Parser::LTR);
-	
-	oppRules (parser, "E", {"E or E"}, 1400, Parser::LTR);
-	
-	parser.addRules ("E", {"Variable:E"}, 1450, Parser::RTL, [](const std::vector <PTNode> args) -> PTNode {
-		assert (typeid (*args[0]) == typeid (ParseTreeVariable));
-		ParseTreeVariable * var = reinterpret_cast <ParseTreeVariable *> (args[0]);
-		assert(not var->releaseInst ());
-		PTNode vt = var->releaseVType (), id = var->releaseIden ();
-		delete var;
-		delete args [1];
-		return new ParseTreeVariable (vt, id, args [2]);
-	});
+	};
 	
 	auto createList = [](const std::vector <PTNode> args){
+		if (args.size () == 1) {
+			return new ParseTreeList (args);
+		}
 		delete args [1];
 		if (args[0]->getType () == ParseTreeNode::NodeType::LIST) {
 			auto a = args[0]->releaseArgs ();
@@ -149,14 +61,111 @@ NumbatParser::NumbatParser () {
 			return new ParseTreeList ({args[0],args[2]});
 		}
 	};
-	parser.addRules ("E", {"E,E"}, 1500, Parser::LTR, createList);
-	parser.addRules ("List", {"E,Variable", "Variable,E", "Variable,Variable", "List,E", "List,Variable"}, 1500, Parser::LTR, createList);
-	parser.addRules ("List", {"Variable"}, 1500, Parser::LTR);
-	//parser.addRules ("InitList", {"Init,Init", "Init,InitList", "Init,E"}, 1500, Parser::RTL);
 	
-	oppRules (parser, "E", {"E?E:E", "E=E", "E+=E", "E-=E", "E~=E", "E*=E", "E/=E", "E%=E", "E<<=E", "E>>=E", "E&=E", "E^=E", "E|=E", "E=>E", "Variable=E"}, 1600, Parser::RTL);
 	
-	parser.addRules ("E", {"if BracketRound E", "if BracketRound E else E", "if MetaTag E", "for BracketSquare E", "for Slice E", "while BracketRound E"}, 1700, Parser::LTR);
+	auto discardSemicolon = [](const std::vector <PTNode> args) {
+		delete args [1];
+		return args [0];
+	};
+	
+	
+	auto accumulatePair = [](const std::vector <PTNode> args) {
+		args [0]->push_back (args [1]);
+		return args [0];
+	};
+	
+	auto accumulateBinary = [](const std::vector <PTNode> args) {
+		args [0]->push_back (args [2]);
+		delete args [1];
+		return args [0];
+	};
+	
+	
+	parser.addRules ("PROGRAM", {"Statement"}, 0, Parser::LTR, [](const std::vector <PTNode> args){return new ParseTree (args);});
+	
+	parser.addRules ("PROGRAM", {"PROGRAM Statement"}, 0, Parser::LTR, accumulatePair);
+	parser.addRules ("PROGRAM", {"PROGRAM ;"}, 0, Parser::LTR, discardSemicolon);
+	
+	
+	parser.addRules ("Statement", {"Assignment;", "Block;", "Call;", "Control;", "Variable;", "Parameter;", "VariableList;", "List;", "Import;"}, -1, Parser::LTR, discardSemicolon);
+	
+	
+	parser.addRules ("Arg", {"E:E"});
+	parser.addRules ("ArgList", {"Arg", "ArgList,Arg", "ArgList,E", "List,Arg"}, 1700, Parser::LTR, createList);
+	parser.addRules ("VariableList", {"Variable", "VariableList,Arg", "VariableList,Variable"}, 1700, Parser::LTR, createList);
+	
+	parser.addRules ("Variable", {"Parameter:E"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		assert (typeid (*args[0]) == typeid (ParseTreeVariable));
+		ParseTreeVariable * var = reinterpret_cast <ParseTreeVariable *> (args[0]);
+		assert(not var->releaseInst ());
+		PTNode vt = var->releaseVType (), id = var->releaseIden ();
+		delete var;
+		delete args [1];
+		return new ParseTreeVariable (vt, id, args [2]);
+	});
+	parser.addRules ("Parameter", {"Atom IDENTIFIER", "var IDENTIFIER", "val IDENTIFIER"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		auto t = new ParseTreeVariable (args[0], args[1]);
+		return t;
+	});
+	
+	parser.addRules ("Assignment", {"List?List:List", "List=List", "List+=List", "List-=List", "List~=List", "List*=List", "List/=List", "List%=List", "List<<=List", "List>>=List", "List&=List", "List^=List", "List|=List", "List=>List"}, 1600, Parser::RTL);
+	
+	parser.addRules ("List", {"List,E"}, 1500, Parser::LTR, createList);
+	parser.addRules ("List", {"Assignment", "E"});
+	
+	oppRules (parser, "E", {"E or E"}, 1400, Parser::LTR);
+	
+	oppRules (parser, "E", {"E and E"}, 1300, Parser::LTR);
+	
+	oppRules (parser, "E", {"E!=E", "E==E"}, 1200, Parser::LTR);
+	
+	oppRules (parser, "E", {"E<E", "E<=E", "E>E", "E>=E"}, 1100, Parser::LTR);
+	
+	oppRules (parser, "E", {"E|E"}, 1000, Parser::LTR);
+	
+	oppRules (parser, "E", {"E^E"}, 900, Parser::LTR);
+	
+	oppRules (parser, "E", {"E&E"}, 800, Parser::LTR);
+	
+	oppRules (parser, "E", {"E<<E", "E>>E"}, 700, Parser::LTR);
+	
+	oppRules (parser, "E", {"E+E", "E-E", "E~E"}, 600, Parser::LTR);
+	
+	oppRules (parser, "E", {"E*E", "E/E", "E%E"}, 500, Parser::LTR);
+	
+	oppRules (parser, "E", {"E in E"}, 450, Parser::LTR);
+	
+	oppRules (parser, "E", {"E as E"}, 400, Parser::LTR);
+	
+	oppRules (parser, "E", {"++E", "--E", "-E", "!E", "not E", "~E"}, 300, Parser::RTL);
+	
+	oppRules (parser, "E", {"E++", "E--"}, 200, Parser::LTR);
+	
+	parser.addRules ("E", {"Atom", "Call"});
+	
+	parser.addRules ("Atom", {"E.Atom", "E.MetaTag"}, 100, Parser::LTR);
+	parser.addRules ("Atom", {"E[]", "E[List]"}, 100, Parser::LTR);
+	parser.addRules ("Call", {"E()", "E(List)", "E(ArgList)"}, 100, Parser::LTR, createCall);
+	parser.addRules ("Slice", {"Atom[:]", "Atom[:E]", "Atom[E:]", "Atom[E:E]", "Atom[::E]", "Atom[:E:E]", "Atom[E::E]", "Atom[E:E:E]"}, 100, Parser::LTR);
+	
+	parser.addRules ("Atom", {"Atom MetaTag"});
+	parser.addRules ("Atom", {"()", "(List)", "LITERAL", "IDENTIFIER", "Lambda", "Slice", "Each", "Control"});
+	
+	
+	parser.addRules ("Block", {"{}", "{PROGRAM}", "{PROGRAM List;}", "{PROGRAM List}", "{List;}", "{List}"});
+	parser.addRules ("MetaTag", {"@Atom"});
+	
+	
+	parser.addRules ("Slice", {"[:]", "[:E]", "[E:]", "[E:E]", "[::E]", "[:E:E]", "[E::E]", "[E:E:E]", "[L in L]", "[E in E]"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		switch (args.size ()) {
+			case 1:
+				return args [0];
+			default:
+				return new ParseTreeSlice ({args.begin ()+1, args.end ()-1});
+		}
+	});
+	
+	parser.addRules ("Control", {"if (E) Statement", "if (E) Statement else Statement", "if MetaTag Statement", "for Slice Statement", "while (E) Statement"}, 1700, Parser::LTR);
 	
 	parser.addRules ("Module", {"import IDENTIFIER", "import LITERAL", "Module.IDENTIFIER", "Module.LITERAL"}, 1800, Parser::LTR, [](const std::vector <PTNode> args){
 		switch (args.size ()) {
@@ -184,24 +193,28 @@ NumbatParser::NumbatParser () {
 		}
 	});
 	
-	parser.addRules ("E", {"Lambda BLOCK"}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
-		args [0]->asFunction ()->setBody (args[1]);
-		return args [0];
-	});
+	parser.addRules ("E", {"()->() Block", "()->(List) Block", "(List)->() Block", "(List)->(List) Block"}, 2000, Parser::LTR);
 	parser.addRules ("Lambda", {
-		"BracketRound->BracketRound",
-		"List->E"
+		"List->List"
 	}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
 		delete args [1];
 		delete args [2];
 		return new Function (nullptr, args [0], args [3], nullptr);
 	});
 	parser.addRules ("Function", {
-		"def IDENTIFIER BracketRound",
-		"def IDENTIFIER BracketRound E",
-		"def IDENTIFIER BracketRound->BracketRound",
-		"def IDENTIFIER BracketRound->BracketRound E"
-	}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
+		"def IDENTIFIER ()",
+		"def IDENTIFIER (List)",
+		"def IDENTIFIER () Statement",
+		"def IDENTIFIER (List) Statement",
+		"def IDENTIFIER ()->()",
+		"def IDENTIFIER ()->(List)",
+		"def IDENTIFIER (List)->()",
+		"def IDENTIFIER (List)->(List)",
+		"def IDENTIFIER ()->() Statement",
+		"def IDENTIFIER ()->(List) Statement",
+		"def IDENTIFIER (List)->() Statement",
+		"def IDENTIFIER (List)->(List) Statement",
+	}, 2000/*, Parser::LTR, [](const std::vector <PTNode> args){
 		delete args [0];
 		switch (args.size ()) {
 			case 3:
@@ -219,7 +232,7 @@ NumbatParser::NumbatParser () {
 			default:
 				assert (false);
 		}
-	});
+	}*/);
 	
 	parser.buildRules ();
 	
