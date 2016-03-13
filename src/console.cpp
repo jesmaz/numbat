@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include "../include/ast.hpp"
+#include "../include/codegen/interpreter.hpp"
+#include "../include/nir/module.hpp"
 #include "../include/numbat.hpp"
 #include "../include/parse/numbatparser.hpp"
 
@@ -32,30 +34,41 @@ int main (int argc, char ** args) {
 	createType ("double", 64, numbat::parser::NumbatRawType::FLOAT);
 	createType ("quad", 128, numbat::parser::NumbatRawType::FLOAT);
 	
+	codegen::Interpreter
+	interpreter;
+	nir::Module nirmodule (&interpreter);
+	auto globalScope = nirmodule.getGlobalScope ();
+	
+	nirmodule.registerPrimative (nir::Type::UINT, 1, "bool");
+	
+	nirmodule.registerPrimative (nir::Type::UINT, 8, "uint8");
+	nirmodule.registerPrimative (nir::Type::UINT, 16, "uint16");
+	nirmodule.registerPrimative (nir::Type::UINT, 32, "uint32");
+	nirmodule.registerPrimative (nir::Type::UINT, 64, "uint64");
+	
+	nirmodule.registerPrimative (nir::Type::INT, 8, "int8");
+	nirmodule.registerPrimative (nir::Type::INT, 16, "int16");
+	nirmodule.registerPrimative (nir::Type::INT, 32, "int32");
+	nirmodule.registerPrimative (nir::Type::INT, 64, "int64");
+	
+	nirmodule.registerPrimative (nir::Type::FPINT, 16, "half");
+	nirmodule.registerPrimative (nir::Type::FPINT, 32, "float");
+	nirmodule.registerPrimative (nir::Type::FPINT, 64, "double");
+	nirmodule.registerPrimative (nir::Type::FPINT, 128, "quad");
+	
 	numbat::Numbat numbat;
 	
 	createType ("ptrint", numbat.getEngine ()->getDataLayout ()->getPointerSizeInBits (), numbat::parser::NumbatRawType::UNSIGNED);
 	
-	auto module = numbat::parser::Module::import ("core util");
+	
 	numbat::NumbatParser parser;
 	string line;
-	numbat::parser::AbstractSyntaxTree * ast = module->getAST ();
-	//numbat::parser::BodyGenerator generator;
-	//ast->accept (generator);
 	for (;;) {
 		std::cout << " >> " << std::flush;
 		std::getline (std::cin, line);
-		PTNode parseTree = parser.parse (line);
-		assert (typeid (*parseTree) == typeid (ParseTree));
-		for (PTNode n : reinterpret_cast <ParseTree*> (parseTree)->getBody ()) {
-			numbat::parser::ASTnode node = n->build (ast);
-			//node->accept (generator);
-			if (node) {
-				std::cout << node->toString () << '\n';
-			} else {
-				std::cout << "nil\n";
-			}
-		}
+		auto parseTree = parser.parse (line);
+		const nir::Instruction * val = parseTree->build (globalScope, ParseTreeNode::BuildMode::NORMAL);
+		std::cout << interpreter (val) << '\n';
 	}
 	return 0;
 	
