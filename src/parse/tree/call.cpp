@@ -1,4 +1,6 @@
 #include "../../../include/core.hpp"
+#include "../../../include/nir/inst/functionPointer.hpp"
+#include "../../../include/nir/scope.hpp"
 #include "../../../include/parse/tree/call.hpp"
 
 auto convArgs = [](const std::vector <PTNode> & args, numbat::parser::NumbatScope * scope){
@@ -12,37 +14,23 @@ auto convArgs = [](const std::vector <PTNode> & args, numbat::parser::NumbatScop
 	return conv;
 };
 
-numbat::parser::ASTnode ParseTreeCall::build (numbat::parser::NumbatScope * scope) {
+auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+	std::vector <const nir::Instruction *> conv;
+	conv.reserve (args.size ());
+	for (auto & arg : args) {
+		assert (arg);
+		conv.push_back (arg->build (scope, mode));
+	}
+	return conv;
+};
+
+const nir::Instruction * ParseTreeCall::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
 	
-	numbat::parser::ASTnode callee = iden->build (scope);
-	
-	auto & idenType = typeid (*callee.get ());
-	if (idenType == typeid (numbat::parser::ASTfunctionlist)) {
-		
-		auto callable = numbat::parser::findBestMatch (convArgs (args, scope), static_cast <numbat::parser::ASTfunctionlist *> (callee.get ())->getElements ());
-		return numbat::parser::makeFunctionCall (scope, callable);
-		
-	} else if (idenType == typeid (numbat::parser::ASTtype)) {
-		
-		auto & ctrs = static_cast <numbat::parser::ASTtype *> (callee.get ())->getType ()->getConstructors ();
-		std::vector <numbat::parser::FunctionDecleration*> cands;
-		cands.reserve (ctrs.size ());
-		for (auto & ctr : ctrs) {
-			cands.push_back (ctr.get ());
-		}
-		auto callable = numbat::parser::findBestMatch (convArgs (args, scope), cands);
-		return numbat::parser::makeFunctionCall (scope, callable);
-		
-	} else if (idenType == typeid (numbat::parser::ASTvariable)) {
-		
-		//TODO: Implement
-		assert (0);
-		
-	} else {
-		
-		//TODO: Fail gracefully
-		assert (0);
-		
+	const nir::Instruction * callee = iden->build (scope, mode);
+	auto & typeId = typeid (*callee);
+	if (typeId == typeid (nir::FunctionPointer)) {
+		const nir::FunctionPointer * fPtr = static_cast <const nir::FunctionPointer *> (callee);
+		return scope->createCall (fPtr->getFunction (), buildArgs (args, scope, mode));
 	}
 	
 }

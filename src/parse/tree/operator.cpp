@@ -1,67 +1,67 @@
 #include "../../../include/core.hpp"
+#include "../../../include/nir/scope.hpp"
 #include "../../../include/parse/tree/operator.hpp"
 
-std::map <string, numbat::parser::ASTnode (*) (numbat::parser::NumbatScope *, const string &, const std::vector <numbat::parser::ASTnode> &)> defImp = {
-	//{"++ ", numbat::parser::defArithmetic},
-	//{"-- ", numbat::parser::defArithmetic},
-	{"- ", numbat::parser::defNegation},
-	{"! ", numbat::parser::defNegation},
-	{"not ", numbat::parser::defNegation},
-	{"~ ", numbat::parser::defNegation},
+
+std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <const nir::Instruction *> &)> nirDefImp = {
+// 	{"- ", &nir::Scope::createNeg},
+// 	{"! ", &nir::Scope::createLNot},
+// 	{"not ", &nir::Scope::createLNot},
+// 	{"~ ", &nir::Scope::createBitNot},
+// 	
+// 	{" as ", &nir::Scope::createAs},
+// 	
+// 	{" in ", &nir::Scope::createIn},
 	
-	//{" ++", numbat::parser::defArithmetic},
-	//{" --", numbat::parser::defArithmetic},
+	{" * ", &nir::Scope::createMul},
+// 	{" / ", &nir::Scope::createDiv},
+// 	{" % ", &nir::Scope::createRem},
 	
-	{" as ", numbat::parser::defAs},
+	{" + ", &nir::Scope::createAdd},
+	{" - ", &nir::Scope::createSub},
+//	{" ~ ", &nir::Scope::createConcat},
 	
-	{" * ", numbat::parser::defArithmetic},
-	{" / ", numbat::parser::defArithmetic},
-	{" % ", numbat::parser::defArithmetic},
+// 	{" << ", &nir::Scope::createShiftLeft},
+// 	{" >> ", &nir::Scope::createShiftRight},
 	
-	{" + ", numbat::parser::defArithmetic},
-	{" - ", numbat::parser::defArithmetic},
-	{" ~ ", numbat::parser::defConcat},
+// 	{" & ", &nir::Scope::createBitAnd},
 	
-	{" << ", numbat::parser::defArithmetic},
-	{" >> ", numbat::parser::defArithmetic},
+// 	{" ^ ", &nir::Scope::createBitXor},
 	
-	{" & ", numbat::parser::defArithmetic},
+// 	{" | ", &nir::Scope::createBitOr},
 	
-	{" ^ ", numbat::parser::defArithmetic},
+// 	{" < ", &nir::Scope::createCmpLT},
+// 	{" <= ", &nir::Scope::createCmpLTE},
+// 	{" > ", &nir::Scope::createCmpGT},
+// 	{" >= ", &nir::Scope::createCmpGTE},
 	
-	{" | ", numbat::parser::defArithmetic},
+// 	{" == ", &nir::Scope::createCmpEQ},
+// 	{" != ", &nir::Scope::createCmpNE},
 	
-	{" < ", numbat::parser::defCompare},
-	{" <= ", numbat::parser::defCompare},
-	{" > ", numbat::parser::defCompare},
-	{" >= ", numbat::parser::defCompare},
+// 	{" and ", &nir::Scope::createLAnd},
 	
-	{" == ", numbat::parser::defCompare},
-	{" != ", numbat::parser::defCompare},
+// 	{" or ", &nir::Scope::createLOr},
+	
+	{" = ", &nir::Scope::createAssign}
 };
 
-numbat::parser::ASTnode ParseTreeOperator::build (numbat::parser::NumbatScope * scope) {
-	std::vector <numbat::parser::ASTnode> nodes;
-	nodes.resize (args.size ());
-	std::vector <numbat::parser::FunctionDecleration *> candidates;
+
+const nir::Instruction * ParseTreeOperator::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+	
+	std::vector <const nir::Instruction *> nodes;
+	nodes.resize (args.size (), nullptr);
+	//std::vector <numbat::parser::FunctionDecleration *> candidates;
 	for (size_t i=0; i<args.size(); ++i) {
 		assert (args[i]);
-		nodes[i] = args[i]->build (scope);
-		assert (nodes[i]);
-		assert (nodes[i]->getType ());
-		auto cand = nodes[i]->getType ()->getMethods (iden);
-		std::copy (cand.begin (), cand.end (), std::back_inserter (candidates));
+		nodes [i] = args[i]->build (scope, mode);
+		assert (nodes [i]);
 	}
 	
-	auto callable = numbat::parser::findBestMatch (nodes, candidates);
-	assert (callable);
-	if (callable->isValid ()) {
-		return numbat::parser::makeFunctionCall (scope, callable);
-	} else {
-		assert (defImp [iden]);
-		return defImp [iden] (scope, iden, nodes);
-	}
+	assert (nirDefImp [iden]);
+	return (scope->*nirDefImp [iden]) (nodes);
+	
 }
+
 
 string ParseTreeOperator::strDump (text::PrintMode mode) {
 	if (iden.empty () and not args.empty ()) {

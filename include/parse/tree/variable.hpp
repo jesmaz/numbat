@@ -9,7 +9,7 @@ class ParseTreeVariable : public ParseTreeNode {
 	
 	public:
 		
-		virtual numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
+		virtual const nir::Instruction * build (nir::Scope * scope, ParseTreeNode::BuildMode mode);
 		
 		PTNode releaseIden () {auto e = iden; iden = 0; return e;}
 		PTNode releaseInst () {auto e = inst; inst = 0; return e;}

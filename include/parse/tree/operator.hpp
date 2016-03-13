@@ -14,7 +14,7 @@ class ParseTreeOperator : public ParseTreeNode {
 		virtual bool isAggregate () {return true;}
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
 		
-		virtual numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
+		virtual const nir::Instruction * build (nir::Scope * scope, ParseTreeNode::BuildMode mode);
 		
 		ParseTreeOperator (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		ParseTreeOperator (const string & iden, const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()), iden (iden), args (args) {}

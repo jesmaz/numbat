@@ -1,29 +1,42 @@
+#include "../../../include/nir/instruction.hpp"
+#include "../../../include/nir/scope.hpp"
 #include "../../../include/parse/tree/variable.hpp"
 
-numbat::parser::ASTnode ParseTreeVariable::build (numbat::parser::NumbatScope * scope) {
-	numbat::parser::ASTnode init = nullptr, type = nullptr;
+
+const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+	
+	const nir::Instruction * init = nullptr, * var = nullptr;
+	const nir::Type * type = nullptr;
 	if (inst) {
-		init = inst->build (scope);
+		init = inst->build (scope, ParseTreeNode::BuildMode::NORMAL);
 	}
 	if (vType->getType () == ParseTreeNode::NodeType::KEYWORD) {
 		assert (inst);
 		assert (init);
-		auto * nbtType = init->getType ();
-		assert (nbtType);
-		type = numbat::parser::ASTnode (new numbat::parser::ASTtype (getLine (), false, false, nbtType));
+		type = init->getType ();
 	} else {
-		type = vType->build (scope);
+		auto * instr = vType->build (scope, ParseTreeNode::BuildMode::NORMAL);
+		assert (instr);
+		type = instr->getType ();
 	}
 	assert (type);
-	assert (type->getType ());
-	numbat::parser::NumbatVariable * var = numbat::parser::createVariable (scope, type, init, iden->getIden (), false, false);
-	if (var) {
-		return numbat::parser::ASTnode (new numbat::parser::ASTvariable (getLine (), var));
+	std::cerr << typeid (*iden).name () << std::endl;
+	std::cerr << iden->toString () << std::endl;
+	std::cerr << iden->getIden () << std::endl;
+	if (mode == ParseTreeNode::BuildMode::PARAMETER) {
+		return scope->createParameter (type, init, iden->getIden ());
 	} else {
-		std::cerr << iden->getIden () << std::endl;
-		assert (0);
-		return nullptr;//generateError (pos, "'" + pos.itt->iden + "' already declared in this scope");
+		var = scope->allocateVariable (type, iden->getIden ());
 	}
+	if (init) {
+		auto val = init;
+		if (init->getType () != type) {
+			val = scope->staticCast (init, type);
+		}
+		return scope->createPut (val, var);
+	}
+	return var;
+	
 }
 
 string ParseTreeVariable::strDump (text::PrintMode mode) {

@@ -1,15 +1,20 @@
 #include "../../include/parse/tree.hpp"
 
-numbat::parser::ASTnode ParseTree::build (numbat::parser::NumbatScope * scope) {
-	if (!treeScope) {
-		treeScope = scope;
-		declareInline ();
+const nir::Instruction * ParseTree::build (nir::Scope * scope, BuildMode mode) {
+	if (nirTreeScope) {
+		scope = nirTreeScope;
+	} else {
+		declare (scope);
+	}
+	const nir::Instruction * last;
+	for (Function * f : functions) {
+		last = f->build (scope, mode);
 	}
 	for (auto * b : body) {
-		if (auto n = b->build (treeScope)) numbat::parser::addToBody (treeScope, n);
+		last = b->build (scope, mode);
 	}
-	//TODO: Fix memory leak
-	return * new numbat::parser::ASTnode (treeScope);
+	
+	return last;
 }
 
 string ParseTree::strDump (text::PrintMode mode) {
@@ -24,41 +29,30 @@ string ParseTree::strDump (text::PrintMode mode) {
 	}
 }
 
-void ParseTree::declare (numbat::parser::NumbatScope * scope) {
-	treeScope = numbat::parser::createChild (scope);
+void ParseTree::declare (nir::Scope * scope) {
+	nirTreeScope = scope;
 	declareInline ();
 }
 
 void ParseTree::declareInline () {
-	auto cvt = [&](const std::vector <PTNode> & args) {
-		std::vector <numbat::parser::ASTnode> nodes (args.size ());
-		for (size_t i=0; i<args.size (); ++i) nodes[i] = args[i]->build (treeScope);
-		return nodes;
-	};
-	for (PTNode n : import) {
-		n->declare (treeScope);
-	}
-	for (Struct * s : structs) {
-		s->declare (treeScope);
-	}
 	for (Function * f : functions) {
-		f->declare (treeScope);
+		f->declare (nirTreeScope);
 	}
 }
 
 void ParseTree::push_back (PTNode node) {
-			switch (node->getType ()) {
-				case ParseTreeNode::NodeType::FUNCTION:
+	switch (node->getType ()) {
+			case ParseTreeNode::NodeType::FUNCTION:
 					functions.push_back (node->asFunction ());
 					break;
-				case ParseTreeNode::NodeType::IMPORT:
+			case ParseTreeNode::NodeType::IMPORT:
 					import.push_back (node);
 					break;
-				case ParseTreeNode::NodeType::STRUCT:
+			case ParseTreeNode::NodeType::STRUCT:
 					structs.push_back (node->asStruct ());
 					break;
-				default:
+			default:
 					break;
-			}
-			body.push_back (node);
-		}
+	}
+	body.push_back (node);
+}

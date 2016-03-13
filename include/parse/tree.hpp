@@ -16,9 +16,9 @@ class ParseTree : public ParseTreeNode {
 		const std::vector <PTNode> & getBody () const {return body;}
 		const std::vector <Struct *> & getStructs () const {return structs;}
 		
-		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
+		const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
 		
-		void declare (numbat::parser::NumbatScope * scope);
+		void declare (nir::Scope * scope);
 		void declareInline ();
 		void push_back (PTNode node);
 		
@@ -53,7 +53,7 @@ class ParseTree : public ParseTreeNode {
 		std::vector <Function *> functions;
 		std::vector <Struct *> structs;
 		
-		numbat::parser::NumbatScope * treeScope=nullptr;
+		nir::Scope * nirTreeScope=nullptr;
 		
 };
 

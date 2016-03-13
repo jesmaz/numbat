@@ -1,38 +1,42 @@
+#include "../../../include/core.hpp"
+#include "../../../include/nir/parameter.hpp"
+#include "../../../include/nir/scope.hpp"
 #include "../../../include/parse/tree/function.hpp"
 
-auto convArgs = [](const std::vector <PTNode> & args, numbat::parser::NumbatScope * scope){
-	std::vector <numbat::parser::ASTnode> conv;
+
+auto buildParams = [](const std::vector <PTNode> & args, nir::Scope * scope) {
+	std::vector <const nir::Parameter *> conv;
 	conv.reserve (args.size ());
 	for (auto & arg : args) {
-		assert (arg);
-		conv.push_back (arg->build (scope));
-		assert (conv.back ());
+		auto * p = arg->build (scope, ParseTreeNode::BuildMode::PARAMETER);
+		assert (p);
+		assert (typeid (*p) == typeid (nir::Parameter));
+		conv.push_back (static_cast <const nir::Parameter *> (p));
 	}
 	return conv;
 };
 
-numbat::parser::ASTnode Function::build (numbat::parser::NumbatScope * scope) {
+const nir::Instruction * Function::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
 	
 	if (not fScope) {
 		//Must be anon
-		fScope = createChild (scope);
-		auto func = numbat::parser::createFunctionDecleration (fScope, iden, convArgs (params, fScope), convArgs (type, fScope), {}, fScope);
-		numbat::parser::setFunction (fScope, func);
+		auto nirParams = buildParams (params, scope);
+		auto nirTypes = buildParams (type, scope);
+		fScope = scope->declareFunction (nirParams, nirTypes);
 	}
 	
 	if (body) {
-		return body->build (fScope);
-	} else {
-		return nullptr;
+		auto b = body->build (fScope, mode);
 	}
+	return fScope->getFunctionPointer ();
 	
 }
 
-void Function::declare (numbat::parser::NumbatScope * scope) {
+void Function::declare (nir::Scope * scope) {
 	
-	fScope = createChild (scope);
-	auto func = numbat::parser::createFunctionDecleration (scope, iden, convArgs (params, fScope), convArgs (type, fScope), {}, fScope);
-	numbat::parser::setFunction (fScope, func);
+	auto nirParams = buildParams (params, scope);
+	auto nirTypes = buildParams (type, scope);
+	fScope = scope->declareFunction (nirParams, nirTypes, iden);
 	
 }
 
@@ -50,7 +54,7 @@ string Function::strDump (text::PrintMode mode) {
 	
 }
 
-Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (params->getLine (), params->getPos ()) {
+Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, params->getLine (), params->getPos ()) {
 	if (iden){
 		this->iden = iden->getIden ();
 	}
