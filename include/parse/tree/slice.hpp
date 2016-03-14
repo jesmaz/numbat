@@ -28,4 +28,21 @@ class ParseTreeSlice : public ParseTreeNode {
 };
 
 
+class ParseTreeSliceDecorator : public ParseTreeNode {
+	
+	public:
+		
+		ParseTreeSliceDecorator (PTNode decor, PTNode slice) : ParseTreeNode (decor->getLine (), decor->getPos ()), decor (decor), slice (slice) {}
+		virtual ~ParseTreeSliceDecorator () {delete decor; delete slice;}
+		
+	protected:
+	private:
+		
+		virtual string strDump (text::PrintMode mode);
+		
+		PTNode decor, slice;
+		
+};
+
+
 #endif /*PARSETREESLICE_HPP*/

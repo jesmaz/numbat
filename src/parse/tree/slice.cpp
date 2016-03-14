@@ -10,3 +10,7 @@ string ParseTreeSlice::strDump (text::PrintMode mode) {
 		return text::PrintMode::COLOUR & mode ? "[]" : "[]";
 	}
 }
+
+string ParseTreeSliceDecorator::strDump (text::PrintMode mode) {
+	return "(" + decor->toString (mode) + " " + slice->toString (mode) + ")";
+}
