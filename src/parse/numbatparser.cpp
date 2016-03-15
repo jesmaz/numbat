@@ -167,7 +167,7 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("E", {"Atom", "Call"});
 	
 	parser.addRules ("Atom", {"E.Atom", "E.MetaTag"}, 100, Parser::LTR);
-	parser.addRules ("Atom", {"E[]", "E[List]"}, 100, Parser::LTR, createIndex);
+	parser.addRules ("Atom", {"Atom[]", "Atom[E]", "Atom[List]", "E[]", "E[E]", "E[List]"}, 100, Parser::LTR, createIndex);
 	parser.addRules ("Call", {"E()", "E(List)", "E(ArgList)"}, 100, Parser::LTR, createCall);
 	parser.addRules ("Slice", {"Atom[:]", "Atom[:E]", "Atom[E:]", "Atom[E:E]", "Atom[::E]", "Atom[:E:E]", "Atom[E::E]", "Atom[E:E:E]"}, 100, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
 		return new ParseTreeSliceDecorator (args [0], new ParseTreeSlice ({args.begin ()+2, args.end ()-1}));
