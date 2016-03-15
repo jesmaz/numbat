@@ -47,6 +47,29 @@ NumbatParser::NumbatParser () {
 		return t;
 	};
 	
+	auto createIndex = [](const std::vector <PTNode> args) -> PTNode {
+		
+		if (args.size () == 3) {
+			delete args [1];
+			delete args [2];
+			return new ParseTreeIndex (args [0], {});
+		}
+		assert (args.size () == 4);
+		
+		delete args [1];
+		delete args [3];
+		
+		if (args[2]->getType () == ParseTreeNode::NodeType::LIST) {
+			auto a = args [2]->releaseArgs ();
+		
+			delete args [2];
+			return new ParseTreeIndex (args [0], a);
+		} else {
+			return new ParseTreeIndex (args [0], {args [2]});
+		}
+		
+	};
+	
 	auto createList = [](const std::vector <PTNode> args){
 		if (args.size () == 1) {
 			return new ParseTreeList (args);
@@ -144,7 +167,7 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("E", {"Atom", "Call"});
 	
 	parser.addRules ("Atom", {"E.Atom", "E.MetaTag"}, 100, Parser::LTR);
-	parser.addRules ("Atom", {"E[]", "E[List]"}, 100, Parser::LTR);
+	parser.addRules ("Atom", {"E[]", "E[List]"}, 100, Parser::LTR, createIndex);
 	parser.addRules ("Call", {"E()", "E(List)", "E(ArgList)"}, 100, Parser::LTR, createCall);
 	parser.addRules ("Slice", {"Atom[:]", "Atom[:E]", "Atom[E:]", "Atom[E:E]", "Atom[::E]", "Atom[:E:E]", "Atom[E::E]", "Atom[E:E:E]"}, 100, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
 		return new ParseTreeSliceDecorator (args [0], new ParseTreeSlice ({args.begin ()+2, args.end ()-1}));

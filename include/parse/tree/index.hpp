@@ -10,7 +10,7 @@ class ParseTreeIndex : public ParseTreeNode {
 	public:
 		
 		ParseTreeIndex (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeIndex (PTNode index) : ParseTreeNode (index->getLine (), index->getPos ()), index (index) {}
+		ParseTreeIndex (PTNode index, const std::vector <PTNode> & args) : ParseTreeNode (index->getLine (), index->getPos ()), index (index), args (args) {}
 		virtual ~ParseTreeIndex () {delete index;}
 		
 	protected:
@@ -19,6 +19,7 @@ class ParseTreeIndex : public ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		PTNode index;
+		std::vector <PTNode> args;
 		
 };
 
