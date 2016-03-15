@@ -1,4 +1,4 @@
-(int32 [45] array)
+((int32 [45]) array)
 (array [34])
 ((array [2]) = (array [4]))
 ((array [:]) = (array [: : (- 1)]))
