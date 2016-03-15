@@ -174,7 +174,18 @@ NumbatParser::NumbatParser () {
 	});
 	
 	parser.addRules ("Atom", {"Atom MetaTag"});
-	parser.addRules ("Atom", {"()", "(List)", "LITERAL", "IDENTIFIER", "Lambda", "Slice", "Each", "Control"});
+	parser.addRules ("Atom", {"LITERAL", "IDENTIFIER", "Lambda", "Slice", "Each", "Control"});
+	parser.addRules ("Atom", {"()"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		auto l = new ParseTreeList (args [0]->getLine (), args [0]->getPos ());
+		delete args [0];
+		delete args [1];
+		return l;
+	});
+	parser.addRules ("Atom", {"(List)"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
+		delete args [0];
+		delete args [2];
+		return args [1];
+	});
 	
 	
 	parser.addRules ("Block", {"{}", "{PROGRAM}", "{PROGRAM List;}", "{PROGRAM List}", "{List;}", "{List}"});
