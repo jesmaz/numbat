@@ -64,7 +64,9 @@ int main (int argc, char ** args) {
 	numbat::NumbatParser parser;
 	string line;
 	for (;;) {
+#ifndef N_PROMPT
 		std::cout << " >> " << std::flush;
+#endif
 		std::getline (std::cin, line);
 		auto parseTree = parser.parse (line);
 		const nir::Instruction * val = parseTree->build (globalScope, ParseTreeNode::BuildMode::NORMAL);
