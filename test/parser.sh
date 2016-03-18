@@ -38,6 +38,11 @@ then
 	echo "Pass:  $pass"
 	echo "Fail:  $(($total-$pass))"
 	echo "Rate:  `bc -l <<< \"100 * ($pass / $total)\"`%"
+	if [ $total -eq $pass ]
+	then
+		exit 0
+	fi
 else
 	echo "Error: No tests found"
 fi
+exit 1
