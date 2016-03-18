@@ -67,7 +67,9 @@ int main (int argc, char ** args) {
 #ifndef N_PROMPT
 		std::cout << " >> " << std::flush;
 #endif
-		std::getline (std::cin, line);
+		if (not std::getline (std::cin, line)) {
+			break;
+		}
 		auto parseTree = parser.parse (line);
 		const nir::Instruction * val = parseTree->build (globalScope, ParseTreeNode::BuildMode::NORMAL);
 		std::cout << interpreter (val) << '\n';
