@@ -14,7 +14,7 @@ std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <c
 // 	{" in ", &nir::Scope::createIn},
 	
 	{" * ", &nir::Scope::createMul},
-// 	{" / ", &nir::Scope::createDiv},
+	{" / ", &nir::Scope::createDiv},
 // 	{" % ", &nir::Scope::createRem},
 	
 	{" + ", &nir::Scope::createAdd},
