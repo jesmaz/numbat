@@ -198,7 +198,12 @@ const Instruction * Scope::createPut (const Instruction * src, const Instruction
 }
 
 const Instruction * Scope::createSub (const std::vector <const Instruction *> & args) {
-	return createBinary <Sub> (args [0], args [1], "sub");
+	if (typeid (*args [0]) == typeid (Constant) and typeid (*args [1]) == typeid (Constant) and args [0]->getType ()->getArithmaticType () == Type::UINT) {
+		Instruction * inst = new Sub (resolveType ("int64"), args [0], args [1], module->newSymbol ("sub"));
+		return insertionPoint->give (inst);
+	} else {
+		return createBinary <Sub> (args [0], args [1], "sub");
+	}
 }
 
 const Instruction * Scope::getFunctionPointer () {
