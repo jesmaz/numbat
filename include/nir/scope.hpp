@@ -35,6 +35,7 @@ struct Scope {
 		const Instruction * createAssign (const std::vector <const Instruction *> & args);
 		const Instruction * createCall (const Function * func, const std::vector <const Instruction *> & args);
 		const Instruction * createConstant (const Type * type, const string & val, const string & iden="");
+		const Instruction * createDiv (const std::vector <const Instruction *> & args);
 		const Instruction * createGet (const Instruction * src);
 		const Instruction * createMul (const std::vector <const Instruction *> & args);
 		const Instruction * createParameter (const Type * const type, const Instruction * init=nullptr, const string & iden="");

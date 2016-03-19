@@ -6,6 +6,7 @@
 #include "../../include/nir/inst/alloc.hpp"
 #include "../../include/nir/inst/call.hpp"
 #include "../../include/nir/inst/constant.hpp"
+#include "../../include/nir/inst/div.hpp"
 #include "../../include/nir/inst/functionPointer.hpp"
 #include "../../include/nir/inst/get.hpp"
 #include "../../include/nir/inst/mul.hpp"
@@ -162,6 +163,10 @@ const Instruction * Scope::createConstant (const Type * type, const string & val
 	assert (type);
 	return insertionPoint->give (inst);
 	
+}
+
+const Instruction * Scope::createDiv (const std::vector <const Instruction *> & args) {
+	return createBinary <Div> (args [0], args [1], "div");
 }
 
 const Instruction * Scope::createGet (const Instruction * src) {
