@@ -120,6 +120,13 @@ void Interpreter::visit (const Constant & con) {
 	
 }
 
+void Interpreter::visit (const Div & div) {
+	
+	Atom res = binaryOpp <std::divides <void>> (div.getLhs (), div.getRhs (), div.getType ());
+	lookupTable [div.getIden ()] = res;
+	
+}
+
 void Interpreter::visit (const DirectCall & call) {
 	
 	std::vector <Atom> args;
