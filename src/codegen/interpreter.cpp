@@ -34,31 +34,31 @@ Interpreter::Atom Interpreter::binaryOpp (const Instruction * ilhs, const Instru
 		case DATA:
 			assert (false);
 		case F32:
-			ret.data.u64 = T (lhs.data.f32, rhs.data.f32);
+			ret.data.f32 = T (lhs.data.f32, rhs.data.f32);
 			break;
 		case F64:
-			ret.data.u64 = T (lhs.data.f64, rhs.data.f64);
+			ret.data.f64 = T (lhs.data.f64, rhs.data.f64);
 			break;
 		case S8:
-			ret.data.u64 = T (lhs.data.s8, rhs.data.s8);
+			ret.data.s8 = T (lhs.data.s8, rhs.data.s8);
 			break;
 		case S16:
-			ret.data.u64 = T (lhs.data.s16, rhs.data.s16);
+			ret.data.s16 = T (lhs.data.s16, rhs.data.s16);
 			break;
 		case S32:
-			ret.data.u64 = T (lhs.data.s32, rhs.data.s32);
+			ret.data.s32 = T (lhs.data.s32, rhs.data.s32);
 			break;
 		case S64:
-			ret.data.u64 = T (lhs.data.s64, rhs.data.s64);
+			ret.data.s64 = T (lhs.data.s64, rhs.data.s64);
 			break;
 		case U8:
-			ret.data.u64 = T (lhs.data.u8, rhs.data.u8);
+			ret.data.u8 = T (lhs.data.u8, rhs.data.u8);
 			break;
 		case U16:
-			ret.data.u64 = T (lhs.data.u16, rhs.data.u16);
+			ret.data.u16 = T (lhs.data.u16, rhs.data.u16);
 			break;
 		case U32:
-			ret.data.u64 = T (lhs.data.u32, rhs.data.u32);
+			ret.data.u32 = T (lhs.data.u32, rhs.data.u32);
 			break;
 		case U64:
 			ret.data.u64 = T (lhs.data.u64, rhs.data.u64);
@@ -284,6 +284,9 @@ Interpreter::Atom Interpreter::staticCast (const Interpreter::Atom & source, con
 			result.data.f64 = atomCast <double> (source);
 			break;
 		case Type::INT:
+			result.atomicType = AtomicType::S64;
+			result.data.s64 = atomCast <int64_t> (source);
+			break;
 		case Type::UINT:
 			result.atomicType = AtomicType::U64;
 			result.data.u64 = atomCast <uint64_t> (source);
