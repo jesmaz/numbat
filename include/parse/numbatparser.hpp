@@ -4,6 +4,7 @@
 
 #include "parser.hpp"
 #include "tree/call.hpp"
+#include "tree/ifelse.hpp"
 #include "tree/import.hpp"
 #include "tree/index.hpp"
 #include "tree/list.hpp"
