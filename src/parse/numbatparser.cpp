@@ -110,7 +110,8 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("PROGRAM", {"PROGRAM ;"}, 0, Parser::LTR, discardSemicolon);
 	
 	
-	parser.addRules ("Statement", {"Assignment;", "Block;", "Call;", "Control;", "Variable;", "Parameter;", "VariableList;", "List;", "Import;"}, -1, Parser::LTR, discardSemicolon);
+	parser.addRules ("Statement", {"Assignment;", "Block;", "Call;", "Control;", "Variable;", "Parameter;", "VariableList;", "List;", "Import;", "Function;"}, -1, Parser::LTR, discardSemicolon);
+	parser.addRules ("Statement", {"Function"}, -1, Parser::LTR);
 	
 	
 	parser.addRules ("Arg", {"E:E"});
@@ -258,37 +259,56 @@ NumbatParser::NumbatParser () {
 		return new Function (nullptr, args [0], args [3], nullptr);
 	});
 	parser.addRules ("Function", {
-		"def IDENTIFIER ()",
-		"def IDENTIFIER (List)",
-		"def IDENTIFIER () Statement",
-		"def IDENTIFIER (List) Statement",
-		"def IDENTIFIER ()->()",
-		"def IDENTIFIER ()->(List)",
-		"def IDENTIFIER (List)->()",
-		"def IDENTIFIER (List)->(List)",
-		"def IDENTIFIER ()->() Statement",
-		"def IDENTIFIER ()->(List) Statement",
-		"def IDENTIFIER (List)->() Statement",
-		"def IDENTIFIER (List)->(List) Statement",
-	}, 2000/*, Parser::LTR, [](const std::vector <PTNode> args){
+		"def IDENTIFIER ()",						//4
+		"def IDENTIFIER (List)",					//5
+		"def IDENTIFIER () Statement",				//5
+		"def IDENTIFIER (List) Statement",			//6
+		"def IDENTIFIER ()->()",					//8
+		"def IDENTIFIER ()->(List)",				//9
+		"def IDENTIFIER (List)->()",				//9
+		"def IDENTIFIER (List)->(List)",			//10
+		"def IDENTIFIER ()->() Statement",			//9
+		"def IDENTIFIER ()->(List) Statement",		//10
+		"def IDENTIFIER (List)->() Statement",		//10
+		"def IDENTIFIER (List)->(List) Statement",	//11
+	}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
 		delete args [0];
-		switch (args.size ()) {
-			case 3:
-				return new Function (args [1], args [2], nullptr, nullptr);
-			case 4:
-				return new Function (args [1], args [2], nullptr, args[3]);
-			case 6:
-				delete args [3];
-				delete args [4];
-				return new Function (args [1], args [2], args [5], nullptr);
-			case 7:
-				delete args [3];
-				delete args [4];
-				return new Function (args [1], args [2], args [5], args [6]);
-			default:
-				assert (false);
+		delete args [2];
+		PTNode iden = args [1], params = nullptr, type = nullptr, body = nullptr;
+		size_t pos = 3;
+		
+		std::cerr << "1: " << args [pos]->toString () << std::endl;
+		if (args [pos]->getType () != ParseTreeNode::NodeType::SYMBOL) {
+			params = args [pos];
+			++pos;
 		}
-	}*/);
+		
+		delete args [pos];
+		
+		if (++pos >= args.size ()) {goto done;}
+		
+		if (args [pos]->getType () != ParseTreeNode::NodeType::SYMBOL) {
+			body = args [pos];
+			goto done;
+		}
+		
+		delete args [pos]; ++pos;
+		delete args [pos]; ++pos;
+		delete args [pos]; ++pos;
+		
+		if (args [pos]->getType () != ParseTreeNode::NodeType::SYMBOL) {
+			type = args [pos];
+			++pos;
+		}
+		
+		delete args [pos];
+		if (++pos >= args.size ()) {goto done;}
+		
+		body = args [pos];
+		
+		done:
+		return new Function (iden, params, type, body);
+	});
 	
 	parser.buildRules ();
 	
