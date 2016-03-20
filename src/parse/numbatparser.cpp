@@ -201,7 +201,7 @@ NumbatParser::NumbatParser () {
 		}
 	});
 	
-	parser.addRules ("Control", {"if (E) Statement", "if (E) Statement else Statement", "if MetaTag Statement", "for Slice Statement", "while (E) Statement"}, 1700, Parser::LTR);
+	parser.addRules ("Control", {"if (E) List", "if (E) List else List", "if MetaTag List", "for Slice List", "while (E) List", "if (E) Block", "if (E) Block else Block", "if MetaTag Block", "for Slice Block", "while (E) Block"}, 1700, Parser::LTR);
 	
 	parser.addRules ("Module", {"import IDENTIFIER", "import LITERAL", "Module.IDENTIFIER", "Module.LITERAL"}, 1800, Parser::LTR, [](const std::vector <PTNode> args){
 		switch (args.size ()) {
