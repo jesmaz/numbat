@@ -54,14 +54,16 @@ string Function::strDump (text::PrintMode mode) {
 	
 }
 
-Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, params->getLine (), params->getPos ()) {
+Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, (iden ? iden : params)->getLine (), (iden ? iden : params)->getPos ()) {	
 	if (iden){
 		this->iden = iden->getIden ();
 	}
-	if (params->isList ()) {
-		this->params = params->getArgs ();
-	} else {
-		this->params.push_back (params);
+	if (params) {
+		if (params->isList ()) {
+			this->params = params->getArgs ();
+		} else {
+			this->params.push_back (params);
+		}
 	}
 	if (type) {
 		if (type->isList ()) {
