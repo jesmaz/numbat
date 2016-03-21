@@ -15,7 +15,7 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTree
 		assert (init);
 		type = init->getType ();
 	} else {
-		auto * instr = vType->build (scope, ParseTreeNode::BuildMode::NORMAL);
+		auto * instr = vType->build (scope, ParseTreeNode::BuildMode::PARAMETER);
 		assert (instr);
 		type = instr->getType ();
 	}
