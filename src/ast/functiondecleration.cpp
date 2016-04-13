@@ -1,4 +1,4 @@
-#include "../include/ast/functiondecleration.hpp"
+#include "../../include/ast/functiondecleration.hpp"
 
 namespace numbat {
 namespace parser {

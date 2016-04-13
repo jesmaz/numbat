@@ -1,4 +1,4 @@
-#include "../include/ast/type/numbatpointertype.hpp"
+#include "../../include/ast/type/numbatpointertype.hpp"
 
 namespace numbat {
 namespace parser {

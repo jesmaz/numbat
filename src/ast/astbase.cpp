@@ -1,7 +1,7 @@
-#include "../include/ast/asterror.hpp"
-#include "../include/ast/control/astbody.hpp"
-#include "../include/ast/memory/aststructindex.hpp"
-#include "../include/ast/memory/astvariable.hpp"
+#include "../../include/ast/asterror.hpp"
+#include "../../include/ast/control/astbody.hpp"
+#include "../../include/ast/memory/aststructindex.hpp"
+#include "../../include/ast/memory/astvariable.hpp"
 
 namespace numbat {
 namespace parser {

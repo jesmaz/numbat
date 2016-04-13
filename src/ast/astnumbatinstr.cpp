@@ -1,4 +1,4 @@
-#include "../include/ast/astnumbatinstr.hpp"
+#include "../../include/ast/astnumbatinstr.hpp"
 
 namespace numbat {
 namespace parser {

@@ -1,4 +1,4 @@
-#include "../include/ast/operatordecleration.hpp"
+#include "../../include/ast/operatordecleration.hpp"
 
 
 namespace numbat {

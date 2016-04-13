@@ -1,5 +1,5 @@
-#include "../include/ast/callable/astcall.hpp"
-#include "../include/ast/memory/astcallindex.hpp"
+#include "../../include/ast/callable/astcall.hpp"
+#include "../../include/ast/memory/astcallindex.hpp"
 
 namespace numbat {
 namespace parser {
