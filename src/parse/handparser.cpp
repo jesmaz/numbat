@@ -219,6 +219,7 @@ struct Match {
 
 struct CodeQueue {
 	bool more ();
+	numbat::lexer::token peakToken ();
 	numbat::lexer::token popToken ();
 	Symbol peak ();
 	Symbol peak (uint32_t index);
@@ -227,11 +228,13 @@ struct CodeQueue {
 	void shiftPop ();
 	void update (uint32_t n);
 	CodeQueue (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) : itt (start), end (end) {}
-	numbat::lexer::tkstring::const_iterator itt, end;
+	numbat::lexer::tkstring::const_iterator itt, safeitt, end;
 	std::deque <numbat::lexer::tkstring::const_iterator> itts;
 	string syms;
 };
 
+
+PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected);
 
 PTNode parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end);
 PTNode parseBlock (CodeQueue * queue);
@@ -242,6 +245,15 @@ PTNode parseStatment (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
 std::vector <PTNode> parseArguments (CodeQueue * queue);
+
+
+PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected) {
+	
+	numbat::lexer::token tkn = queue->peakToken ();
+	while (queue->peak () == Symbol::SEMICOLON) queue->popToken ();
+	return new ParseTreeError (tkn.line, 0, "Unexpected token '" + tkn.iden + "', expected " + expected);
+	
+}
 
 
 PTNode parse (const string & program) {
@@ -360,8 +372,7 @@ PTNode parseBlock (CodeQueue * queue) {
 	}
 	
 	if (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT) {
-		//TODO: make queue aware of it's position
-		return new ParseTreeError (0, 0, "Expected a }");
+		return errorUnexpectedToken (queue, "'}'");
 	}
 	
 	queue->shiftPop ();
@@ -377,7 +388,6 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 	
 	if (not lhs) {
 		
-		//TODO: replace with appropriate set of unary
 		Match opp = queue->shiftPop ("", prefixOperators);
 		
 		if (opp.iden != "") {
@@ -418,16 +428,14 @@ PTNode parseIfElse (CodeQueue * queue) {
 	queue->shiftPop ();
 	
 	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
-		//TODO: make a helper function for unexpected tokens
-		return new ParseTreeError (0, 0, "Unexpected token, expected (");
+		return errorUnexpectedToken (queue, "'('");
 	}
 	queue->shiftPop ();
 	
 	PTNode cond = parseExpression (queue);
 	
 	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
-		//TODO: make a helper function for unexpected tokens
-		return new ParseTreeError (0, 0, "Unexpected token, expected )");
+		return errorUnexpectedToken (queue, "')'");
 	}
 	queue->shiftPop ();
 	
@@ -540,8 +548,7 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 		
 	}
 	
-	//TODO: make a helper function for unexpected tokens
-	return new ParseTreeError (0, 0, "Unexpected token");
+	return errorUnexpectedToken (queue, "':' or end of expression");;
 	
 }
 
@@ -600,8 +607,18 @@ Symbol CodeQueue::peak (uint32_t index) {
 	
 }
 
+numbat::lexer::token CodeQueue::peakToken() {
+	
+	if (syms.empty ()) update (32);
+	if (syms.empty ()) return *safeitt;
+	auto t = itts.front ();
+	return *t;
+	
+}
+
 numbat::lexer::token CodeQueue::popToken() {
 	
+	if (syms.empty ()) update (32);
 	auto t = itts.front ();
 	syms = syms.substr (1);
 	itts.pop_front ();
@@ -667,6 +684,7 @@ void CodeQueue::update (uint32_t n) {
 		while (itt != end and (itt->type == numbat::lexer::TOKEN::whitespace or itt->type == numbat::lexer::TOKEN::indent)) ++itt;
 		if (itt==end) return;
 		
+		safeitt = itt;
 		itts.push_back (itt);
 		Symbol sym;
 		switch (itt->type) {
