@@ -47,11 +47,14 @@ enum class Symbol : char {
 	SYMBOL_HIGH_HAT='^',
 	SYMBOL_LESS='<',
 	SYMBOL_MINUS='-',
+	SYMBOL_MODULUS='%',
 	SYMBOL_PARENRHESES_LEFT='(',
 	SYMBOL_PARENRHESES_RIGHT=')',
 	SYMBOL_PERIOD='.',
+	SYMBOL_PIPE='|',
 	SYMBOL_PLUS='+',
 	SYMBOL_SHARP='#',
+	SYMBOL_SLASH='/',
 	SYMBOL_SQUARE_LEFT='[',
 	SYMBOL_SQUARE_RIGHT=']',
 	__NONE__
@@ -94,72 +97,75 @@ std::map <string, Symbol> symbolMap {
 	{"^", Symbol::SYMBOL_HIGH_HAT},
 	{"<", Symbol::SYMBOL_LESS},
 	{"-", Symbol::SYMBOL_MINUS},
+	{"%", Symbol::SYMBOL_MODULUS},
 	{"(", Symbol::SYMBOL_PARENRHESES_LEFT},
 	{")", Symbol::SYMBOL_PARENRHESES_RIGHT},
 	{".", Symbol::SYMBOL_PERIOD},
+	{"|", Symbol::SYMBOL_PIPE},
 	{"+", Symbol::SYMBOL_PLUS},
 	{"#", Symbol::SYMBOL_SHARP},
+	{"/", Symbol::SYMBOL_SLASH},
 	{"[", Symbol::SYMBOL_SQUARE_LEFT},
 	{"]", Symbol::SYMBOL_SQUARE_RIGHT},
 };
 
 std::map <string, Operator> operators {
-	{"=", {" = ", 1600, RTL}},
-	{"+=", {" += ", 1600, RTL}},
-	{"-=", {" -= ", 1600, RTL}},
-	{"~=", {" ~= ", 1600, RTL}},
-	{"*=", {" *= ", 1600, RTL}},
-	{"/=", {" /= ", 1600, RTL}},
-	{"%=", {" %= ", 1600, RTL}},
-	{"<<=", {" <<= ", 1600, RTL}},
-	{">>=", {" >>= ", 1600, RTL}},
-	{"^=", {" ^= ", 1600, RTL}},
-	{"&=", {" &= ", 1600, RTL}},
-	{"|=", {" |= ", 1600, RTL}},
-	{"=>", {" => ", 1600, RTL}},
+	{" = ", {" = ", 1600, RTL}},
+	{" += ", {" +=  ", 1600, RTL}},
+	{" -= ", {" -= ", 1600, RTL}},
+	{" ~= ", {" ~= ", 1600, RTL}},
+	{" *= ", {" *= ", 1600, RTL}},
+	{" /= ", {" /= ", 1600, RTL}},
+	{" %= ", {" %= ", 1600, RTL}},
+	{" <<= ", {" <<= ", 1600, RTL}},
+	{" >>= ", {" >>= ", 1600, RTL}},
+	{" ^= ", {" ^= ", 1600, RTL}},
+	{" &= ", {" &= ", 1600, RTL}},
+	{" |= ", {" |= ", 1600, RTL}},
+	{" => ", {" => ", 1600, RTL}},
 	
-	{string () + char (Symbol::OR), {" or ", 1400, LTR}},
+	{string (" ") + char (Symbol::OR) + " ", {" or ", 1400, LTR}},
 	
-	{string () + char (Symbol::AND), {" and ", 1300, LTR}},
+	{string (" ") + char (Symbol::AND) + " ", {" and ", 1300, LTR}},
 	
-	{"!=", {" != ", 1200, LTR}},
-	{"==", {" == ", 1200, LTR}},
+	{" != ", {" != ", 1200, LTR}},
+	{" == ", {" == ", 1200, LTR}},
 	
-	{"<", {" < ", 1100, LTR}},
-	{"<=", {" <= ", 1100, LTR}},
-	{">", {" > ", 1100, LTR}},
-	{">=", {" >= ", 1100, LTR}},
+	{" < ", {" < ", 1100, LTR}},
+	{" <= ", {" <= ", 1100, LTR}},
+	{" > ", {" > ", 1100, LTR}},
+	{" >= ", {" >= ", 1100, LTR}},
 	
-	{"|", {" | ", 1000, LTR}},
+	{" | ", {" | ", 1000, LTR}},
 	
-	{"^", {" ^ ", 900, LTR}},
+	{" ^ ", {" ^ ", 900, LTR}},
 	
-	{"&", {" & ", 800, LTR}},
+	{" & ", {" & ", 800, LTR}},
 	
-	{"<<", {" << ", 700, LTR}},
-	{">>", {" >> ", 700, LTR}},
+	{" << ", {" << ", 700, LTR}},
+	{" >> ", {" >> ", 700, LTR}},
 	
-	{"+", {" + ", 600, LTR}},
-	{"-", {" - ", 600, LTR}},
-	{"~", {" ~ ", 600, LTR}},
+	{" + ", {" + ", 600, LTR}},
+	{" - ", {" - ", 600, LTR}},
+	{" ~ ", {" ~ ", 600, LTR}},
 	
-	{"*", {" * ", 500, LTR}},
-	{"/", {" / ", 500, LTR}},
-	{"%", {" % ", 500, LTR}},
+	{" * ", {" * ", 500, LTR}},
+	{" / ", {" / ", 500, LTR}},
+	{" % ", {" % ", 500, LTR}},
 	
-	{string () + char (Symbol::IN), {" in ", 450, LTR}},
+	{string (" ") + char (Symbol::IN) + " ", {" in ", 450, LTR}},
 	
-	{string () + char (Symbol::AS), {" as ", 400, LTR}},
+	{string (" ") + char (Symbol::AS) + " ", {" as ", 400, LTR}},
 	
-	{"++", {"++ ", 300, RTL}},
-	{"--", {"-- ", 300, RTL}},
-	{"-", {"- ", 300, RTL}},
-	{"!", {"! ", 300, RTL}},
-	{string () + char (Symbol::NOT), {"not ", 300, RTL}},
-	{"~", {"~ ", 300, RTL}},
+	{"++ ", {"++ ", 300, RTL}},
+	{"-- ", {"-- ", 300, RTL}},
+	{"- ", {"- ", 300, RTL}},
+	{"! ", {"! ", 300, RTL}},
+	{string () + char (Symbol::NOT) + " ", {"not ", 300, RTL}},
+	{"~ ", {"~ ", 300, RTL}},
 	
-	{"++", {" ++", 200, LTR}},
-	{"--", {" --", 200, LTR}},
+	{" ++", {" ++", 200, LTR}},
+	{" --", {" --", 200, LTR}},
 };
 
 std::set <string> oppPrecRangeInc (int min, int max) {
@@ -189,8 +195,8 @@ struct CodeQueue {
 	numbat::lexer::token popToken ();
 	Symbol peak ();
 	Symbol peak (uint32_t index);
-	Match shiftPop (std::set <string> accepted);
-	Match shiftPop (std::set <string> accepted, int precedence);
+	Match shiftPop (const std::string & seen, std::set <string> accepted);
+	Match shiftPop (const std::string & seen, std::set <string> accepted, int precedence);
 	void shiftPop ();
 	void update (uint32_t n);
 	CodeQueue (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) : itt (start), end (end) {}
@@ -230,7 +236,7 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 		lhs = parseList (queue);
 	}
 	
-	Match opp = queue->shiftPop (allocateOperators);
+	Match opp = queue->shiftPop (" ", allocateOperators);
 	
 	if (opp.iden == "") return new ParseTreeError (lhs->getLine (), lhs->getPos (), "Expected an assignment operation");
 	
@@ -344,7 +350,7 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 	if (not lhs) {
 		
 		//TODO: replace with appropriate set of unary
-		Match opp = queue->shiftPop (prefixOperators);
+		Match opp = queue->shiftPop ("", prefixOperators);
 		
 		if (opp.iden != "") {
 			
@@ -352,14 +358,14 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 			lhs = new ParseTreeOperator (opp.iden, {lhs});
 			
 		} else {
-			
+				
 			lhs = parseAtom (queue);
 			
 		}
 		
 	}
 	
-	auto opp = queue->shiftPop (expressionOperators, precedence);//opp.precedence < precedence or (opp.precedence == precedence and opp.isLHS)
+	auto opp = queue->shiftPop (" ", expressionOperators, precedence);//opp.precedence < precedence or (opp.precedence == precedence and opp.isLHS)
 	if (opp.iden != "") {
 		
 		PTNode rhs = parseExpression (queue, opp.precedence);
@@ -552,24 +558,26 @@ void CodeQueue::shiftPop () {
 	
 }
 
-Match CodeQueue::shiftPop (std::set <string> accepted, int precedence) {
+Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted, int precedence) {
 	
 	if (syms.size () < 8) update (32);
-	string match = syms.substr (0, 1);
+	string match = seen + syms.substr (0, 1);
+	uint8_t index=1;
 	auto acpItt = accepted.lower_bound (match);
 	auto acpEnd = accepted.end ();
 	
-	while (acpItt != acpEnd and acpItt->compare (0, match.size (), match) == 0) {
+	while (acpItt != acpEnd and acpItt->compare (0, match.size (), match) == 0 and index < 32) {
 		
-		if (*acpItt == match) {
+		if (*acpItt == match or *acpItt == match + " ") {
 			
-			int prec = operators [match].precedence;
-			if (prec < precedence or (prec == precedence and operators [match].rule == RTL)) {
+			auto opp = operators [*acpItt];
+			int prec = opp.precedence;
+			if (prec < precedence or (prec == precedence and opp.rule == RTL)) {
 				
-				syms = syms.substr (match.size ());
-				for (size_t i=0; i<match.size (); ++i) itts.pop_front ();
+				syms = syms.substr (match.size ()-seen.size ());
+				for (size_t i=0; i<match.size ()-seen.size (); ++i) itts.pop_front ();
 				return {
-					operators [match].precedence, operators [match].ptn
+					opp.precedence, opp.ptn
 				};
 				
 			}
@@ -578,15 +586,18 @@ Match CodeQueue::shiftPop (std::set <string> accepted, int precedence) {
 			
 		}
 		
+		match = seen + syms.substr (0, ++index);
+		acpItt = accepted.lower_bound (match);
+		
 	}
 	
 	return {-1, ""};
 	
 }
 
-Match CodeQueue::shiftPop (std::set <string> accepted) {
+Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted) {
 	
-	return shiftPop (accepted, __INT_MAX__);
+	return shiftPop (seen, accepted, __INT_MAX__);
 	
 }
 
