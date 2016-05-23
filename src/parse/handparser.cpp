@@ -44,6 +44,8 @@ enum class Symbol : char {
 	SYMBOL_BRACE_RIGHT='}',
 	SYMBOL_COMMA=',',
 	SYMBOL_BANG='!',
+	SYMBOL_EQUALS='=',
+	SYMBOL_GREATER='>',
 	SYMBOL_HIGH_HAT='^',
 	SYMBOL_LESS='<',
 	SYMBOL_MINUS='-',
@@ -94,6 +96,8 @@ std::map <string, Symbol> symbolMap {
 	{"}", Symbol::SYMBOL_BRACE_RIGHT},
 	{",", Symbol::SYMBOL_COMMA},
 	{"!", Symbol::SYMBOL_BANG},
+	{"=", Symbol::SYMBOL_EQUALS},
+	{">", Symbol::SYMBOL_GREATER},
 	{"^", Symbol::SYMBOL_HIGH_HAT},
 	{"<", Symbol::SYMBOL_LESS},
 	{"-", Symbol::SYMBOL_MINUS},
@@ -247,7 +251,7 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 		rhs = parseAssignment (queue, rhs);
 	}
 	
-	return new ParseTreeOperator (opp.iden, {lhs});
+	return new ParseTreeOperator (opp.iden, {lhs, rhs});
 	
 }
 
