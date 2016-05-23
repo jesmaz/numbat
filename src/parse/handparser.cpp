@@ -562,14 +562,16 @@ Match CodeQueue::shiftPop (std::set <string> accepted, int precidance) {
 	while (acpItt != acpEnd and acpItt->compare (0, match.size (), match) == 0) {
 		
 		if (*acpItt == match) {
-			syms = syms.substr (match.size ());
-			for (size_t i=0; i<match.size (); ++i) itts.pop_front ();
 			
 			int prec = operators [match].precidance;
 			if (prec < precidance or (prec == precidance and operators [match].rule == RTL)) {
+				
+				syms = syms.substr (match.size ());
+				for (size_t i=0; i<match.size (); ++i) itts.pop_front ();
 				return {
 					operators [match].precidance, operators [match].ptn
 				};
+				
 			}
 			
 			return {-1, ""};
