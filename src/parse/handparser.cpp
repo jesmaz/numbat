@@ -5,6 +5,7 @@
 #include <parse/tree/call.hpp>
 #include <parse/tree/error.hpp>
 #include <parse/tree/identifier.hpp>
+#include <parse/tree/ifelse.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
 #include <parse/tree/operator.hpp>
@@ -202,6 +203,7 @@ namespace SymbolFlags {
 		
 	};
 	SetSymbols __set_valuues__ ({
+		{Symbol::ELSE, TERMINATE_STATEMENT},
 		{Symbol::SEMICOLON, TERMINATE_STATEMENT},
 		{Symbol::SYMBOL_BRACE_RIGHT, TERMINATE_STATEMENT},
 		{Symbol::SYMBOL_PARENRHESES_RIGHT, TERMINATE_STATEMENT},
@@ -233,6 +235,7 @@ struct CodeQueue {
 
 PTNode parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end);
 PTNode parseBlock (CodeQueue * queue);
+PTNode parseIfElse (CodeQueue * queue);
 PTNode parseList (CodeQueue * queue, PTNode prev=nullptr);
 PTNode parseProgram (CodeQueue * queue);
 PTNode parseStatment (CodeQueue * queue);
@@ -292,7 +295,7 @@ PTNode parseAtom (CodeQueue * queue) {
 			break;
 		}
 		case Symbol::IF:
-			//atom = parseIf (queue);
+			atom = parseIfElse (queue);
 			break;
 		case Symbol::LITERAL: {
 			numbat::lexer::token token = queue->popToken ();
@@ -406,6 +409,40 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 		return lhs;
 		
 	}
+	
+}
+
+PTNode parseIfElse (CodeQueue * queue) {
+	
+	// drop if token
+	queue->shiftPop ();
+	
+	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
+		//TODO: make a helper function for unexpected tokens
+		return new ParseTreeError (0, 0, "Unexpected token, expected (");
+	}
+	queue->shiftPop ();
+	
+	PTNode cond = parseExpression (queue);
+	
+	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+		//TODO: make a helper function for unexpected tokens
+		return new ParseTreeError (0, 0, "Unexpected token, expected )");
+	}
+	queue->shiftPop ();
+	
+	PTNode body = parseStatment (queue);
+	PTNode el = nullptr;
+	
+	if (queue->peak () == Symbol::ELSE) {
+		
+		queue->shiftPop ();
+		
+		el = parseStatment (queue);
+		
+	}
+		
+	return new ParseTreeIfElse (cond, body, el);
 	
 }
 
