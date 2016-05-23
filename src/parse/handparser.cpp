@@ -1,6 +1,7 @@
 #include <deque>
 
 #include <parse/tree.hpp>
+#include <parse/tree/call.hpp>
 #include <parse/tree/error.hpp>
 #include <parse/tree/identifier.hpp>
 #include <parse/tree/list.hpp>
@@ -48,6 +49,7 @@ enum class Symbol : char {
 	SYMBOL_MINUS='-',
 	SYMBOL_PARENRHESES_LEFT='(',
 	SYMBOL_PARENRHESES_RIGHT=')',
+	SYMBOL_PERIOD='.',
 	SYMBOL_PLUS='+',
 	SYMBOL_SHARP='#',
 	SYMBOL_SQUARE_LEFT='[',
@@ -94,6 +96,7 @@ std::map <string, Symbol> symbolMap {
 	{"-", Symbol::SYMBOL_MINUS},
 	{"(", Symbol::SYMBOL_PARENRHESES_LEFT},
 	{")", Symbol::SYMBOL_PARENRHESES_RIGHT},
+	{".", Symbol::SYMBOL_PERIOD},
 	{"+", Symbol::SYMBOL_PLUS},
 	{"#", Symbol::SYMBOL_SHARP},
 	{"[", Symbol::SYMBOL_SQUARE_LEFT},
@@ -185,6 +188,7 @@ struct CodeQueue {
 	bool more ();
 	numbat::lexer::token popToken ();
 	Symbol peak ();
+	Symbol peak (uint32_t index);
 	Match shiftPop (std::set <string> accepted);
 	Match shiftPop (std::set <string> accepted, int precidance);
 	void shiftPop ();
@@ -202,6 +206,8 @@ PTNode parseList (CodeQueue * queue, PTNode prev=nullptr);
 PTNode parseProgram (CodeQueue * queue);
 PTNode parseStatment (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
+
+std::vector <PTNode> parseArguments (CodeQueue * queue);
 
 
 PTNode parse (const string & program) {
@@ -281,11 +287,32 @@ PTNode parseAtom (CodeQueue * queue) {
 			break;
 	}
 	
-	Match opp = queue->shiftPop ({"."});
+	PTNode oldAtom;
 	
-	if (opp.iden != "") {
-		return new ParseTreeError (atom->getLine (), atom->getPos (), "Scope resolution not yet implemented");
-	}
+	do {
+		
+		oldAtom = atom;
+		switch (queue->peak ()) {
+			case Symbol::SYMBOL_PARENRHESES_LEFT: {
+				// Function call
+				queue->shiftPop ();
+				atom = new ParseTreeCall (atom, parseArguments (queue));
+				assert (queue->peak () == Symbol::SYMBOL_PARENRHESES_RIGHT);
+				queue->shiftPop ();
+				break;
+			}
+			case Symbol::SYMBOL_PERIOD:
+				// Scope resolution
+				return new ParseTreeError (atom->getLine (), atom->getPos (), "Scope resolution not yet implemented");
+			case Symbol::SYMBOL_SQUARE_LEFT:
+				// Slice
+				break;
+			default:
+				break;
+		}
+		
+	} while (oldAtom != atom);
+	
 	return atom;
 	
 }
@@ -454,6 +481,33 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 }
 
 
+std::vector <PTNode> parseArguments (CodeQueue * queue) {
+	
+	Symbol next = queue->peak ();
+	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT) return {};
+	
+	std::vector <PTNode> args;
+	do {
+		
+		if (next == Symbol::IDENTIFIER and queue->peak (1) == Symbol::COLON) {
+			args.push_back (new ParseTreeError (0, 0, "Named arguments are not yet supported"));
+		} else {
+			args.push_back (parseExpression (queue));
+		}
+		
+		next = queue->peak ();
+		if (next == Symbol::SYMBOL_COMMA) {
+			queue->shiftPop ();
+		} else {
+			break;
+		}
+	} while (true);
+	
+	return args;
+	
+}
+
+
 bool CodeQueue::more() {
 	
 	if (itts.empty ()) update (32);
@@ -468,6 +522,16 @@ Symbol CodeQueue::peak () {
 		return Symbol::__NONE__;
 	}
 	return Symbol (syms.front ());
+	
+}
+
+Symbol CodeQueue::peak (uint32_t index) {
+	
+	if (itts.empty ()) update (32 < index ? 32 : index);
+	if (syms.size () <= index) {
+		return Symbol::__NONE__;
+	}
+	return Symbol (syms [index]);
 	
 }
 
