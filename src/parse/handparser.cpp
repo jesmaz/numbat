@@ -61,7 +61,7 @@ enum RuleType {NONE=0, LTR=1, RTL=2, ACCUM=4, PTN_Sx=8, PTN_xSx=9, PTN_xS=10};
 
 struct Operator {
 	string ptn;
-	int precidance;
+	int precedence;
 	RuleType rule;
 };
 
@@ -165,7 +165,7 @@ std::map <string, Operator> operators {
 std::set <string> oppPrecRangeInc (int min, int max) {
 	std::set <string> ret;
 	for (auto opp : operators) {
-		if (min <= opp.second.precidance and opp.second.precidance <= max) {
+		if (min <= opp.second.precedence and opp.second.precedence <= max) {
 			ret.insert (opp.first);
 		}
 	}
@@ -179,7 +179,7 @@ std::set <string> prefixOperators = oppPrecRangeInc (300, 300);
 
 
 struct Match {
-	int precidance;
+	int precedence;
 	string iden;
 };
 
@@ -190,7 +190,7 @@ struct CodeQueue {
 	Symbol peak ();
 	Symbol peak (uint32_t index);
 	Match shiftPop (std::set <string> accepted);
-	Match shiftPop (std::set <string> accepted, int precidance);
+	Match shiftPop (std::set <string> accepted, int precedence);
 	void shiftPop ();
 	void update (uint32_t n);
 	CodeQueue (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) : itt (start), end (end) {}
@@ -339,7 +339,7 @@ PTNode parseBlock (CodeQueue * queue) {
 	
 }
 
-PTNode parseExpression (CodeQueue * queue, int precidance=__INT_MAX__, PTNode lhs=nullptr) {
+PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lhs=nullptr) {
 	
 	if (not lhs) {
 		
@@ -348,7 +348,7 @@ PTNode parseExpression (CodeQueue * queue, int precidance=__INT_MAX__, PTNode lh
 		
 		if (opp.iden != "") {
 			
-			lhs = parseExpression (queue, opp.precidance);
+			lhs = parseExpression (queue, opp.precedence);
 			lhs = new ParseTreeOperator (opp.iden, {lhs});
 			
 		} else {
@@ -359,13 +359,13 @@ PTNode parseExpression (CodeQueue * queue, int precidance=__INT_MAX__, PTNode lh
 		
 	}
 	
-	auto opp = queue->shiftPop (expressionOperators, precidance);//opp.precidance < precidance or (opp.precidance == precidance and opp.isLHS)
+	auto opp = queue->shiftPop (expressionOperators, precedence);//opp.precedence < precedence or (opp.precedence == precedence and opp.isLHS)
 	if (opp.iden != "") {
 		
-		PTNode rhs = parseExpression (queue, opp.precidance);
+		PTNode rhs = parseExpression (queue, opp.precedence);
 		PTNode node = new ParseTreeOperator (opp.iden, {lhs, rhs});
-		if (precidance > opp.precidance) {
-			return parseExpression (queue, precidance, node);
+		if (precedence > opp.precedence) {
+			return parseExpression (queue, precedence, node);
 		} else {
 			return node;
 		}
@@ -552,7 +552,7 @@ void CodeQueue::shiftPop () {
 	
 }
 
-Match CodeQueue::shiftPop (std::set <string> accepted, int precidance) {
+Match CodeQueue::shiftPop (std::set <string> accepted, int precedence) {
 	
 	if (syms.size () < 8) update (32);
 	string match = syms.substr (0, 1);
@@ -563,13 +563,13 @@ Match CodeQueue::shiftPop (std::set <string> accepted, int precidance) {
 		
 		if (*acpItt == match) {
 			
-			int prec = operators [match].precidance;
-			if (prec < precidance or (prec == precidance and operators [match].rule == RTL)) {
+			int prec = operators [match].precedence;
+			if (prec < precedence or (prec == precedence and operators [match].rule == RTL)) {
 				
 				syms = syms.substr (match.size ());
 				for (size_t i=0; i<match.size (); ++i) itts.pop_front ();
 				return {
-					operators [match].precidance, operators [match].ptn
+					operators [match].precedence, operators [match].ptn
 				};
 				
 			}
