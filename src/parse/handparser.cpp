@@ -1,3 +1,4 @@
+#include <array>
 #include <deque>
 
 #include <parse/tree.hpp>
@@ -186,6 +187,26 @@ std::set <string> allocateOperators = oppPrecRangeInc (1500, 1700);
 std::set <string> expressionOperators = oppPrecRangeInc (400, 1500);
 std::set <string> postfixOperators = oppPrecRangeInc (200, 200);
 std::set <string> prefixOperators = oppPrecRangeInc (300, 300);
+
+
+namespace SymbolFlags {
+	enum Flags : uint8_t {NONE=0, TERMINATE_STATEMENT=1};
+	std::array <SymbolFlags::Flags, __UINT8_MAX__> map = {SymbolFlags::NONE};
+	struct SetSymbols {
+		SetSymbols (const std::vector <std::pair <Symbol, Flags>> & flags) {
+			for (auto & p : flags) {
+				assert (size_t (p.first) < __UINT8_MAX__);
+				map [size_t (p.first)] = p.second;
+			}
+		}
+		
+	};
+	SetSymbols __set_valuues__ ({
+		{Symbol::SEMICOLON, TERMINATE_STATEMENT},
+		{Symbol::SYMBOL_BRACE_RIGHT, TERMINATE_STATEMENT},
+		{Symbol::SYMBOL_PARENRHESES_RIGHT, TERMINATE_STATEMENT},
+	});
+};
 
 
 struct Match {
@@ -458,12 +479,9 @@ PTNode parseStatment (CodeQueue * queue) {
 		lhs = parseList (queue, lhs);
 	}
 	
-	if (queue->peak () == Symbol::SEMICOLON) {
-		queue->shiftPop ();
+	if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) {
 		return lhs;
 	}
-	
-	if (queue->peak () == Symbol::SYMBOL_BRACE_RIGHT) return lhs;
 	
 	return parseAssignment (queue, lhs);
 	
