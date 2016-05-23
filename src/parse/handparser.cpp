@@ -1,6 +1,7 @@
 #include <deque>
 
 #include <parse/tree.hpp>
+#include <parse/tree/error.hpp>
 #include <parse/tree/identifier.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
@@ -223,10 +224,9 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 		lhs = parseList (queue);
 	}
 	
-	//TODO: replace with proper set
 	Match opp = queue->shiftPop (allocateOperators);
 	
-	if (opp.iden == "") return nullptr; //TODO: Return an error, expected an assignment unless lhs is a call
+	if (opp.iden == "") return new ParseTreeError (lhs->getLine (), lhs->getPos (), "Expected an assignment operation");
 	
 	PTNode rhs = parseList (queue);
 	
@@ -284,7 +284,7 @@ PTNode parseAtom (CodeQueue * queue) {
 	Match opp = queue->shiftPop ({"."});
 	
 	if (opp.iden != "") {
-		return nullptr;
+		return new ParseTreeError (atom->getLine (), atom->getPos (), "Scope resolution not yet implemented");
 	}
 	return atom;
 	
@@ -299,7 +299,8 @@ PTNode parseBlock (CodeQueue * queue) {
 	}
 	
 	if (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT) {
-		return nullptr; //TODO: Expected '}'
+		//TODO: make queue aware of it's position
+		return new ParseTreeError (0, 0, "Expected a }");
 	}
 	
 	queue->shiftPop ();
@@ -447,7 +448,8 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 		
 	}
 	
-	return nullptr;
+	//TODO: make a helper function for unexpected tokens
+	return new ParseTreeError (0, 0, "Unexpected token");
 	
 }
 
