@@ -57,6 +57,7 @@ enum class Symbol : char {
 enum RuleType {NONE=0, LTR=1, RTL=2, ACCUM=4, PTN_Sx=8, PTN_xSx=9, PTN_xS=10};
 
 struct Operator {
+	string ptn;
 	int precidance;
 	RuleType rule;
 };
@@ -99,62 +100,62 @@ std::map <string, Symbol> symbolMap {
 };
 
 std::map <string, Operator> operators {
-	{"=", {1600, RTL}},
-	{"+=", {1600, RTL}},
-	{"-=", {1600, RTL}},
-	{"~=", {1600, RTL}},
-	{"*=", {1600, RTL}},
-	{"/=", {1600, RTL}},
-	{"%=", {1600, RTL}},
-	{"<<=", {1600, RTL}},
-	{">>=", {1600, RTL}},
-	{"^=", {1600, RTL}},
-	{"&=", {1600, RTL}},
-	{"|=", {1600, RTL}},
-	{"=>", {1600, RTL}},
+	{"=", {" = ", 1600, RTL}},
+	{"+=", {" += ", 1600, RTL}},
+	{"-=", {" -= ", 1600, RTL}},
+	{"~=", {" ~= ", 1600, RTL}},
+	{"*=", {" *= ", 1600, RTL}},
+	{"/=", {" /= ", 1600, RTL}},
+	{"%=", {" %= ", 1600, RTL}},
+	{"<<=", {" <<= ", 1600, RTL}},
+	{">>=", {" >>= ", 1600, RTL}},
+	{"^=", {" ^= ", 1600, RTL}},
+	{"&=", {" &= ", 1600, RTL}},
+	{"|=", {" |= ", 1600, RTL}},
+	{"=>", {" => ", 1600, RTL}},
 	
-	{string () + char (Symbol::OR), {1400, LTR}},
+	{string () + char (Symbol::OR), {" or ", 1400, LTR}},
 	
-	{string () + char (Symbol::AND), {1300, LTR}},
+	{string () + char (Symbol::AND), {" and ", 1300, LTR}},
 	
-	{"!=", {1200, LTR}},
-	{"==", {1200, LTR}},
+	{"!=", {" != ", 1200, LTR}},
+	{"==", {" == ", 1200, LTR}},
 	
-	{"<", {1100, LTR}},
-	{"<=", {1100, LTR}},
-	{">", {1100, LTR}},
-	{">=", {1100, LTR}},
+	{"<", {" < ", 1100, LTR}},
+	{"<=", {" <= ", 1100, LTR}},
+	{">", {" > ", 1100, LTR}},
+	{">=", {" >= ", 1100, LTR}},
 	
-	{"|", {1000, LTR}},
+	{"|", {" | ", 1000, LTR}},
 	
-	{"^", {900, LTR}},
+	{"^", {" ^ ", 900, LTR}},
 	
-	{"&", {800, LTR}},
+	{"&", {" & ", 800, LTR}},
 	
-	{"<<", {700, LTR}},
-	{">>", {700, LTR}},
+	{"<<", {" << ", 700, LTR}},
+	{">>", {" >> ", 700, LTR}},
 	
-	{"+", {600, LTR}},
-	{"-", {600, LTR}},
-	{"~", {600, LTR}},
+	{"+", {" + ", 600, LTR}},
+	{"-", {" - ", 600, LTR}},
+	{"~", {" ~ ", 600, LTR}},
 	
-	{"*", {500, LTR}},
-	{"/", {500, LTR}},
-	{"%", {500, LTR}},
+	{"*", {" * ", 500, LTR}},
+	{"/", {" / ", 500, LTR}},
+	{"%", {" % ", 500, LTR}},
 	
-	{string () + char (Symbol::IN), {450, LTR}},
+	{string () + char (Symbol::IN), {" in ", 450, LTR}},
 	
-	{string () + char (Symbol::AS), {400, LTR}},
+	{string () + char (Symbol::AS), {" as ", 400, LTR}},
 	
-	{"++", {300, RTL}},
-	{"--", {300, RTL}},
-	{"-", {300, RTL}},
-	{"!", {300, RTL}},
-	{string () + char (Symbol::NOT), {300, RTL}},
-	{"~", {300, RTL}},
+	{"++", {"++ ", 300, RTL}},
+	{"--", {"-- ", 300, RTL}},
+	{"-", {"- ", 300, RTL}},
+	{"!", {"! ", 300, RTL}},
+	{string () + char (Symbol::NOT), {"not ", 300, RTL}},
+	{"~", {"~ ", 300, RTL}},
 	
-	{"++", {200, LTR}},
-	{"--", {200, LTR}},
+	{"++", {" ++", 200, LTR}},
+	{"--", {" --", 200, LTR}},
 };
 
 std::set <string> oppPrecRangeInc (int min, int max) {
@@ -269,6 +270,10 @@ PTNode parseAtom (CodeQueue * queue) {
 			atom = parseBlock (queue);
 			break;
 		case Symbol::SYMBOL_PARENRHESES_LEFT:
+			queue->shiftPop ();
+			atom = parseList (queue);
+			assert (queue->peak () == Symbol::SYMBOL_PARENRHESES_RIGHT);
+			queue->shiftPop ();
 			break;
 		case Symbol::SYMBOL_SQUARE_LEFT:
 			break;
@@ -400,8 +405,9 @@ PTNode parseStatment (CodeQueue * queue) {
 	}
 	
 	if (not lhs) {
-		lhs = parseAtom (queue);
+		lhs = parseExpression (queue);
 	}
+	
 	
 	switch (queue->peak ()) {
 		case Symbol::IDENTIFIER: 
@@ -410,6 +416,9 @@ PTNode parseStatment (CodeQueue * queue) {
 			break;
 	}
 	
+	if (queue->peak () == Symbol::SYMBOL_COMMA) {
+		lhs = parseList (queue, lhs);
+	}
 	
 	if (queue->peak () == Symbol::SEMICOLON) {
 		queue->shiftPop ();
@@ -466,6 +475,7 @@ numbat::lexer::token CodeQueue::popToken() {
 	syms = syms.substr (1);
 	itts.pop_front ();
 	return *t;
+	
 }
 
 void CodeQueue::shiftPop () {
@@ -492,7 +502,7 @@ Match CodeQueue::shiftPop (std::set <string> accepted, int precidance) {
 			int prec = operators [match].precidance;
 			if (prec < precidance or (prec == precidance and operators [match].rule == RTL)) {
 				return {
-					operators [match].precidance, match
+					operators [match].precidance, operators [match].ptn
 				};
 			}
 			
