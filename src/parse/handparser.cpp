@@ -245,7 +245,7 @@ PTNode parseIfElse (CodeQueue * queue);
 PTNode parseImport (CodeQueue * queue);
 PTNode parseList (CodeQueue * queue, PTNode prev=nullptr);
 PTNode parseProgram (CodeQueue * queue);
-PTNode parseStatment (CodeQueue * queue);
+PTNode parseStatement (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
 std::vector <PTNode> parseArguments (CodeQueue * queue);
@@ -371,7 +371,7 @@ PTNode parseBlock (CodeQueue * queue) {
 	
 	std::vector <PTNode> body;
 	while (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT and queue->peak () != Symbol::__NONE__) {
-		body.push_back (parseStatment (queue));
+		body.push_back (parseStatement (queue));
 		while (queue->peak () == Symbol::SEMICOLON) queue->popToken ();
 	}
 	
@@ -443,14 +443,14 @@ PTNode parseIfElse (CodeQueue * queue) {
 	}
 	queue->shiftPop ();
 	
-	PTNode body = parseStatment (queue);
+	PTNode body = parseStatement (queue);
 	PTNode el = nullptr;
 	
 	if (queue->peak () == Symbol::ELSE) {
 		
 		queue->shiftPop ();
 		
-		el = parseStatment (queue);
+		el = parseStatement (queue);
 		
 	}
 		
@@ -523,7 +523,7 @@ PTNode parseProgram (CodeQueue * queue) {
 	
 	std::vector <PTNode> body;
 	while (queue->more ()) {
-		body.push_back (parseStatment (queue));
+		body.push_back (parseStatement (queue));
 		while (queue->peak () == Symbol::SEMICOLON) queue->popToken ();
 	}
 	if (body.empty ()) {
@@ -534,7 +534,7 @@ PTNode parseProgram (CodeQueue * queue) {
 	
 }
 
-PTNode parseStatment (CodeQueue * queue) {
+PTNode parseStatement (CodeQueue * queue) {
 	
 	PTNode lhs=nullptr;
 	
