@@ -63,6 +63,7 @@ enum class Symbol : char {
 	SYMBOL_SLASH='/',
 	SYMBOL_SQUARE_LEFT='[',
 	SYMBOL_SQUARE_RIGHT=']',
+	SYMBOL_TIDLE='~',
 	__NONE__
 };
 
@@ -116,6 +117,7 @@ std::map <string, Symbol> symbolMap {
 	{"/", Symbol::SYMBOL_SLASH},
 	{"[", Symbol::SYMBOL_SQUARE_LEFT},
 	{"]", Symbol::SYMBOL_SQUARE_RIGHT},
+	{"~", Symbol::SYMBOL_TIDLE},
 };
 
 std::map <string, Operator> operators {
@@ -194,7 +196,7 @@ std::set <string> prefixOperators = oppPrecRangeInc (300, 300);
 
 
 namespace SymbolFlags {
-	enum Flags : uint8_t {NONE=0, TERMINATE_STATEMENT=1};
+	enum Flags : uint8_t {NONE=0, EXPRESSION_START=0b1, TERMINATE_STATEMENT=0b10};
 	std::array <SymbolFlags::Flags, __UINT8_MAX__> map = {SymbolFlags::NONE};
 	struct SetSymbols {
 		SetSymbols (const std::vector <std::pair <Symbol, Flags>> & flags) {
@@ -206,10 +208,22 @@ namespace SymbolFlags {
 		
 	};
 	SetSymbols __set_valuues__ ({
-		{Symbol::ELSE, TERMINATE_STATEMENT},
-		{Symbol::SEMICOLON, TERMINATE_STATEMENT},
-		{Symbol::SYMBOL_BRACE_RIGHT, TERMINATE_STATEMENT},
+		{Symbol::ELSE,                     TERMINATE_STATEMENT},
+		{Symbol::IDENTIFIER,               EXPRESSION_START},
+		{Symbol::IF,                       EXPRESSION_START},
+		{Symbol::LITERAL,                  EXPRESSION_START},
+		{Symbol::NOT,                      EXPRESSION_START},
+		{Symbol::SEMICOLON,                TERMINATE_STATEMENT},
+		{Symbol::WHILE,                    EXPRESSION_START},
+		{Symbol::SYMBOL_BANG,              EXPRESSION_START},
+		{Symbol::SYMBOL_BRACE_LEFT,        EXPRESSION_START},
+		{Symbol::SYMBOL_BRACE_RIGHT,       TERMINATE_STATEMENT},
+		{Symbol::SYMBOL_MINUS,             EXPRESSION_START},
+		{Symbol::SYMBOL_PARENRHESES_LEFT,  EXPRESSION_START},
 		{Symbol::SYMBOL_PARENRHESES_RIGHT, TERMINATE_STATEMENT},
+		{Symbol::SYMBOL_PLUS,              EXPRESSION_START},
+		{Symbol::SYMBOL_SQUARE_LEFT,       EXPRESSION_START},
+		{Symbol::SYMBOL_TIDLE,             EXPRESSION_START},
 	});
 };
 
@@ -700,7 +714,7 @@ Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted,
 	
 	while (acpItt != acpEnd and acpItt->compare (0, match.size (), match) == 0 and index < 32) {
 		
-		if (*acpItt == match or *acpItt == match + " ") {
+		if (*acpItt == match or (*acpItt == match + " " and (SymbolFlags::map [syms [index]] & SymbolFlags::EXPRESSION_START))) {
 			
 			auto opp = operators [*acpItt];
 			int prec = opp.precedence;
