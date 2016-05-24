@@ -7,6 +7,7 @@
 #include <parse/tree/identifier.hpp>
 #include <parse/tree/ifelse.hpp>
 #include <parse/tree/import.hpp>
+#include <parse/tree/index.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
 #include <parse/tree/operator.hpp>
@@ -259,6 +260,7 @@ PTNode parseIfElse (CodeQueue * queue);
 PTNode parseImport (CodeQueue * queue);
 PTNode parseList (CodeQueue * queue, PTNode prev=nullptr);
 PTNode parseProgram (CodeQueue * queue);
+PTNode parseSlice (CodeQueue * queue, PTNode owner=nullptr);
 PTNode parseStatement (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
@@ -346,6 +348,7 @@ PTNode parseAtom (CodeQueue * queue) {
 			queue->shiftPop ();
 			break;
 		case Symbol::SYMBOL_SQUARE_LEFT:
+			atom = parseSlice (queue);
 			break;
 		default:
 			break;
@@ -370,6 +373,7 @@ PTNode parseAtom (CodeQueue * queue) {
 				return new ParseTreeError (atom->getLine (), atom->getPos (), "Scope resolution not yet implemented");
 			case Symbol::SYMBOL_SQUARE_LEFT:
 				// Slice
+				atom = parseSlice (queue, atom);
 				break;
 			default:
 				break;
@@ -599,6 +603,34 @@ PTNode parseStatement (CodeQueue * queue) {
 	}
 	
 	return parseAssignment (queue, lhs);
+	
+}
+
+PTNode parseSlice (CodeQueue * queue, PTNode owner) {
+	
+	//Drop '['
+	queue->shiftPop ();
+	
+	if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
+		queue->shiftPop ();
+		if (owner) {
+			return new ParseTreeIndex (owner, {});
+		}
+		return errorUnexpectedToken (queue, "slice");
+	}
+	
+	PTNode index = parseExpression (queue);
+	
+	if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
+		queue->shiftPop ();
+		if (owner) {
+			return new ParseTreeIndex (owner, {index});
+		}
+		return errorUnexpectedToken (queue, "slice");
+	}
+	
+	//TODO: Create proper slice classes and use them
+	return new ParseTreeError (0, 0, "Slices are not yet supported");
 	
 }
 
