@@ -1,6 +1,7 @@
 #include <array>
 #include <deque>
 
+#include <parse/handparser.hpp>
 #include <parse/tree.hpp>
 #include <parse/tree/call.hpp>
 #include <parse/tree/error.hpp>
@@ -254,7 +255,6 @@ struct CodeQueue {
 
 PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected);
 
-PTNode parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end);
 PTNode parseBlock (CodeQueue * queue);
 PTNode parseIfElse (CodeQueue * queue);
 PTNode parseImport (CodeQueue * queue);

@@ -5,6 +5,7 @@
 #include "../include/nir/module.hpp"
 #include "../include/numbat.hpp"
 #include "../include/parse/numbatparser.hpp"
+#include "parse/handparser.cpp"
 
 
 
@@ -60,8 +61,6 @@ int main (int argc, char ** args) {
 	
 	createType ("ptrint", numbat.getEngine ()->getDataLayout ()->getPointerSizeInBits (), numbat::parser::NumbatRawType::UNSIGNED);
 	
-	
-	numbat::NumbatParser parser;
 	string line;
 	for (;;) {
 #ifndef N_PROMPT
@@ -70,7 +69,8 @@ int main (int argc, char ** args) {
 		if (not std::getline (std::cin, line)) {
 			break;
 		}
-		auto parseTree = parser.parse (line);
+		auto parseTree = parse (line);
+		std::cerr << parseTree->toString () << std::endl;
 		const nir::Instruction * val = parseTree->build (globalScope, ParseTreeNode::BuildMode::NORMAL);
 		std::cout << interpreter (val) << '\n';
 	}
