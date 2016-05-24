@@ -515,7 +515,11 @@ PTNode parseList (CodeQueue * queue, PTNode prev) {
 		args.push_back (parseExpression (queue));
 	}
 	
-	return new ParseTreeList (args);
+	if (args.size () != 1) {
+		return new ParseTreeList (args);
+	} else {
+		return args [0];
+	}
 	
 }
 
