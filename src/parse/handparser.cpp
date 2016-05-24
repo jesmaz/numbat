@@ -6,6 +6,7 @@
 #include <parse/tree/error.hpp>
 #include <parse/tree/identifier.hpp>
 #include <parse/tree/ifelse.hpp>
+#include <parse/tree/import.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
 #include <parse/tree/operator.hpp>
@@ -26,6 +27,7 @@ enum class Symbol : char {
 	FOR,
 	IDENTIFIER,
 	IF,
+	IMPORT,
 	IN,
 	LIST,
 	LITERAL,
@@ -83,6 +85,7 @@ std::map <string, Symbol> symbolMap {
 	{"enum", Symbol::ENUM},
 	{"for", Symbol::FOR},
 	{"if", Symbol::IF},
+	{"import", Symbol::IMPORT},
 	{"not", Symbol::NOT},
 	{"or", Symbol::OR},
 	{";", Symbol::SEMICOLON},
@@ -239,6 +242,7 @@ PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected);
 PTNode parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end);
 PTNode parseBlock (CodeQueue * queue);
 PTNode parseIfElse (CodeQueue * queue);
+PTNode parseImport (CodeQueue * queue);
 PTNode parseList (CodeQueue * queue, PTNode prev=nullptr);
 PTNode parseProgram (CodeQueue * queue);
 PTNode parseStatment (CodeQueue * queue);
@@ -454,6 +458,52 @@ PTNode parseIfElse (CodeQueue * queue) {
 	
 }
 
+PTNode parseImport (CodeQueue * queue) {
+	
+	// drop import token
+	queue->shiftPop ();
+	
+	std::vector <PTNode> path;
+	
+	for (;;) {
+		
+		if (queue->peak () == Symbol::LITERAL) {
+			auto tkn = queue->popToken ();
+			path.push_back (new ParseTreeLiteral (tkn.line, 0, tkn.iden, tkn.type));
+			
+		} else if (queue->peak () == Symbol::IDENTIFIER) {
+			auto tkn = queue->popToken ();
+			path.push_back (new ParseTreeIdentifier (tkn.line, 0, tkn.iden));
+			
+		} else {
+			return errorUnexpectedToken (queue, "a literal or an identifier");
+		}
+		
+		if (queue->peak () == Symbol::SYMBOL_PERIOD) {
+			queue->shiftPop ();
+		} else {
+			break;
+		}
+		
+	}
+	
+	PTNode iden=nullptr;
+	
+	if (queue->peak () == Symbol::AS) {
+		queue->shiftPop ();
+		if (queue->peak () == Symbol::IDENTIFIER) {
+			auto tkn = queue->popToken ();
+			iden = new ParseTreeIdentifier (tkn.line, 0, tkn.iden);
+			
+		} else {
+			return errorUnexpectedToken (queue, "an identifier");
+		}
+	}
+	
+	return new ParseTreeImport (new ParseTreeImportPath (path), iden);
+	
+}
+
 PTNode parseList (CodeQueue * queue, PTNode prev) {
 	
 	std::vector <PTNode> args;
@@ -493,6 +543,8 @@ PTNode parseStatment (CodeQueue * queue) {
 			//return parseFunction (queue);
 		case Symbol::ENUM:
 			//return parseEnum (queue);
+		case Symbol::IMPORT:
+			return parseImport (queue);
 		case Symbol::STRUCT:
 			//return parseStruct (queue);
 		case Symbol::UNION:
