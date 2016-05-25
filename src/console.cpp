@@ -5,7 +5,7 @@
 #include "../include/nir/module.hpp"
 #include "../include/numbat.hpp"
 #include "../include/parse/numbatparser.hpp"
-#include "parse/handparser.cpp"
+#include <parse/handparser.hpp>
 
 
 

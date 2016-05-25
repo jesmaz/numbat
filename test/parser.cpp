@@ -1,6 +1,8 @@
 #include "../include/parse/parser.hpp"
 #include "../include/parse/numbatparser.hpp"
 
+#include <parse/handparser.hpp>
+
 #include <fstream>
 #include <iostream>
 
@@ -73,7 +75,6 @@ int main (int argl, char ** argc) {
 		}
 	}
 	
-	numbat::NumbatParser parser;
 	if (files.empty ()) {
 		
 		string line, prog;
@@ -81,13 +82,13 @@ int main (int argl, char ** argc) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				print (parser.parse (prog));
+				print (parse (prog));
 				std::cout << std::endl;
 				prog = line;
 			}
 		}
 		if (not prog.empty()) {
-			print (parser.parse (prog));
+			print (parse (prog));
 		}
 		
 	} else {
@@ -96,7 +97,7 @@ int main (int argl, char ** argc) {
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
-			print (parser.parse (prog));
+			print (parse (prog));
 			std::cout << "########" << f << "########" << std::endl;
 		}
 	}

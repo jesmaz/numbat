@@ -28,7 +28,7 @@ struct Parser {
 		enum RuleType {NONE=0, LTR=1, RTL=2, ACCUM=4};
 		
 		struct Rule {
-			struct Args	 {
+			struct Args {
 				string s;
 				std::function <PTNode (const std::vector <PTNode> &)> * ptr;
 				int prec;
@@ -67,7 +67,7 @@ struct Parser {
 		};
 		
 		struct State {
-			enum class Action : uint16_t {ACCEPT='A', ERROR='.', REDUCE='R', SHIFT='S', TRYSHIFT='T'};
+			enum class Action : uint16_t {ACCEPT='A', CHANGE_STATE='C', ERROR='.', REDUCE='R', SHIFT='S', TRYSHIFT='T'};
 			struct R {
 				uint32_t index=0;
 				Action action=Action::ERROR;
@@ -91,6 +91,7 @@ struct Parser {
 		
 		std::map <char, std::map <string, ProductionRule>> seperateKernals (const std::map <string, ProductionRule> & kernals) const;
 		std::map <string, ProductionRule> generateKernals () const;
+		std::map <string, ProductionRule> generateProductionRules () const;
 		
 		Parser ();
 		
