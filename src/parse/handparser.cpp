@@ -9,6 +9,7 @@
 #include <parse/tree/ifelse.hpp>
 #include <parse/tree/import.hpp>
 #include <parse/tree/index.hpp>
+#include <parse/tree/keyword.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
 #include <parse/tree/operator.hpp>
@@ -267,10 +268,16 @@ PTNode parseVariable (CodeQueue * queue, PTNode type);
 std::vector <PTNode> parseArguments (CodeQueue * queue);
 
 
+void clear (CodeQueue * queue) {
+	
+	while (not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) queue->popToken ();
+	
+}
+
 PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected) {
 	
 	numbat::lexer::token tkn = queue->peakToken ();
-	while (queue->peak () == Symbol::SEMICOLON) queue->popToken ();
+	clear (queue);
 	return new ParseTreeError (tkn.line, 0, "Unexpected token '" + tkn.iden + "', expected " + expected);
 	
 }
@@ -298,7 +305,7 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 	
 	Match opp = queue->shiftPop (" ", allocateOperators);
 	
-	if (opp.iden == "") return new ParseTreeError (lhs->getLine (), lhs->getPos (), "Expected an assignment operation");
+	if (opp.iden == "") return errorUnexpectedToken (queue, "an assignment operation");
 	
 	PTNode rhs = parseList (queue);
 	
