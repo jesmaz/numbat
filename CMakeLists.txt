@@ -74,6 +74,7 @@ set(sources ${sources} "src/parse/tree/slice.cpp")
 set(sources ${sources} "src/parse/tree/struct.cpp")
 set(sources ${sources} "src/parse/tree/symbol.cpp")
 set(sources ${sources} "src/parse/tree/variable.cpp")
+set(sources ${sources} "src/utility/alphanumeric.cpp")
 add_library(numbat-static STATIC ${sources})
 
 set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl z tinfo)
