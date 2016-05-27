@@ -7,7 +7,7 @@
 
 size_t nir::Struct::calculateSize (size_t ptrSize) const {
 	size_t s=0;
-	for (Type * t : memberArr) {
+	for (const Type * t : memberArr) {
 		s += t->calculateSize (ptrSize);
 	}
 	return s;
@@ -22,9 +22,9 @@ std::string nir::Struct::strDump (text::PrintMode mode) const {
 	s.back () = '}';
 }
 
-nir::Struct::Struct (const std::map <std::string, nir::Type *> & members, const std::vector <nir::Type *> & memberArr) : members (members), memberArr (memberArr) {
+nir::Struct::Struct (const std::map <std::string, const nir::Type *> & members, const std::vector <const nir::Type *> & memberArr) : members (members), memberArr (memberArr) {
 	// members and memberArr must be consistent
-	std::set <Type *> set (memberArr.begin (), memberArr.end ());
+	std::set <const Type *> set (memberArr.begin (), memberArr.end ());
 	for (auto & m : members) {
 		assert (set.count (m.second));
 	}

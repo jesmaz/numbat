@@ -17,13 +17,13 @@ class Struct : public Type {
 		
 		virtual size_t calculateSize (size_t ptrSize) const;
 		
-		Struct (const std::map <string, Type *> & members, const std::vector <Type *> & memberArr);
+		Struct (const std::map <string, const Type *> & members, const std::vector <const Type *> & memberArr);
 		
 	protected:
 	private:
 		
-		std::map <string, Type *> members;
-		std::vector <Type *> memberArr;
+		std::map <string, const Type *> members;
+		std::vector <const Type *> memberArr;
 		
 		virtual string strDump (text::PrintMode mode) const;
 		
