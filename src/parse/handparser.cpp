@@ -207,13 +207,13 @@ std::set <string> prefixOperators = oppPrecRangeInc (300, 300);
 
 
 namespace SymbolFlags {
-	enum Flags : uint8_t {NONE=0, EXPRESSION_START=0b1, TERMINATE_STATEMENT=0b10};
+	enum Flags : uint8_t {NONE=0, EXPRESSION_START=0b1, TERMINATE_STATEMENT=0b10, SEGMENT_BEGIN=0b100, SEGMENT_END=0b1000};
 	std::array <SymbolFlags::Flags, __UINT8_MAX__> map = {SymbolFlags::NONE};
 	struct SetSymbols {
-		SetSymbols (const std::vector <std::pair <Symbol, Flags>> & flags) {
+		SetSymbols (const std::vector <std::pair <Symbol, uint8_t>> & flags) {
 			for (auto & p : flags) {
 				assert (size_t (p.first) < __UINT8_MAX__);
-				map [size_t (p.first)] = p.second;
+				map [size_t (p.first)] = Flags (p.second);
 			}
 		}
 		
@@ -227,13 +227,14 @@ namespace SymbolFlags {
 		{Symbol::SEMICOLON,                TERMINATE_STATEMENT},
 		{Symbol::WHILE,                    EXPRESSION_START},
 		{Symbol::SYMBOL_BANG,              EXPRESSION_START},
-		{Symbol::SYMBOL_BRACE_LEFT,        EXPRESSION_START},
-		{Symbol::SYMBOL_BRACE_RIGHT,       TERMINATE_STATEMENT},
+		{Symbol::SYMBOL_BRACE_LEFT,        EXPRESSION_START | SEGMENT_BEGIN},
+		{Symbol::SYMBOL_BRACE_RIGHT,       TERMINATE_STATEMENT | SEGMENT_END},
 		{Symbol::SYMBOL_MINUS,             EXPRESSION_START},
-		{Symbol::SYMBOL_PARENRHESES_LEFT,  EXPRESSION_START},
-		{Symbol::SYMBOL_PARENRHESES_RIGHT, TERMINATE_STATEMENT},
+		{Symbol::SYMBOL_PARENRHESES_LEFT,  EXPRESSION_START | SEGMENT_BEGIN},
+		{Symbol::SYMBOL_PARENRHESES_RIGHT, TERMINATE_STATEMENT | SEGMENT_END},
 		{Symbol::SYMBOL_PLUS,              EXPRESSION_START},
-		{Symbol::SYMBOL_SQUARE_LEFT,       EXPRESSION_START},
+		{Symbol::SYMBOL_SQUARE_LEFT,       EXPRESSION_START | SEGMENT_BEGIN},
+		{Symbol::SYMBOL_SQUARE_RIGHT,      SEGMENT_END},
 		{Symbol::SYMBOL_TIDLE,             EXPRESSION_START},
 	});
 };
@@ -279,7 +280,14 @@ std::vector <PTNode> parseParameterList (CodeQueue * queue);
 
 void clear (CodeQueue * queue) {
 	
-	while (not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) queue->popToken ();
+	uint32_t scope=0;
+	SymbolFlags::Flags flags = SymbolFlags::map [size_t (queue->peak ())];
+	while (queue->more () and (scope or not (flags & SymbolFlags::TERMINATE_STATEMENT))) {
+		scope += !!(flags & SymbolFlags::SEGMENT_BEGIN) - !!(flags & SymbolFlags::SEGMENT_END);
+		std::cerr << "Scope: " << scope << std::endl;
+		queue->popToken ();
+		flags = SymbolFlags::map [size_t (queue->peak ())];
+	}
 	
 }
 
