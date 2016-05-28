@@ -24,6 +24,7 @@ struct Function : ParseTreeNode {
 		
 		Function (uint32_t line, uint32_t pos) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), body (nullptr) {}
 		Function (PTNode iden, PTNode params, PTNode type, PTNode body);
+		Function (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & params, const std::vector <PTNode> & type, PTNode body);
 		
 	protected:
 	private:
