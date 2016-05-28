@@ -9,6 +9,7 @@
 #include <parse/tree/ifelse.hpp>
 #include <parse/tree/import.hpp>
 #include <parse/tree/index.hpp>
+#include <parse/tree/function.hpp>
 #include <parse/tree/keyword.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
@@ -273,6 +274,7 @@ PTNode parseStatement (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
 std::vector <PTNode> parseArguments (CodeQueue * queue);
+std::vector <PTNode> parseParameterList (CodeQueue * queue);
 
 
 void clear (CodeQueue * queue) {
@@ -458,6 +460,57 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 	
 }
 
+PTNode parseFunction (CodeQueue * queue) {
+	
+	// drop def
+	queue->shiftPop ();
+	
+	//TODO: Check for extern
+	
+	if (queue->peak () != Symbol::IDENTIFIER) {
+		return errorUnexpectedToken (queue, "identifier");
+	}
+	numbat::lexer::token token = queue->popToken ();
+	
+	//TODO: Parse meta tags
+	
+	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
+		return errorUnexpectedToken (queue, "'('");
+	}
+	queue->shiftPop ();
+	
+	std::vector <PTNode> params = parseParameterList (queue), type;
+	
+	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+		return errorUnexpectedToken (queue, "')'");
+	}
+	queue->shiftPop ();
+	
+	if (queue->peak () == Symbol::SYMBOL_MINUS and queue->peak (1) == Symbol::SYMBOL_GREATER) {
+		queue->shiftPop ();
+		queue->shiftPop ();
+		if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
+			return errorUnexpectedToken (queue, "'('");
+		}
+		queue->shiftPop ();
+		
+		type = parseParameterList (queue);
+		
+		if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+			return errorUnexpectedToken (queue, "')'");
+		}
+		queue->shiftPop ();
+	}
+	
+	PTNode body;
+	
+	if (not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
+		body = parseStatement (queue);
+	}
+	return new Function (token.line, 0, token.iden, params, type, body);
+	
+}
+
 PTNode parseIfElse (CodeQueue * queue) {
 	
 	// drop if token
@@ -579,7 +632,7 @@ PTNode parseStatement (CodeQueue * queue) {
 	
 	switch (queue->peak ()) {
 		case Symbol::DEF:
-			//return parseFunction (queue);
+			return parseFunction (queue);
 		case Symbol::ENUM:
 			//return parseEnum (queue);
 		case Symbol::IMPORT:
@@ -665,6 +718,10 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 		queue->shiftPop ();
 		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
 		
+	} if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) {
+		
+		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
+		
 	}
 	
 	return errorUnexpectedToken (queue, "':' or end of expression");;
@@ -694,6 +751,44 @@ std::vector <PTNode> parseArguments (CodeQueue * queue) {
 		}
 	} while (true);
 	
+	return args;
+	
+}
+
+std::vector <PTNode> parseParameterList (CodeQueue * queue) {
+	
+	Symbol next = queue->peak ();
+	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT) return {};
+	
+	std::vector <PTNode> args;
+	for (;;) {
+		PTNode atom;
+		switch (queue->peak ()) {
+			case Symbol::VAL:
+			case Symbol::VAR: {
+				numbat::lexer::token token = queue->popToken ();
+				atom = new ParseTreeKeyword (token.line, 0, token.iden);
+				break;
+			}
+			default:
+				atom = parseAtom (queue);
+				break;
+		}
+		
+		if (queue->peak () == Symbol::IDENTIFIER) {
+			args.push_back (parseVariable (queue, atom));
+		} else if (queue->peak () != Symbol::SYMBOL_COMMA and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
+			args.push_back (parseExpression (queue, __INT_MAX__, atom));
+		} else {
+			args.push_back (atom);
+		}
+		
+		if (next == Symbol::SYMBOL_COMMA) {
+			queue->shiftPop ();
+		} else {
+			break;
+		}
+	}
 	return args;
 	
 }
@@ -807,6 +902,9 @@ void CodeQueue::update (uint32_t n) {
 		itts.push_back (itt);
 		Symbol sym;
 		switch (itt->type) {
+			case numbat::lexer::TOKEN::def:
+				sym = Symbol::DEF;
+				break;
 			case numbat::lexer::TOKEN::identifier:
 				sym = Symbol::IDENTIFIER;
 				break;
