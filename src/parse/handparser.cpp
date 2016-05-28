@@ -138,6 +138,13 @@ std::map <string, Operator> operators {
 	{" |= ", {" |= ", 1600, RTL}},
 	{" => ", {" => ", 1600, RTL}},
 	
+	{" <& ", {" <& ", 1580, RTL}},
+	{" &> ", {" &> ", 1550, RTL}},
+	
+	{" -> ", {" -> ", 1520, RTL}},
+	
+	{" , ", {" , ", 1500, LTR}},
+	
 	{string (" ") + char (Symbol::OR) + " ", {" or ", 1400, LTR}},
 	
 	{string (" ") + char (Symbol::AND) + " ", {" and ", 1300, LTR}},
@@ -192,8 +199,8 @@ std::set <string> oppPrecRangeInc (int min, int max) {
 	return ret;
 }
 
-std::set <string> allocateOperators = oppPrecRangeInc (1500, 1700);
-std::set <string> expressionOperators = oppPrecRangeInc (400, 1500);
+std::set <string> allocateOperators = oppPrecRangeInc (1501, 1700);
+std::set <string> expressionOperators = oppPrecRangeInc (400, 1499);
 std::set <string> postfixOperators = oppPrecRangeInc (200, 200);
 std::set <string> prefixOperators = oppPrecRangeInc (300, 300);
 
@@ -532,9 +539,12 @@ PTNode parseImport (CodeQueue * queue) {
 PTNode parseList (CodeQueue * queue, PTNode prev) {
 	
 	std::vector <PTNode> args;
-	if (prev) args.push_back (prev);
+	if (prev) {
+		args.push_back (prev);
+	} else {
+		args.push_back (parseExpression (queue));
+	}
 	
-	args.push_back (parseExpression (queue));
 	while (queue->peak () == Symbol::SYMBOL_COMMA) {
 		queue->shiftPop ();
 		args.push_back (parseExpression (queue));
