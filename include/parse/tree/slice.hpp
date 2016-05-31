@@ -11,19 +11,16 @@ class ParseTreeSlice : public ParseTreeNode {
 	
 	public:
 		
-		virtual bool isAggregate () {return true;}
-		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
-		
 		ParseTreeSlice (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeSlice (const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
-		virtual ~ParseTreeSlice () {for (PTNode n : args) delete n;}
+		ParseTreeSlice (uint32_t line, uint32_t pos, const PTNode & start, const PTNode & end, const PTNode & step) : ParseTreeNode (line, pos), start (start), end (end), step (step) {}
+		virtual ~ParseTreeSlice () {delete start; delete end; delete step;}
 		
 	protected:
 	private:
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		std::vector <PTNode> args;
+		PTNode start, end, step;
 		
 };
 

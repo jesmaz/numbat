@@ -1,7 +1,7 @@
 #include "../include/ast.hpp"
 #include "../include/ast/astmodule.hpp"
 #include "../include/module.hpp"
-#include "../include/parse/numbatparser.hpp"
+#include "../include/parse/handparser.hpp"
 
 #include <fstream>
 
@@ -16,14 +16,12 @@ std::map <string, shared_ptr <Module>> Module::allModules;
 std::set <string> Module::includeDirs;
 std::vector <ASTnode> Module::main;
 
-NumbatParser numbatparser;
-
 PTNode loadFromStream (std::istream & is) {
 	std::string out;
 	std::string buffer;
 	while (std::getline (is, buffer))
 		out += buffer + "\n";
-	return numbatparser.parse (out);
+	return parse (out);
 }
 
 PTNode loadFromFile (const std::string & file) {
