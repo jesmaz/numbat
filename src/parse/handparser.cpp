@@ -14,6 +14,7 @@
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
 #include <parse/tree/operator.hpp>
+#include <parse/tree/slice.hpp>
 #include <parse/tree/variable.hpp>
 
 
@@ -91,6 +92,7 @@ std::map <string, Symbol> symbolMap {
 	{"for", Symbol::FOR},
 	{"if", Symbol::IF},
 	{"import", Symbol::IMPORT},
+	{"in", Symbol::IN},
 	{"not", Symbol::NOT},
 	{"or", Symbol::OR},
 	{";", Symbol::SEMICOLON},
@@ -697,18 +699,55 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 		return errorUnexpectedToken (queue, "slice");
 	}
 	
-	PTNode index = parseExpression (queue);
+	PTNode index = nullptr;
 	
-	if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
-		queue->shiftPop ();
-		if (owner) {
-			return new ParseTreeIndex (owner, {index});
+	if (queue->peak () != Symbol::COLON) {
+		
+		index = parseExpression (queue);
+		
+		if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
+			queue->shiftPop ();
+			if (owner) {
+				return new ParseTreeIndex (owner, {index});
+			}
+			return errorUnexpectedToken (queue, "slice");
 		}
-		return errorUnexpectedToken (queue, "slice");
+		
 	}
 	
-	//TODO: Create proper slice classes and use them
-	return new ParseTreeError (0, 0, "Slices are not yet supported");
+	if (queue->peak () != Symbol::COLON) {
+		return errorUnexpectedToken (queue, ":");
+	}
+	
+	queue->shiftPop ();
+	PTNode end = nullptr;
+	PTNode step = nullptr;
+	
+	if (queue->peak () != Symbol::COLON) {
+		end = parseExpression (queue);
+	}
+	
+	if (queue->peak () == Symbol::COLON) {
+		
+		queue->shiftPop ();
+		if (queue->peak () != Symbol::SYMBOL_SQUARE_RIGHT) {
+			step = parseExpression (queue);
+		}
+		
+	}
+	
+	if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
+		
+		queue->shiftPop ();
+		//TODO: give slices a proper location
+		PTNode slice = new ParseTreeSlice (0, 0, index, end, step);
+		if (owner) {
+			return new ParseTreeSliceDecorator (owner, slice);
+		}
+		return slice;
+	}
+	
+	return errorUnexpectedToken (queue, "]");
 	
 }
 
@@ -915,6 +954,9 @@ void CodeQueue::update (uint32_t n) {
 				break;
 			case numbat::lexer::TOKEN::identifier:
 				sym = Symbol::IDENTIFIER;
+				break;
+			case numbat::lexer::TOKEN::import:
+				sym = Symbol::IMPORT;
 				break;
 			case numbat::lexer::TOKEN::chararrayliteral:
 			case numbat::lexer::TOKEN::numericliteral:
