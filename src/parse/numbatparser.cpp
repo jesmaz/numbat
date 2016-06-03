@@ -110,12 +110,13 @@ NumbatParser::NumbatParser () {
 	parser.addRules ("PROGRAM", {"PROGRAM ;"}, 0, Parser::LTR, discardSemicolon);
 	
 	
-	parser.addRules ("Statement", {"Assignment;", "Block;", "Call;", "Control;", "Variable;", "Parameter;", "VariableList;", "List;", "Import;", "Function;"}, -1, Parser::LTR, discardSemicolon);
+	parser.addRules ("Statement", {"Assignment;", "Call;", "Control;", "Variable;", "Parameter;", "VariableList;", "List;", "Import;", "Function;"}, -1, Parser::LTR, discardSemicolon);
 	parser.addRules ("Statement", {"Function"}, -1, Parser::LTR);
 	
 	
 	parser.addRules ("Arg", {"E:E"});
 	parser.addRules ("ArgList", {"Arg", "ArgList,Arg", "ArgList,E", "List,Arg"}, 1700, Parser::LTR, createList);
+	parser.addRules ("ParameterList", {"Parameter", "Parameter,Parameter", "ParameterList,Parameter"}, 1700, Parser::LTR, createList);
 	parser.addRules ("VariableList", {"Variable", "VariableList,Arg", "VariableList,Variable"}, 1700, Parser::LTR, createList);
 	
 	parser.addRules ("Variable", {"Parameter:E"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
@@ -175,9 +176,9 @@ NumbatParser::NumbatParser () {
 	});
 	
 	parser.addRules ("Atom", {"Atom MetaTag"});
-	parser.addRules ("Atom", {"LITERAL", "IDENTIFIER", "Lambda", "Slice", "Each", "Control"});
+	parser.addRules ("Atom", {"LITERAL", "IDENTIFIER", "Lambda", "Slice", "Each", "Control", "Block"});
 	parser.addRules ("Atom", {"()"}, 0, Parser::LTR, [](const std::vector <PTNode> args) -> PTNode {
-		auto l = new ParseTreeList (args [0]->getLine (), args [0]->getPos ());
+		auto l = new ParseTreeList (args [0]->getLine (), args [0]->getPos ()); 
 		delete args [0];
 		delete args [1];
 		return l;
@@ -189,7 +190,7 @@ NumbatParser::NumbatParser () {
 	});
 	
 	
-	parser.addRules ("Block", {"{}", "{PROGRAM}", "{PROGRAM List;}", "{PROGRAM List}", "{List;}", "{List}"});
+	parser.addRules ("Block", {"{}", "{PROGRAM}", "{PROGRAM List}", "{List}"});
 	parser.addRules ("MetaTag", {"@Atom"});
 	
 	
@@ -260,17 +261,17 @@ NumbatParser::NumbatParser () {
 	});
 	parser.addRules ("Function", {
 		"def IDENTIFIER ()",						//4
-		"def IDENTIFIER (List)",					//5
+		"def IDENTIFIER (ParameterList)",					//5
 		"def IDENTIFIER () Statement",				//5
-		"def IDENTIFIER (List) Statement",			//6
+		"def IDENTIFIER (ParameterList) Statement",			//6
 		"def IDENTIFIER ()->()",					//8
 		"def IDENTIFIER ()->(List)",				//9
-		"def IDENTIFIER (List)->()",				//9
-		"def IDENTIFIER (List)->(List)",			//10
+		"def IDENTIFIER (ParameterList)->()",				//9
+		"def IDENTIFIER (ParameterList)->(List)",			//10
 		"def IDENTIFIER ()->() Statement",			//9
 		"def IDENTIFIER ()->(List) Statement",		//10
-		"def IDENTIFIER (List)->() Statement",		//10
-		"def IDENTIFIER (List)->(List) Statement",	//11
+		"def IDENTIFIER (ParameterList)->() Statement",		//10
+		"def IDENTIFIER (ParameterList)->(List) Statement",	//11
 	}, 2000, Parser::LTR, [](const std::vector <PTNode> args){
 		delete args [0];
 		delete args [2];

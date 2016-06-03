@@ -155,11 +155,15 @@ PTNode Parser::parse (numbat::lexer::tkstring::const_iterator start, numbat::lex
 		
 		while (true) {
 			
-			PARSER_LOG (std::cout << "STATE: " << state.reduce << " '" << state.ptn << "'" << std::endl);
+			PARSER_LOG (std::cout << "STATE: " << state.reduce << " '" << state.ptn << "' '" << c << "' 0x" << std::hex << index << std::dec << std::endl);
 			
 			switch (state [c].action) {
 				case State::Action::ACCEPT:
 					return 0;
+				case State::Action::CHANGE_STATE: {
+					parseState (state [c].index, depth);
+					break;
+				}
 				case State::Action::ERROR:
 					PARSER_LOG (std::cout << "ERROR: '" << state.ptn << "' unexpected: " << c << " " << stack.getS () << " (" << state.reduce << ")" << std::endl);
 					return -1;
@@ -169,9 +173,10 @@ PTNode Parser::parse (numbat::lexer::tkstring::const_iterator start, numbat::lex
 				case State::Action::SHIFT: {
 					PARSER_LOG (std::cout << "SHIFTING: '" << c << "' (" << int(c) << ")" << std::endl);
 					auto n = parseState (state [c].index, depth+1);
-					PARSER_LOG (std::cout << "STATE: " << state.reduce << " '" << state.ptn << "'" << std::endl);
+					PARSER_LOG (std::cout << "STATE: " << state.reduce << " '" << state.ptn << "' '" << c << "' 0x" << std::hex << index << std::dec << std::endl);
 					PARSER_LOG (std::cout << "STACK: '" << stack.getS () << "'" << std::endl);
 					if (n) return n-1;
+					return 0;
 					break;
 				}
 				case State::Action::TRYSHIFT: {
@@ -261,43 +266,164 @@ void Parser::addRules (const string & rule, const std::vector <string> & ptn, in
 
 void Parser::buildRules () {
 	
-	std::map <string, ProductionRule> prod = generateKernals (), additional, existing;
-	
-	std::map <string, uint32_t> entries;
-	size_t i=0;
+	std::map <char, std::set <char>> synonyms, oneToOne;
+	std::map <string, std::set <char>> reductions, shifts;
+	std::map <string, Rule::Args> ruleMap;
+	std::map <string, int32_t> stateIndex;
+	std::map <string, char> uniqeReductions;
 	
 	{
-		
-		assert (prod.count (""));
-		auto prodRules = prod.find ("")->second.expected;
-		assert (prodRules.size () == 1);
-		std::map <char, std::map <string, uint32_t>> indexes;
-		std::vector <State *> statePool;
-		for (auto & e : prodRules) {
-			initialState = stateIndex (' ', prod.find ("")->second, seperateKernals (prod), statePool, indexes);
-		}
-		for (State * s : statePool) {
-			states.push_back (*s);
-			delete s;
-		}
-		for (auto & index : indexes) {
-			for (auto & i : index.second) {
-				string s;
-				if (index.first) {
-					s = string () + index.first + " : " + i.first;
-				} else {
-					s = string () + "\\0: " + i.first;
+		for (auto & e : rules) {
+			const Rule & r = e.second;
+			std::set <char> & set = synonyms [e.first];
+			for (const Rule::Args & arg : r.expantions) {
+				set.insert (arg.s.front ());
+				for (uint64_t i=1, l=arg.s.length (); i<l; ++i) {
+					shifts [arg.s.substr (0, i)].insert (e.first);
 				}
-				entries [s] = i.second;
+				reductions [arg.s].insert (e.first);
+				if (arg.s.length () == 1) {
+					oneToOne [arg.s.front ()].insert (e.first);
+					oneToOne [arg.s.front ()].insert (arg.s.front ());
+				}
+			}
+		}
+		bool cont = true;
+		while (cont) {
+			cont = false;
+			for (auto & e : synonyms) {
+				std::set <char> set = e.second;
+				for (char c : set) {
+					e.second.insert (synonyms [c].begin (), synonyms [c].end ());
+				}
+				cont |= set.size () != e.second.size ();
+			}
+		}
+		cont = true;
+		while (cont) {
+			cont = false;
+			for (auto & e : oneToOne) {
+				std::set <char> set = e.second;
+				for (char c : set) {
+					e.second.insert (oneToOne [c].begin (), oneToOne [c].end ());
+				}
+				cont |= set.size () != e.second.size ();
+			}
+		}
+		for (auto & e : rules) {
+			for (const Rule::Args & arg : e.second.expantions) {
+				for (char c : oneToOne [e.first]) {
+					if (ruleMap.count (c + (" -> " + arg.s))) abort ();
+					ruleMap [c + (" -> " + arg.s)] = arg;
+					uniqeReductions [c + (" -> " + arg.s)] = e.first;
+				}
+				ruleMap [e.first + (" -> " + arg.s)] = arg;
+				uniqeReductions [e.first + (" -> " + arg.s)] = e.first;
 			}
 		}
 	}
 	
+	for (auto rule : ruleMap) {
+		//std::cout << "'" << rule.first << "'\n";
+	}
+	//std::cout << "\n\n\n";
+	
+	std::function <int32_t (const std::set <char>&, const string &)> generateState = [&](const std::set <char> & targets, const string & seen)->int32_t {
+		
+		assert (not targets.empty ());
+		
+		string target;
+		for (char t : targets) {
+			target += t + string(" ");
+		}
+		
+		std::string key = target + std::string ("-> ") + seen;
+		
+		auto siItt = stateIndex.find (key);
+		if (siItt != stateIndex.end ()) {
+			return siItt->second;
+		}
+		
+		auto index = stateIndex [key] = this->states.size ();
+		State s;
+		states.resize (index+1);
+		s.ptn = seen;
+		
+		//std::cout << "Searching: '" << key << "'\n";
+		std::map <char, std::set <char>> expected;
+		std::list <std::pair <char, const Rule::Args *>> reductions;
+		
+		State::Action def = State::Action::ERROR;
+		
+		for (char t : targets) {
+			
+			std::string key = t + std::string (" -> ") + seen;
+			
+			for (std::map <string, Rule::Args>::iterator itt=ruleMap.lower_bound (key), end=ruleMap.end (); itt!=end and itt->first.find (key) == 0; ++itt) {
+				//std::cout << '\t' << itt->first << "\n";
+			}
+			
+			for (std::map <string, Rule::Args>::iterator itt=ruleMap.lower_bound (key), end=ruleMap.end (); itt!=end and itt->first.find (key) == 0; ++itt) {
+				
+				//std::cout << itt->first << "\n";
+				int diff = itt->first.length () - key.length ();
+				if (diff > 0) {
+					
+					char orig = itt->first [key.length ()];
+					
+					for (char c : synonyms [orig]) {
+						if (c != orig) {
+							expected [c].insert (orig);
+						}
+					}
+					expected [orig].insert (t);
+					
+				} else if (not diff) {
+					
+					reductions.push_back (std::make_pair (t, &itt->second));
+					
+				}
+				
+			}
+		
+		}
+		
+		for (auto & exp : expected) {
+			
+			State::R & r = s [exp.first];
+			
+			r.action = State::Action::SHIFT;
+			
+			if (exp.second.count (exp.first)) {
+				r.index = generateState (exp.second, seen + exp.first);
+			} else {
+				r.index = generateState (exp.second, string ("") + exp.first);
+			}
+			
+		}
+		
+		for (int c=' '; c<128; ++c) {
+			
+			if (s [c].action == State::Action::ERROR) {
+				s [c].action = def;
+			}
+			
+		}
+		
+		states [index] = s;
+		return index;
+		 
+	};
+	
+	
+	
+	initialState = generateState ({getCode ("PROGRAM")}, "");
+	
 #ifdef DEBUG
-	for (auto & entry : entries) {
-		assert (entry.first.size () <= 16);
+	for (auto & entry : stateIndex) {
+		assert (entry.first.size () <= 32);
 		std::cout << entry.first;
-		for (size_t i=0; i<16-(entry.first.size ()); ++i) {
+		for (size_t i=0; i<32-(entry.first.size ()); ++i) {
 			std::cout << " ";
 		}
 		std::cout << text::yel << "0x" << (entry.second > 0xff ? "" : (entry.second > 0xf ? "0" : "00")) << std::hex << entry.second << " ";
@@ -310,7 +436,7 @@ void Parser::buildRules () {
 			}
 		}
 		k=0;
-		std::cout << text::normal << "\n                      ";
+		std::cout << text::normal << "\n                                      ";
 		for (size_t i=' '; i<128; ++i) {
 			if (charsUsed [i-' ']) {
 				std::cout << (k%4<=1 ? (k%4==0 ? text::cyn : text::mag) : (k%4==2 ? text::grn : text::blu)) << char (i) << ' ' << char (state [i].action);
@@ -323,224 +449,9 @@ void Parser::buildRules () {
 	
 }
 
-size_t Parser::stateIndex (char reduction, const ProductionRule & rule, const std::map <char, std::map <string, ProductionRule>> & kernals, std::vector <State *> & statePool, std::map <char, std::map <string, uint32_t>> & indexes) {
+std::map <string, Parser::ProductionRule> Parser::generateProductionRules () const {
 	
-	auto & specificIndex = indexes [reduction];
-	if (specificIndex.find (rule.seen) != specificIndex.end ()) {
-		return specificIndex [rule.seen];
-	}
-	
-	size_t index = specificIndex [rule.seen] = statePool.size ();
-	State * state = new State;
-	statePool.push_back (state);
-	state->ptn = rule.seen;
-	
-	
-	for (auto & expected : rule.expected) {
-		
-		auto & exp = expected.first;
-		if (exp.empty ()) {
-			if (expected.second.rule) state->ptr = expected.second.rule->ptr;
-			state->reduce = expected.second.reduce;
-			assert (state->reduce);
-			state->terminal = expected.second.accept;
-			continue;
-		}
-		
-		
-		auto & r = (*state) [exp.front ()];
-		if (r.action == State::Action::REDUCE) {
-			r.action = State::Action::TRYSHIFT;
-		} else {
-			r.action = State::Action::SHIFT;
-		}
-		assert (kernals.find (reduction) != kernals.end ());
-		assert (kernals.find (reduction)->second.find (rule.seen + exp.front ()) != kernals.find (reduction)->second.end ());
-		r.index = stateIndex (reduction, kernals.find (reduction)->second.find (rule.seen + exp.front ())->second, kernals, statePool, indexes);
-		
-		std::set <char> visited, current, queued = {exp.front ()};
-		while (not queued.empty ()) {
-			
-			current = queued;
-			queued.clear ();
-			
-			for (char c : current) {
-				
-				if (visited.count (c)) continue;
-				visited.insert (c);
-				if (rules.find (c) == rules.end ()) continue;
-				std::map <char, std::set <string>> expan;
-				
-				for (auto & rule : rules [c].expantions) {
-					
-					queued.insert (rule.s.front ());
-					expan [rule.s.front ()].insert (rule.s.substr (1));
-					
-				}
-				
-				for (auto e : expan) {
-					auto & r = (*state) [e.first];
-					if (r.action == State::Action::REDUCE) {
-						r.action = State::Action::TRYSHIFT;
-					} else if (r.action == State::Action::SHIFT) {
-						continue;
-					} else {
-						r.action = State::Action::SHIFT;
-					}
-					assert (kernals.find (c) != kernals.end ());
-					assert (kernals.find (c)->second.find (string () + e.first) != kernals.find (c)->second.end ());
-					r.index = stateIndex (c, kernals.find (c)->second.find (string () + e.first)->second, kernals, statePool, indexes);
-				}
-				
-			}
-			
-		}
-		
-	}
-	
-	if (not rule.seen.empty ()) {
-		
-		for (auto & subRule : rules [rule.seen.back ()].expantions) {
-			
-			if (rule.seen.back () != subRule.s.front () or subRule.s.size () == 1) continue;
-			auto & r = (*state) [subRule.s [1]];
-			if (r.action != State::Action::ERROR) continue;
-			
-			if (not rule.rule or not state->reduce) {
-				r.action = State::Action::SHIFT;
-				
-			} else if (rule.rule->prec == 0) {
-				//0 is a special case
-				if (subRule.prec < 0) {
-					//-1 is also special, it means 'reduce if possible'
-					r.action = State::Action::REDUCE;
-				} else {
-					r.action = State::Action::SHIFT;
-				}
-				
-			} else if (rule.rule->prec > subRule.prec) {
-				//Lower precedence
-				r.action = State::Action::SHIFT;
-				
-			} else if (rule.rule->prec < subRule.prec) {
-				//Higher precedence
-				r.action = State::Action::REDUCE;
-				
-			} else if (rule.rule->type == LTR) {
-				//Left to Right associativity
-				r.action = State::Action::REDUCE;
-				
-			} else if (rule.rule->type == RTL) {
-				//Right to Left associativity
-				r.action = State::Action::SHIFT;
-				
-			} else {
-				abort ();
-			}
-			
-			char c = rule.seen.back ();
-			assert (kernals.find (c) != kernals.end ());
-			assert (kernals.find (c)->second.find (subRule.s.substr (0, 2)) != kernals.find (c)->second.end ());
-			r.index = stateIndex (c, kernals.find (c)->second.find (subRule.s.substr (0, 2))->second, kernals, statePool, indexes);
-			
-		}
-		
-	}
-	
-	
-	if (state->reduce and rule.rule) {
-		for (auto & r : state->rules) {
-			if (r.action == State::Action::ERROR) {
-				r.action = State::Action::REDUCE;
-			} else if (r.action == State::Action::SHIFT) {
-				r.action = State::Action::TRYSHIFT;
-			}
-		}
-		state->ptr = rule.rule->ptr;
-	}
-	
-	return index;
-	
-}
-
-std::map <char, std::map <string, Parser::ProductionRule>> Parser::seperateKernals (const std::map <string, ProductionRule> & kernals) const {
-	
-	std::map <char, std::set <char>> substitutions;
-	substitutions [' '].insert (' ');
-	substitutions [getCode ("PROGRAM")].insert (' ');
-	{
-		std::set <std::pair <char, char>> queue;
-		std::set <std::pair <char, char>> seen;
-		for (auto & r : rules) {
-			queue.insert (std::make_pair (r.first, r.first));
-		}
-		do {
-			for (auto q : queue) {
-				substitutions [q.first].insert (q.second);
-				seen.insert (q);
-			}
-			queue.clear ();
-			for (auto & s : substitutions) {
-				for (auto & e : s.second) {
-					if (rules.find (e) == rules.end ()) continue;
-					for (auto & x : rules.find (e)->second.expantions) {
-						auto p = std::make_pair (x.s.front (), s.first);
-						if (not seen.count (p)) queue.insert (std::make_pair (x.s.front (), s.first));
-					}
-				}
-			}
-		} while (not queue.empty ());
-	}
-	
-	std::map <char, std::map <string, Parser::ProductionRule>> sepK;
-	for (auto & k : kernals) {
-		for (auto & exp : k.second.expected) {
-			for (char c : substitutions [exp.second.reduce]) {
-				ProductionRule & pr = sepK [c][k.first];
-				assert (k.second.seen == k.first);
-				pr.rule = k.second.rule;
-				pr.seen = k.second.seen;
-				pr.expected.insert (exp);
-				assert (exp.second.reduce);
-			}
-		}
-	}
-	return sepK;
-	
-}
-
-std::map <string, Parser::ProductionRule> Parser::generateKernals () const {
-	
-	std::map <string, ProductionRule> map;
-	
-	ProductionRule start, stop;
-	start.rule = nullptr;
-	start.seen = "";
-	start.expected [start.seen + getCode ("PROGRAM")] = {nullptr, ' ', false};
-	map [""] = start;
-	stop.rule = nullptr;
-	stop.seen = start.seen + getCode ("PROGRAM");
-	stop.expected [""] = {nullptr, ' ', true};
-	map [stop.seen] = stop;
-	
-	for (auto & r : rules) {
-		for (auto & e : r.second.expantions) {
-			const string & s = e.s;
-			for (size_t i=0, l=s.size (); i<l; ++i) {
-				const string seen = s.substr (0, i+1);
-				ProductionRule & kernal = map [seen];
-				kernal.seen = seen;
-				kernal.expected [s.substr (i+1)] = {&e, r.first, false};
-				assert (r.first);
-				if (i+1 == l) {
-					assert (not kernal.rule);
-					kernal.rule = &e;
-				}
-			}
-		}
-	}
-	
-	return map;
+	std::map <string, ProductionRule> pRules;
 	
 }
 
