@@ -42,4 +42,22 @@ class ParseTreeSliceDecorator : public ParseTreeNode {
 };
 
 
+class ParseTreeSliceForEach : public ParseTreeNode {
+	
+	public:
+		
+		ParseTreeSliceForEach (uint32_t line, uint32_t pos, const string & var, PTNode range) : ParseTreeNode (line, pos), var (var), range (range) {}
+		virtual ~ParseTreeSliceForEach () {delete range;}
+		
+	protected:
+	private:
+		
+		virtual string strDump (text::PrintMode mode);
+		
+		string var;
+		PTNode range;
+		
+};
+
+
 #endif /*PARSETREESLICE_HPP*/

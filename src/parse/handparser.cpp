@@ -699,6 +699,19 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 		return errorUnexpectedToken (queue, "slice");
 	}
 	
+	if (queue->peak (1) == Symbol::IN) {
+		
+		auto tkn = queue->popToken ();
+		queue->shiftPop ();
+		PTNode range = parseExpression (queue);
+		if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
+			queue->shiftPop ();
+			return new ParseTreeSliceForEach (tkn.line, 0, tkn.iden, range);
+		}
+		return errorUnexpectedToken (queue, "]");
+		
+	}
+	
 	PTNode index = nullptr;
 	
 	if (queue->peak () != Symbol::COLON) {
@@ -706,11 +719,13 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 		index = parseExpression (queue);
 		
 		if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
+			
 			queue->shiftPop ();
 			if (owner) {
 				return new ParseTreeIndex (owner, {index});
 			}
-			return errorUnexpectedToken (queue, "slice");
+			return errorUnexpectedToken (queue, "]");
+			
 		}
 		
 	}
