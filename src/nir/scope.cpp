@@ -67,6 +67,9 @@ const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
 				case Type::INT:
 				case Type::UINT:
 					return lhs;
+				default:
+					std::cerr << "Unknown arithmetic type" << std::endl;
+					abort ();
 			}
 		case Type::INT:
 			switch (rhs->getArithmaticType ()) {
@@ -76,9 +79,15 @@ const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
 				case Type::INT:
 				case Type::UINT:
 					return lhs;
+				default:
+					std::cerr << "Unknown arithmetic type" << std::endl;
+					abort ();
 			}
 		case Type::UINT:
 			return rhs;
+		default:
+			std::cerr << "Unknown arithmetic type" << std::endl;
+			abort ();
 	}
 }
 
@@ -268,6 +277,7 @@ const Instruction * Scope::resolve (const string & iden) {
 	}
 	
 	if (parent) return parent->resolve (iden);
+	std::cerr << "Could not resolve '" << iden << "'" << std::endl;
 	assert (false);
 	return nullptr;
 	
