@@ -102,6 +102,8 @@ void Interpreter::visit (const Constant & con) {
 	
 	Atom res;
 	res.type = con.getType ();
+	if (con.getType ()->calculateSize (8) == 0) return;
+	
 	switch (con.getType ()->getArithmaticType ()) {
 		case Type::DECINT:
 		case Type::DEFAULT:

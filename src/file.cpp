@@ -9,10 +9,30 @@
 namespace numbat {
 
 
+string joinPaths (const string & lhs, const string & rhs) {
+	
+	//TODO: Properly implement this function for all operating systems
+	//TODO: Handle paths with '..' and '.'
+	if (lhs.empty ()) return rhs;
+	if (rhs.empty ()) return lhs;
+	string path;
+	path.reserve (lhs.size () + rhs.size ());
+	if (lhs.back () != '/' and rhs.front () != '/') {
+		path = lhs + '/' + rhs;
+	} else if (lhs.back () == '/' and rhs.front () == '/') {
+		path = lhs + rhs.substr (1);
+	} else {
+		path = lhs + rhs;
+	}
+	return path;
+	
+}
+
+
 bool File::asyncEnabled=false;
 std::atomic_uint File::files, File::processed;
 std::map <string, std::unique_ptr <File>> File::compiledFiles;
-std::vector <string> File::includeDirs;
+std::vector <string> File::includeDirs = {"/usr/include/numbat"};
 
 std::mutex fileMutex;
 
@@ -29,6 +49,7 @@ File * File::compile (const string & path, nir::Module * module) {
 		
 		fin.open (path);
 		if (not fin.is_open ()) {
+			std::cout << "'" << path << "' not found" << std::endl;
 			return nullptr;
 		}
 		
@@ -39,23 +60,21 @@ File * File::compile (const string & path, nir::Module * module) {
 	size_t pos = path.find_last_of ("/");
 	if (pos == string::npos) {
 		f->directory = path;
-		f->directory = "";
+		f->fileName = "";
 	} else {
 		f->directory = path.substr (pos+1);
-		f->directory = path.substr (0, pos);
+		f->fileName = path.substr (0, pos);
 	}
 	
 	PTNode parseTree;
 	{
-		const size_t buffer_size = 1024*4;
-		char buffer [buffer_size];
 		std::string file;
-		size_t n;
-		while (fin.read (buffer, buffer_size)) {
-			n = fin.gcount ();
-			file.append (buffer, n);
-		}
+		std::string buffer;
+		while (std::getline (fin, buffer))
+			file += buffer + "\n";
 		parseTree = parse (file);
+		std::cerr << file << std::endl;
+		std::cerr << parseTree->toString () << std::endl;
 	}
 	
 	nir::Scope * root = module->createRootScope ();
@@ -68,7 +87,7 @@ File * File::compile (const string & path, nir::Module * module) {
 
 File * File::import (const string & dir, const string & path, nir::Module * module) {
 	
-	File * f = compile (dir + path, module);
+	File * f = compile (joinPaths (dir, path + ".nbt"), module);
 	if (not f) f = import (path, module);
 	return f;
 	
@@ -78,7 +97,7 @@ File * File::import (const string & path, nir::Module * module) {
 	
 	File * f;
 	for (const string & dir : includeDirs) {
-		if (f = compile (dir + path, module)) {
+		if (f = compile (joinPaths (dir, path + ".nbt"), module)) {
 			return f;
 		}
 	}

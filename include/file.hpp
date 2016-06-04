@@ -19,6 +19,7 @@ struct File {
 	
 	public:
 		
+		const nir::Scope * getScope () const {return scope;}
 		const string & getDirectory () const {return directory;}
 		const string & getFileName () const {return fileName;}
 		

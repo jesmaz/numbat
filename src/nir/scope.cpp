@@ -12,6 +12,7 @@
 #include "../../include/nir/inst/mul.hpp"
 #include "../../include/nir/inst/put.hpp"
 #include "../../include/nir/inst/sub.hpp"
+#include "../../include/nir/type/importHandle.hpp"
 #include "../../include/nir/type/number.hpp"
 
 #include <iostream>
@@ -186,6 +187,12 @@ const Instruction * Scope::createGet (const Instruction * src) {
 	auto * instr = new Get (src->getType ()->getDereferenceType (), src, module->newSymbol (src->printIden ()));
 	return insertionPoint->give (instr);
 	
+}
+
+const Instruction * Scope::createImportHandle (const Scope * scope, const string & iden) {
+	Type * type = new ImportHandle (scope);
+	Instruction * inst = new Constant (type, "", module->newSymbol (iden));
+	return variables [iden] = inst;
 }
 
 const Instruction * Scope::createMul (const std::vector <const Instruction *> & args) {

@@ -7,7 +7,12 @@
 
 const nir::Instruction * ParseTreeImport::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
 	
-	return ParseTreeNode::build (scope, mode);
+	if (not sourceFile) declare (scope);
+	if (iden) {
+		return scope->createImportHandle (sourceFile->getScope (), iden->getIden ());
+	} else {
+		return scope->createImportHandle (sourceFile->getScope ());
+	}
 	
 }
 
@@ -44,6 +49,11 @@ void ParseTreeImport::declare (nir::Scope * scope) {
 		sourceFile = numbat::File::import (parent->getDirectory (), relPath, scope->getModule ());
 	} else {
 		sourceFile = numbat::File::import (relPath, scope->getModule ());
+	}
+	
+	if (not sourceFile) {
+		std::cerr << "Failed to import '" << relPath << "'" << std::endl;
+		abort ();
 	}
 	
 }
