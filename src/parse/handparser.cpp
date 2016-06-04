@@ -29,6 +29,7 @@ enum class Symbol : char {
 	ELSE,
 	ENUM,
 	EXPRESSION,
+	EXTERN,
 	FOR,
 	IDENTIFIER,
 	IF,
@@ -472,6 +473,12 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 
 PTNode parseFunction (CodeQueue * queue) {
 	
+	bool defExtern = false;
+	if (queue->peak () == Symbol::EXTERN) {
+		defExtern = true;
+		queue->shiftPop ();
+	}
+	
 	// drop def
 	queue->shiftPop ();
 	
@@ -514,7 +521,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	
 	PTNode body;
 	
-	if (not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
+	if (not defExtern and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		body = parseStatement (queue);
 	}
 	return new Function (token.line, 0, token.iden, params, type, body);
@@ -645,6 +652,8 @@ PTNode parseStatement (CodeQueue * queue) {
 			return parseFunction (queue);
 		case Symbol::ENUM:
 			//return parseEnum (queue);
+		case Symbol::EXTERN:
+			return parseFunction (queue);
 		case Symbol::IMPORT:
 			return parseImport (queue);
 		case Symbol::STRUCT:
@@ -966,6 +975,9 @@ void CodeQueue::update (uint32_t n) {
 		switch (itt->type) {
 			case numbat::lexer::TOKEN::def:
 				sym = Symbol::DEF;
+				break;
+			case numbat::lexer::TOKEN::externdef:
+				sym = Symbol::EXTERN;
 				break;
 			case numbat::lexer::TOKEN::identifier:
 				sym = Symbol::IDENTIFIER;
