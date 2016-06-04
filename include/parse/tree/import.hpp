@@ -3,6 +3,7 @@
 
 
 #include "base.hpp"
+#include <file.hpp>
 
 #include <vector>
 
@@ -13,6 +14,9 @@ class ParseTreeImport : public ParseTreeNode {
 		
 		virtual const string & getIden () const {return iden->getIden ();}
 		
+		const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
+		
+		void declare (nir::Scope * scope);
 		void declare (numbat::parser::NumbatScope * scope);
 		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
 		
@@ -27,6 +31,7 @@ class ParseTreeImport : public ParseTreeNode {
 		
 		PTNode path, iden;
 		numbat::parser::NumbatVariable * var=nullptr;
+		numbat::File * sourceFile;
 		
 };
 

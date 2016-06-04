@@ -1,8 +1,15 @@
 #include "../../../include/parse/tree/import.hpp"
 #include "../../../include/module.hpp"
 #include "../../../include/ast/astmodule.hpp"
+#include <nir/scope.hpp>
 
 #define PATH_JOIN "/"
+
+const nir::Instruction * ParseTreeImport::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+	
+	return ParseTreeNode::build (scope, mode);
+	
+}
 
 string joinPath (const std::vector <PTNode> & path) {
 	string relPath = path.front ()->getIden ();
@@ -23,6 +30,22 @@ string ParseTreeImport::strDump (text::PrintMode mode) {
 
 string ParseTreeImportPath::strDump (text::PrintMode mode) {
 	return "'" + joinPath (path) + "'";
+}
+
+void ParseTreeImport::declare (nir::Scope * scope) {
+	
+	using namespace numbat::parser;
+	
+	auto & args = path->getArgs ();
+	string relPath = joinPath (args);
+	
+	const numbat::File * parent = scope->getSourceFile ();
+	if (parent) {
+		sourceFile = numbat::File::import (parent->getDirectory (), relPath, scope->getModule ());
+	} else {
+		sourceFile = numbat::File::import (relPath, scope->getModule ());
+	}
+	
 }
 
 void ParseTreeImport::declare (numbat::parser::NumbatScope * scope) {
