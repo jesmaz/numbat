@@ -3,6 +3,7 @@
 
 
 #include "forward.hpp"
+#include <file.hpp>
 
 #include <map>
 #include <set>
@@ -20,6 +21,8 @@ struct Scope {
 	public:
 		
 		const Function * getOwner () const {if (owner) return owner; else if (parent) return parent->getOwner (); else return nullptr;}
+		Module * getModule () const {return module;}
+		const numbat::File * getSourceFile () const {return sourceFile;}
 		
 		Scope * declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden="");
 		
@@ -63,6 +66,7 @@ struct Scope {
 		Module * module;
 		Block * insertionPoint;
 		Function * owner;
+		numbat::File * sourceFile;
 		
 	
 };

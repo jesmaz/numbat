@@ -21,6 +21,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -Weffc++ -pedantic -DUSE_LLVM -std=c++14 -g -
 set(sources ${sources} "src/ast.cpp")
 set(sources ${sources} "src/cast.cpp")
 set(sources ${sources} "src/core.cpp")
+set(sources ${sources} "src/file.cpp")
 set(sources ${sources} "src/generator.cpp")
 set(sources ${sources} "src/lexer.cpp")
 set(sources ${sources} "src/module.cpp")

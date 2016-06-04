@@ -18,6 +18,20 @@ void Module::registerPrimative (Type::ArithmaticType arith, uint32_t width, cons
 	
 }
 
+Scope * Module::createRootScope() {
+	
+	Scope * global = getGlobalScope ();
+	symbol sym = newSymbol ("__entry__");
+	assert (sym);
+	Function * func = new Function;
+	data->functions [sym] = func;
+	global->createCall (func, {});
+	Scope * scope = new Scope (this, func->getEntryPoint (), func);
+	data->scopes.insert (scope);
+	return scope;
+	
+}
+
 Scope * Module::getGlobalScope () {
 	
 	if (not data->globalScope) {

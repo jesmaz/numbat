@@ -26,6 +26,7 @@ struct Module {
 		
 		Builder registerFunction (std::vector <Type> args, std::vector <Type> ret, const string & name);
 		
+		Scope * createRootScope ();
 		Scope * getGlobalScope ();
 		
 		symbol findSymbol (const string & iden);

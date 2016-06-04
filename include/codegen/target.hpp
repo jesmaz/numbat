@@ -19,7 +19,7 @@ class Target {
 	public:
 		
 		virtual void reset ()=0;
-		virtual void visit (const Function * module)=0;
+		virtual void visit (const nir::Function * module)=0;
 		virtual void visit (const Type * module)=0;
 		
 		void * jitFunction (const nir::Function *);
