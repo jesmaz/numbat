@@ -21,6 +21,7 @@ struct Function {
 		const Type * getType () const {return type;}
 		const std::vector <const Parameter *> & getArgs () const {return args;}
 		const std::vector <const Parameter *> & getRet () const {return ret;}
+		void pushBlock (Block * block) {blocks.push_back (block);}
 		
 		Function ();
 		Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret);

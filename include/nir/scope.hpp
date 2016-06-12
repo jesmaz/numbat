@@ -62,6 +62,7 @@ struct Scope {
 		std::map <string, std::vector <Function *> *> functions;
 		std::map <string, Type *> types;
 		std::map <string, const Instruction *> variables;
+		std::map <symbol, Block *> blocks;
 		std::set <Scope *> scopes;
 		Scope * parent=nullptr;
 		Module * module;

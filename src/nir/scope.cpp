@@ -311,4 +311,14 @@ const Instruction * Scope::staticCast (const Instruction * src, const Type * con
 }
 
 
+symbol Scope::createBlock (const string & iden) {
+	
+	symbol s = module->newSymbol (iden);
+	Block * b = new Block ();
+	owner->pushBlock (b);
+	blocks [s] = b;
+	return s;
+	
+}
+
 };
