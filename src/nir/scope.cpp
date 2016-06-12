@@ -311,6 +311,14 @@ const Instruction * Scope::staticCast (const Instruction * src, const Type * con
 }
 
 
+size_t Scope::changeActiveBlock (symbol block) {
+	
+	insertionPoint = blocks [block];
+	assert (insertionPoint);
+	return 0;
+	
+}
+
 symbol Scope::createBlock (const string & iden) {
 	
 	symbol s = module->newSymbol (iden);
