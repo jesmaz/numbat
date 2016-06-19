@@ -37,6 +37,9 @@ struct Scope {
 		const Instruction * createAdd (const std::vector <const Instruction *> & args);
 		const Instruction * createAssign (const std::vector <const Instruction *> & args);
 		const Instruction * createCall (const Function * func, const std::vector <const Instruction *> & args);
+		template <typename T>
+		const Instruction * createCmp (const Instruction * lhs, const Instruction * rhs, const string & iden);
+		const Instruction * createCmpLT (const std::vector <const Instruction *> & args);
 		const Instruction * createConstant (const Type * type, const string & val, const string & iden="");
 		const Instruction * createDiv (const std::vector <const Instruction *> & args);
 		const Instruction * createGet (const Instruction * src);

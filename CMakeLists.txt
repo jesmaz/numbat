@@ -16,7 +16,7 @@ execute_process(COMMAND llvm-config --cppflags OUTPUT_VARIABLE LLVM_FLAGS OUTPUT
 include_directories(${LLVM_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/include")
 link_directories(${LLVM_LIBRARY_DIRS})
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Weffc++ -pedantic -DUSE_LLVM -std=c++14 -g -pthread -march=native ${LLVM_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -DUSE_LLVM -std=c++14 -g -pthread -march=native ${LLVM_FLAGS}")
 
 set(sources ${sources} "src/ast.cpp")
 set(sources ${sources} "src/cast.cpp")
@@ -45,6 +45,7 @@ set(sources ${sources} "src/codegen/target.cpp")
 set(sources ${sources} "src/nir/function.cpp")
 set(sources ${sources} "src/nir/inst/add.cpp")
 set(sources ${sources} "src/nir/inst/div.cpp")
+set(sources ${sources} "src/nir/inst/less.cpp")
 set(sources ${sources} "src/nir/inst/mul.cpp")
 set(sources ${sources} "src/nir/inst/sub.cpp")
 set(sources ${sources} "src/nir/instruction.cpp")

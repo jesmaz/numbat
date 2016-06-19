@@ -7,6 +7,7 @@
 #include "../nir/inst/div.hpp"
 #include "../nir/inst/functionPointer.hpp"
 #include "../nir/inst/get.hpp"
+#include "../nir/inst/less.hpp"
 #include "../nir/inst/mul.hpp"
 #include "../nir/inst/put.hpp"
 #include "../nir/inst/sub.hpp"
@@ -24,7 +25,7 @@ namespace codegen {
 using namespace nir;
 using numbat::visitor::ConstVisitor;
 
-class Interpreter : public Target, public ConstVisitor <Add>, public ConstVisitor <Alloc>, public ConstVisitor <Constant>, public ConstVisitor <Div>, public ConstVisitor <DirectCall>, public ConstVisitor <FunctionPointer>, public ConstVisitor <Get>, public ConstVisitor <Mul>, public ConstVisitor <Number>, public ConstVisitor <Parameter>, public ConstVisitor <Put>, public ConstVisitor <Sub> {
+class Interpreter : public Target, public ConstVisitor <Add>, public ConstVisitor <Alloc>, public ConstVisitor <Constant>, public ConstVisitor <Div>, public ConstVisitor <DirectCall>, public ConstVisitor <FunctionPointer>, public ConstVisitor <Get>, public ConstVisitor <Less>, public ConstVisitor <Mul>, public ConstVisitor <Number>, public ConstVisitor <Parameter>, public ConstVisitor <Put>, public ConstVisitor <Sub> {
 	
 	public:
 		
@@ -39,6 +40,7 @@ class Interpreter : public Target, public ConstVisitor <Add>, public ConstVisito
 		virtual void visit (const Function * func);
 		virtual void visit (const FunctionPointer & fptr);
 		virtual void visit (const Get & get);
+		virtual void visit (const Less & less);
 		virtual void visit (const Mul & mul);
 		virtual void visit (const Number & num);
 		virtual void visit (const Parameter & param);

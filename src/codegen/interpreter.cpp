@@ -188,6 +188,13 @@ void Interpreter::visit (const Get & get) {
 	
 }
 
+void Interpreter::visit (const Less & less) {
+	
+	Atom res = binaryOpp <std::less <void>> (less.getLhs (), less.getRhs (), less.getType ());
+	lookupTable [less.getIden ()] = res;
+	
+}
+
 void Interpreter::visit (const Mul & mul) {
 	
 	Atom res = binaryOpp <std::multiplies <void>> (mul.getLhs (), mul.getRhs (), mul.getType ());

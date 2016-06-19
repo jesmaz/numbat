@@ -10,6 +10,7 @@
 #include "../../include/nir/inst/functionPointer.hpp"
 #include "../../include/nir/inst/get.hpp"
 #include "../../include/nir/inst/jump.hpp"
+#include "../../include/nir/inst/less.hpp"
 #include "../../include/nir/inst/mul.hpp"
 #include "../../include/nir/inst/put.hpp"
 #include "../../include/nir/inst/sub.hpp"
@@ -165,6 +166,27 @@ const Instruction * Scope::createCall (const Function * func, const std::vector 
 	Instruction * inst = new DirectCall (func, args, idens);
 	return insertionPoint->give (inst);
 	
+}
+
+template <typename T>
+const Instruction * Scope::createCmp (const Instruction * lhs, const Instruction * rhs, const string & iden) {
+	std::cerr << lhs->toString () << std::endl;
+	std::cerr << rhs->toString () << std::endl;
+	const Instruction * tlhs = lhs, * trhs = rhs;
+	if (lhs->getType ()->getDereferenceType ()) {
+		tlhs = createGet (lhs);
+	}
+	if (rhs->getType ()->getDereferenceType ()) {
+		trhs = createGet (rhs);
+	}
+	auto * t = promoteArithmatic (tlhs->getType (), trhs->getType ());
+	auto * b = resolveType ("bool");
+	Instruction * inst = new T (b, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
+	return insertionPoint->give (inst);
+}
+
+const Instruction * Scope::createCmpLT (const std::vector <const Instruction *> & args) {
+	return createCmp <Less> (args [0], args [1], "less");
 }
 
 const Instruction * Scope::createConstant (const Type * type, const string & val, const string & iden) {
