@@ -41,6 +41,8 @@ struct Scope {
 		const Instruction * createDiv (const std::vector <const Instruction *> & args);
 		const Instruction * createGet (const Instruction * src);
 		const Instruction * createImportHandle (const Scope * scope, const string & iden="");
+		const Instruction * createJump (symbol block);
+		const Instruction * createJump (const Instruction * cond, symbol block);
 		const Instruction * createMul (const std::vector <const Instruction *> & args);
 		const Instruction * createParameter (const Type * const type, const Instruction * init=nullptr, const string & iden="");
 		const Instruction * createPut (const Instruction * src, const Instruction * dest);

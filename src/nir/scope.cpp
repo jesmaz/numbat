@@ -9,6 +9,7 @@
 #include "../../include/nir/inst/div.hpp"
 #include "../../include/nir/inst/functionPointer.hpp"
 #include "../../include/nir/inst/get.hpp"
+#include "../../include/nir/inst/jump.hpp"
 #include "../../include/nir/inst/mul.hpp"
 #include "../../include/nir/inst/put.hpp"
 #include "../../include/nir/inst/sub.hpp"
@@ -185,6 +186,17 @@ const Instruction * Scope::createGet (const Instruction * src) {
 	std::cerr << src->getType ()->getDereferenceType ()->toString () << std::endl;
 	std::cerr << src->getType ()->getPointerTo ()->toString () << std::endl;
 	auto * instr = new Get (src->getType ()->getDereferenceType (), src, module->newSymbol (src->printIden ()));
+	return insertionPoint->give (instr);
+	
+}
+
+const Instruction * Scope::createJump (symbol block) {return createJump (nullptr, block);}
+
+const Instruction * Scope::createJump (const Instruction * cond, symbol block) {
+	
+	std::cerr << "Creating Jump" << std::endl;
+	const Block * b = blocks [block];
+	auto * instr = new Jump (cond, b);
 	return insertionPoint->give (instr);
 	
 }
