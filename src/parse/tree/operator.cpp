@@ -4,7 +4,7 @@
 
 
 std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <const nir::Instruction *> &)> nirDefImp = {
-// 	{"- ", &nir::Scope::createNeg},
+	{"- ", &nir::Scope::createNeg},
 // 	{"! ", &nir::Scope::createLNot},
 // 	{"not ", &nir::Scope::createLNot},
 // 	{"~ ", &nir::Scope::createBitNot},

@@ -12,6 +12,7 @@
 #include "../../include/nir/inst/jump.hpp"
 #include "../../include/nir/inst/less.hpp"
 #include "../../include/nir/inst/mul.hpp"
+#include "../../include/nir/inst/neg.hpp"
 #include "../../include/nir/inst/put.hpp"
 #include "../../include/nir/inst/sub.hpp"
 #include "../../include/nir/type/importHandle.hpp"
@@ -208,6 +209,13 @@ const Instruction * Scope::createGet (const Instruction * src) {
 	std::cerr << src->getType ()->getDereferenceType ()->toString () << std::endl;
 	std::cerr << src->getType ()->getPointerTo ()->toString () << std::endl;
 	auto * instr = new Get (src->getType ()->getDereferenceType (), src, module->newSymbol (src->printIden ()));
+	return insertionPoint->give (instr);
+	
+}
+
+const Instruction * Scope::createNeg (const std::vector <const Instruction *> & args) {
+	
+	Instruction * instr = new Neg (args [0]);
 	return insertionPoint->give (instr);
 	
 }

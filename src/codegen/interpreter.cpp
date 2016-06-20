@@ -202,6 +202,47 @@ void Interpreter::visit (const Mul & mul) {
 	
 }
 
+void Interpreter::visit (const Neg & neg) {
+	
+	Interpreter::Atom arg = lookupAtom (neg.getArg ());
+	switch (arg.atomicType) {
+		case DATA:
+			assert (false);
+		case F32:
+			arg.data.f32 = -arg.data.f32;
+			break;
+		case F64:
+			arg.data.f64 = -arg.data.f64;
+			break;
+		case S8:
+			arg.data.s8 = -arg.data.s8;
+			break;
+		case S16:
+			arg.data.s16 = -arg.data.s16;
+			break;
+		case S32:
+			arg.data.s32 = -arg.data.s32;
+			break;
+		case S64:
+			arg.data.s64 = -arg.data.s64;
+			break;
+		case U8:
+			arg.data.u8 = -arg.data.u8;
+			break;
+		case U16:
+			arg.data.u16 = -arg.data.u16;
+			break;
+		case U32:
+			arg.data.u32 = -arg.data.u32;
+			break;
+		case U64:
+			arg.data.u64 = -arg.data.u64;
+			break;
+	}
+	lookupTable [neg.getIden ()] = arg;
+	
+}
+
 void Interpreter::visit (const Number & num) {
 	
 }
