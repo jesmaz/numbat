@@ -32,7 +32,7 @@ string joinPaths (const string & lhs, const string & rhs) {
 bool File::asyncEnabled=false;
 std::atomic_uint File::files, File::processed;
 std::map <string, std::unique_ptr <File>> File::compiledFiles;
-std::vector <string> File::includeDirs = {"/usr/include/numbat"};
+std::vector <string> File::includeDirs = {"/usr/include/numbat", "."};
 
 std::mutex fileMutex;
 
@@ -97,7 +97,7 @@ File * File::import (const string & path, nir::Module * module) {
 	
 	File * f;
 	for (const string & dir : includeDirs) {
-		if (f = compile (joinPaths (dir, path + ".nbt"), module)) {
+		if ((f = compile (joinPaths (dir, path + ".nbt"), module))) {
 			return f;
 		}
 	}
