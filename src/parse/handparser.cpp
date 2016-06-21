@@ -40,6 +40,7 @@ enum class Symbol : char {
 	NOT,
 	OR,
 	PROGRAM,
+	REF,
 	SEMICOLON,
 	STATEMENT,
 	STRUCT,
@@ -97,6 +98,7 @@ std::map <string, Symbol> symbolMap {
 	{"not", Symbol::NOT},
 	{"or", Symbol::OR},
 	{";", Symbol::SEMICOLON},
+	{"ref", Symbol::REF},
 	{"struct", Symbol::STRUCT},
 	{"union", Symbol::UNION},
 	{"val", Symbol::VAL},
@@ -661,6 +663,7 @@ PTNode parseStatement (CodeQueue * queue) {
 		case Symbol::UNION:
 			//return parseUnion (queue);
 			break;
+		case Symbol::REF:
 		case Symbol::VAL:
 		case Symbol::VAR: {
 			numbat::lexer::token token = queue->popToken ();
@@ -677,7 +680,8 @@ PTNode parseStatement (CodeQueue * queue) {
 	
 	
 	switch (queue->peak ()) {
-		case Symbol::IDENTIFIER: 
+		case Symbol::IDENTIFIER:
+		case Symbol::SYMBOL_AT:
 			return parseVariable (queue, lhs);
 		default:
 			break;

@@ -14,6 +14,11 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTree
 		assert (inst);
 		assert (init);
 		type = init->getType ();
+		if (vType->getIden () == "ref") {
+			type = type->getPointerTo ();
+		}
+		//TODO: make type const if needed
+		
 	} else {
 		auto * instr = vType->build (scope, ParseTreeNode::BuildMode::PARAMETER);
 		assert (instr);
