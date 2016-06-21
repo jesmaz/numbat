@@ -25,6 +25,9 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 		const Type * const getType () const {return type;}
 		symbol getIden () const {return iden;}
 		
+		virtual const nir::Type * resolveType (const string & iden) const {return nullptr;}
+		virtual const nir::Instruction * resolve (nir::Scope * scope, const string & iden) const {return nullptr;}
+		
 	protected:
 		
 		Instruction (const Type * type, symbol iden) : type (type), iden (iden) {}

@@ -14,6 +14,7 @@
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
 #include <parse/tree/operator.hpp>
+#include <parse/tree/resolvescope.hpp>
 #include <parse/tree/slice.hpp>
 #include <parse/tree/variable.hpp>
 
@@ -397,9 +398,16 @@ PTNode parseAtom (CodeQueue * queue) {
 				queue->shiftPop ();
 				break;
 			}
-			case Symbol::SYMBOL_PERIOD:
+			case Symbol::SYMBOL_PERIOD: {
 				// Scope resolution
-				return new ParseTreeError (atom->getLine (), atom->getPos (), "Scope resolution not yet implemented");
+				queue->shiftPop ();
+				if (queue->peak () != Symbol::IDENTIFIER) {
+					return errorUnexpectedToken (queue, "an identifier");
+				}
+				numbat::lexer::token token = queue->popToken ();
+				atom = new ResolveScope (atom, token.iden);
+				break;
+			}
 			case Symbol::SYMBOL_SQUARE_LEFT:
 				// Slice
 				atom = parseSlice (queue, atom);
