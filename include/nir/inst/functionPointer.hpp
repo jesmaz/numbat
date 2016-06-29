@@ -22,7 +22,7 @@ class FunctionPointer : public Instruction {
 	protected:
 	private:
 		
-		FunctionPointer (const Function * func, symbol iden=nullptr) : Instruction (func->getType (), iden), func (func) {}
+		FunctionPointer (const Function * func, symbol iden=nullptr) : Instruction ({func->getType ()}, {iden}), func (func) {}
 		
 		const Function * func;
 		

@@ -75,4 +75,4 @@ Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : Pars
 	this->body = body;
 }
 
-Function::Function (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & params, const std::vector <PTNode> & type, PTNode body) : ParseTreeNode (line, pos), params (params), type (type), iden (iden), body (body) {}
+Function::Function (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & params, const std::vector <PTNode> & type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), params (params), type (type), iden (iden), body (body) {}

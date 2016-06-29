@@ -19,7 +19,7 @@ auto getInstType = [](const std::vector <const Parameter *> & args) {
 
 Function::Function () : entry (new Block), blocks ({entry}) {}
 
-Function::Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret) : entry (new Block), blocks ({entry}), args (args), ret (ret), type (FunctionType::get (getInstType (args), getInstType (ret))) {}
+Function::Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret) : entry (new Block), blocks ({entry}), args (args), ret (ret), retTypes (getInstType (ret)), type (FunctionType::get (getInstType (args), retTypes)) {}
 
 
 };

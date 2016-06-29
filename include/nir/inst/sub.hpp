@@ -22,7 +22,7 @@ class Sub : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const;
 		
-		Sub (const Type * type, const Instruction * lhs, const Instruction * rhs, symbol iden=nullptr) : Instruction (type, iden), lhs (lhs), rhs (rhs) {}
+		Sub (const Type * type, const Instruction * lhs, const Instruction * rhs, symbol iden=nullptr) : Instruction ({type}, {iden}), lhs (lhs), rhs (rhs) {}
 		
 		const Instruction * lhs, * rhs;
 		

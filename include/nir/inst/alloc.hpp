@@ -18,7 +18,7 @@ class Alloc : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "alloc." + getType ()->toString () + " " + amount->printIden ();}
 		
-		Alloc (const Type * type, const Instruction * amount, symbol iden=nullptr) : Instruction (type, iden), amount (amount) {}
+		Alloc (const Type * type, const Instruction * amount, symbol iden=nullptr) : Instruction ({type}, {iden}), amount (amount) {}
 		
 		const Instruction * amount;
 		

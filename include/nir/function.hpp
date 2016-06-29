@@ -21,6 +21,7 @@ struct Function {
 		const Type * getType () const {return type;}
 		const std::vector <const Parameter *> & getArgs () const {return args;}
 		const std::vector <const Parameter *> & getRet () const {return ret;}
+		const std::vector <const Type *> getRetTypes () const {return retTypes;}
 		void pushBlock (Block * block) {blocks.push_back (block);}
 		
 		Function ();
@@ -34,6 +35,7 @@ struct Function {
 		
 		
 		std::vector <const Parameter *> args, ret;
+		std::vector <const Type *> retTypes;
 		const Type * type;
 		CallConv cc = CallConv::NCC;
 		

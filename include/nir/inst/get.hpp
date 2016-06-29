@@ -13,7 +13,7 @@ class Get : public Instruction {
 		
 		virtual bool validate () const {return true;}
 		
-		Get (const Type * type, const Instruction * src, symbol iden=nullptr) : Instruction (type, iden), src (src) {}
+		Get (const Type * type, const Instruction * src, symbol iden=nullptr) : Instruction ({type}, {iden}), src (src) {}
 		
 	protected:
 	private:

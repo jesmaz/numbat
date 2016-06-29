@@ -22,7 +22,7 @@ class Add : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const;
 		
-		Add (const Type * type, const Instruction * lhs, const Instruction * rhs, symbol iden=nullptr) : Instruction (type, iden), lhs (lhs), rhs (rhs) {}
+		Add (const Type * type, const Instruction * lhs, const Instruction * rhs, symbol iden=nullptr) : Instruction ({type}, {iden}), lhs (lhs), rhs (rhs) {}
 		
 		const Instruction * lhs, * rhs;
 		

@@ -93,6 +93,7 @@ class Interpreter : public Target, public ConstVisitor <Add>, public ConstVisito
 		Atom staticCast (const Atom & source, const Type * const target);
 		static std::vector <Atom> callFunction (const Function * func, const std::vector <Atom> & args);
 		std::vector <Atom> operator () (const Block * block);
+		std::vector <Atom> lookupAtoms (const Instruction * val);
 		
 		std::map <symbol, Atom> lookupTable;
 		std::set <void *> ptrs;

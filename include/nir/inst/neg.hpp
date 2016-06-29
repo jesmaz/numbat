@@ -19,7 +19,7 @@ class Neg : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "-" + arg->toString (mode);}
 		
-		Neg (const Instruction * arg, symbol iden=nullptr) : Instruction (arg->getType (), iden), arg (arg) {}
+		Neg (const Instruction * arg, symbol iden=nullptr) : Instruction (arg->getTypes (), {iden}), arg (arg) {}
 		
 		const Instruction * arg;
 		

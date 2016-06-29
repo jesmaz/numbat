@@ -138,7 +138,7 @@ void Interpreter::visit (const DirectCall & call) {
 	}
 	auto ret = callFunction (call.getFunc (), args);
 	assert (ret.size () == call.getIdens ().size ());
-	auto & idens = call.getIdens ();
+	const auto & idens = call.getIdens ();
 	for (size_t i=0, l=ret.size (); i<l; ++i) {
 		lookupTable [idens [i]] = ret [i];
 	}
@@ -361,38 +361,59 @@ std::string Interpreter::operator ()(const nir::Instruction * val) {
 		return this->operator ()(&get);
 	}
 	
-	Atom atom = lookupAtom (val);
+	std::string s;
 	
-	switch (atom.atomicType) {
-		case DATA:
-			return "Code could not be interpreted";
-		case F32:
-			return std::to_string (atom.data.f32);
-		case F64:
-			return std::to_string (atom.data.f64);
-		case FUNCTION:
-			return atom.data.func->getType ()->toString ();
-		case S8:
-			return std::to_string (atom.data.s8);
-		case S16:
-			return std::to_string (atom.data.s16);
-		case S32:
-			return std::to_string (atom.data.s32);
-		case S64:
-			return std::to_string (atom.data.s64);
-		case U8:
-			return std::to_string (atom.data.u8);
-		case U16:
-			return std::to_string (atom.data.u16);
-		case U32:
-			return std::to_string (atom.data.u32);
-		case U64:
-			return std::to_string (atom.data.u64);
-		case VOID:
-			return "void";
-		default:
-			abort ();
+	for (Atom atom : lookupAtoms (val)) {
+		
+		switch (atom.atomicType) {
+			case DATA:
+				s += "Code could not be interpreted";
+				break;
+			case F32:
+				s += std::to_string (atom.data.f32);
+				break;
+			case F64:
+				s += std::to_string (atom.data.f64);
+				break;
+			case FUNCTION:
+				s += atom.data.func->getType ()->toString ();
+				break;
+			case S8:
+				s += std::to_string (atom.data.s8);
+				break;
+			case S16:
+				s += std::to_string (atom.data.s16);
+				break;
+			case S32:
+				s += std::to_string (atom.data.s32);
+				break;
+			case S64:
+				s += std::to_string (atom.data.s64);
+				break;
+			case U8:
+				s += std::to_string (atom.data.u8);
+				break;
+			case U16:
+				s += std::to_string (atom.data.u16);
+				break;
+			case U32:
+				s += std::to_string (atom.data.u32);
+				break;
+			case U64:
+				s += std::to_string (atom.data.u64);
+				break;
+			case VOID:
+				s += "void";
+				break;
+			default:
+				abort ();
+		}
+		s += " ";
+		
 	}
+	s.pop_back ();
+	
+	return s;
 	
 }
 
@@ -406,6 +427,38 @@ std::vector <Interpreter::Atom> Interpreter::operator ()(const Block * block) {
 		if (currentBlock != block) return (*this)(currentBlock);
 	}
 	return std::vector <Interpreter::Atom> ({last});
+	
+}
+
+std::vector <Interpreter::Atom> Interpreter::lookupAtoms (const Instruction * val) {
+	
+	size_t l=val->getIdens ().size ();
+	std::vector <Interpreter::Atom> atoms;
+	atoms.resize (l);
+	const auto & idens = val->getIdens ();
+	
+	for (size_t i=0; i<l; ++i) {
+		auto itt = lookupTable.find (idens [i]);
+		
+		if (itt != lookupTable.end ()) {
+			atoms [i] = itt->second;
+		}
+	}
+	
+	val->accept (*this);
+	
+	for (size_t i=0; i<l; ++i) {
+		auto itt = lookupTable.find (idens [i]);
+		
+		if (itt != lookupTable.end ()) {
+			atoms [i] = itt->second;
+		} else {
+			abort ();
+		}
+		
+	}
+	
+	return atoms;
 	
 }
 
