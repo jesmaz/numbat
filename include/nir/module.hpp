@@ -36,7 +36,7 @@ struct Module {
 		
 		void build ();
 		void holdInst (Instruction * inst);
-		void registerPrimative (Type::ArithmaticType arith, uint32_t width, const string & name);
+		void registerPrimitive (Type::ArithmaticType arith, uint32_t width, const string & name);
 		void registerStruct (std::vector <Type> members, const string & name);
 		
 		Module (codegen::Target * target);
