@@ -23,7 +23,7 @@ bool Module::validate () const {
 	
 }
 
-void Module::registerPrimative (Type::ArithmaticType arith, uint32_t width, const string & name) {
+void Module::registerPrimitive (Type::ArithmaticType arith, uint32_t width, const string & name) {
 	
 	if (symbol s = newSymbol (name, false)) {
 		data->types [s] = new Number (arith, width);
@@ -99,6 +99,23 @@ void Module::build () {
 
 Module::Module (codegen::Target * target) : data (new Module::Data) {
 	data->target = target;
+	
+	registerPrimitive (nir::Type::UINT, 1, "bool");
+	
+	registerPrimitive (nir::Type::UINT, 8, "uint8");
+	registerPrimitive (nir::Type::UINT, 16, "uint16");
+	registerPrimitive (nir::Type::UINT, 32, "uint32");
+	registerPrimitive (nir::Type::UINT, 64, "uint64");
+	
+	registerPrimitive (nir::Type::INT, 8, "int8");
+	registerPrimitive (nir::Type::INT, 16, "int16");
+	registerPrimitive (nir::Type::INT, 32, "int32");
+	registerPrimitive (nir::Type::INT, 64, "int64");
+	
+	registerPrimitive (nir::Type::FPINT, 16, "half");
+	registerPrimitive (nir::Type::FPINT, 32, "float");
+	registerPrimitive (nir::Type::FPINT, 64, "double");
+	registerPrimitive (nir::Type::FPINT, 128, "quad");
 }
 
 
