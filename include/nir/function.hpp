@@ -16,6 +16,8 @@ struct Function {
 		
 		enum CallConv : char {CCC, NCC, SV_ABI};
 		
+		bool validate () const;
+		
 		Block * getEntryPoint () {return entry;}
 		const Block * getEntryPoint () const {return entry;}
 		const Type * getType () const {return type;}

@@ -15,6 +15,8 @@ struct Block {
 	
 	public:
 		
+		bool validate () const;
+		
 		const std::vector <const Instruction *> getInstructions () const {return instructions;}
 		
 		const Instruction * give (Instruction * instr) {instructions.push_back (instr); return instr;}

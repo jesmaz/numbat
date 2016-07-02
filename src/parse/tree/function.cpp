@@ -54,7 +54,7 @@ string Function::strDump (text::PrintMode mode) {
 	
 }
 
-Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, (iden ? iden : params)->getLine (), (iden ? iden : params)->getPos ()) {	
+Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, (iden ? iden : params)->getLine (), (iden ? iden : params)->getPos ()) {
 	if (iden){
 		this->iden = iden->getIden ();
 	}

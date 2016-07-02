@@ -24,6 +24,8 @@ struct Module {
 	
 	public:
 		
+		bool validate () const;
+		
 		Builder registerFunction (std::vector <Type> args, std::vector <Type> ret, const string & name);
 		
 		Scope * createRootScope ();

@@ -19,6 +19,8 @@ class Type : public numbat::visitor::BaseConstVisitable {
 		
 		enum ArithmaticType : char {DEFAULT=0, DECINT='d', INT='i', FPINT='f', UINT='u'};
 		
+		virtual bool validate () const {return true;}
+		
 		string toString (text::PrintMode mode=text::PLAIN) const {if (this) return strDump (mode); else return "nullptr";}
 		
 		virtual const Type * getDereferenceType () const {return nullptr;}

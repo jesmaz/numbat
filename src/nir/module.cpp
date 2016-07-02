@@ -8,6 +8,21 @@
 namespace nir {
 
 
+bool Module::validate () const {
+	
+	bool valid = true;
+	for (auto func : data->functions) {
+		valid &= func.second->validate ();
+	}
+	
+	for (auto type : data->types) {
+		valid &= type.second->validate ();
+	}
+	
+	return valid;
+	
+}
+
 void Module::registerPrimative (Type::ArithmaticType arith, uint32_t width, const string & name) {
 	
 	if (symbol s = newSymbol (name, false)) {
