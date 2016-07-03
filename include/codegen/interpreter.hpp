@@ -1,21 +1,7 @@
 #pragma once
 
-#include "../nir/inst/add.hpp"
-#include "../nir/inst/alloc.hpp"
-#include "../nir/inst/call.hpp"
-#include "../nir/inst/constant.hpp"
-#include "../nir/inst/div.hpp"
-#include "../nir/inst/functionPointer.hpp"
-#include "../nir/inst/get.hpp"
-#include "../nir/inst/less.hpp"
-#include "../nir/inst/mul.hpp"
-#include "../nir/inst/neg.hpp"
-#include "../nir/inst/put.hpp"
-#include "../nir/inst/sub.hpp"
-#include "../nir/parameter.hpp"
 
-#include "target.hpp"
-
+#include <codegen/targetVisitor.hpp>
 #include <memory>
 #include <set>
 #include <vector>
@@ -24,9 +10,8 @@
 namespace codegen {
 
 using namespace nir;
-using numbat::visitor::ConstVisitor;
 
-class Interpreter : public Target, public ConstVisitor <Add>, public ConstVisitor <Alloc>, public ConstVisitor <Constant>, public ConstVisitor <Div>, public ConstVisitor <DirectCall>, public ConstVisitor <FunctionPointer>, public ConstVisitor <Get>, public ConstVisitor <Less>, public ConstVisitor <Mul>, public ConstVisitor <Neg>, public ConstVisitor <Number>, public ConstVisitor <Parameter>, public ConstVisitor <Put>, public ConstVisitor <Sub> {
+class Interpreter : public TargetVisitor {
 	
 	public:
 		
