@@ -10,18 +10,18 @@ class Neg : public Instruction {
 	CONST_VISITABLE
 	public:
 		
-		bool validate () const {return arg->validate ();}
+		bool validate () const {return arg.instr->validate ();}
 		
-		const Instruction * getArg () const {return arg;}
+		Argument getArg () const {return arg;}
 		
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) const {return "-" + arg->toString (mode);}
+		virtual string strDump (text::PrintMode mode) const {return "-" + arg.toString (mode);}
 		
-		Neg (const Instruction * arg, symbol iden=nullptr) : Instruction (arg->getTypes (), {iden}), arg (arg) {}
+		Neg (Argument arg, symbol iden=nullptr) : Instruction (arg.instr->getTypes (), {iden}), arg (arg) {}
 		
-		const Instruction * arg;
+		Argument arg;
 		
 		friend Scope;
 		

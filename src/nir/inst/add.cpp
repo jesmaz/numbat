@@ -26,7 +26,7 @@ bool Add::validate () const {
 
 string Add::strDump (text::PrintMode mode) const {
 	
-	return "add." + getType ()->toString (mode) + " " + lhs->printIden (mode) + " " + rhs->printIden (mode);
+	return "add." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);
 	
 }
 

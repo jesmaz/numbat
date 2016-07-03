@@ -26,7 +26,7 @@ bool Div::validate () const {
 
 string Div::strDump (text::PrintMode mode) const {
 	
-	return "mul." + getType ()->toString (mode) + " " + lhs->printIden (mode) + " " + rhs->printIden (mode);
+	return "mul." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);
 	
 }
 

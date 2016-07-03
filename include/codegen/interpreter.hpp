@@ -72,9 +72,9 @@ class Interpreter : public TargetVisitor {
 		};
 		
 		template <typename T>
-		Interpreter::Atom binaryOpp (const Instruction * ilhs, const Instruction * irhs, const Type * type);
+		Interpreter::Atom binaryOpp (Argument ilhs, Argument irhs, const Type * type);
 		
-		Atom lookupAtom (const Instruction * val);
+		Atom lookupAtom (Argument val);
 		Atom staticCast (const Atom & source, const Type * const target);
 		static std::vector <Atom> callFunction (const Function * func, const std::vector <Atom> & args);
 		std::vector <Atom> operator () (const Block * block);

@@ -12,17 +12,17 @@ class Less : public Instruction {
 		
 		bool validate () const;
 		
-		const Instruction * getLhs () const {return lhs;}
-		const Instruction * getRhs () const {return rhs;}
+		Argument getLhs () const {return lhs;}
+		Argument getRhs () const {return rhs;}
 		
 	protected:
 	private:
 		
 		virtual string strDump (text::PrintMode mode) const;
 		
-		Less (const Type * type, const Instruction * lhs, const Instruction * rhs, symbol iden=nullptr) : Instruction ({type}, {iden}), lhs (lhs), rhs (rhs) {}
+		Less (const Type * type, Argument lhs, Argument rhs, symbol iden=nullptr) : Instruction ({type}, {iden}), lhs (lhs), rhs (rhs) {}
 		
-		const Instruction * lhs, * rhs;
+		Argument lhs, rhs;
 		
 		friend Scope;
 		

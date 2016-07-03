@@ -3,7 +3,7 @@
 #include "../../../include/parse/tree/operator.hpp"
 
 
-std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <const nir::Instruction *> &)> nirDefImp = {
+std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <nir::Argument> &)> nirDefImp = {
 	{"- ", &nir::Scope::createNeg},
 // 	{"! ", &nir::Scope::createLNot},
 // 	{"not ", &nir::Scope::createLNot},
@@ -48,13 +48,14 @@ std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <c
 
 const nir::Instruction * ParseTreeOperator::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
 	
-	std::vector <const nir::Instruction *> nodes;
-	nodes.resize (args.size (), nullptr);
+	std::vector <nir::Argument> nodes;
+	nodes.resize (args.size (), {nullptr, nullptr});
 	//std::vector <numbat::parser::FunctionDecleration *> candidates;
 	for (size_t i=0; i<args.size(); ++i) {
 		assert (args[i]);
-		nodes [i] = args[i]->build (scope, mode);
-		assert (nodes [i]);
+		const nir::Instruction * instr = args[i]->build (scope, mode);
+		nodes [i] = {instr, instr->getIden ()};
+		assert (instr);
 	}
 	
 	assert (nirDefImp [iden]);

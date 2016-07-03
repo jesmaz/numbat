@@ -10,7 +10,7 @@ class Jump : public Instruction {
 	CONST_VISITABLE
 	public:
 		
-		const Instruction * getCondition () const {return condition;}
+		Argument getCondition () const {return condition;}
 		const Block * getBlock () const {return block;}
 		
 		virtual bool validate () const {return true;}
@@ -20,9 +20,9 @@ class Jump : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "Jump TODO: destination & condition";}
 		
-		Jump (const Instruction * condition, const Block * block) : Instruction ({nullptr}, {nullptr}), condition (condition), block (block) {}
+		Jump (Argument condition, const Block * block) : Instruction ({nullptr}, {nullptr}), condition (condition), block (block) {}
 		
-		const Instruction * condition;
+		Argument condition;
 		const Block * block;
 		
 		friend Scope;

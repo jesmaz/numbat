@@ -25,7 +25,7 @@ std::vector <Interpreter::Atom> Interpreter::callFunction (const Function * func
 
 
 template <typename K>
-Interpreter::Atom Interpreter::binaryOpp (const Instruction * ilhs, const Instruction * irhs, const Type * type) {
+Interpreter::Atom Interpreter::binaryOpp (Argument ilhs, Argument irhs, const Type * type) {
 	Interpreter::Atom lhs = staticCast (lookupAtom (ilhs), type);
 	Interpreter::Atom rhs = staticCast (lookupAtom (irhs), type);
 	Atom ret = rhs;
@@ -274,16 +274,17 @@ void Interpreter::visit (const Type * type) {
 	
 }
 
-Interpreter::Atom Interpreter::lookupAtom (const nir::Instruction * val) {
+Interpreter::Atom Interpreter::lookupAtom (Argument val) {
 	
-	if (val->getIden ()) {
-		auto itt = lookupTable.find (val->getIden ());
+	if (val.sym) {
+		auto itt = lookupTable.find (val.instr->getIden ());
 		if (itt != lookupTable.end ()) {
 			return itt->second;
 		}
 	}
-	val->accept (*this);
-	auto itt = lookupTable.find (val->getIden ());
+	
+	val.instr->accept (*this);
+	auto itt = lookupTable.find (val.sym ? val.sym : val.instr->getIden ());
 	if (itt != lookupTable.end ()) {
 		return itt->second;
 	}
@@ -357,7 +358,7 @@ Interpreter::Atom Interpreter::staticCast (const Interpreter::Atom & source, con
 std::string Interpreter::operator ()(const nir::Instruction * val) {
 	
 	if (const Type * type = val->getType ()->getDereferenceType ()) {
-		auto get = Get (type, val);
+		auto get = Get (type, {val, nullptr});
 		return this->operator ()(&get);
 	}
 	
@@ -420,13 +421,12 @@ std::string Interpreter::operator ()(const nir::Instruction * val) {
 std::vector <Interpreter::Atom> Interpreter::operator ()(const Block * block) {
 	
 	currentBlock = block;
-	Atom last;
-	last.atomicType = VOID;
+	std::vector <Interpreter::Atom> last;
 	for (auto & val : block->getInstructions ()) {
-		last = lookupAtom (val);
+		last = lookupAtoms (val);
 		if (currentBlock != block) return (*this)(currentBlock);
 	}
-	return std::vector <Interpreter::Atom> ({last});
+	return std::vector <Interpreter::Atom> (last);
 	
 }
 

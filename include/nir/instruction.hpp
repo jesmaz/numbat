@@ -46,6 +46,12 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 		
 };
 
+struct Argument {
+	const Instruction * instr;
+	symbol sym;
+	string toString (text::PrintMode mode=text::PLAIN) const;
+};
+
 };
 
 

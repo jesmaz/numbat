@@ -29,7 +29,9 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTree
 	std::cerr << iden->toString () << std::endl;
 	std::cerr << iden->getIden () << std::endl;
 	if (mode == ParseTreeNode::BuildMode::PARAMETER) {
-		return scope->createParameter (type, init, iden->getIden ());
+		nir::symbol sym = nullptr;
+		if (init) sym = init->getIden ();
+		return scope->createParameter (type, {init, sym}, iden->getIden ());
 	} else {
 		var = scope->allocateVariable (type, iden->getIden ());
 	}
@@ -38,7 +40,7 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTree
 		if (init->getType () != type) {
 			val = scope->staticCast (init, type);
 		}
-		return scope->createPut (val, var);
+		return scope->createPut ({val, val->getIden ()}, {var, var->getIden ()});
 	}
 	return var;
 	

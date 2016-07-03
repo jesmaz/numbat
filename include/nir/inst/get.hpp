@@ -9,18 +9,18 @@ class Get : public Instruction {
 	CONST_VISITABLE
 	public:
 		
-		const Instruction * getSrc () const {return src;}
+		Argument getSrc () const {return src;}
 		
 		virtual bool validate () const {return true;}
 		
-		Get (const Type * type, const Instruction * src, symbol iden=nullptr) : Instruction ({type}, {iden}), src (src) {}
+		Get (const Type * type, Argument src, symbol iden=nullptr) : Instruction ({type}, {iden}), src (src) {}
 		
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) const {return "get." + getType ()->toString () + " " + src->printIden ();}
+		virtual string strDump (text::PrintMode mode) const {return "get." + getType ()->toString () + " " + src.toString ();}
 		
-		const Instruction * src;
+		Argument src;
 		
 		friend Scope;
 		

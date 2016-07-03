@@ -15,11 +15,14 @@ auto convArgs = [](const std::vector <PTNode> & args, numbat::parser::NumbatScop
 };
 
 auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	std::vector <const nir::Instruction *> conv;
+	std::vector <nir::Argument> conv;
 	conv.reserve (args.size ());
 	for (auto & arg : args) {
 		assert (arg);
-		conv.push_back (arg->build (scope, mode));
+		const nir::Instruction * instr = arg->build (scope, mode);
+		for (nir::symbol iden : instr->getIdens ()) {
+			conv.push_back ({instr, iden});
+		}
 	}
 	return conv;
 };

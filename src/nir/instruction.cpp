@@ -4,6 +4,21 @@
 namespace nir {
 
 
+string Argument::toString (text::PrintMode mode) const {
+	
+	if (instr) {
+		if (sym) {
+			return *sym;
+		} else {
+			return instr->printIden (mode);
+		}
+	} else {
+		return "nullptr";
+	}
+	
+}
+
+
 string Instruction::printIden (text::PrintMode mode) const {
 	if (this) {
 		string s;

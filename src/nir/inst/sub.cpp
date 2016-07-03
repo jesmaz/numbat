@@ -26,7 +26,7 @@ bool Sub::validate () const {
 
 string Sub::strDump (text::PrintMode mode) const {
 	
-	return "sub." + getType ()->toString (mode) + " " + lhs->printIden (mode) + " " + rhs->printIden (mode);
+	return "sub." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);
 	
 }
 

@@ -9,19 +9,19 @@ class Put : public Instruction {
 	CONST_VISITABLE
 	public:
 		
-		const Instruction * getDest () const {return dest;}
-		const Instruction * getSrc () const {return src;}
+		Argument getDest () const {return dest;}
+		Argument getSrc () const {return src;}
 		
 		virtual bool validate () const {return true;}
 		
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) const {return "put." + getType ()->toString () + " " + src->printIden () + " " + dest->printIden ();}
+		virtual string strDump (text::PrintMode mode) const {return "put." + getType ()->toString () + " " + src.instr->printIden () + " " + dest.instr->printIden ();}
 		
-		Put (const Type * type, const Instruction * src, const Instruction * dest, symbol iden=nullptr) : Instruction ({type}, {iden}), src (src), dest (dest) {}
+		Put (const Type * type, Argument src, Argument dest, symbol iden=nullptr) : Instruction ({type}, {iden}), src (src), dest (dest) {}
 		
-		const Instruction * src, * dest;
+		Argument src, dest;
 		
 		friend Scope;
 		

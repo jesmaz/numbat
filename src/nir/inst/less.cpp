@@ -26,7 +26,7 @@ bool Less::validate () const {
 
 string Less::strDump (text::PrintMode mode) const {
 	
-	return "less." + getType ()->toString (mode) + " " + lhs->printIden (mode) + " " + rhs->printIden (mode);
+	return "less." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);
 	
 }
 

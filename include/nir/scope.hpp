@@ -2,10 +2,9 @@
 #define NIR_SCOPE
 
 
-#include "forward.hpp"
 #include <file.hpp>
-
 #include <map>
+#include <nir/instruction.hpp>
 #include <set>
 #include <vector>
 
@@ -13,8 +12,6 @@
 namespace nir {
 
 using std::string;
-
-typedef const string * symbol;
 
 struct Scope {
 	
@@ -31,27 +28,29 @@ struct Scope {
 		
 		const Type * resolveType (const string & iden) const;
 		
+		Argument createGet (Argument src);
+		Argument staticCast (Argument src, const Type * const target, const string & iden="");
+		
 		const Instruction * allocateVariable (const Type * const type, const string & iden="");
 		template <typename T>
-		const Instruction * createBinary (const Instruction * lhs, const Instruction * rhs, const string & iden);
-		const Instruction * createAdd (const std::vector <const Instruction *> & args);
-		const Instruction * createAssign (const std::vector <const Instruction *> & args);
-		const Instruction * createCall (const Function * func, const std::vector <const Instruction *> & args);
+		const Instruction * createBinary (Argument lhs, Argument rhs, const string & iden);
+		const Instruction * createAdd (const std::vector <Argument> & args);
+		const Instruction * createAssign (const std::vector <Argument> & args);
+		const Instruction * createCall (const Function * func, const std::vector <Argument> & args);
 		template <typename T>
-		const Instruction * createCmp (const Instruction * lhs, const Instruction * rhs, const string & iden);
-		const Instruction * createCmpLT (const std::vector <const Instruction *> & args);
+		const Instruction * createCmp (Argument lhs, Argument rhs, const string & iden);
+		const Instruction * createCmpLT (const std::vector <Argument> & args);
 		const Instruction * createConstant (const Type * type, const string & val, const string & iden="");
-		const Instruction * createDiv (const std::vector <const Instruction *> & args);
-		const Instruction * createGet (const Instruction * src);
+		const Instruction * createDiv (const std::vector <Argument> & args);
 		const Instruction * createImportHandle (const Scope * scope, const string & iden="");
-		const Instruction * createNeg (const std::vector <const Instruction *> & args);
+		const Instruction * createNeg (const std::vector <Argument> & args);
 		const Instruction * createJump (symbol block);
-		const Instruction * createJump (const Instruction * cond, symbol block);
-		const Instruction * createMul (const std::vector <const Instruction *> & args);
-		const Instruction * createParameter (const Type * const type, const Instruction * init=nullptr, const string & iden="");
-		const Instruction * createPut (const Instruction * src, const Instruction * dest);
-		const Instruction * createStructValue (const Type * const type, std::vector <const Instruction *> vals, const string & iden="");
-		const Instruction * createSub (const std::vector <const Instruction *> & args);
+		const Instruction * createJump (Argument cond, symbol block);
+		const Instruction * createMul (const std::vector <Argument> & args);
+		const Instruction * createParameter (const Type * const type, Argument init={nullptr, nullptr}, const string & iden="");
+		const Instruction * createPut (Argument src, Argument dest);
+		const Instruction * createStructValue (const Type * const type, std::vector <Argument> vals, const string & iden="");
+		const Instruction * createSub (const std::vector <Argument> & args);
 		const Instruction * getFunctionPointer ();
 		const Instruction * resolve (const string & iden);
 		const Instruction * staticCast (const Instruction * src, const Type * const target, const string & iden="");
