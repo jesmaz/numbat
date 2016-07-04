@@ -7,6 +7,8 @@ namespace codegen {
 std::map <string, Target::FFunc> * Target::targets=nullptr;
 
 Target * Target::find (const string & iden) {
+	if (not targets) return nullptr;
+	if (not targets->count (iden)) return nullptr;
 	auto * f = (*targets) [iden];
 	assert (f);
 	auto * t = f();

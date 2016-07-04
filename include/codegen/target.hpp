@@ -18,6 +18,7 @@ class Target {
 	
 	public:
 		
+		virtual void finalise () {}
 		virtual void reset ()=0;
 		virtual void visit (const nir::Function * module)=0;
 		virtual void visit (const Type * module)=0;
@@ -37,7 +38,7 @@ class Target {
 		
 	private:
 		
-		virtual void generate (const nir::Function * func, std::vector <uint8_t> & output)=0;
+		virtual void generate (const nir::Function * func, std::vector <uint8_t> & output) {}
 		
 		static std::map <string, FFunc> * targets;
 		
