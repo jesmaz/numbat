@@ -30,7 +30,7 @@ class ParseTree : public ParseTreeNode {
 				switch (node->getType ()) {
 					case ParseTreeNode::NodeType::FUNCTION:
 						functions.push_back (node->asFunction ());
-						break;
+						continue;
 					case ParseTreeNode::NodeType::IMPORT:
 						import.push_back (node);
 						break;
