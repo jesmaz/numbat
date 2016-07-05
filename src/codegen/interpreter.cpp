@@ -366,7 +366,7 @@ Interpreter::Atom Interpreter::staticCast (const Interpreter::Atom & source, con
 std::string Interpreter::operator ()(const nir::Instruction * val) {
 	
 	if (const Type * type = val->getType ()->getDereferenceType ()) {
-		auto get = Get (type, {val, nullptr});
+		auto get = Get (type, {val, nullptr}, nullptr);
 		return this->operator ()(&get);
 	}
 	

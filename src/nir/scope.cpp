@@ -227,7 +227,7 @@ Argument Scope::createGet (Argument src) {
 
 const Instruction * Scope::createNeg (const std::vector <Argument> & args) {
 	
-	Instruction * instr = new Neg (args [0]);
+	Instruction * instr = new Neg (args [0], module->newSymbol ("neg"));
 	return insertionPoint->give (instr);
 	
 }
@@ -267,7 +267,7 @@ const Instruction * Scope::createParameter (const Type * const type, Argument in
 
 const Instruction * Scope::createPut (Argument src, Argument dest) {
 	
-	auto * instr = new Put (dest.instr->getType ()->getDereferenceType (), src, dest);
+	auto * instr = new Put (dest.instr->getType ()->getDereferenceType (), src, dest, module->newSymbol ("put"));
 	return insertionPoint->give (instr);
 	
 }
