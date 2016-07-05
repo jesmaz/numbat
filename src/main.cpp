@@ -9,7 +9,7 @@ int main (int argl, char ** args) {
 	Config::initalise (argl, args);
 	const Config & cfg = Config::globalConfig ();
 	
-	codegen::Target * target = new codegen::LLVM;
+	codegen::Target * target = codegen::Target::find ("llvm");
 	
 	nir::Module nirModule (target);
 	for (const string & file : cfg.files) {
@@ -21,6 +21,7 @@ int main (int argl, char ** args) {
 	}
 	
 	nirModule.build ();
+	target->finalise ();
 	return 0;
 	
 }
