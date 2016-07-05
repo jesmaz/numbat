@@ -1,10 +1,7 @@
 #ifdef USE_LLVM
-#include "../../include/codegen/llvm.hpp"
-#include "../../include/nir/block.hpp"
-#include "../../include/nir/function.hpp"
-#include "../../include/nir/type/number.hpp"
 
 
+#include <codegen/llvm.hpp>
 #include <iostream>
 #include <llvm/Analysis/Passes.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
@@ -18,17 +15,32 @@
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/PassManager.h>
-#include <llvm/Support/raw_ostream.h>
-#include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/FileSystem.h>
+#include <llvm/Support/FormattedStream.h>
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/ToolOutputFile.h>
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Target/TargetLibraryInfo.h>
 #include <llvm/Transforms/IPO.h>
 #include <llvm/Transforms/Scalar.h>
+#include <nir/block.hpp>
+#include <nir/function.hpp>
+#include <nir/type/number.hpp>
+#include <utility/config.hpp>
 
 
 namespace codegen {
 
 
-Target::RegTarget LLVM::target ("llvm", []()->Target*{return new LLVM;});
+Target::RegTarget LLVM::target ("llvm", []()->Target*{
+	llvm::InitializeAllTargets ();
+	llvm::InitializeAllTargetMCs ();
+	llvm::InitializeAllAsmPrinters ();
+	llvm::InitializeAllAsmParsers ();
+	llvm::InitializeNativeTarget ();
+	return new LLVM;
+});
 
 
 llvm::Type * LLVM::resolve (const Type * type) {
@@ -59,11 +71,14 @@ llvm::Function * LLVM::resolve (const nir::Function * func) {
 		ret.push_back (resolve (t));
 	}
 	
-	llvm::FunctionType * ft = llvm::FunctionType::get (
-		llvm::StructType::get (irBuilder.getContext (), ret),
-		params,
-		false
-	);
+	llvm::Type * retType;
+	if (ret.empty ()) {
+		retType = irBuilder.getVoidTy ();
+	} else {
+		retType = llvm::StructType::get (irBuilder.getContext (), ret);
+	}
+	
+	llvm::FunctionType * ft = llvm::FunctionType::get (retType, params, false);
 	return f = llvm::Function::Create (ft, llvm::Function::ExternalLinkage, func->getLabel (), module);
 	
 }
@@ -77,8 +92,48 @@ llvm::Value * LLVM::resolve (nir::Argument val) {
 	return v;
 }
 
-void LLVM::finalise() {
-	module->dump ();
+void LLVM::finalise () {
+	
+	const Config & config = Config::globalConfig ();
+	
+	std::string error;
+	
+	llvm::Triple theTriple (module->getTargetTriple ());
+	const llvm::Target * target = llvm::TargetRegistry::lookupTarget ("x86-64", theTriple, error);
+	llvm::TargetRegistry::printRegisteredTargetsForVersion ();
+	
+	if (not target) {
+		std::cerr << error << std::endl;
+		std::cerr << theTriple.getTriple () << std::endl;
+		return;
+	}
+	
+	llvm::TargetOptions options;
+	llvm::TargetMachine * machine = target->createTargetMachine (theTriple.getTriple (), "generic", "", options);
+	
+	if (not machine) {
+		std::cerr << "could not allocate target machine" << std::endl;
+		return;
+	}
+	
+	
+	llvm::tool_output_file fout ((config.outfile + ".o").c_str (), error, llvm::sys::fs::F_None);
+	if (!error.empty ()) {
+		std::cerr << error << std::endl;
+		return;
+	}
+	
+	
+	llvm::PassManager pm;
+	pm.add (new llvm::TargetLibraryInfo (theTriple));
+	machine->addAnalysisPasses (pm);
+	pm.add (new llvm::DataLayoutPass (*machine->getDataLayout ()));
+	llvm::formatted_raw_ostream frouts (fout.os ());
+	machine->addPassesToEmitFile (pm, frouts, llvm::TargetMachine::CGFT_ObjectFile);
+	
+	pm.run (*module);
+	fout.keep ();
+	
 }
 
 void LLVM::reset () {
@@ -173,6 +228,13 @@ void LLVM::visit (const nir::Function * func) {
 	
 	instrDict.clear ();
 	
+	std::cerr << std::flush;
+	llvm::raw_fd_ostream llerr (2, false);
+	if (llvm::verifyFunction (*llFunc, &llerr)) {
+		llFunc->print (llerr);
+		llerr.flush ();
+	}
+	
 }
 
 void LLVM::visit (const nir::Mul & mul) {
@@ -182,7 +244,11 @@ void LLVM::visit (const nir::Mul & mul) {
 
 void LLVM::visit (const nir::Neg & neg) {
 	auto * arg = resolve (neg.getArg ());
-	instrDict [neg.getIden ()] = irBuilder.CreateNeg (arg, "neg");
+	if (arg->getType ()->isFloatingPointTy ()) {
+		instrDict [neg.getIden ()] = irBuilder.CreateFNeg (arg, "neg");
+	} else {
+		instrDict [neg.getIden ()] = irBuilder.CreateNeg (arg, "neg");
+	}
 }
 
 void LLVM::visit (const nir::Number & num) {
