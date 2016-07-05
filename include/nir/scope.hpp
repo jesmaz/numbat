@@ -36,6 +36,7 @@ struct Scope {
 		const Instruction * createBinary (Argument lhs, Argument rhs, const string & iden);
 		const Instruction * createAdd (const std::vector <Argument> & args);
 		const Instruction * createAssign (const std::vector <Argument> & args);
+		const Instruction * createAutoReturn (const Instruction * instr);
 		const Instruction * createCall (const Function * func, const std::vector <Argument> & args);
 		template <typename T>
 		const Instruction * createCmp (Argument lhs, Argument rhs, const string & iden);

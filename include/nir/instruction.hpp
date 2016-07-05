@@ -52,6 +52,9 @@ struct Argument {
 	string toString (text::PrintMode mode=text::PLAIN) const;
 };
 
+std::vector <const Type *> argumentToType (const std::vector <Argument> & args);
+std::vector <symbol> argumentToSymbol (const std::vector <Argument> & args);
+
 };
 
 

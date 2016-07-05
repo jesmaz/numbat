@@ -13,6 +13,7 @@
 #include <nir/inst/mul.hpp>
 #include <nir/inst/neg.hpp>
 #include <nir/inst/put.hpp>
+#include <nir/inst/ret.hpp>
 #include <nir/inst/sub.hpp>
 #include <nir/parameter.hpp>
 #include <nir/type/number.hpp>
@@ -38,6 +39,7 @@ class TargetVisitor :
 	public ConstVisitor <Number>,
 	public ConstVisitor <Parameter>,
 	public ConstVisitor <Put>,
+	public ConstVisitor <Ret>,
 	public ConstVisitor <Sub> {};
 
 }

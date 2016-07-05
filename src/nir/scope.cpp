@@ -14,6 +14,7 @@
 #include "../../include/nir/inst/mul.hpp"
 #include "../../include/nir/inst/neg.hpp"
 #include "../../include/nir/inst/put.hpp"
+#include "../../include/nir/inst/ret.hpp"
 #include "../../include/nir/inst/sub.hpp"
 #include "../../include/nir/type/importHandle.hpp"
 #include "../../include/nir/type/number.hpp"
@@ -155,6 +156,17 @@ const Instruction * Scope::createAssign (const std::vector <Argument> & args) {
 	}
 	tsrc = staticCast (tsrc, args [0].instr->getType ()->getDereferenceType ());
 	return createPut (args [1], args [0]);
+}
+
+const Instruction * Scope::createAutoReturn (const Instruction * instr) {
+	
+	std::vector <Argument> args;
+	for (symbol s : instr->getIdens ()) {
+		args.push_back ({instr, s});
+	}
+	Instruction * ret = new Ret (args);
+	return insertionPoint->give (ret);
+	
 }
 
 const Instruction * Scope::createCall (const Function * func, const std::vector <Argument> & args) {

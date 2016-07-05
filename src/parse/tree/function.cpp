@@ -27,6 +27,7 @@ const nir::Instruction * Function::build (nir::Scope * scope, ParseTreeNode::Bui
 	
 	if (body) {
 		auto b = body->build (fScope, mode);
+		fScope->createAutoReturn (b);
 	}
 	return fScope->getFunctionPointer ();
 	
