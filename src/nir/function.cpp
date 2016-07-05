@@ -36,9 +36,9 @@ bool Function::validate () const {
 }
 
 
-Function::Function () : entry (new Block), blocks ({entry}) {}
+Function::Function (const std::string & label) : entry (new Block), blocks ({entry}), label (label) {}
 
-Function::Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret) : entry (new Block), blocks ({entry}), args (args), ret (ret), retTypes (getInstType (ret)), type (FunctionType::get (getInstType (args), retTypes)) {}
+Function::Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret, const std::string & label) : entry (new Block), blocks ({entry}), args (args), ret (ret), retTypes (getInstType (ret)), type (FunctionType::get (getInstType (args), retTypes)), label (label) {}
 
 
 };

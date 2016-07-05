@@ -33,12 +33,12 @@ void Module::registerPrimitive (Type::ArithmaticType arith, uint32_t width, cons
 	
 }
 
-Scope * Module::createRootScope() {
+Scope * Module::createRootScope () {
 	
 	Scope * global = getGlobalScope ();
 	symbol sym = newSymbol ("__entry__");
 	assert (sym);
-	Function * func = new Function;
+	Function * func = new Function (*sym);
 	data->functions [sym] = func;
 	global->createCall (func, {});
 	Scope * scope = new Scope (this, func->getEntryPoint (), func);
@@ -52,7 +52,7 @@ Scope * Module::getGlobalScope () {
 	if (not data->globalScope) {
 		symbol sym = newSymbol ("__entry__", true);
 		assert (sym);
-		Function * func = new Function;
+		Function * func = new Function (*sym);
 		data->functions [sym] = func;
 		data->globalScope = new Scope (this, func->getEntryPoint (), func);
 	}

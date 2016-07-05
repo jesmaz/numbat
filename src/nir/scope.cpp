@@ -28,14 +28,14 @@ namespace nir {
 
 Scope * Scope::declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden) {
 	
-	Function * func = new Function (params, ret);
-	
 	string label = "nbt_" + iden;// + "_-";
 	//for (Type * p : params) label += p->getIden () + "-";
 	//label += "_-";
 	//for (Type * r : ret) label += r->getIden () + "-";
 	label += "_" + std::to_string (params.size ());
 	label += "_" + std::to_string (ret.size ());
+	
+	Function * func = new Function (params, ret, label);
 	
 	symbol s;
 	if (iden == "") {

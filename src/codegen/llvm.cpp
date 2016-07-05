@@ -64,7 +64,7 @@ llvm::Function * LLVM::resolve (const nir::Function * func) {
 		params,
 		false
 	);
-	return f = llvm::Function::Create (ft, llvm::Function::ExternalLinkage, "function", module);
+	return f = llvm::Function::Create (ft, llvm::Function::ExternalLinkage, func->getLabel (), module);
 	
 }
 

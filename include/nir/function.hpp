@@ -2,8 +2,8 @@
 #define NIR_FUNCTION
 
 
-#include "forward.hpp"
-
+#include <nir/forward.hpp>
+#include <string>
 #include <vector>
 
 
@@ -21,13 +21,14 @@ struct Function {
 		Block * getEntryPoint () {return entry;}
 		const Block * getEntryPoint () const {return entry;}
 		const Type * getType () const {return type;}
+		const std::string getLabel () const {return label;}
 		const std::vector <const Parameter *> & getArgs () const {return args;}
 		const std::vector <const Parameter *> & getRet () const {return ret;}
 		const std::vector <const Type *> getRetTypes () const {return retTypes;}
 		void pushBlock (Block * block) {blocks.push_back (block);}
 		
-		Function ();
-		Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret);
+		Function (const std::string & label);
+		Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret, const std::string & label);
 		
 	protected:
 	private:
@@ -36,6 +37,7 @@ struct Function {
 		std::vector <Block *> blocks;
 		
 		
+		std::string label;
 		std::vector <const Parameter *> args, ret;
 		std::vector <const Type *> retTypes;
 		const Type * type;
