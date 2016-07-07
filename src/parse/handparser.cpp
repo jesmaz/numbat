@@ -13,6 +13,7 @@
 #include <parse/tree/keyword.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
+#include <parse/tree/metaTags.hpp>
 #include <parse/tree/operator.hpp>
 #include <parse/tree/resolvescope.hpp>
 #include <parse/tree/slice.hpp>
@@ -268,6 +269,7 @@ struct CodeQueue {
 	string syms;
 };
 
+PTNode decorateNodeWithTags (const std::vector <PTNode> & metaTags, PTNode node);
 
 PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected);
 
@@ -281,6 +283,7 @@ PTNode parseStatement (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
 std::vector <PTNode> parseArguments (CodeQueue * queue);
+std::vector <PTNode> parseMetaTags (CodeQueue * queue);
 std::vector <PTNode> parseParameterList (CodeQueue * queue);
 
 
@@ -295,6 +298,10 @@ void clear (CodeQueue * queue) {
 		flags = SymbolFlags::map [size_t (queue->peak ())];
 	}
 	
+}
+
+PTNode decorateNodeWithTags (const std::vector <PTNode> & metaTags, PTNode node) {
+	return new MetaTags (metaTags, node);
 }
 
 PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected) {
@@ -426,7 +433,13 @@ PTNode parseBlock (CodeQueue * queue) {
 	
 	std::vector <PTNode> body;
 	while (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT and queue->peak () != Symbol::__NONE__) {
-		body.push_back (parseStatement (queue));
+		if (queue->peak () == Symbol::SYMBOL_AT) {
+			auto tags = parseMetaTags (queue);
+			auto stmt = parseStatement (queue);
+			body.push_back (decorateNodeWithTags (tags, stmt));
+		} else {
+			body.push_back (parseStatement (queue));
+		}
 		while (queue->peak () == Symbol::SEMICOLON) queue->popToken ();
 	}
 	
@@ -656,6 +669,7 @@ PTNode parseProgram (CodeQueue * queue) {
 PTNode parseStatement (CodeQueue * queue) {
 	
 	PTNode lhs=nullptr;
+	std::vector <PTNode> metaTags = parseMetaTags (queue);
 	
 	switch (queue->peak ()) {
 		case Symbol::DEF:
@@ -838,15 +852,43 @@ std::vector <PTNode> parseArguments (CodeQueue * queue) {
 	
 }
 
+std::vector <PTNode> parseMetaTags (CodeQueue * queue) {
+	
+	std::vector <PTNode> metaTags;
+	while (queue->peak () == Symbol::SYMBOL_AT) {
+		
+		queue->popToken ();
+		if (queue->peak () != Symbol::IDENTIFIER) {
+			metaTags.push_back (errorUnexpectedToken (queue, "an identifier"));
+		} else {
+			metaTags.push_back (parseAtom (queue));
+		}
+		
+		if (queue->peak () == Symbol::SEMICOLON) {
+			queue->popToken ();
+			// This allows for the following:
+			// @foo
+			// @bar
+			// def baz ()
+		}
+		
+	}
+	
+	return metaTags;
+	
+}
+
 std::vector <PTNode> parseParameterList (CodeQueue * queue) {
 	
 	Symbol next = queue->peak ();
 	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT) return {};
 	
-	std::vector <PTNode> args;
+	std::vector <PTNode> args, metaTags;
 	for (;;) {
 		PTNode atom;
 		switch (queue->peak ()) {
+			case Symbol::SYMBOL_AT:
+				metaTags = parseMetaTags (queue);
 			case Symbol::VAL:
 			case Symbol::VAR: {
 				numbat::lexer::token token = queue->popToken ();
@@ -859,18 +901,23 @@ std::vector <PTNode> parseParameterList (CodeQueue * queue) {
 		}
 		
 		if (queue->peak () == Symbol::IDENTIFIER) {
-			args.push_back (parseVariable (queue, atom));
+			atom = parseVariable (queue, atom);
 		} else if (queue->peak () != Symbol::SYMBOL_COMMA and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
-			args.push_back (parseExpression (queue, __INT_MAX__, atom));
-		} else {
-			args.push_back (atom);
+			atom = parseExpression (queue, __INT_MAX__, atom);
 		}
+		
+		if (not metaTags.empty ()) {
+			atom = decorateNodeWithTags (metaTags, atom);
+			metaTags.clear ();
+		}
+		args.push_back (atom);
 		
 		if (next == Symbol::SYMBOL_COMMA) {
 			queue->shiftPop ();
 		} else {
 			break;
 		}
+		
 	}
 	return args;
 	
