@@ -35,30 +35,37 @@
 ##Version 0.3##
  - [ ] High level optimisation pass
    - [ ] Static code evaluation
- - [ ] Replace ASTnumbatInstruction with a more robust solution
+ - [x] Replace ASTnumbatInstruction with a more robust solution
  - [ ] Rewrite (and properly document) code generator
- - [ ] Rewrite parser
+ - [x] Rewrite parser
    - [x] Parser should be bottom up
    - [x] Parser should not handle semantics, only syntax
    - [x] Parser should still accept arbitrary operators
-   - [ ] Testing, lots of testing
+   - [x] Testing, lots of testing
  - [ ] Semantic analysis pass
    - [ ] Side effect propagation
-   - [ ] Transforms the parse tree into the abstract syntax tree
+   - [x] Transform into NIR
  - [ ] Verification pass
    - [ ] Define what situations result in error/warning in documentation
 
 ##Version 0.3.1##
- - [ ] Array of complex data types
-   - [ ] Copying
+ - [ ] Arrays
+   - [ ] Copying elements with a overloaded assignment operator
    - [ ] Destruction
    - [ ] Initialisation
+ - [ ] Operator overloading
+ - [ ] OS module
+   - [ ] Numbat friendly wrapper (no pointers passed by the user)
+   - [ ] Open, read, write, close system calls
  - [ ] Smart pointers (reference counting)
+ - [ ] Templates (required for smart pointers)
+   - [ ] Parse variables/parameters with a template
 
 ##Version 0.3.2##
  - [ ] Enum parser
  - [ ] Enum printer
  - [ ] Flagged enums
+ - [ ] Meta tags
 
 ##Version 0.3.3##
  - [ ] Partial file I/O
