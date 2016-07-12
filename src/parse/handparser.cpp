@@ -280,6 +280,7 @@ PTNode parseList (CodeQueue * queue, PTNode prev=nullptr);
 PTNode parseProgram (CodeQueue * queue);
 PTNode parseSlice (CodeQueue * queue, PTNode owner=nullptr);
 PTNode parseStatement (CodeQueue * queue);
+PTNode parseStruct (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
 std::vector <PTNode> parseArguments (CodeQueue * queue);
@@ -293,7 +294,6 @@ void clear (CodeQueue * queue) {
 	SymbolFlags::Flags flags = SymbolFlags::map [size_t (queue->peak ())];
 	while (queue->more () and (scope or not (flags & SymbolFlags::TERMINATE_STATEMENT))) {
 		scope += !!(flags & SymbolFlags::SEGMENT_BEGIN) - !!(flags & SymbolFlags::SEGMENT_END);
-		std::cerr << "Scope: " << scope << std::endl;
 		queue->popToken ();
 		flags = SymbolFlags::map [size_t (queue->peak ())];
 	}
@@ -424,6 +424,10 @@ PTNode parseAtom (CodeQueue * queue) {
 		}
 		
 	} while (oldAtom != atom);
+	
+	if (not atom) {
+		return errorUnexpectedToken (queue, "an expression");
+	}
 	
 	return atom;
 	
@@ -681,7 +685,7 @@ PTNode parseStatement (CodeQueue * queue) {
 		case Symbol::IMPORT:
 			return parseImport (queue);
 		case Symbol::STRUCT:
-			//return parseStruct (queue);
+			return parseStruct (queue);
 		case Symbol::UNION:
 			//return parseUnion (queue);
 			break;
@@ -801,6 +805,33 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 	
 }
 
+PTNode parseStruct (CodeQueue * queue) {
+	
+	// Drop struct keyword
+	numbat::lexer::token token = queue->popToken ();
+	
+	string iden;
+	if (queue->peak () == Symbol::IDENTIFIER) {
+		numbat::lexer::token token = queue->popToken ();
+		iden = token.iden;
+	}
+	
+	std::vector <PTNode> members;
+	if (queue->peak () == Symbol::SYMBOL_BRACE_LEFT) {
+		queue->shiftPop ();
+		members = parseParameterList (queue);
+		if (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT) {
+			PTNode err = errorUnexpectedToken (queue, "'}' or ','");
+			if (queue->peak () == Symbol::SYMBOL_BRACE_RIGHT) queue->shiftPop ();
+			return err;
+		}
+		queue->shiftPop ();
+	}
+	
+	return new Struct (token.line, 0, iden, members);
+	
+}
+
 PTNode parseVariable (CodeQueue * queue, PTNode type) {
 	
 	numbat::lexer::token token = queue->popToken ();
@@ -815,7 +846,11 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 		queue->shiftPop ();
 		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
 		
-	} if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) {
+	} else if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) {
+		
+		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
+		
+	} else if (queue->peak () == Symbol::SYMBOL_COMMA) {
 		
 		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
 		
@@ -881,7 +916,7 @@ std::vector <PTNode> parseMetaTags (CodeQueue * queue) {
 std::vector <PTNode> parseParameterList (CodeQueue * queue) {
 	
 	Symbol next = queue->peak ();
-	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT) return {};
+	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT or next == Symbol::SYMBOL_BRACE_RIGHT) return {};
 	
 	std::vector <PTNode> args, metaTags;
 	for (;;) {
@@ -912,7 +947,7 @@ std::vector <PTNode> parseParameterList (CodeQueue * queue) {
 		}
 		args.push_back (atom);
 		
-		if (next == Symbol::SYMBOL_COMMA) {
+		if (queue->peak () == Symbol::SYMBOL_COMMA) {
 			queue->shiftPop ();
 		} else {
 			break;

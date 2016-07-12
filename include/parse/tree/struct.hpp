@@ -16,13 +16,14 @@ struct Struct : ParseTreeNode {
 		void declare (nir::Scope * scope);
 		
 		Struct (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		Struct (const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()) {}
+		Struct (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & members) : ParseTreeNode (line, pos), iden (iden), members (members) {}
 		
 	protected:
 	private:
 		
 		virtual string strDump (text::PrintMode mode);
 		
+		string iden;
 		std::vector <PTNode> tplate, tags, members;
 		nir::Struct * type;
 		numbat::parser::NumbatScope * sscope;

@@ -17,5 +17,7 @@ void Struct::declare (nir::Scope * scope) {
 }
 
 string Struct::strDump (text::PrintMode mode) {
-	return "";
+	string s = (mode&text::COLOUR ? text::blu + "struct " + text::reset : "struct ") + iden;
+	s += " {" + text::listPtrToStr (members.begin (), members.end (), mode) + "}";
+	return s;
 }
