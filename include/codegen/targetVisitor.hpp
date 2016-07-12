@@ -4,6 +4,7 @@
 #include <codegen/target.hpp>
 #include <nir/inst/add.hpp>
 #include <nir/inst/alloc.hpp>
+#include <nir/inst/bitwise.hpp>
 #include <nir/inst/call.hpp>
 #include <nir/inst/constant.hpp>
 #include <nir/inst/div.hpp>
@@ -28,6 +29,9 @@ class TargetVisitor :
 	public Target,
 	public ConstVisitor <Add>,
 	public ConstVisitor <Alloc>,
+	public ConstVisitor <BitAnd>,
+	public ConstVisitor <BitOr>,
+	public ConstVisitor <BitXor>,
 	public ConstVisitor <Constant>,
 	public ConstVisitor <Div>,
 	public ConstVisitor <DirectCall>,

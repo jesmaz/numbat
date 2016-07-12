@@ -24,6 +24,9 @@ class LLVM : public TargetVisitor {
 		
 		virtual void visit (const Add & add);
 		virtual void visit (const Alloc & alloc);
+		virtual void visit (const BitAnd & bitAnd);
+		virtual void visit (const BitOr & bitOr);
+		virtual void visit (const BitXor & bitXor);
 		virtual void visit (const Block & block);
 		virtual void visit (const Constant & con);
 		virtual void visit (const DirectCall & call);

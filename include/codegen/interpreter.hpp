@@ -19,6 +19,9 @@ class Interpreter : public TargetVisitor {
 		
 		virtual void visit (const Add & add);
 		virtual void visit (const Alloc & alloc);
+		virtual void visit (const BitAnd & bitAnd);
+		virtual void visit (const BitOr & bitOr);
+		virtual void visit (const BitXor & bitXor);
 		virtual void visit (const Block & block);
 		virtual void visit (const Constant & con);
 		virtual void visit (const Div & div);
@@ -74,6 +77,8 @@ class Interpreter : public TargetVisitor {
 		
 		template <typename T>
 		Interpreter::Atom binaryOpp (Argument ilhs, Argument irhs, const Type * type);
+		template <typename T>
+		Interpreter::Atom bitwiseOpp (Argument ilhs, Argument irhs, const Type * type);
 		
 		Atom lookupAtom (Argument val);
 		Atom staticCast (const Atom & source, const Type * const target);

@@ -153,6 +153,21 @@ void LLVM::visit (const nir::Alloc & alloc) {
 	instrDict [alloc.getIden ()] = irBuilder.CreateAlloca (resolve (alloc.getType ()->getDereferenceType ()), arraySize);
 }
 
+void LLVM::visit (const nir::BitAnd & bitAnd) {
+	auto * lhs = resolve (bitAnd.getLhs ()/*, type*/), * rhs = resolve (bitAnd.getRhs ()/*, type*/);
+	instrDict [bitAnd.getIden ()] = irBuilder.CreateAdd (lhs, rhs, "and");
+}
+
+void LLVM::visit (const nir::BitOr & bitOr) {
+	auto * lhs = resolve (bitOr.getLhs ()/*, type*/), * rhs = resolve (bitOr.getRhs ()/*, type*/);
+	instrDict [bitOr.getIden ()] = irBuilder.CreateOr (lhs, rhs, "or");
+}
+
+void LLVM::visit (const nir::BitXor & bitXor) {
+	auto * lhs = resolve (bitXor.getLhs ()/*, type*/), * rhs = resolve (bitXor.getRhs ()/*, type*/);
+	instrDict [bitXor.getIden ()] = irBuilder.CreateXor (lhs, rhs, "xor");
+}
+
 void LLVM::visit (const nir::Block & block) {
 	//TODO: Make insertion block relevant
 	std::cerr << "\nBlock\n\n";

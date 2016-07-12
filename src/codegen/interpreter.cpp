@@ -67,6 +67,46 @@ Interpreter::Atom Interpreter::binaryOpp (Argument ilhs, Argument irhs, const Ty
 	return ret;
 }
 
+template <typename K>
+Interpreter::Atom Interpreter::bitwiseOpp (Argument ilhs, Argument irhs, const Type * type) {
+	Interpreter::Atom lhs = staticCast (lookupAtom (ilhs), type);
+	Interpreter::Atom rhs = staticCast (lookupAtom (irhs), type);
+	Atom ret = rhs;
+	K T;
+	switch (lhs.atomicType) {
+		case DATA:
+		case F32:
+		case F64:
+			assert (false);
+			break;
+		case S8:
+			ret.data.s8 = T (lhs.data.s8, rhs.data.s8);
+			break;
+		case S16:
+			ret.data.s16 = T (lhs.data.s16, rhs.data.s16);
+			break;
+		case S32:
+			ret.data.s32 = T (lhs.data.s32, rhs.data.s32);
+			break;
+		case S64:
+			ret.data.s64 = T (lhs.data.s64, rhs.data.s64);
+			break;
+		case U8:
+			ret.data.u8 = T (lhs.data.u8, rhs.data.u8);
+			break;
+		case U16:
+			ret.data.u16 = T (lhs.data.u16, rhs.data.u16);
+			break;
+		case U32:
+			ret.data.u32 = T (lhs.data.u32, rhs.data.u32);
+			break;
+		case U64:
+			ret.data.u64 = T (lhs.data.u64, rhs.data.u64);
+			break;
+	}
+	return ret;
+}
+
 void Interpreter::reset () {
 	cleanup ();
 	*this = Interpreter ();
@@ -92,6 +132,21 @@ void Interpreter::visit (const Alloc & alloc) {
 	ptrs.insert (data);
 	lookupTable [alloc.getIden ()] = res;
 	
+}
+
+void Interpreter::visit (const BitAnd & bitAnd) {
+	Atom res = bitwiseOpp <std::bit_and <void>> (bitAnd.getLhs (), bitAnd.getRhs (), bitAnd.getType ());
+	lookupTable [bitAnd.getIden ()] = res;
+}
+
+void Interpreter::visit (const BitOr & bitOr) {
+	Atom res = bitwiseOpp <std::bit_or <void>> (bitOr.getLhs (), bitOr.getRhs (), bitOr.getType ());
+	lookupTable [bitOr.getIden ()] = res;
+}
+
+void Interpreter::visit (const BitXor & bitXor) {
+	Atom res = bitwiseOpp <std::bit_xor <void>> (bitXor.getLhs (), bitXor.getRhs (), bitXor.getType ());
+	lookupTable [bitXor.getIden ()] = res;
 }
 
 void Interpreter::visit (const Block & block) {

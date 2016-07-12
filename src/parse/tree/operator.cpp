@@ -24,11 +24,11 @@ std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <n
 // 	{" << ", &nir::Scope::createShiftLeft},
 // 	{" >> ", &nir::Scope::createShiftRight},
 	
-// 	{" & ", &nir::Scope::createBitAnd},
+	{" & ", &nir::Scope::createBitAnd},
 	
-// 	{" ^ ", &nir::Scope::createBitXor},
+	{" ^ ", &nir::Scope::createBitXor},
 	
-// 	{" | ", &nir::Scope::createBitOr},
+	{" | ", &nir::Scope::createBitOr},
 	
 	{" < ", &nir::Scope::createCmpLT},
 // 	{" <= ", &nir::Scope::createCmpLTE},

@@ -1,23 +1,24 @@
-#include "../../include/nir/block.hpp"
-#include "../../include/nir/module.hpp"
-#include "../../include/nir/parameter.hpp"
-#include "../../include/nir/scope.hpp"
-#include "../../include/nir/inst/add.hpp"
-#include "../../include/nir/inst/alloc.hpp"
-#include "../../include/nir/inst/call.hpp"
-#include "../../include/nir/inst/constant.hpp"
-#include "../../include/nir/inst/div.hpp"
-#include "../../include/nir/inst/functionPointer.hpp"
-#include "../../include/nir/inst/get.hpp"
-#include "../../include/nir/inst/jump.hpp"
-#include "../../include/nir/inst/less.hpp"
-#include "../../include/nir/inst/mul.hpp"
-#include "../../include/nir/inst/neg.hpp"
-#include "../../include/nir/inst/put.hpp"
-#include "../../include/nir/inst/ret.hpp"
-#include "../../include/nir/inst/sub.hpp"
-#include "../../include/nir/type/importHandle.hpp"
-#include "../../include/nir/type/number.hpp"
+#include <nir/block.hpp>
+#include <nir/module.hpp>
+#include <nir/parameter.hpp>
+#include <nir/scope.hpp>
+#include <nir/inst/add.hpp>
+#include <nir/inst/alloc.hpp>
+#include <nir/inst/bitwise.hpp>
+#include <nir/inst/call.hpp>
+#include <nir/inst/constant.hpp>
+#include <nir/inst/div.hpp>
+#include <nir/inst/functionPointer.hpp>
+#include <nir/inst/get.hpp>
+#include <nir/inst/jump.hpp>
+#include <nir/inst/less.hpp>
+#include <nir/inst/mul.hpp>
+#include <nir/inst/neg.hpp>
+#include <nir/inst/put.hpp>
+#include <nir/inst/ret.hpp>
+#include <nir/inst/sub.hpp>
+#include <nir/type/importHandle.hpp>
+#include <nir/type/number.hpp>
 
 #include <iostream>
 #include <map>
@@ -167,6 +168,18 @@ const Instruction * Scope::createAutoReturn (const Instruction * instr) {
 	Instruction * ret = new Ret (args);
 	return insertionPoint->give (ret);
 	
+}
+
+const Instruction * Scope::createBitAnd (const std::vector< Argument > & args) {
+	return createBinary <BitAnd> (args [0], args [1], "bitand");
+}
+
+const Instruction * Scope::createBitOr (const std::vector< Argument > & args) {
+	return createBinary <BitOr> (args [0], args [1], "bitor");
+}
+
+const Instruction * Scope::createBitXor (const std::vector< Argument > & args) {
+	return createBinary <BitXor> (args [0], args [1], "bitxor");
 }
 
 const Instruction * Scope::createCall (const Function * func, const std::vector <Argument> & args) {

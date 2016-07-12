@@ -37,6 +37,9 @@ struct Scope {
 		const Instruction * createAdd (const std::vector <Argument> & args);
 		const Instruction * createAssign (const std::vector <Argument> & args);
 		const Instruction * createAutoReturn (const Instruction * instr);
+		const Instruction * createBitAnd (const std::vector <Argument> & args);
+		const Instruction * createBitOr (const std::vector <Argument> & args);
+		const Instruction * createBitXor (const std::vector <Argument> & args);
 		const Instruction * createCall (const Function * func, const std::vector <Argument> & args);
 		template <typename T>
 		const Instruction * createCmp (Argument lhs, Argument rhs, const string & iden);
