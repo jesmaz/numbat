@@ -32,7 +32,7 @@ std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <n
 	
 	{" < ", &nir::Scope::createCmpLT},
 // 	{" <= ", &nir::Scope::createCmpLTE},
-// 	{" > ", &nir::Scope::createCmpGT},
+	{" > ", &nir::Scope::createCmpGT},
 // 	{" >= ", &nir::Scope::createCmpGTE},
 	
 // 	{" == ", &nir::Scope::createCmpEQ},

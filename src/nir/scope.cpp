@@ -211,6 +211,10 @@ const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string &
 	return insertionPoint->give (inst);
 }
 
+const Instruction * Scope::createCmpGT (const std::vector< Argument > & args) {
+	return createCmp <Less> (args [1], args [0], "greater");
+}
+
 const Instruction * Scope::createCmpLT (const std::vector <Argument> & args) {
 	return createCmp <Less> (args [0], args [1], "less");
 }
