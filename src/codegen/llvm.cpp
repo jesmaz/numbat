@@ -299,6 +299,17 @@ void LLVM::visit (const nir::Ret & ret) {
 	}
 }
 
+void LLVM::visit (const nir::Struct & stru) {
+	
+	std::vector <llvm::Type *> members;
+	members.reserve (stru.getMemberArr ().size ());
+	for (const nir::Parameter * p : stru.getMemberArr ()) {
+		members.push_back (resolve (p->getType ()));
+	}
+	typeDict [&stru] = llvm::StructType::get (irBuilder.getContext (), members);
+	
+}
+
 void LLVM::visit (const nir::Sub & sub) {
 	//auto * type = resolve (add.getType ())
 	auto * lhs = resolve (sub.getLhs ()/*, type*/), * rhs = resolve (sub.getRhs ()/*, type*/);

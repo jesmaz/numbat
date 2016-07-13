@@ -26,7 +26,6 @@ struct Struct : ParseTreeNode {
 		string iden;
 		std::vector <PTNode> tplate, tags, members;
 		nir::Struct * type;
-		numbat::parser::NumbatScope * sscope;
 		
 };
 

@@ -390,6 +390,22 @@ Argument Scope::staticCast (Argument src, const Type * const target, const strin
 }
 
 
+Struct * Scope::registerStruct (const string & iden) {
+	
+	Struct * s = new Struct;
+	if (iden != "") {
+		Type *& t = types [iden];
+		if (t) {
+			delete s;
+			return nullptr;
+		}
+		t = s;
+	}
+	return s;
+	
+}
+
+
 size_t Scope::changeActiveBlock (symbol block) {
 	
 	insertionPoint = blocks [block];

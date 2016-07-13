@@ -1,3 +1,4 @@
+#include <nir/parameter.hpp>
 #include <nir/type/struct.hpp>
 
 #include <cassert>
@@ -7,8 +8,8 @@
 
 size_t nir::Struct::calculateSize (size_t ptrSize) const {
 	size_t s=0;
-	for (const Type * t : memberArr) {
-		s += t->calculateSize (ptrSize);
+	for (const Parameter * p : memberArr) {
+		s += p->getType ()->calculateSize (ptrSize);
 	}
 	return s;
 }
@@ -22,10 +23,12 @@ std::string nir::Struct::strDump (text::PrintMode mode) const {
 	s.back () = '}';
 }
 
-nir::Struct::Struct (const std::map <std::string, const nir::Type *> & members, const std::vector <const nir::Type *> & memberArr) : members (members), memberArr (memberArr) {
-	// members and memberArr must be consistent
-	std::set <const Type *> set (memberArr.begin (), memberArr.end ());
-	for (auto & m : members) {
-		assert (set.count (m.second));
+void nir::Struct::populate (const std::vector <const nir::Parameter *> & mem) {
+	
+	memberArr = mem;
+	
+	for (const Parameter * p : memberArr) {
+		members [*p->getIden ()] = p;
 	}
+	
 }

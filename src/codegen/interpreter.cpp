@@ -326,6 +326,10 @@ void Interpreter::visit (const Ret & ret) {
 	
 }
 
+void Interpreter::visit (const Struct & stru) {
+	
+}
+
 void Interpreter::visit (const Sub & sub) {
 	
 	Atom res = binaryOpp <std::minus <void>> (sub.getLhs (), sub.getRhs (), sub.getType ());

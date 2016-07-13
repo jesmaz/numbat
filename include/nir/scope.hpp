@@ -5,6 +5,7 @@
 #include <file.hpp>
 #include <map>
 #include <nir/instruction.hpp>
+#include <nir/type/struct.hpp>
 #include <set>
 #include <vector>
 
@@ -59,6 +60,8 @@ struct Scope {
 		const Instruction * getFunctionPointer ();
 		const Instruction * resolve (const string & iden);
 		const Instruction * staticCast (const Instruction * src, const Type * const target, const string & iden="");
+		
+		Struct * registerStruct (const std::string & iden);
 		
 		void declareFunction ();
 		
