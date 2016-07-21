@@ -123,8 +123,21 @@ const Type * Scope::resolveType (const string & iden) const {
 
 const Type * Scope::resolveType (Argument parent, const string & iden) const {
 	
-	std::cerr << "Not supported quite yet" << std::endl;
-	abort ();
+	const Type * type = parent.instr->getType ();
+	if (typeid (*type) == typeid (Struct)) {
+		
+		const Struct * str = static_cast <const Struct *> (type);
+		const auto & memberArr = str->getMemberArr ();
+		std::cerr << "Nested structs are not yet supported" << std::endl;
+		abort ();
+		
+	} else if (typeid (*type) == typeid (ImportHandle)) {
+		
+		const ImportHandle * imp = static_cast <const ImportHandle *> (type);
+		const Scope * scope = imp->getScope ();
+		return scope->resolveType (iden);
+		
+	}
 	
 }
 
