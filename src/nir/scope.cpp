@@ -14,6 +14,7 @@
 #include <nir/inst/less.hpp>
 #include <nir/inst/mul.hpp>
 #include <nir/inst/neg.hpp>
+#include <nir/inst/pickStructMember.hpp>
 #include <nir/inst/put.hpp>
 #include <nir/inst/ret.hpp>
 #include <nir/inst/sub.hpp>
@@ -117,6 +118,13 @@ const Type * Scope::resolveType (const string & iden) const {
 	}
 	assert (nullptr);
 	return nullptr;
+	
+}
+
+const Type * Scope::resolveType (Argument parent, const string & iden) const {
+	
+	std::cerr << "Not supported quite yet" << std::endl;
+	abort ();
 	
 }
 
@@ -312,7 +320,36 @@ const Instruction * Scope::getFunctionPointer () {
 	
 }
 
+const Instruction * Scope::resolve (Argument parent, const string & iden) {
+	
+	const Type * type = parent.instr->getType ();
+	if (typeid (*type) == typeid (Struct)) {
+		
+		const Struct * str = static_cast <const Struct *> (type);
+		const auto & memberArr = str->getMemberArr ();
+		
+		for (size_t i=0; i<memberArr.size (); ++i) {
+			const Parameter * param = memberArr [i];
+			if (*param->getIden () == iden) {
+				return insertionPoint->give (new PickStructMember (param->getType (), parent, i, iden, module->newSymbol (iden)));
+			}
+		}
+		
+	} else if (typeid (*type) == typeid (ImportHandle)) {
+		
+		const ImportHandle * imp = static_cast <const ImportHandle *> (type);
+		const Scope * scope = imp->getScope ();
+		return scope->resolve (iden, insertionPoint);
+		
+	}
+	
+}
+
 const Instruction * Scope::resolve (const string & iden) {
+	return resolve (iden, insertionPoint);
+}
+
+const Instruction * Scope::resolve (const string & iden, Block * insertionPoint) const {
 	
 	//TODO: log error
 	

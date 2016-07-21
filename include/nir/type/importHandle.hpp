@@ -16,6 +16,8 @@ class ImportHandle : public Type {
 	CONST_VISITABLE
 	public:
 		
+		const nir::Scope * getScope () const {return scope;}
+		
 		bool validate () const {return true;}
 		size_t calculateSize (size_t ptrSize) const {return 0;}
 		

@@ -7,9 +7,9 @@ const nir::Instruction * ResolveScope::build (nir::Scope * scope, ParseTreeNode:
 	
 	const nir::Instruction * p = parent->build (scope, mode);
 	if (mode == ParseTreeNode::BuildMode::NORMAL) {
-		return p->resolve (scope, iden);
+		return scope->resolve ({p, p->getIden ()}, iden);
 	} else {
-		return scope->createParameter (p->resolveType (iden));
+		return scope->createParameter (scope->resolveType ({p, p->getIden ()}, iden));
 	}
 	
 }

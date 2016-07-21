@@ -27,6 +27,7 @@ struct Scope {
 		symbol createBlock (const string & iden="");
 		size_t changeActiveBlock (symbol block);
 		
+		const Type * resolveType (Argument parent, const string & iden) const;
 		const Type * resolveType (const string & iden) const;
 		
 		Argument createGet (Argument src);
@@ -58,7 +59,9 @@ struct Scope {
 		const Instruction * createStructValue (const Type * const type, std::vector <Argument> vals, const string & iden="");
 		const Instruction * createSub (const std::vector <Argument> & args);
 		const Instruction * getFunctionPointer ();
+		const Instruction * resolve (Argument parent, const string & iden);
 		const Instruction * resolve (const string & iden);
+		const Instruction * resolve (const string & iden, Block * insertionPoint) const;
 		const Instruction * staticCast (const Instruction * src, const Type * const target, const string & iden="");
 		
 		Struct * registerStruct (const std::string & iden);
