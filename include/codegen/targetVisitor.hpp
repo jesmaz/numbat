@@ -31,6 +31,7 @@ class TargetVisitor :
 	public ConstVisitor <Add>,
 	public ConstVisitor <Alloc>,
 	public ConstVisitor <BitAnd>,
+	public ConstVisitor <BitNot>,
 	public ConstVisitor <BitOr>,
 	public ConstVisitor <BitXor>,
 	public ConstVisitor <Constant>,

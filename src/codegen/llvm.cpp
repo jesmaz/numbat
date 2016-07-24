@@ -158,6 +158,11 @@ void LLVM::visit (const nir::BitAnd & bitAnd) {
 	instrDict [bitAnd.getIden ()] = irBuilder.CreateAdd (lhs, rhs, "and");
 }
 
+void LLVM::visit (const nir::BitNot & bitNot) {
+	auto * arg = resolve (bitNot.getArg ()/*, type*/);
+	instrDict [bitNot.getIden ()] = irBuilder.CreateNot (arg, "not");
+}
+
 void LLVM::visit (const nir::BitOr & bitOr) {
 	auto * lhs = resolve (bitOr.getLhs ()/*, type*/), * rhs = resolve (bitOr.getRhs ()/*, type*/);
 	instrDict [bitOr.getIden ()] = irBuilder.CreateOr (lhs, rhs, "or");

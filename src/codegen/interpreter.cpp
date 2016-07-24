@@ -139,6 +139,44 @@ void Interpreter::visit (const BitAnd & bitAnd) {
 	lookupTable [bitAnd.getIden ()] = res;
 }
 
+void Interpreter::visit (const BitNot & bitNot) {
+	
+	Interpreter::Atom arg = lookupAtom (bitNot.getArg ());
+	switch (arg.atomicType) {
+		case DATA:
+		case F32:
+		case F64:
+			assert (false);
+			break;
+		case S8:
+			arg.data.s8 = ~arg.data.s8;
+			break;
+		case S16:
+			arg.data.s16 = ~arg.data.s16;
+			break;
+		case S32:
+			arg.data.s32 = ~arg.data.s32;
+			break;
+		case S64:
+			arg.data.s64 = ~arg.data.s64;
+			break;
+		case U8:
+			arg.data.u8 = ~arg.data.u8;
+			break;
+		case U16:
+			arg.data.u16 = ~arg.data.u16;
+			break;
+		case U32:
+			arg.data.u32 = ~arg.data.u32;
+			break;
+		case U64:
+			arg.data.u64 = ~arg.data.u64;
+			break;
+	}
+	lookupTable [bitNot.getIden ()] = arg;
+	
+}
+
 void Interpreter::visit (const BitOr & bitOr) {
 	Atom res = bitwiseOpp <std::bit_or <void>> (bitOr.getLhs (), bitOr.getRhs (), bitOr.getType ());
 	lookupTable [bitOr.getIden ()] = res;
