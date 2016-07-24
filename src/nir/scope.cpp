@@ -195,6 +195,10 @@ const Instruction * Scope::createBitAnd (const std::vector< Argument > & args) {
 	return createBinary <BitAnd> (args [0], args [1], "bitand");
 }
 
+const Instruction * Scope::createBitNot (const std::vector <Argument> & args) {
+	return insertionPoint->give (new BitNot (args [0], module->newSymbol ("bitnot")));
+}
+
 const Instruction * Scope::createBitOr (const std::vector< Argument > & args) {
 	return createBinary <BitOr> (args [0], args [1], "bitor");
 }
@@ -263,13 +267,6 @@ Argument Scope::createGet (Argument src) {
 	
 }
 
-const Instruction * Scope::createNeg (const std::vector <Argument> & args) {
-	
-	Instruction * instr = new Neg (args [0], module->newSymbol ("neg"));
-	return insertionPoint->give (instr);
-	
-}
-
 const Instruction * Scope::createJump (symbol block) {return createJump ({nullptr, nullptr}, block);}
 
 const Instruction * Scope::createJump (Argument cond, symbol block) {
@@ -287,8 +284,19 @@ const Instruction * Scope::createImportHandle (const Scope * scope, const string
 	return variables [iden] = inst;
 }
 
+const Instruction * Scope::createLNot (const std::vector< Argument > & args) {
+	return insertionPoint->give (new BitNot (resolveType ("bool"), args [0], module->newSymbol ("bitnot")));
+}
+
 const Instruction * Scope::createMul (const std::vector <Argument> & args) {
 	return createBinary <Mul> (args [0], args [1], "mul");
+}
+
+const Instruction * Scope::createNeg (const std::vector <Argument> & args) {
+	
+	Instruction * instr = new Neg (args [0], module->newSymbol ("neg"));
+	return insertionPoint->give (instr);
+	
 }
 
 const Instruction * Scope::createParameter (const Type * const type, Argument init, const string & iden) {

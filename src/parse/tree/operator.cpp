@@ -5,10 +5,10 @@
 
 std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <nir::Argument> &)> nirDefImp = {
 	{"- ", &nir::Scope::createNeg},
-// 	{"! ", &nir::Scope::createLNot},
-// 	{"not ", &nir::Scope::createLNot},
-// 	{"~ ", &nir::Scope::createBitNot},
-// 	
+	{"! ", &nir::Scope::createLNot},
+	{"not ", &nir::Scope::createLNot},
+	{"~ ", &nir::Scope::createBitNot},
+	
 // 	{" as ", &nir::Scope::createAs},
 // 	
 // 	{" in ", &nir::Scope::createIn},

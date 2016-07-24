@@ -31,6 +31,30 @@ class BitAnd : public Instruction {
 		
 };
 
+class BitNot : public Instruction {
+	CONST_VISITABLE
+	public:
+		
+		bool validate () const {return true;}
+		
+		Argument getArg () const {return arg;}
+		
+	protected:
+	private:
+		
+		virtual string strDump (text::PrintMode mode) const {
+			return "bitnot." + getType ()->toString (mode) + " " + arg.toString (mode);
+		}
+		
+		BitNot (Argument arg, symbol iden) : Instruction ({arg.instr->getType ()}, {iden}), arg (arg) {}
+		BitNot (const Type * type, Argument arg, symbol iden) : Instruction ({type}, {iden}), arg (arg) {}
+		
+		Argument arg;
+		
+		friend Scope;
+		
+};
+
 class BitOr : public Instruction {
 	CONST_VISITABLE
 	public:

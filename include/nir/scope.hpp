@@ -40,6 +40,7 @@ struct Scope {
 		const Instruction * createAssign (const std::vector <Argument> & args);
 		const Instruction * createAutoReturn (const Instruction * instr);
 		const Instruction * createBitAnd (const std::vector <Argument> & args);
+		const Instruction * createBitNot (const std::vector <Argument> & args);
 		const Instruction * createBitOr (const std::vector <Argument> & args);
 		const Instruction * createBitXor (const std::vector <Argument> & args);
 		const Instruction * createCall (const Function * func, const std::vector <Argument> & args);
@@ -50,10 +51,11 @@ struct Scope {
 		const Instruction * createConstant (const Type * type, const string & val, const string & iden="");
 		const Instruction * createDiv (const std::vector <Argument> & args);
 		const Instruction * createImportHandle (const Scope * scope, const string & iden="");
-		const Instruction * createNeg (const std::vector <Argument> & args);
 		const Instruction * createJump (symbol block);
 		const Instruction * createJump (Argument cond, symbol block);
+		const Instruction * createLNot (const std::vector <Argument> & args);
 		const Instruction * createMul (const std::vector <Argument> & args);
+		const Instruction * createNeg (const std::vector <Argument> & args);
 		const Instruction * createParameter (const Type * const type, Argument init={nullptr, nullptr}, const string & iden="");
 		const Instruction * createPut (Argument src, Argument dest);
 		const Instruction * createStructValue (const Type * const type, std::vector <Argument> vals, const string & iden="");
