@@ -28,6 +28,8 @@ struct Module {
 		
 		Builder registerFunction (std::vector <Type> args, std::vector <Type> ret, const string & name);
 		
+		const std::map <symbol, Function *> getFunctions () const {return data->functions;}
+		
 		Scope * createRootScope ();
 		Scope * getGlobalScope ();
 		

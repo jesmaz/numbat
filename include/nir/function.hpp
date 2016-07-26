@@ -22,6 +22,7 @@ struct Function {
 		const Block * getEntryPoint () const {return entry;}
 		const Type * getType () const {return type;}
 		const std::string getLabel () const {return label;}
+		const std::vector <Block *> getBody () const {return blocks;}
 		const std::vector <const Parameter *> & getArgs () const {return args;}
 		const std::vector <const Parameter *> & getRet () const {return ret;}
 		const std::vector <const Type *> getRetTypes () const {return retTypes;}
