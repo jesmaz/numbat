@@ -17,8 +17,6 @@ class CallGraph : public GenericPass {
 		
 		const std::multiset <std::pair <const nir::Function *, const nir::Function *>> & getEdges () const {return edges;}
 		
-		virtual void run (const nir::Module * module);
-		
 		virtual ~CallGraph () {}
 		
 	protected:
@@ -26,7 +24,7 @@ class CallGraph : public GenericPass {
 		
 		friend PassProcession;
 		
-		CallGraph (PassProcession * PassProcession);
+		CallGraph (PassProcession * procession, nir::Module * module);
 		
 		std::multiset <std::pair <const nir::Function *, const nir::Function *>> edges;
 		

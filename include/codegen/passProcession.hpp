@@ -18,8 +18,7 @@ class PassProcession {
 		typename std::enable_if <std::is_base_of <GenericPass, T>::value, T*>::type runPass (nir::Module * module) {
 			std::shared_ptr <GenericPass> & pass = passes [typeid (T).name ()];
 			if (not pass) {
-				pass = std::shared_ptr <GenericPass> (new T (this));
-				pass->run (module);
+				pass = std::shared_ptr <GenericPass> (new T (this, module));
 			}
 			return reinterpret_cast <T*> (pass.get ());
 		}

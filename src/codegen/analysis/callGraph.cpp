@@ -10,7 +10,7 @@ namespace codegen {
 namespace analysis {
 
 
-void CallGraph::run (const nir::Module * module) {
+CallGraph::CallGraph (PassProcession * procession, nir::Module * module) {
 	
 	for (auto funcPair : module->getFunctions ()) {
 		for (Block * block : funcPair.second->getBody ()) {
@@ -23,8 +23,6 @@ void CallGraph::run (const nir::Module * module) {
 	}
 	
 }
-
-CallGraph::CallGraph (PassProcession * PassProcession) : GenericPass (PassProcession) {}
 
 
 }
