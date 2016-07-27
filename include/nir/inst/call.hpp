@@ -20,7 +20,7 @@ class DirectCall : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "call TODO: function names and args";}
 		
-		DirectCall (const Function * func, const std::vector <Argument> & args, const std::vector <symbol> & idens) : Instruction (func->getRetTypes (), idens), func (func), args (args) {}
+		DirectCall (const Function * func, const std::vector <Argument> & args, const std::vector <symbol> & idens) : Instruction (args, func->getRetTypes (), idens), func (func), args (args) {}
 		
 		const Function * func;
 		std::vector <Argument> args;

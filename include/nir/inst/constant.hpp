@@ -22,7 +22,7 @@ class Constant : public Instruction {
 	protected:
 	private:
 		
-		Constant (const Type * type, const string & val, symbol iden=nullptr) : Instruction ({type}, {iden}), val (val) {}
+		Constant (const Type * type, const string & val, symbol iden=nullptr) : Instruction ({}, {type}, {iden}), val (val) {}
 		
 		string val;
 		

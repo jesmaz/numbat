@@ -21,7 +21,7 @@ class Mul : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const;
 		
-		Mul (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({type}, {iden}), lhs (lhs), rhs (rhs) {}
+		Mul (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		

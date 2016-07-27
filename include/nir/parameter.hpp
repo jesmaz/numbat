@@ -15,8 +15,8 @@ class Parameter : public Instruction {
 		
 		Argument getDefVal () const {return defVal;}
 		
-		Parameter (Argument instruction, const string & iden) : Instruction (instruction.instr->getTypes (), {&(this->iden)}), defVal (instruction), iden (iden) {}
-		Parameter (const Type * type, const string & iden) : Instruction ({type}, {&(this->iden)}), iden (iden) {}
+		Parameter (Argument instruction, const string & iden) : Instruction ({instruction}, instruction.instr->getTypes (), {&(this->iden)}), defVal (instruction), iden (iden) {}
+		Parameter (const Type * type, const string & iden) : Instruction ({}, {type}, {&(this->iden)}), iden (iden) {}
 		
 	protected:
 	private:

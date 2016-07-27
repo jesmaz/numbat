@@ -18,7 +18,7 @@ class Ret : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "ret TODO: return values";}
 		
-		Ret (const std::vector <Argument> & args) : Instruction (argumentToType (args), argumentToSymbol (args)), args (args) {}
+		Ret (const std::vector <Argument> & args) : Instruction ({args}, argumentToType (args), argumentToSymbol (args)), args (args) {}
 		
 		std::vector <Argument> args;
 		

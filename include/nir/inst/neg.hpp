@@ -19,7 +19,7 @@ class Neg : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "-" + arg.toString (mode);}
 		
-		Neg (Argument arg, symbol iden) : Instruction (arg.instr->getTypes (), {iden}), arg (arg) {}
+		Neg (Argument arg, symbol iden) : Instruction ({arg}, arg.instr->getTypes (), {iden}), arg (arg) {}
 		
 		Argument arg;
 		
