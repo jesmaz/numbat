@@ -182,12 +182,17 @@ const Instruction * Scope::createAssign (const std::vector <Argument> & args) {
 
 const Instruction * Scope::createAutoReturn (const Instruction * instr) {
 	
-	std::vector <Argument> args;
-	for (symbol s : instr->getIdens ()) {
-		args.push_back ({instr, s});
+	if (owner->getRet ().empty ()) {
+		Instruction * ret = new Ret ({});
+		return insertionPoint->give (ret);
+	} else {
+		std::vector <Argument> args;
+		for (symbol s : instr->getIdens ()) {
+			args.push_back ({instr, s});
+		}
+		Instruction * ret = new Ret (args);
+		return insertionPoint->give (ret);
 	}
-	Instruction * ret = new Ret (args);
-	return insertionPoint->give (ret);
 	
 }
 
@@ -247,8 +252,22 @@ const Instruction * Scope::createCmpLT (const std::vector <Argument> & args) {
 const Instruction * Scope::createConstant (const Type * type, const string & val, const string & iden) {
 	
 	//TODO: Ensure the type is sensible
-	Instruction * inst = new Constant (type, val);
+	Constant * inst = new Constant ({type}, {module->newSymbol (iden)});
 	assert (type);
+	switch (type->getArithmaticType ()) {
+		case Type::DECINT:
+		case Type::DEFAULT:
+			assert (false);
+		case Type::FPINT:
+			inst->push_back (std::stod (val));
+			break;
+		case Type::INT:
+			inst->push_back (int64_t (std::stoll (val)));
+			break;
+		case Type::UINT:
+			inst->push_back (uint64_t (std::stoull (val)));
+			break;
+	}
 	return insertionPoint->give (inst);
 	
 }
@@ -280,7 +299,7 @@ const Instruction * Scope::createJump (Argument cond, symbol block) {
 
 const Instruction * Scope::createImportHandle (const Scope * scope, const string & iden) {
 	Type * type = new ImportHandle (scope);
-	Instruction * inst = new Constant (type, "", module->newSymbol (iden));
+	Instruction * inst = new Constant ({type}, {module->newSymbol (iden)});
 	return variables [iden] = inst;
 }
 

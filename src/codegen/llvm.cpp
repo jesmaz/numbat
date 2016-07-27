@@ -187,17 +187,34 @@ void LLVM::visit (const nir::Block & block) {
 
 void LLVM::visit (const nir::Constant & con) {
 	
-	switch (con.getType ()->getArithmaticType ()) {
-		case Type::DECINT:
-		case Type::DEFAULT:
-			assert (false);
-		case Type::FPINT:
-			instrDict [con.getIden ()] = llvm::ConstantFP::get (irBuilder.getDoubleTy (), con.getVal ());
-			break;
-		case Type::INT:
-		case Type::UINT:
-			instrDict [con.getIden ()] = irBuilder.getIntN (64, std::stoull (con.getVal ()));
-			break;
+	llvm::Value * val;
+	
+	const auto & syms = con.getIdens ();
+	const auto & data = con.getData ();
+	const auto & types = con.getTypes ();
+	
+	assert (syms.size () == data.size ());
+	
+	for (size_t i=0, l=syms.size (); i<l; ++i) {
+		
+		const Constant::Data & d = *data [i];
+		
+		switch (d.getType ()) {
+			case Constant::Data::DOUBLE:
+				val = llvm::ConstantFP::get (irBuilder.getDoubleTy (), d.asDouble ());
+				break;
+			case Constant::Data::INT:
+				val = irBuilder.getIntN (64, d.asUint ());
+				break;
+			case Constant::Data::STRING:
+				break;
+			case Constant::Data::UINT:
+				val = irBuilder.getIntN (64, d.asUint ());
+				break;
+		}
+		
+		instrDict [syms [i]] = val;
+		
 	}
 	
 }

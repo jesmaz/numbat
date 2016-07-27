@@ -123,7 +123,7 @@ void Interpreter::visit (const Alloc & alloc) {
 	
 	Atom amount = lookupAtom (alloc.getAmount ());
 	const Type * type = alloc.getType ()->getDereferenceType ();
-	size_t size = (type->calculateSize (8) + 7)/8;
+	size_t size = type->calculateSize (8);
 	uint8_t * data = new uint8_t [size];
 	Atom res;
 	res.type = alloc.getType ();
@@ -194,24 +194,38 @@ void Interpreter::visit (const Block & block) {
 void Interpreter::visit (const Constant & con) {
 	
 	Atom res;
-	res.type = con.getType ();
-	if (con.getType ()->calculateSize (8) == 0) return;
 	
-	switch (con.getType ()->getArithmaticType ()) {
-		case Type::DECINT:
-		case Type::DEFAULT:
-			assert (false);
-		case Type::FPINT:
-			res.atomicType = AtomicType::F64;
-			res.data.f64 = std::stod (con.getVal ());
-			break;
-		case Type::INT:
-		case Type::UINT:
-			res.atomicType = AtomicType::U64;
-			res.data.u64 = std::stoull (con.getVal ());
-			break;
+	const auto & syms = con.getIdens ();
+	const auto & data = con.getData ();
+	const auto & types = con.getTypes ();
+	
+	assert (syms.size () == data.size ());
+	
+	for (size_t i=0, l=syms.size (); i<l; ++i) {
+		
+		const Constant::Data & d = *data [i];
+		res.type = types [i];
+		
+		switch (d.getType ()) {
+			case Constant::Data::DOUBLE:
+				res.atomicType = AtomicType::F64;
+				res.data.f64 = d.asDouble ();
+				break;
+			case Constant::Data::INT:
+				res.atomicType = AtomicType::S64;
+				res.data.s64 = d.asInt ();
+				break;
+			case Constant::Data::STRING:
+				break;
+			case Constant::Data::UINT:
+				res.atomicType = AtomicType::U64;
+				res.data.u64 = d.asUint ();
+				break;
+		}
+		
+		lookupTable [syms [i]] = res;
+		
 	}
-	lookupTable [con.getIden ()] = res;
 	
 }
 
@@ -353,6 +367,7 @@ void Interpreter::visit (const Put & put) {
 	assert (dest.atomicType == AtomicType::DATA);
 	size_t amount = src.type->calculateSize (8);
 	std::copy (reinterpret_cast <uint8_t *> (&src.data), reinterpret_cast <uint8_t *> (&src.data)+amount, dest.data.ptr);
+	lookupTable [put.getIden ()] = src;
 	
 }
 
@@ -381,15 +396,13 @@ void Interpreter::visit (const Type * type) {
 
 Interpreter::Atom Interpreter::lookupAtom (Argument val) {
 	
-	if (val.sym) {
-		auto itt = lookupTable.find (val.instr->getIden ());
-		if (itt != lookupTable.end ()) {
-			return itt->second;
-		}
+	auto itt = lookupTable.find (val.sym ? val.sym : val.instr->getIden ());
+	if (itt != lookupTable.end ()) {
+		return itt->second;
 	}
 	
 	val.instr->accept (*this);
-	auto itt = lookupTable.find (val.sym ? val.sym : val.instr->getIden ());
+	itt = lookupTable.find (val.sym ? val.sym : val.instr->getIden ());
 	if (itt != lookupTable.end ()) {
 		return itt->second;
 	}
@@ -541,14 +554,19 @@ std::vector <Interpreter::Atom> Interpreter::lookupAtoms (const Instruction * va
 	std::vector <Interpreter::Atom> atoms;
 	atoms.resize (l);
 	const auto & idens = val->getIdens ();
+	bool calc = false;
 	
 	for (size_t i=0; i<l; ++i) {
 		auto itt = lookupTable.find (idens [i]);
 		
 		if (itt != lookupTable.end ()) {
 			atoms [i] = itt->second;
+		} else {
+			calc = true;
 		}
 	}
+	
+	if (not calc) return atoms;
 	
 	val->accept (*this);
 	
