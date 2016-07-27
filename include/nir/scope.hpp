@@ -22,7 +22,7 @@ struct Scope {
 		Module * getModule () const {return module;}
 		const numbat::File * getSourceFile () const {return sourceFile;}
 		
-		Scope * declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden="");
+		Scope * declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden, LINKAGE linkage);
 		
 		symbol createBlock (const string & iden="");
 		size_t changeActiveBlock (symbol block);

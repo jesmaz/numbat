@@ -28,7 +28,7 @@
 namespace nir {
 
 
-Scope * Scope::declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden) {
+Scope * Scope::declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden, LINKAGE linkage) {
 	
 	string label = "nbt_" + iden;// + "_-";
 	//for (Type * p : params) label += p->getIden () + "-";
@@ -37,7 +37,7 @@ Scope * Scope::declareFunction (const std::vector <const Parameter *> params, co
 	label += "_" + std::to_string (params.size ());
 	label += "_" + std::to_string (ret.size ());
 	
-	Function * func = new Function (params, ret, label);
+	Function * func = new Function (params, ret, label, linkage);
 	
 	symbol s;
 	if (iden == "") {

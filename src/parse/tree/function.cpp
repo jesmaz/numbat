@@ -22,7 +22,7 @@ const nir::Instruction * Function::build (nir::Scope * scope, ParseTreeNode::Bui
 		//Must be anon
 		auto nirParams = buildParams (params, scope);
 		auto nirTypes = buildParams (type, scope);
-		fScope = scope->declareFunction (nirParams, nirTypes);
+		fScope = scope->declareFunction (nirParams, nirTypes, "", linkage);
 	}
 	
 	if (body) {
@@ -37,7 +37,7 @@ void Function::declare (nir::Scope * scope) {
 	
 	auto nirParams = buildParams (params, scope);
 	auto nirTypes = buildParams (type, scope);
-	fScope = scope->declareFunction (nirParams, nirTypes, iden);
+	fScope = scope->declareFunction (nirParams, nirTypes, iden, linkage);
 	
 }
 
@@ -76,4 +76,4 @@ Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : Pars
 	this->body = body;
 }
 
-Function::Function (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & params, const std::vector <PTNode> & type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), params (params), type (type), iden (iden), body (body) {}
+Function::Function (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & params, const std::vector <PTNode> & type, PTNode body, nir::LINKAGE linkage) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), params (params), type (type), iden (iden), body (body), linkage (linkage) {}

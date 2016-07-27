@@ -5,6 +5,8 @@
 namespace nir {
 
 
+enum class LINKAGE {EXTERNAL, LOCAL};
+
 class Function;
 class Instruction;
 class Number;

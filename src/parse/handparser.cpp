@@ -500,9 +500,9 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 
 PTNode parseFunction (CodeQueue * queue) {
 	
-	bool defExtern = false;
+	nir::LINKAGE linkage = nir::LINKAGE::LOCAL;
 	if (queue->peak () == Symbol::EXTERN) {
-		defExtern = true;
+		linkage = nir::LINKAGE::EXTERNAL;
 		queue->shiftPop ();
 	}
 	
@@ -548,10 +548,10 @@ PTNode parseFunction (CodeQueue * queue) {
 	
 	PTNode body;
 	
-	if (not defExtern and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
+	if (linkage != nir::LINKAGE::EXTERNAL and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		body = parseStatement (queue);
 	}
-	return new Function (token.line, 0, token.iden, params, type, body);
+	return new Function (token.line, 0, token.iden, params, type, body, linkage);
 	
 }
 

@@ -20,6 +20,7 @@ struct Function {
 		
 		Block * getEntryPoint () {return entry;}
 		const Block * getEntryPoint () const {return entry;}
+		const LINKAGE getLinkage () const {return linkage;}
 		const Type * getType () const {return type;}
 		const std::string getLabel () const {return label;}
 		const std::vector <Block *> getBody () const {return blocks;}
@@ -28,8 +29,8 @@ struct Function {
 		const std::vector <const Type *> getRetTypes () const {return retTypes;}
 		void pushBlock (Block * block) {blocks.push_back (block);}
 		
-		Function (const std::string & label);
-		Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret, const std::string & label);
+		Function (const std::string & label, LINKAGE linkage);
+		Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret, const std::string & label, LINKAGE linkage);
 		
 	protected:
 	private:
@@ -43,6 +44,7 @@ struct Function {
 		std::vector <const Type *> retTypes;
 		const Type * type;
 		CallConv cc = CallConv::NCC;
+		LINKAGE linkage;
 		
 };
 
