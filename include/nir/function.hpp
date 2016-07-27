@@ -28,6 +28,8 @@ struct Function {
 		const std::vector <const Parameter *> & getRet () const {return ret;}
 		const std::vector <const Type *> getRetTypes () const {return retTypes;}
 		void pushBlock (Block * block) {blocks.push_back (block);}
+		//WARNING: Deleting the old body is the responsibility of the user of this method
+		void dirtyReplaceBody (const std::vector <Block *> & b) {blocks = b;}
 		
 		Function (const std::string & label, LINKAGE linkage);
 		Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret, const std::string & label, LINKAGE linkage);
