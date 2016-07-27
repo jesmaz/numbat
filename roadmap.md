@@ -42,8 +42,8 @@
    - [x] Parser should not handle semantics, only syntax
    - [x] Parser should still accept arbitrary operators
    - [x] Testing, lots of testing
- - [ ] Semantic analysis pass
-   - [ ] Side effect propagation
+ - [x] Semantic analysis pass
+   - [x] Side effect propagation
    - [x] Transform into NIR
  - [ ] Verification pass
    - [ ] Define what situations result in error/warning in documentation
@@ -53,6 +53,7 @@
    - [ ] Copying elements with a overloaded assignment operator
    - [ ] Destruction
    - [ ] Initialisation
+ - [ ] LLVM upgrade to a more recent version
  - [ ] Operator overloading
  - [ ] OS module
    - [ ] Numbat friendly wrapper (no pointers passed by the user)
