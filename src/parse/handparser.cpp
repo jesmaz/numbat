@@ -546,7 +546,7 @@ PTNode parseFunction (CodeQueue * queue) {
 		queue->shiftPop ();
 	}
 	
-	PTNode body;
+	PTNode body=nullptr;
 	
 	if (linkage != nir::LINKAGE::EXTERNAL and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		body = parseStatement (queue);
