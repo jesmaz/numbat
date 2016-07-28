@@ -13,6 +13,8 @@ class Parameter : public Instruction {
 		
 		bool validate () const {return true;}
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {abort ();}
+		
 		Argument getDefVal () const {return defVal;}
 		
 		Parameter (Argument instruction, const string & iden) : Instruction ({instruction}, instruction.instr->getTypes (), {&(this->iden)}), defVal (instruction), iden (iden) {}

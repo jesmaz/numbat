@@ -13,6 +13,8 @@ class Get : public Instruction {
 		
 		virtual bool validate () const {return true;}
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Get (getType (), replacmentArgs [0], getIden ());}
+		
 		Get (const Type * type, Argument src, symbol iden) : Instruction ({src}, {type}, {iden}), src (src) {}
 		
 	protected:

@@ -13,6 +13,8 @@ class Jump : public Instruction {
 		Argument getCondition () const {return condition;}
 		const Block * getBlock () const {return block;}
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Jump (replacmentArgs [0], block);}
+		
 		virtual bool validate () const {return true;}
 		
 	protected:

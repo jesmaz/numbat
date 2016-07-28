@@ -9,6 +9,8 @@ class Ret : public Instruction {
 	CONST_VISITABLE
 	public:
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {return new Ret (replacmentArgs);}
+		
 		const std::vector <Argument> & getArgs () const {return args;}
 		
 		virtual bool validate () const {return true;}

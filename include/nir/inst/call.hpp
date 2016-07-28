@@ -10,6 +10,8 @@ class DirectCall : public Instruction {
 	CONST_VISITABLE
 	public:
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {return new DirectCall (func, replacmentArgs, getIdens ());}
+		
 		const Function * getFunc () const {return func;}
 		const std::vector <Argument> & getArgs () const {return args;}
 		

@@ -13,6 +13,8 @@ class BitAnd : public Instruction {
 		
 		bool validate () const {return true;}
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 2); return new BitAnd (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());}
+		
 		Argument getLhs () const {return lhs;}
 		Argument getRhs () const {return rhs;}
 		
@@ -36,6 +38,8 @@ class BitNot : public Instruction {
 	public:
 		
 		bool validate () const {return true;}
+		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new BitNot (getType (), replacmentArgs [0], getIden ());}
 		
 		Argument getArg () const {return arg;}
 		
@@ -61,6 +65,8 @@ class BitOr : public Instruction {
 		
 		bool validate () const {return true;}
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 2); return new BitOr (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());}
+		
 		Argument getLhs () const {return lhs;}
 		Argument getRhs () const {return rhs;}
 		
@@ -84,6 +90,8 @@ class BitXor : public Instruction {
 	public:
 		
 		bool validate () const {return true;}
+		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 2); return new BitXor (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());}
 		
 		Argument getLhs () const {return lhs;}
 		Argument getRhs () const {return rhs;}

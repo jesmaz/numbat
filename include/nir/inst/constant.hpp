@@ -61,6 +61,8 @@ class Constant : public Instruction {
 		
 		bool validate () const {return true;}
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {abort ();}
+		
 		const std::vector <std::unique_ptr <Data>> & getData () const {return data;}
 		
 		template <typename T>

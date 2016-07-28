@@ -41,6 +41,8 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 		const std::vector <const Type *> & getTypes () const {return types;}
 		const std::vector <symbol> & getIdens () const {return idens;}
 		
+		virtual const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const=0;
+		
 		virtual const nir::Type * resolveType (const string & iden) const {return nullptr;}
 		virtual const nir::Instruction * resolve (nir::Scope * scope, const string & iden) const {return nullptr;}
 		

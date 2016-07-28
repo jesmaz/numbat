@@ -19,6 +19,8 @@ class FunctionPointer : public Instruction {
 		bool validate () const {return true;}
 		const Function * getFunction () const {return func;}
 		
+		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {abort ();}
+		
 	protected:
 	private:
 		
