@@ -33,8 +33,8 @@
  - [x] Make errors display line and file data correctly
 
 ##Version 0.3##
- - [ ] High level optimisation pass
-   - [ ] Static code evaluation
+ - [x] High level optimisation pass
+   - [x] Static code evaluation
  - [x] Replace ASTnumbatInstruction with a more robust solution
  - [ ] Rewrite (and properly document) code generator
  - [x] Rewrite parser
@@ -55,6 +55,9 @@
    - [ ] Initialisation
  - [ ] LLVM upgrade to a more recent version
  - [ ] Operator overloading
+ - [ ] Optimisation
+   - [ ] Activate the static evaluator with a flag
+   - [ ] Dead code removal pass
  - [ ] OS module
    - [ ] Numbat friendly wrapper (no pointers passed by the user)
    - [ ] Open, read, write, close system calls
@@ -67,6 +70,9 @@
  - [ ] Enum printer
  - [ ] Flagged enums
  - [ ] Meta tags
+ - [ ] Optimisation
+   - [ ] Branch elimination pass
+   - [ ] Generic correctness test, ensures correctness of all optimisation passes
 
 ##Version 0.3.3##
  - [ ] Partial file I/O
