@@ -17,9 +17,10 @@ struct Block {
 		
 		bool validate () const;
 		
-		const std::vector <const Instruction *> getInstructions () const {return instructions;}
+		std::vector <const Instruction *> & getInstructions () {return instructions;}
+		const std::vector <const Instruction *> & getInstructions () const {return instructions;}
 		
-		const Instruction * give (Instruction * instr) {instructions.push_back (instr); return instr;}
+		const Instruction * give (const Instruction * instr) {instructions.push_back (instr); return instr;}
 		
 	protected:
 	private:
