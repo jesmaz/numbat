@@ -1,63 +1,58 @@
 ```
-BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'as' | 'is' | 'or' | ',' | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
+Atom				=>	'{' Body '}'
+					|	'(' List ')'
+					|	Atom '(' Arguments ')'
+					|	Atom '.' Identifier
+					|	Atom Slice
+					|	Do
+					|	For
+					|	Identifier
+					|	IfElse
+					|	Literal
+					|	While
 ```
 ```
-Body				=>	Expression ; BodyCont
-					|	;
-```
-```
-BodyCont			=>	Expression ; BodyCont
+Arguments			=>	Identifier ':' Expression
+					|	Identifier ':' Expression ',' Arguments
+					|	Expression
+					|	Expression ',' Arguments
 					|	ε
 ```
 ```
-BracketCurvy		=>	'{' '}'
-					|	'{' Body '}'
-					|	'{' Expression '}'
+Assignment			=>	List AssignOpp List
+					|	List AssignOpp Assignment
 ```
 ```
-BracketRound		=>	'(' ')'
-					|	'(' Body ')'
-					|	'(' Expression ')'
+AssignOpp			=>	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
 ```
 ```
-BracketSquare		=>	'[' ']'
-					|	'[' Expression ']'
+BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'as' | 'is' | 'or'
 ```
 ```
-Call				=>	Template Expression BracketRound
-					|	PrefixUnaryOp Expression
-					|	Expression PostfixUnaryOp
-					|	Expression BinaryOp Expression
-					|	Expression TernaryOp Expression
+Body				=>	Body Statement
+					|	Body MetaTags Statement
+					|	ε
 ```
 ```
 CharArrayLiteral	=>	<string single quotes>
 ```
 ```
-Decl				=>	Expression ;
-					|	ExternDecl
-					|	FunctionDecl
-					|	StructDecl
-					|	TypeDef
+Decl				=>	Statement
+					|	MetaTags Statement
 ```
 ```
-Expression			=>	BracketCurvy
-					|	BracketRound
-					|	Call
-					|	Identifier
+Expression			=>	Atom
+					|	Atom AssignOpp Expression
+					|	Expression BinaryOp Expression
 					|	LambdaExpression
-					|	Literal
-					|	Type
-					|	VariableDecl
-```
-```
-ExternDecl			=>	'extern' FunctionDecl
+					|	PrefixUnaryOp Expression
 ```
 ```
 FloatLiteral		=>	['0' ... '9']* '.' ('0' ... '9')+ [('e' | 'E') ['+' | '-'] ('0' ... '9')+] ['f' | 'F' | 'h' | 'H' | 'q' | 'Q']
 ```
 ```
-FunctionDecl		=>	'def' Template FunctionID LambdaExpression ;
+Function			=>	'extern' 'def' FunctionID Template LambdaExpression
+					|	'def' FunctionID Template LambdaExpression
 ```
 ```
 FunctionID			=>	'~' CharArrayLiteral
@@ -77,15 +72,20 @@ ID_continue			=>	ID_start
 					|	<numbers>
 ```
 ```
+IfElse				=>	'if' '(' Expression ')' Expression
+					|	'if' '(' Expression ')' Expression 'else' Expression
+					|	'if' '(' Expression ')' Expression 'else' IfElse
+```
+```
 IntLiteral			=>	['1' ... '9'] ('0' ... '9')+
 					|	'0' ('b' | 'B') ('0' | '1')+
 					|	'0' ('o' | 'O') ('0' ... '7')+
 					|	'0' ('x' | 'X') ('0' ... '9' | 'a' ... 'f' | 'A' ... 'F')+
 ```
 ```
-LambdaExpression	=>	BracketRound '{' Program '}'
-					|	BracketRound '->' BracketRound
-					|	BracketRound '->' BracketRound '{' Program '}'
+LambdaExpression	=>	'(' Parameters ')' '{' Program '}'
+					|	'(' Parameters ')' '->' '(' Parameters ')'
+					|	'(' Parameters ')' '->' '(' Parameters ')' '{' Program '}'
 ```
 ```
 Literal				=>	CharArrayLiteral
@@ -94,56 +94,58 @@ Literal				=>	CharArrayLiteral
 					|	StringLiteral
 ```
 ```
-MetaTag				=>	'@'Identifier
-					|	'@(' Expression ')'
-```
-```
-MetaTagList			=>	MetaTag MetaTagList
+List				=>	Expression
+					|	Expression ',' List
 					|	ε
 ```
 ```
-PostfixUnaryOp		=>	'++' | '--'
+MetaTags			=>	'@'Atom
+					|	'@'Atom MetaTags
 ```
 ```
-PrefixUnaryOp		=>	'++' | '--' | '+' | '-' | '!' | 'not' | '~'
+Param				=>	Expression
+					|	Variable
 ```
 ```
-TopLevelExpression	=>	Expression
-					|	ReturnExpression
+Parameters			=>	MetaTags Param
+					|	MetaTags Param ',' Parameters
+					|	Param
+					|	Param ',' Parameters
+					|	ε
+```
+```
+PrefixUnaryOp		=>	'-' | '!' | 'not' | '~'
 ```
 ```
 Program				=>	Decl Program
 					|	ε
 ```
 ```
-ReturnExpression	=>	'return'
+Statement			=>	Assignment
+					|	Enum
+					|	Expression
+					|	Function
+					|	Import
+					|	List
+					|	Struct
+					|	Union
+					|	Variable
 					|	'return' Expression
 ```
 ```
 StringLiteral		=>	<string double quotes>
 ```
 ```
-StructDecl			=>	'struct' Template Identifier MetaTagList BracketCurvy ;
+Struct				=>	'struct' Identifier Template '{' Parameters '}'
 ```
 ```
-Template			=>	BracketSquare
+Template			=>	TBD
 					|	ε
 ```
 ```
-Type				=>	BracketCurvy
-					|	BracketRound '->' BracketRound
-					|	Identifier
-					|	'type'
-					|	TypeModifier Type
+Variable			=>	Atom Identifier
+					|	Atom Identifier ':' Expression
 ```
 ```
-TypeDef				=>	'typedef' VariableDecl
-```
-```
-TypeModifier		=>	'ref'
-					|	'atomic'
-					|	'const'
-```
-```
-VariableDecl		=>	Type Identifier
+While				=>	'while' '(' Expression ')' Expression
 ```
