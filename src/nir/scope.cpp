@@ -144,7 +144,8 @@ const Type * Scope::resolveType (Argument parent, const string & iden) const {
 const Instruction * Scope::allocateVariable (const Type * const type, const string & iden) {
 	
 	Type * ctype = new Number (Type::UINT, 32);
-	Argument amount = {createConstant (ctype, "1"), nullptr};
+	auto * con = createConstant (ctype, "1");
+	Argument amount = {con, con->getIden ()};
 	Instruction * inst = new Alloc (type->getPointerTo (), amount, module->newSymbol (iden));
 	return variables [iden] = insertionPoint->give (inst);
 	
