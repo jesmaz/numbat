@@ -40,10 +40,8 @@ class ParseTreeNode {
 		virtual Function * asFunction () {return nullptr;}
 		virtual Struct * asStruct () {return nullptr;}
 		
-		virtual numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope) {std::cerr << "virtual 'build' not implemented for: " << typeid (*this).name () << std::endl; assert (0); return nullptr;}
 		virtual const nir::Instruction * build (nir::Scope * scope, BuildMode mode) {std::cerr << "virtual 'build' not implemented for: " << typeid (*this).name () << std::endl; assert (0); return nullptr;}
 		
-		virtual void declare (numbat::parser::NumbatScope * scope) {std::cerr << "virtual 'declare' not implemented for: " << typeid (*this).name () << std::endl; assert (0);}
 		virtual void declare (nir::Scope * scope) {std::cerr << "virtual 'declare' not implemented for: " << typeid (*this).name () << std::endl; assert (0);}
 		virtual void push_back (ParseTreeNode * e) {std::cerr << "virtual 'push_back' not implemented for: " << typeid (*this).name () << std::endl; assert (0);}
 		

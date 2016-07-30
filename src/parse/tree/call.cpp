@@ -1,18 +1,6 @@
-#include "../../../include/core.hpp"
-#include "../../../include/nir/inst/functionPointer.hpp"
-#include "../../../include/nir/scope.hpp"
-#include "../../../include/parse/tree/call.hpp"
-
-auto convArgs = [](const std::vector <PTNode> & args, numbat::parser::NumbatScope * scope){
-	std::vector <numbat::parser::ASTnode> conv;
-	conv.reserve (args.size ());
-	for (auto & arg : args) {
-		assert (arg);
-		conv.push_back (arg->build (scope));
-		assert (conv.back ());
-	}
-	return conv;
-};
+#include <nir/inst/functionPointer.hpp>
+#include <nir/scope.hpp>
+#include <parse/tree/call.hpp>
 
 auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope, ParseTreeNode::BuildMode mode) {
 	std::vector <nir::Argument> conv;

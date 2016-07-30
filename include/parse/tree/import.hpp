@@ -17,8 +17,6 @@ class ParseTreeImport : public ParseTreeNode {
 		const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
 		
 		void declare (nir::Scope * scope);
-		void declare (numbat::parser::NumbatScope * scope);
-		numbat::parser::ASTnode build (numbat::parser::NumbatScope * scope);
 		
 		ParseTreeImport (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos), path (nullptr), iden (nullptr) {}
 		ParseTreeImport (PTNode path, PTNode iden=nullptr) : ParseTreeNode (ParseTreeNode::NodeType::IMPORT, path->getLine (), path->getPos ()), path (path), iden (iden) {}
