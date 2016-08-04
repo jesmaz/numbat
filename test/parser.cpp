@@ -1,51 +1,8 @@
-#include "../include/parse/parser.hpp"
-#include "../include/parse/numbatparser.hpp"
-
-#include <parse/handparser.hpp>
-
 #include <fstream>
 #include <iostream>
+#include <parse/handparser.hpp>
+#include <parse/tree.hpp>
 
-
-class TestParser : public numbat::Parser {
-	public:
-		TestParser () {
-			this->addRules ("PROGRAM", {"L=R", "R"});
-			this->addRules ("L", {"*R", "IDENTIFIER"});
-			this->addRules ("R", {"L"});
-			auto kernals = this->generateKernals ();
-			int i = 0;
-			for (auto & k : kernals) {
-				std::cout << "I" << i << '\n';
-				for (auto & e : k.second.expected) {
-					std::cout << e.second.reduce << " -> " << k.second.seen << "." << e.first << '\n';
-				}
-				std::cout << '\n';
-				++i;
-			}
-			this->buildRules ();
-		}
-};
-class TestParser2 : public numbat::Parser {
-	public:
-		TestParser2 () {
-			this->addRules ("PROGRAM", {"E"});
-			this->addRules ("E", {"E+T", "T"});
-			this->addRules ("T", {"T*F", "F"});
-			this->addRules ("F", {"(E)", "IDENTIFIER"});
-			auto kernals = this->generateKernals ();
-			int i = 0;
-			for (auto & k : kernals) {
-				std::cout << "I" << i << '\n';
-				for (auto & e : k.second.expected) {
-					std::cout << e.second.reduce << " -> " << k.second.seen << "." << e.first << '\n';
-				}
-				std::cout << '\n';
-				++i;
-			}
-			this->buildRules ();
-		}
-};
 
 void printHelp (char * cmd) {
 	std::cerr << "Usage: " << cmd << " [Option]... [File...]\n";

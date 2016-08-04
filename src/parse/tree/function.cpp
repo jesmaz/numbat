@@ -1,7 +1,6 @@
-#include "../../../include/core.hpp"
-#include "../../../include/nir/parameter.hpp"
-#include "../../../include/nir/scope.hpp"
-#include "../../../include/parse/tree/function.hpp"
+#include <nir/parameter.hpp>
+#include <nir/scope.hpp>
+#include <parse/tree/function.hpp>
 
 
 auto buildParams = [](const std::vector <PTNode> & args, nir::Scope * scope) {

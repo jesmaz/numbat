@@ -1,6 +1,5 @@
-#include "../../../include/core.hpp"
-#include "../../../include/nir/scope.hpp"
-#include "../../../include/parse/tree/operator.hpp"
+#include <nir/scope.hpp>
+#include <parse/tree/operator.hpp>
 
 
 std::map <string, const nir::Instruction * (nir::Scope::*) (const std::vector <nir::Argument> &)> nirDefImp = {

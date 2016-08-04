@@ -1,7 +1,5 @@
-#include "../../../include/parse/tree/import.hpp"
-#include "../../../include/module.hpp"
-#include "../../../include/ast/astmodule.hpp"
 #include <nir/scope.hpp>
+#include <parse/tree/import.hpp>
 
 #define PATH_JOIN "/"
 
@@ -33,8 +31,6 @@ string ParseTreeImportPath::strDump (text::PrintMode mode) {
 }
 
 void ParseTreeImport::declare (nir::Scope * scope) {
-	
-	using namespace numbat::parser;
 	
 	auto & args = path->getArgs ();
 	string relPath = joinPath (args);

@@ -1,9 +1,5 @@
-#include "../../../include/ast/constant/astconstantcstring.hpp"
-#include "../../../include/ast/constant/astconstantint.hpp"
-#include "../../../include/ast/constant/astconstantfpint.hpp"
-#include "../../../include/nir/scope.hpp"
-#include "../../../include/parse/tree/literal.hpp"
-
+#include <nir/scope.hpp>
+#include <parse/tree/literal.hpp>
 #include <string>
 
 const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {

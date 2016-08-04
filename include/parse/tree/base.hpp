@@ -2,12 +2,12 @@
 #define PARSETREENODE_HPP
 
 
-#include "../../ast/numbatscope.hpp"
-#include "../../nir/forward.hpp"
-#include "../../utility/text.hpp"
-
 #include <cassert>
+#include <iostream>
+#include <nir/forward.hpp>
 #include <string>
+#include <typeinfo>
+#include <utility/text.hpp>
 #include <vector>
 
 

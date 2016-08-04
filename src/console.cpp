@@ -1,10 +1,6 @@
+#include <codegen/interpreter.hpp>
 #include <iostream>
-
-#include "../include/ast.hpp"
-#include "../include/codegen/interpreter.hpp"
-#include "../include/nir/module.hpp"
-#include "../include/numbat.hpp"
-#include "../include/parse/numbatparser.hpp"
+#include <nir/module.hpp>
 #include <parse/handparser.hpp>
 
 

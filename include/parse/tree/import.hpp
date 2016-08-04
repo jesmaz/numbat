@@ -28,7 +28,6 @@ class ParseTreeImport : public ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		PTNode path, iden;
-		numbat::parser::NumbatVariable * var=nullptr;
 		numbat::File * sourceFile;
 		
 };
