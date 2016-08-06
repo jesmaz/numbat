@@ -730,15 +730,7 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 	//Drop '['
 	queue->shiftPop ();
 	
-	if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
-		queue->shiftPop ();
-		if (owner) {
-			return new ParseTreeIndex (owner, {});
-		}
-		return errorUnexpectedToken (queue, "slice");
-	}
-	
-	if (queue->peak (1) == Symbol::IN) {
+	if (queue->peak () == Symbol::IDENTIFIER and queue->peak (1) == Symbol::IN) {
 		
 		auto tkn = queue->popToken ();
 		queue->shiftPop ();
@@ -751,41 +743,33 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 		
 	}
 	
+	bool trueSlice=false;
+	
 	PTNode index = nullptr;
-	
-	if (queue->peak () != Symbol::COLON) {
-		
-		index = parseExpression (queue);
-		
-		if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
-			
-			queue->shiftPop ();
-			if (owner) {
-				return new ParseTreeIndex (owner, {index});
-			}
-			return errorUnexpectedToken (queue, "]");
-			
-		}
-		
-	}
-	
-	if (queue->peak () != Symbol::COLON) {
-		return errorUnexpectedToken (queue, ":");
-	}
-	
-	queue->shiftPop ();
 	PTNode end = nullptr;
 	PTNode step = nullptr;
 	
-	if (queue->peak () != Symbol::COLON) {
-		end = parseExpression (queue);
+	if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::EXPRESSION_START) {
+		index = parseExpression (queue);
 	}
 	
 	if (queue->peak () == Symbol::COLON) {
 		
-		queue->shiftPop ();
-		if (queue->peak () != Symbol::SYMBOL_SQUARE_RIGHT) {
-			step = parseExpression (queue);
+		trueSlice = true;
+		queue->popToken ();
+		
+		if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::EXPRESSION_START) {
+			end = parseExpression (queue);
+		}
+		
+		if (queue->peak () == Symbol::COLON) {
+			
+			queue->popToken ();
+			
+			if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::EXPRESSION_START) {
+				step = parseExpression (queue);
+			}
+			
 		}
 		
 	}
@@ -793,12 +777,25 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 	if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
 		
 		queue->shiftPop ();
-		//TODO: give slices a proper location
-		PTNode slice = new ParseTreeSlice (0, 0, index, end, step);
-		if (owner) {
-			return new ParseTreeSliceDecorator (owner, slice);
+		
+		if (trueSlice) {
+			
+			PTNode slice = new ParseTreeSlice (0, 0, index, end, step);
+			if (owner) {
+				return new ParseTreeSliceDecorator (owner, slice);
+			}
+			return slice;
+			
+		} else if (owner) {
+			if (index) {
+				return new ParseTreeIndex (owner, {index});
+			} else {
+				return new ParseTreeIndex (owner, {});
+			}
 		}
-		return slice;
+		
+		return errorUnexpectedToken (queue, "slice");
+		
 	}
 	
 	return errorUnexpectedToken (queue, "]");
