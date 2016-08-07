@@ -82,6 +82,7 @@ struct Operator {
 	string ptn;
 	int precedence;
 	RuleType rule;
+	PTNode(*ctr)(const string &, const std::vector <PTNode> &);
 };
 
 
@@ -131,70 +132,75 @@ std::map <string, Symbol> symbolMap {
 	{"~", Symbol::SYMBOL_TIDLE},
 };
 
+template <OPERATION opp>
+PTNode operatorFactory (const string & s, const std::vector <PTNode> & v) {
+	return new SpecificOperator <opp> (s, v);
+}
+
 std::map <string, Operator> operators {
-	{" = ", {" = ", 1600, RTL}},
-	{" += ", {" +=  ", 1600, RTL}},
-	{" -= ", {" -= ", 1600, RTL}},
-	{" ~= ", {" ~= ", 1600, RTL}},
-	{" *= ", {" *= ", 1600, RTL}},
-	{" /= ", {" /= ", 1600, RTL}},
-	{" %= ", {" %= ", 1600, RTL}},
-	{" <<= ", {" <<= ", 1600, RTL}},
-	{" >>= ", {" >>= ", 1600, RTL}},
-	{" ^= ", {" ^= ", 1600, RTL}},
-	{" &= ", {" &= ", 1600, RTL}},
-	{" |= ", {" |= ", 1600, RTL}},
-	{" => ", {" => ", 1600, RTL}},
+	{" = ", {" = ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" += ", {" +=  ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" -= ", {" -= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" ~= ", {" ~= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" *= ", {" *= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" /= ", {" /= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" %= ", {" %= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" <<= ", {" <<= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" >>= ", {" >>= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" ^= ", {" ^= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" &= ", {" &= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" |= ", {" |= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" => ", {" => ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
 	
-	{" <& ", {" <& ", 1580, RTL}},
-	{" &> ", {" &> ", 1550, RTL}},
+	{" <& ", {" <& ", 1580, RTL, operatorFactory <OPERATION::NONE>}},
+	{" &> ", {" &> ", 1550, RTL, operatorFactory <OPERATION::NONE>}},
 	
-	{" -> ", {" -> ", 1520, RTL}},
+	{" -> ", {" -> ", 1520, RTL, operatorFactory <OPERATION::NONE>}},
 	
-	{" , ", {" , ", 1500, LTR}},
+	{" , ", {" , ", 1500, LTR, operatorFactory <OPERATION::NONE>}},
 	
-	{string (" ") + char (Symbol::OR) + " ", {" or ", 1400, LTR}},
+	{string (" ") + char (Symbol::OR) + " ", {" or ", 1400, LTR, operatorFactory <OPERATION::OR>}},
 	
-	{string (" ") + char (Symbol::AND) + " ", {" and ", 1300, LTR}},
+	{string (" ") + char (Symbol::AND) + " ", {" and ", 1300, LTR, operatorFactory <OPERATION::AND>}},
 	
-	{" != ", {" != ", 1200, LTR}},
-	{" == ", {" == ", 1200, LTR}},
+	{" != ", {" != ", 1200, LTR, operatorFactory <OPERATION::CMPNE>}},
+	{" == ", {" == ", 1200, LTR, operatorFactory <OPERATION::CMPEQ>}},
 	
-	{" < ", {" < ", 1100, LTR}},
-	{" <= ", {" <= ", 1100, LTR}},
-	{" > ", {" > ", 1100, LTR}},
-	{" >= ", {" >= ", 1100, LTR}},
+	{" < ", {" < ", 1100, LTR, operatorFactory <OPERATION::CMPLT>}},
+	{" <= ", {" <= ", 1100, LTR, operatorFactory <OPERATION::CMPLTE>}},
+	{" > ", {" > ", 1100, LTR, operatorFactory <OPERATION::CMPGT>}},
+	{" >= ", {" >= ", 1100, LTR, operatorFactory <OPERATION::CMPGTE>}},
 	
-	{" | ", {" | ", 1000, LTR}},
+	{" | ", {" | ", 1000, LTR, operatorFactory <OPERATION::BOR>}},
 	
-	{" ^ ", {" ^ ", 900, LTR}},
+	{" ^ ", {" ^ ", 900, LTR, operatorFactory <OPERATION::BXOR>}},
 	
-	{" & ", {" & ", 800, LTR}},
+	{" & ", {" & ", 800, LTR, operatorFactory <OPERATION::BAND>}},
 	
-	{" << ", {" << ", 700, LTR}},
-	{" >> ", {" >> ", 700, LTR}},
+	{" << ", {" << ", 700, LTR, operatorFactory <OPERATION::NONE>}},
+	{" >> ", {" >> ", 700, LTR, operatorFactory <OPERATION::NONE>}},
 	
-	{" + ", {" + ", 600, LTR}},
-	{" - ", {" - ", 600, LTR}},
-	{" ~ ", {" ~ ", 600, LTR}},
+	{" + ", {" + ", 600, LTR, operatorFactory <OPERATION::ADD>}},
+	{" - ", {" - ", 600, LTR, operatorFactory <OPERATION::SUB>}},
+	{" ~ ", {" ~ ", 600, LTR, operatorFactory <OPERATION::CONCAT>}},
 	
-	{" * ", {" * ", 500, LTR}},
-	{" / ", {" / ", 500, LTR}},
-	{" % ", {" % ", 500, LTR}},
+	{" * ", {" * ", 500, LTR, operatorFactory <OPERATION::MUL>}},
+	{" / ", {" / ", 500, LTR, operatorFactory <OPERATION::DIV>}},
+	{" % ", {" % ", 500, LTR, operatorFactory <OPERATION::REM>}},
 	
-	{string (" ") + char (Symbol::IN) + " ", {" in ", 450, LTR}},
+	{string (" ") + char (Symbol::IN) + " ", {" in ", 450, LTR, operatorFactory <OPERATION::IN>}},
 	
-	{string (" ") + char (Symbol::AS) + " ", {" as ", 400, LTR}},
+	{string (" ") + char (Symbol::AS) + " ", {" as ", 400, LTR, operatorFactory <OPERATION::AS>}},
 	
-	{"++ ", {"++ ", 300, RTL}},
-	{"-- ", {"-- ", 300, RTL}},
-	{"- ", {"- ", 300, RTL}},
-	{"! ", {"! ", 300, RTL}},
-	{string () + char (Symbol::NOT) + " ", {"not ", 300, RTL}},
-	{"~ ", {"~ ", 300, RTL}},
+	{"++ ", {"++ ", 300, RTL, operatorFactory <OPERATION::INCREMENT>}},
+	{"-- ", {"-- ", 300, RTL, operatorFactory <OPERATION::DECREMENT>}},
+	{"- ", {"- ", 300, RTL, operatorFactory <OPERATION::NEG>}},
+	{"! ", {"! ", 300, RTL, operatorFactory <OPERATION::LNOT>}},
+	{string () + char (Symbol::NOT) + " ", {"not ", 300, RTL, operatorFactory <OPERATION::LNOT>}},
+	{"~ ", {"~ ", 300, RTL, operatorFactory <OPERATION::BNOT>}},
 	
-	{" ++", {" ++", 200, LTR}},
-	{" --", {" --", 200, LTR}},
+	{" ++", {" ++", 200, LTR, operatorFactory <OPERATION::NONE>}},
+	{" --", {" --", 200, LTR, operatorFactory <OPERATION::NONE>}},
 };
 
 std::set <string> oppPrecRangeInc (int min, int max) {
@@ -250,6 +256,7 @@ namespace SymbolFlags {
 struct Match {
 	int precedence;
 	string iden;
+	PTNode(*ctr)(const string &, const std::vector <PTNode> &);
 };
 
 
@@ -335,7 +342,7 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 	
 	Match opp = queue->shiftPop (" ", allocateOperators);
 	
-	if (opp.iden == "") return errorUnexpectedToken (queue, "an assignment operation");
+	if (opp.ctr == nullptr) return errorUnexpectedToken (queue, "an assignment operation");
 	
 	PTNode rhs = parseList (queue);
 	
@@ -344,7 +351,7 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 		rhs = parseAssignment (queue, rhs);
 	}
 	
-	return new ParseTreeOperator (opp.iden, {lhs, rhs});
+	return opp.ctr (opp.iden, {lhs, rhs});
 	
 }
 
@@ -466,10 +473,10 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 		
 		Match opp = queue->shiftPop ("", prefixOperators);
 		
-		if (opp.iden != "") {
+		if (opp.ctr != nullptr) {
 			
 			lhs = parseExpression (queue, opp.precedence);
-			lhs = new ParseTreeOperator (opp.iden, {lhs});
+			lhs = opp.ctr (opp.iden, {lhs});
 			
 		} else {
 				
@@ -480,10 +487,10 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 	}
 	
 	auto opp = queue->shiftPop (" ", expressionOperators, precedence);//opp.precedence < precedence or (opp.precedence == precedence and opp.isLHS)
-	if (opp.iden != "") {
+	if (opp.ctr != nullptr) {
 		
 		PTNode rhs = parseExpression (queue, opp.precedence);
-		PTNode node = new ParseTreeOperator (opp.iden, {lhs, rhs});
+		PTNode node = opp.ctr (opp.iden, {lhs, rhs});
 		if (precedence > opp.precedence) {
 			return parseExpression (queue, precedence, node);
 		} else {
@@ -1029,12 +1036,12 @@ Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted,
 				syms = syms.substr (match.size ()-seen.size ());
 				for (size_t i=0; i<match.size ()-seen.size (); ++i) itts.pop_front ();
 				return {
-					opp.precedence, opp.ptn
+					opp.precedence, opp.ptn, opp.ctr
 				};
 				
 			}
 			
-			return {-1, ""};
+			return {-1, "", nullptr};
 			
 		}
 		
@@ -1043,7 +1050,7 @@ Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted,
 		
 	}
 	
-	return {-1, ""};
+	return {-1, "", nullptr};
 	
 }
 
