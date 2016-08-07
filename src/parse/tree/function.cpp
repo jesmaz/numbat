@@ -43,7 +43,7 @@ void Function::declare (nir::Scope * scope) {
 string Function::strDump (text::PrintMode mode) {
 	
 	string s = iden.empty () ? "" : "def ";
-	s = mode&text::COLOUR ? text::blu + s + text::reset : s;
+	s += mode&text::COLOUR ? text::blu + s + text::reset : s;
 	s += iden.empty () ? "" : iden + " ";
 	if (not tplate.empty ())
 		s += "@[" + text::listPtrToStr (tplate.begin (), tplate.end (), mode) + "]";
