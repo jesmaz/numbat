@@ -7,9 +7,6 @@ const nir::Instruction * ParseTree::build (nir::Scope * scope, BuildMode mode) {
 		declare (scope);
 	}
 	const nir::Instruction * last;
-	for (Function * f : functions) {
-		last = f->build (scope, mode);
-	}
 	for (auto * b : body) {
 		last = b->build (scope, mode);
 	}
