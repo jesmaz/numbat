@@ -1,0 +1,7 @@
+var a : 10
+a = 90
+ref b : a
+var c : a
+a = 6
+b
+c
