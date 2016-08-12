@@ -9,8 +9,10 @@ class ParseTreeIdentifier : public ParseTreeNode {
 	
 	public:
 		
-		const nir::Type * buildType (nir::Scope * scope);
-		const nir::Instruction * build (nir::Scope * scope, ParseTreeNode::BuildMode mode);
+		virtual const nir::Instruction * build (nir::Scope * scope);
+		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
+		virtual const nir::Type * resolveType (nir::Scope * scope);
+		
 		const string & getIden () const {return iden;}
 		
 		ParseTreeIdentifier (uint32_t line, uint32_t pos, const string & iden) : ParseTreeNode (line, pos), iden (iden) {}

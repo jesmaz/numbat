@@ -7,7 +7,7 @@ auto buildParams = [](const std::vector <PTNode> & args, nir::Scope * scope) {
 	std::vector <const nir::Parameter *> conv;
 	conv.reserve (args.size ());
 	for (auto & arg : args) {
-		auto * p = arg->build (scope, ParseTreeNode::BuildMode::PARAMETER);
+		auto * p = arg->buildParameter (scope);
 		assert (p);
 		assert (typeid (*p) == typeid (nir::Parameter));
 		conv.push_back (static_cast <const nir::Parameter *> (p));
@@ -15,7 +15,7 @@ auto buildParams = [](const std::vector <PTNode> & args, nir::Scope * scope) {
 	return conv;
 };
 
-const nir::Instruction * Function::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * Function::build (nir::Scope * scope) {
 	
 	if (not fScope) {
 		//Must be anon
@@ -25,7 +25,7 @@ const nir::Instruction * Function::build (nir::Scope * scope, ParseTreeNode::Bui
 	}
 	
 	if (body) {
-		auto b = body->build (fScope, mode);
+		auto b = body->build (fScope);
 		fScope->createAutoReturn (b);
 	}
 	return fScope->getFunctionPointer ();

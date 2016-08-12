@@ -18,7 +18,7 @@ class MetaTags : public ParseTreeNode {
 		virtual Function * asFunction () {return componant->asFunction ();}
 		virtual Struct * asStruct () {return componant->asStruct ();}
 		
-		virtual const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
+		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		virtual void declare (nir::Scope * scope);
 		virtual void push_back (ParseTreeNode * e) {componant->push_back (e);}

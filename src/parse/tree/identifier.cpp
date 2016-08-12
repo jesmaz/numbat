@@ -1,19 +1,16 @@
-#include "../../../include/nir/scope.hpp"
-#include "../../../include/parse/tree/identifier.hpp"
+#include <nir/scope.hpp>
+#include <parse/tree/identifier.hpp>
 
-const nir::Type * ParseTreeIdentifier::buildType (nir::Scope * scope) {
-	return scope->resolveType (iden);
+const nir::Instruction * ParseTreeIdentifier::build (nir::Scope * scope) {
+	return scope->resolve (iden);
 }
 
-const nir::Instruction * ParseTreeIdentifier::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	
-	if (mode == ParseTreeNode::BuildMode::NORMAL) {
-		return scope->resolve (iden);
-	} else {
-		const nir::Type * type = scope->resolveType (iden);
-		return scope->createParameter (type);
-	}
-	
+const nir::Instruction * ParseTreeIdentifier::buildAllocate (nir::Scope * scope, const string & iden) {
+	return scope->allocateVariable (resolveType (scope), iden);
+}
+
+const nir::Type * ParseTreeIdentifier::resolveType (nir::Scope * scope) {
+	return scope->resolveType (iden);
 }
 
 string ParseTreeIdentifier::strDump (text::PrintMode mode) {

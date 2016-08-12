@@ -10,7 +10,10 @@ struct ResolveScope : ParseTreeNode {
 	
 	public:
 		
-		virtual const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
+		virtual const nir::Instruction * build (nir::Scope * scope);
+		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
+		virtual const nir::Type * resolveType (nir::Scope * scope);
+		
 		const string & getIden () const {return iden;}
 		
 		ResolveScope (PTNode parent, const string & iden) : ParseTreeNode (ParseTreeNode::NodeType::EXPRESSION, parent->getLine (), parent->getPos ()), parent (parent), iden (iden) {}

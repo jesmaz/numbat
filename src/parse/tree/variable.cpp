@@ -1,14 +1,14 @@
-#include "../../../include/nir/instruction.hpp"
-#include "../../../include/nir/scope.hpp"
-#include "../../../include/parse/tree/variable.hpp"
+#include <nir/instruction.hpp>
+#include <nir/scope.hpp>
+#include <parse/tree/variable.hpp>
 
 
-const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 	
 	const nir::Instruction * init = nullptr, * var = nullptr;
 	const nir::Type * type = nullptr;
 	if (inst) {
-		init = inst->build (scope, ParseTreeNode::BuildMode::NORMAL);
+		init = inst->build (scope);
 	}
 	if (vType->getType () == ParseTreeNode::NodeType::KEYWORD) {
 		assert (inst);
@@ -18,23 +18,17 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTree
 			type = type->getPointerTo ();
 		}
 		//TODO: make type const if needed
-		
+		var = scope->allocateVariable (type, iden->getIden ());
 	} else {
-		auto * instr = vType->build (scope, ParseTreeNode::BuildMode::PARAMETER);
-		assert (instr);
-		type = instr->getType ();
+		var = vType->buildAllocate (scope, iden->getIden ());
+		type = vType->resolveType (scope);
 	}
-	assert (type);
+	assert (var);
 	std::cerr << typeid (*iden).name () << std::endl;
 	std::cerr << iden->toString () << std::endl;
 	std::cerr << iden->getIden () << std::endl;
-	if (mode == ParseTreeNode::BuildMode::PARAMETER) {
-		nir::symbol sym = nullptr;
-		if (init) sym = init->getIden ();
-		return scope->createParameter (type, {init, sym}, iden->getIden ());
-	} else {
-		var = scope->allocateVariable (type, iden->getIden ());
-	}
+	
+	
 	if (init) {
 		auto val = init;
 		if (init->getType () != type) {
@@ -44,6 +38,33 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope, ParseTree
 	}
 	return var;
 	
+}
+
+const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) {
+	const nir::Instruction * init = nullptr, * var = nullptr;
+	const nir::Type * type = nullptr;
+	if (inst) {
+		init = inst->build (scope);
+	}
+	if (vType->getType () == ParseTreeNode::NodeType::KEYWORD) {
+		assert (inst);
+		assert (init);
+		type = init->getType ();
+		if (vType->getIden () == "ref") {
+			type = type->getPointerTo ();
+		}
+		//TODO: make type const if needed
+	} else {
+		type = vType->resolveType (scope);
+	}
+	assert (type);
+	std::cerr << typeid (*iden).name () << std::endl;
+	std::cerr << iden->toString () << std::endl;
+	std::cerr << iden->getIden () << std::endl;
+	
+	nir::symbol sym = nullptr;
+	if (init) sym = init->getIden ();
+	return scope->createParameter (type, {init, sym}, iden->getIden ());
 }
 
 string ParseTreeVariable::strDump (text::PrintMode mode) {

@@ -1,8 +1,8 @@
 #include <parse/tree/metaTags.hpp>
 
-const nir::Instruction * MetaTags::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * MetaTags::build (nir::Scope * scope) {
 	
-	const auto * cmpt = componant->build (scope, mode);
+	const auto * cmpt = componant->build (scope);
 	for (auto itt = tags.rbegin (), end = tags.rend (); itt!=end; ++itt) {
 		//TODO: Implement this method. Will require some attention to defining meta tags in the first place
 		// One option is: def @tag (function f) -> (function)

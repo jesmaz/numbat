@@ -1,8 +1,7 @@
 #include <file.hpp>
-#include <nir/scope.hpp>
-#include <parse/handparser.hpp>
-#include <mutex>
 #include <fstream>
+#include <nir/scope.hpp>
+#include <mutex>
 #include <parse/handparser.hpp>
 
 
@@ -79,7 +78,7 @@ File * File::compile (const string & path, nir::Module * module) {
 	
 	nir::Scope * root = module->createRootScope ();
 	parseTree->declare (root);
-	parseTree->build (root, ParseTreeNode::BuildMode::NORMAL);
+	parseTree->build (root);
 	f->scope = root;
 	return f;
 	

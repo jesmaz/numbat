@@ -14,7 +14,7 @@ class GenericOperator : public ParseTreeNode {
 		
 		virtual bool isAggregate () {return true;}
 		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
-		virtual const nir::Instruction * build (nir::Scope * scope, ParseTreeNode::BuildMode mode);
+		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		GenericOperator (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		GenericOperator (const string & iden, const std::vector <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()), iden (iden), args (args) {}
@@ -22,7 +22,7 @@ class GenericOperator : public ParseTreeNode {
 		
 	protected:
 		
-		virtual const nir::Instruction * defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode)=0;
+		virtual const nir::Instruction * defBuild (nir::Scope * scope)=0;
 		
 		string iden;
 		std::vector <PTNode> args;
@@ -43,7 +43,7 @@ class SpecificOperator : public GenericOperator {
 		
 	protected:
 		
-		virtual const nir::Instruction * defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode);
+		virtual const nir::Instruction * defBuild (nir::Scope * scope);
 		
 	private:
 };

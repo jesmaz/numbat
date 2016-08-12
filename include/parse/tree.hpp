@@ -16,7 +16,7 @@ class ParseTree : public ParseTreeNode {
 		const std::vector <PTNode> & getBody () const {return body;}
 		const std::vector <Struct *> & getStructs () const {return structs;}
 		
-		const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
+		const nir::Instruction * build (nir::Scope * scope);
 		
 		void declare (nir::Scope * scope);
 		void declareInline ();

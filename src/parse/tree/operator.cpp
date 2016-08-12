@@ -2,14 +2,14 @@
 #include <parse/tree/operator.hpp>
 
 
-std::vector <nir::Argument> resolveNodes (nir::Scope * scope, ParseTreeNode::BuildMode mode, std::vector <PTNode> args) {
+std::vector <nir::Argument> resolveNodes (nir::Scope * scope, std::vector <PTNode> args) {
 	
 	std::vector <nir::Argument> nodes;
 	nodes.resize (args.size (), {nullptr, nullptr});
 	//std::vector <numbat::parser::FunctionDecleration *> candidates;
 	for (size_t i=0; i<args.size(); ++i) {
 		assert (args[i]);
-		const nir::Instruction * instr = args[i]->build (scope, mode);
+		const nir::Instruction * instr = args[i]->build (scope);
 		nodes [i] = {instr, instr->getIden ()};
 		assert (instr);
 	}
@@ -19,8 +19,8 @@ std::vector <nir::Argument> resolveNodes (nir::Scope * scope, ParseTreeNode::Bui
 }
 
 
-const nir::Instruction * GenericOperator::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return defBuild (scope, mode);
+const nir::Instruction * GenericOperator::build (nir::Scope * scope) {
+	return defBuild (scope);
 }
 
 
@@ -52,131 +52,131 @@ string GenericOperator::strDump (text::PrintMode mode) {
 
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::ADD>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createAdd (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::ADD>::defBuild (nir::Scope * scope) {
+	return scope->createAdd (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::AS>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::AS>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::ASSIGN>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createAssign (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::ASSIGN>::defBuild (nir::Scope * scope) {
+	return scope->createAssign (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::BAND>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createBitAnd (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::BAND>::defBuild (nir::Scope * scope) {
+	return scope->createBitAnd (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::BNOT>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createBitNot (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::BNOT>::defBuild (nir::Scope * scope) {
+	return scope->createBitNot (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::BOR>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createBitOr (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::BOR>::defBuild (nir::Scope * scope) {
+	return scope->createBitOr (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::BXOR>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createBitXor (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::BXOR>::defBuild (nir::Scope * scope) {
+	return scope->createBitXor (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::CMPEQ>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::CMPEQ>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::CMPGT>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createCmpGT (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::CMPGT>::defBuild (nir::Scope * scope) {
+	return scope->createCmpGT (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::CMPGTE>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::CMPGTE>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::CMPLT>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createCmpLT (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::CMPLT>::defBuild (nir::Scope * scope) {
+	return scope->createCmpLT (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::CMPLTE>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::CMPLTE>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::CMPNE>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::CMPNE>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::CONCAT>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::CONCAT>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::DECREMENT>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::DECREMENT>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::DIV>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createDiv (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::DIV>::defBuild (nir::Scope * scope) {
+	return scope->createDiv (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::IN>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::IN>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::INCREMENT>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::INCREMENT>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::LNOT>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createLNot (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::LNOT>::defBuild (nir::Scope * scope) {
+	return scope->createLNot (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::MUL>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createMul (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::MUL>::defBuild (nir::Scope * scope) {
+	return scope->createMul (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::NEG>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createNeg (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::NEG>::defBuild (nir::Scope * scope) {
+	return scope->createNeg (resolveNodes (scope, args));
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::NONE>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::NONE>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::REM>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * SpecificOperator <OPERATION::REM>::defBuild (nir::Scope * scope) {
 	abort ();
 }
 
 template <>
-const nir::Instruction * SpecificOperator <OPERATION::SUB>::defBuild (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
-	return scope->createSub (resolveNodes (scope, mode, args));
+const nir::Instruction * SpecificOperator <OPERATION::SUB>::defBuild (nir::Scope * scope) {
+	return scope->createSub (resolveNodes (scope, args));
 }

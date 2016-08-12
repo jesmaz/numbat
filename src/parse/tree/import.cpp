@@ -3,7 +3,7 @@
 
 #define PATH_JOIN "/"
 
-const nir::Instruction * ParseTreeImport::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * ParseTreeImport::build (nir::Scope * scope) {
 	
 	if (not sourceFile) declare (scope);
 	if (iden) {

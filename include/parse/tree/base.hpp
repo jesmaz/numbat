@@ -20,7 +20,6 @@ class ParseTreeNode {
 	
 	public:
 		
-		enum class BuildMode {NORMAL, PARAMETER};
 		enum class NodeType {EXPRESSION, FUNCTION, IMPORT, KEYWORD, LIST, STRUCT, SYMBOL};
 		
 		NodeType getType () {return type;}
@@ -40,7 +39,10 @@ class ParseTreeNode {
 		virtual Function * asFunction () {return nullptr;}
 		virtual Struct * asStruct () {return nullptr;}
 		
-		virtual const nir::Instruction * build (nir::Scope * scope, BuildMode mode) {std::cerr << "virtual 'build' not implemented for: " << typeid (*this).name () << std::endl; assert (0); return nullptr;}
+		virtual const nir::Instruction * build (nir::Scope * scope) {std::cerr << "virtual 'build' not implemented for: " << typeid (*this).name () << std::endl; assert (0); return nullptr;}
+		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden) {std::cerr << typeid (*this).name () << " can't create an allocate instruction" << std::endl; assert (0); return nullptr;}
+		virtual const nir::Instruction * buildParameter (nir::Scope * scope) {std::cerr << typeid (*this).name () << " is not a valid parameter" << std::endl; assert (0); return nullptr;}
+		virtual const nir::Type * resolveType (nir::Scope * scope) {std::cerr << typeid (*this).name () << " can't resolve a type" << std::endl; assert (0); return nullptr;}
 		
 		virtual void declare (nir::Scope * scope) {std::cerr << "virtual 'declare' not implemented for: " << typeid (*this).name () << std::endl; assert (0);}
 		virtual void push_back (ParseTreeNode * e) {std::cerr << "virtual 'push_back' not implemented for: " << typeid (*this).name () << std::endl; assert (0);}

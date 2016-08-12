@@ -2,12 +2,12 @@
 #include <nir/scope.hpp>
 #include <parse/tree/call.hpp>
 
-auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope) {
 	std::vector <nir::Argument> conv;
 	conv.reserve (args.size ());
 	for (auto & arg : args) {
 		assert (arg);
-		const nir::Instruction * instr = arg->build (scope, mode);
+		const nir::Instruction * instr = arg->build (scope);
 		for (nir::symbol iden : instr->getIdens ()) {
 			conv.push_back ({instr, iden});
 		}
@@ -15,13 +15,13 @@ auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope, Parse
 	return conv;
 };
 
-const nir::Instruction * ParseTreeCall::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * ParseTreeCall::build (nir::Scope * scope) {
 	
-	const nir::Instruction * callee = iden->build (scope, mode);
+	const nir::Instruction * callee = iden->build (scope);
 	auto & typeId = typeid (*callee);
 	if (typeId == typeid (nir::FunctionPointer)) {
 		const nir::FunctionPointer * fPtr = static_cast <const nir::FunctionPointer *> (callee);
-		return scope->createCall (fPtr->getFunction (), buildArgs (args, scope, mode));
+		return scope->createCall (fPtr->getFunction (), buildArgs (args, scope));
 	}
 	
 }

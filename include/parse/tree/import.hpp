@@ -14,7 +14,7 @@ class ParseTreeImport : public ParseTreeNode {
 		
 		virtual const string & getIden () const {return iden->getIden ();}
 		
-		const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
+		const nir::Instruction * build (nir::Scope * scope);
 		
 		void declare (nir::Scope * scope);
 		

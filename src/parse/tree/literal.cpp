@@ -2,7 +2,7 @@
 #include <parse/tree/literal.hpp>
 #include <string>
 
-const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope) {
 	
 	switch (tokenType) {
 		case numbat::lexer::TOKEN::chararrayliteral: {

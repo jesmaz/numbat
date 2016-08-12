@@ -23,7 +23,7 @@ int main (int argc, char ** args) {
 		auto parseTree = parse (line);
 		std::cerr << parseTree->toString () << std::endl;
 		parseTree->declare (globalScope);
-		const nir::Instruction * val = parseTree->build (globalScope, ParseTreeNode::BuildMode::NORMAL);
+		const nir::Instruction * val = parseTree->build (globalScope);
 		std::cout << interpreter (val) << '\n';
 	}
 	return 0;

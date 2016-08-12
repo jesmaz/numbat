@@ -14,7 +14,7 @@ struct Function : ParseTreeNode {
 		const std::vector <PTNode> & getParams () const {return params;}
 		const std::vector <PTNode> & getType () const {return type;}
 		
-		const nir::Instruction * build (nir::Scope * scope, BuildMode mode);
+		const nir::Instruction * build (nir::Scope * scope);
 		
 		void declare (nir::Scope * scope);
 		void setBody (PTNode b) {body = b;}

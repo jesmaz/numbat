@@ -2,9 +2,9 @@
 #include <parse/tree/ifelse.hpp>
 
 
-const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	
-	const nir::Instruction * condition = cond->build (scope, mode);
+	const nir::Instruction * condition = cond->build (scope);
 	nir::symbol bodyBlock=scope->createBlock (), altBlock;
 	
 	if (alternate) {
@@ -14,12 +14,12 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope, ParseTreeNo
 	nir::symbol contBlock=scope->createBlock ();
 	const nir::Instruction * condJump = scope->createJump ({condition, condition->getIden ()}, bodyBlock);
 	scope->changeActiveBlock (bodyBlock);
-	body->build (scope, mode);
+	body->build (scope);
 	
 	if (alternate) {
 		scope->createJump (altBlock);
 		scope->changeActiveBlock (altBlock);
-		alternate->build (scope, mode);
+		alternate->build (scope);
 	}
 	
 	scope->createJump (contBlock);

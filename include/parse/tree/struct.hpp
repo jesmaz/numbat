@@ -11,7 +11,7 @@ struct Struct : ParseTreeNode {
 	
 	public:
 		
-		virtual const nir::Instruction * build (nir::Scope * scope, ParseTreeNode::BuildMode mode);
+		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		void declare (nir::Scope * scope);
 		

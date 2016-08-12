@@ -7,7 +7,7 @@
 
 
 
-const nir::Instruction * Struct::build (nir::Scope * scope, ParseTreeNode::BuildMode mode) {
+const nir::Instruction * Struct::build (nir::Scope * scope) {
 	
 	if (not type) {
 		declare (scope);
@@ -20,7 +20,7 @@ const nir::Instruction * Struct::build (nir::Scope * scope, ParseTreeNode::Build
 	std::vector <const nir::Parameter *> conv;
 	conv.reserve (members.size ());
 	for (auto & arg : members) {
-		auto * p = arg->build (scope, ParseTreeNode::BuildMode::PARAMETER);
+		auto * p = arg->buildParameter (scope);
 		assert (p);
 		assert (typeid (*p) == typeid (nir::Parameter));
 		conv.push_back (static_cast <const nir::Parameter *> (p));

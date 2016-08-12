@@ -1,6 +1,6 @@
 #include "../../include/parse/tree.hpp"
 
-const nir::Instruction * ParseTree::build (nir::Scope * scope, BuildMode mode) {
+const nir::Instruction * ParseTree::build (nir::Scope * scope) {
 	if (nirTreeScope) {
 		scope = nirTreeScope;
 	} else {
@@ -8,7 +8,7 @@ const nir::Instruction * ParseTree::build (nir::Scope * scope, BuildMode mode) {
 	}
 	const nir::Instruction * last;
 	for (auto * b : body) {
-		last = b->build (scope, mode);
+		last = b->build (scope);
 	}
 	
 	return last;

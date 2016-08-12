@@ -10,7 +10,7 @@ class ParseTreeLiteral : public ParseTreeNode {
 	
 	public:
 		
-		virtual const nir::Instruction * build (nir::Scope * scope, ParseTreeNode::BuildMode mode);
+		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		ParseTreeLiteral (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		ParseTreeLiteral (uint32_t line, uint32_t pos, const string & literal, numbat::lexer::TOKEN tokenType) : ParseTreeNode (line, pos), literal (literal), tokenType(tokenType) {}
