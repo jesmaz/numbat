@@ -3,8 +3,6 @@
 pass=0
 total=0
 score=0
-# passLine=0
-# totalLine=0
 
 cd `dirname "${BASH_SOURCE[0]}"`
 
@@ -32,11 +30,6 @@ done
 
 if [ $total -gt 0 ]
 then
-# 	echo "Results (per line)"
-# 	echo "Total: $totalLine"
-# 	echo "Pass:  $passLine"
-# 	echo "Fail:  $(($totalLine-$passLine))"
-# 	echo "Rate:  `bc -l <<< \"100 * ($passLine / $totalLine)\"`%"
 	echo "Results"
 	echo "Total: $total"
 	echo "Pass:  $pass"

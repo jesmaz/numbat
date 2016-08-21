@@ -20,19 +20,13 @@ for i in $( find parser/*.nbt ); do
 	else
 		pass=$(($pass+1))
 	fi
-# 	passLine=$(($passLine+($lcount-$fail)))
+	
 	total=$(($total+1))
-# 	totalLine=$(($totalLine+$lcount))
 	
 done
 
 if [ $total -gt 0 ]
 then
-# 	echo "Results (per line)"
-# 	echo "Total: $totalLine"
-# 	echo "Pass:  $passLine"
-# 	echo "Fail:  $(($totalLine-$passLine))"
-# 	echo "Rate:  `bc -l <<< \"100 * ($passLine / $totalLine)\"`%"
 	echo "Results"
 	echo "Total: $total"
 	echo "Pass:  $pass"
