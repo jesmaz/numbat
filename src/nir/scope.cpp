@@ -6,6 +6,7 @@
 #include <nir/inst/alloc.hpp>
 #include <nir/inst/bitwise.hpp>
 #include <nir/inst/call.hpp>
+#include <nir/inst/composite.hpp>
 #include <nir/inst/constant.hpp>
 #include <nir/inst/div.hpp>
 #include <nir/inst/functionPointer.hpp>
@@ -335,6 +336,13 @@ const Instruction * Scope::createPut (Argument src, Argument dest) {
 	
 	auto * instr = new Put (dest.instr->getType ()->getDereferenceType (), src, dest, module->newSymbol ("put"));
 	return insertionPoint->give (instr);
+	
+}
+
+const Instruction * Scope::createStructValue (const Type * const type, std::vector <Argument> vals, const string & iden) {
+	
+	const Instruction * inst = new Composite (type, vals, module->newSymbol (iden));
+	return insertionPoint->give (inst);
 	
 }
 
