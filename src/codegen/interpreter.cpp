@@ -200,7 +200,7 @@ void Interpreter::visit (const Composite & comp) {
 		atDat [i] = lookupAtom (comp.getArguments () [i]);
 	}
 	Atom res;
-	res.atomicType = AtomicType::DATA;
+	res.atomicType = AtomicType::STRUCT;
 	res.data.ptr = reinterpret_cast <uint8_t *> (atDat);
 	res.type = comp.getType ();
 	lookupTable [comp.getIden ()] = res;
