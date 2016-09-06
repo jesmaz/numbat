@@ -19,6 +19,7 @@
 #include <nir/inst/put.hpp>
 #include <nir/inst/ret.hpp>
 #include <nir/inst/sub.hpp>
+#include <nir/type/array.hpp>
 #include <nir/type/importHandle.hpp>
 #include <nir/type/number.hpp>
 
@@ -117,6 +118,7 @@ const Type * Scope::resolveType (const string & iden) const {
 	if (itt != module->data->types.end ()) {
 		return itt->second;
 	}
+	std::cerr << "Could not resolve " << iden << std::endl;
 	assert (nullptr);
 	return nullptr;
 	
@@ -139,6 +141,24 @@ const Type * Scope::resolveType (Argument parent, const string & iden) const {
 		return scope->resolveType (iden);
 		
 	}
+	
+}
+
+const Instruction * Scope::allocateArray (const Type * const type, Argument size, const string & iden) {
+	
+	Struct * s = Array::arrayOf (type);
+	const Instruction * ptr = allocateBytes (type, size, iden + "_ptr");
+	const Instruction * var = allocateVariable (s, iden);
+	const Instruction * val = createStructValue (s, {{ptr, ptr->getIden ()}, size});
+	const Instruction * inst = createPut ({val, val->getIden ()}, {var, var->getIden ()});
+	return insertionPoint->give (inst);
+	
+}
+
+const Instruction * Scope::allocateBytes (const Type * const type, Argument size, const string & iden) {
+	
+	Instruction * inst = new Alloc (type->getPointerTo (), size, module->newSymbol (iden));
+	return inst;
 	
 }
 

@@ -1,13 +1,16 @@
-#ifndef PARSETREEINDEX_HPP
-#define PARSETREEINDEX_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
 
 
 class ParseTreeIndex : public ParseTreeNode {
 	
 	public:
+		
+		virtual const nir::Instruction * build (nir::Scope * scope);
+		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
+		virtual const nir::Type * resolveType (nir::Scope * scope);
 		
 		ParseTreeIndex (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		ParseTreeIndex (PTNode index, const std::vector <PTNode> & args) : ParseTreeNode (index->getLine (), index->getPos ()), index (index), args (args) {}
@@ -22,6 +25,3 @@ class ParseTreeIndex : public ParseTreeNode {
 		std::vector <PTNode> args;
 		
 };
-
-
-#endif /*PARSETREEINDEX_HPP*/

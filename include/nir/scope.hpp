@@ -33,6 +33,8 @@ struct Scope {
 		Argument createGet (Argument src);
 		Argument staticCast (Argument src, const Type * const target, const string & iden="");
 		
+		const Instruction * allocateArray (const Type * const type, Argument size, const string & iden="");
+		const Instruction * allocateBytes (const Type * const type, Argument size, const string & iden="");
 		const Instruction * allocateVariable (const Type * const type, const string & iden="");
 		template <typename T>
 		const Instruction * createBinary (Argument lhs, Argument rhs, const string & iden);

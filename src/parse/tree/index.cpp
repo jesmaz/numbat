@@ -1,4 +1,33 @@
-#include "../../../include/parse/tree/index.hpp"
+#include <parse/tree/index.hpp>
+#include <nir/parameter.hpp>
+#include <nir/scope.hpp>
+#include <nir/type/array.hpp>
+
+const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
+	
+	return ParseTreeNode::build (scope);
+	
+}
+
+const nir::Instruction * ParseTreeIndex::buildAllocate (nir::Scope * scope, const string & iden) {
+	
+	const nir::Instruction * s = nullptr;
+	for (PTNode node : args) {
+		const nir::Instruction * r = node->build (scope);
+		if (s) {
+			s = scope->createMul ({{s, s->getIden ()}, {r, r->getIden ()}});
+		} else {
+			s = r;
+		}
+	}
+	
+	return scope->allocateArray (index->resolveType (scope), {s, s->getIden ()}, iden);
+	
+}
+
+const nir::Type * ParseTreeIndex::resolveType (nir::Scope * scope) {
+	return nir::Array::arrayOf (index->resolveType (scope));
+}
 
 string ParseTreeIndex::strDump (text::PrintMode mode) {
 	string s = "(" + index->toString (mode) + (text::PrintMode::COLOUR & mode ? text::red + " [" + text::reset : " [");
