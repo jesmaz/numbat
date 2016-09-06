@@ -93,7 +93,7 @@ class Interpreter : public TargetVisitor {
 		std::vector <Atom> operator () (const Block * block);
 		
 		std::map <symbol, Atom> lookupTable;
-		std::set <void *> ptrs;
+		std::set <uint8_t *> ptrs;
 		const Block * currentBlock=nullptr;
 		
 };

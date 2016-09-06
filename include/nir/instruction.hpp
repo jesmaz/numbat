@@ -1,6 +1,4 @@
-#ifndef NIR_INSTRUCTION
-#define NIR_INSTRUCTION
-
+#pragma once
 
 #include <nir/forward.hpp>
 #include <nir/type.hpp>
@@ -61,6 +59,3 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 };
 
 };
-
-
-#endif/*NIR_TYPE_BASE_HPP*/

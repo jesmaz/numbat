@@ -607,7 +607,7 @@ Interpreter::~Interpreter () {
 }
 
 void Interpreter::cleanup() {
-	for (void * p : ptrs) {
+	for (uint8_t * p : ptrs) {
 		delete p;
 	}
 	ptrs.clear ();

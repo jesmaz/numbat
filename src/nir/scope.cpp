@@ -141,6 +141,7 @@ const Type * Scope::resolveType (Argument parent, const string & iden) const {
 		return scope->resolveType (iden);
 		
 	}
+	abort ();
 	
 }
 
@@ -411,6 +412,7 @@ const Instruction * Scope::resolve (Argument parent, const string & iden) {
 		return scope->resolve (iden, insertionPoint);
 		
 	}
+	abort ();
 	
 }
 
