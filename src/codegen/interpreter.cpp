@@ -191,6 +191,22 @@ void Interpreter::visit (const Block & block) {
 	
 }
 
+void Interpreter::visit (const Composite & comp) {
+	
+	auto l = comp.getArguments ().size ();
+	Atom * atDat = new Atom [l];
+	ptrs.insert (reinterpret_cast <uint8_t *> (atDat));
+	for (auto i=0ul; i<l; ++i) {
+		atDat [i] = lookupAtom (comp.getArguments () [i]);
+	}
+	Atom res;
+	res.atomicType = AtomicType::DATA;
+	res.data.ptr = reinterpret_cast <uint8_t *> (atDat);
+	res.type = comp.getType ();
+	lookupTable [comp.getIden ()] = res;
+	
+}
+
 void Interpreter::visit (const Constant & con) {
 	
 	Atom res;

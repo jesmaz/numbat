@@ -185,6 +185,17 @@ void LLVM::visit (const nir::Block & block) {
 	}
 }
 
+void LLVM::visit (const nir::Composite & comp) {
+	
+	llvm::Value * val = llvm::GlobalValue::getNullValue (resolve (comp.getType ()));
+	auto i = 0;
+	for (Argument arg : comp.getArguments ()) {
+		val = irBuilder.CreateInsertValue  (val, resolve (arg), i++);
+	}
+	instrDict [comp.getIden ()] = val;
+	
+}
+
 void LLVM::visit (const nir::Constant & con) {
 	
 	llvm::Value * val;

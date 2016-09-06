@@ -51,6 +51,7 @@ class Interpreter : public TargetVisitor {
 		virtual void visit (const BitOr & bitOr);
 		virtual void visit (const BitXor & bitXor);
 		virtual void visit (const Block & block);
+		virtual void visit (const Composite & com);
 		virtual void visit (const Constant & con);
 		virtual void visit (const Div & div);
 		virtual void visit (const DirectCall & call);

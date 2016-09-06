@@ -6,6 +6,7 @@
 #include <nir/inst/alloc.hpp>
 #include <nir/inst/bitwise.hpp>
 #include <nir/inst/call.hpp>
+#include <nir/inst/composite.hpp>
 #include <nir/inst/constant.hpp>
 #include <nir/inst/div.hpp>
 #include <nir/inst/functionPointer.hpp>
@@ -34,6 +35,7 @@ class TargetVisitor :
 	public ConstVisitor <BitNot>,
 	public ConstVisitor <BitOr>,
 	public ConstVisitor <BitXor>,
+	public ConstVisitor <Composite>,
 	public ConstVisitor <Constant>,
 	public ConstVisitor <Div>,
 	public ConstVisitor <DirectCall>,
