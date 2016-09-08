@@ -147,7 +147,7 @@ const Type * Scope::resolveType (Argument parent, const string & iden) const {
 
 const Instruction * Scope::allocateArray (const Type * const type, Argument size, const string & iden) {
 	
-	Struct * s = Array::arrayOf (type);
+	Array * s = Array::arrayOf (type);
 	const Instruction * ptr = allocateBytes (type, size, iden + "_ptr");
 	const Instruction * var = allocateVariable (s, iden);
 	const Instruction * val = createStructValue (s, {{ptr, ptr->getIden ()}, size});

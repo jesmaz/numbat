@@ -13,23 +13,21 @@ class Array : public Type {
 	CONST_VISITABLE
 	public:
 		
-		virtual ArithmaticType getArithmaticType () const {return Type::ArithmaticType::UINT;}
-		virtual const Type * getDereferenceType () const {return type;}
-		virtual size_t calculateSize (size_t ptrSize) const {return ptrSize*2;}
+		virtual size_t calculateSize (size_t ptrSize) const {return type.calculateSize (ptrSize);}
 		
-		static Struct * arrayOf (const Type * t);
+		static Array * arrayOf (const Type * t);
 		
 	protected:
 	private:
 		
-		Array (const Type * type) : type (type) {}
+		Array () {}
 		
-		virtual string strDump (text::PrintMode mode) const {return type->toString (mode) + "*";}
+		virtual string strDump (text::PrintMode mode) const {return type.toString (mode);}
 		
 		
-		const Type * type;
+		Struct type;
 		
-		static std::map <const Type *, Struct *> arrayTypes;
+		static std::map <const Type *, Array *> arrayTypes;
 		
 };
 
