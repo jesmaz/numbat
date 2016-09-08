@@ -159,7 +159,7 @@ const Instruction * Scope::allocateArray (const Type * const type, Argument size
 const Instruction * Scope::allocateBytes (const Type * const type, Argument size, const string & iden) {
 	
 	Instruction * inst = new Alloc (type->getPointerTo (), size, module->newSymbol (iden));
-	return inst;
+	return insertionPoint->give (inst);
 	
 }
 
