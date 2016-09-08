@@ -1,11 +1,7 @@
-#ifndef NIR_POINTER_TYPE
-#define NIR_POINTER_TYPE
-
-
-#include "../type.hpp"
+#pragma once
 
 #include <map>
-
+#include <nir/type.hpp>
 
 namespace nir {
 
@@ -16,7 +12,7 @@ class PointerType : public Type {
 		
 		string toString (text::PrintMode mode=text::PLAIN) {if (this) return strDump (mode); else return "nullptr";}
 		
-		virtual ArithmaticType getArithmaticType () {return Type::ArithmaticType::UINT;}
+		virtual ArithmaticType getArithmaticType () const {return Type::ArithmaticType::UINT;}
 		virtual const Type * getDereferenceType () const {return type;}
 		virtual size_t calculateSize (size_t ptrSize) const {return ptrSize;}
 		
@@ -45,6 +41,3 @@ class PointerType : public Type {
 
 
 };
-
-
-#endif/*NIR_POINTER_TYPE*/
