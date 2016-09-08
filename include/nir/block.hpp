@@ -1,5 +1,4 @@
-#ifndef NIR_BLOCK
-#define NIR_BLOCK
+#pragma once
 
 
 #include "forward.hpp"
@@ -20,7 +19,7 @@ struct Block {
 		std::vector <const Instruction *> & getInstructions () {return instructions;}
 		const std::vector <const Instruction *> & getInstructions () const {return instructions;}
 		
-		const Instruction * give (const Instruction * instr) {instructions.push_back (instr); return instr;}
+		const Instruction * give (const Instruction * instr);
 		
 	protected:
 	private:
@@ -32,6 +31,3 @@ struct Block {
 
 
 };
-
-
-#endif/*NIR_BLOCK*/

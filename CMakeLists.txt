@@ -69,15 +69,21 @@ set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl z t
 add_executable(console src/console.cpp)
 add_executable(interpreter src/console.cpp)
 add_executable(numbat src/main.cpp src/codegen/llvm.cpp)
+add_executable(nirtest test/nir.cpp src/nir/block.cpp)
+add_executable(nirtest-dbg test/nir.cpp src/nir/block.cpp)
 add_executable(parsertest test/parser.cpp)
 add_executable(parsertest-dbg test/parser.cpp)
 
 target_link_libraries(console ${libs})
 target_link_libraries(interpreter ${libs})
 target_link_libraries(numbat ${libs})
+target_link_libraries(nirtest ${libs})
+target_link_libraries(nirtest-dbg ${libs})
 target_link_libraries(parsertest ${libs})
 target_link_libraries(parsertest-dbg ${libs})
 
+set_target_properties(nirtest PROPERTIES COMPILE_FLAGS "-DD_PRINT")
+set_target_properties(nirtest-dbg PROPERTIES COMPILE_FLAGS "-DDEBUG -DD_PRINT")
 set_target_properties(parsertest-dbg PROPERTIES COMPILE_FLAGS "-DDEBUG")
 set_target_properties(interpreter PROPERTIES COMPILE_FLAGS "-DN_PROMPT")
 
