@@ -14,6 +14,17 @@ size_t nir::Struct::calculateSize (size_t ptrSize) const {
 	return s;
 }
 
+ssize_t nir::Struct::calculateOffset (size_t ptrSize, const string& iden) const {
+	size_t s=0;
+	for (const Parameter * p : memberArr) {
+		if (*p->getIden () == iden) {
+			return s;
+		}
+		s += p->getType ()->calculateSize (ptrSize);
+	}
+	return -1;
+}
+
 std::string nir::Struct::strDump (text::PrintMode mode) const {
 	string s = "{";
 	for (auto & m : members) {

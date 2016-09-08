@@ -14,6 +14,7 @@ class Array : public Type {
 	public:
 		
 		virtual size_t calculateSize (size_t ptrSize) const {return type.calculateSize (ptrSize);}
+		virtual ssize_t calculateOffset (size_t ptrSize, const string & iden) const {return type.calculateOffset (ptrSize, iden);}
 		
 		static Array * arrayOf (const Type * t);
 		

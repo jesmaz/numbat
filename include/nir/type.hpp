@@ -1,12 +1,10 @@
-#ifndef NIR_TYPE_HPP
-#define NIR_TYPE_HPP
+#pragma once
 
 
-#include "../utility/text.hpp"
-#include "../visitor.hpp"
-#include "forward.hpp"
-
+#include <nir/forward.hpp>
 #include <string>
+#include <utility/text.hpp>
+#include <visitor.hpp>
 
 
 namespace nir {
@@ -27,6 +25,7 @@ class Type : public numbat::visitor::BaseConstVisitable {
 		const Type * getPointerTo () const;
 		
 		virtual size_t calculateSize (size_t ptrSize) const=0;//Expects bytes
+		virtual ssize_t calculateOffset (size_t ptrSize, const string & iden) const {return -1;}//Expects bytes
 		
 		virtual ArithmaticType getArithmaticType () const {return ArithmaticType::DEFAULT;}
 		
@@ -38,6 +37,3 @@ class Type : public numbat::visitor::BaseConstVisitable {
 };
 
 };
-
-
-#endif/*NIR_TYPE_BASE_HPP*/
