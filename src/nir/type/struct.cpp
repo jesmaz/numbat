@@ -21,6 +21,7 @@ std::string nir::Struct::strDump (text::PrintMode mode) const {
 	}
 	s.pop_back ();
 	s.back () = '}';
+	return s;
 }
 
 void nir::Struct::populate (const std::vector <const nir::Parameter *> & mem) {
