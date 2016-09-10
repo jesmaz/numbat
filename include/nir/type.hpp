@@ -24,6 +24,7 @@ class Type : public numbat::visitor::BaseConstVisitable {
 		virtual const Type * getDereferenceType () const {return nullptr;}
 		const Type * getPointerTo () const;
 		
+		virtual const Parameter * getParam (const string & str) const {return nullptr;}
 		virtual size_t calculateSize (size_t ptrSize) const=0;//Expects bytes
 		virtual ssize_t calculateOffset (size_t ptrSize, const string & iden) const {return -1;}//Expects bytes
 		

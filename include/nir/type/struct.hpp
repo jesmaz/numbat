@@ -15,6 +15,7 @@ class Struct : public Type {
 	CONST_VISITABLE
 	public:
 		
+		virtual const Parameter * getParam (const string & str) const;
 		virtual size_t calculateSize (size_t ptrSize) const;
 		virtual ssize_t calculateOffset (size_t ptrSize, const string & iden) const;
 		

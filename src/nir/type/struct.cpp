@@ -5,6 +5,13 @@
 #include <set>
 
 
+const nir::Parameter * nir::Struct::getParam (const string & str) const {
+	auto itt = members.find (str);
+	if (itt != members.end ()) {
+		return itt->second;
+	}
+	return nullptr;
+}
 
 size_t nir::Struct::calculateSize (size_t ptrSize) const {
 	size_t s=0;
