@@ -59,6 +59,7 @@ struct Scope {
 		const Instruction * createMul (const std::vector <Argument> & args);
 		const Instruction * createNeg (const std::vector <Argument> & args);
 		const Instruction * createParameter (const Type * const type, Argument init={nullptr, nullptr}, const string & iden="");
+		const Instruction * createPointerAdd (const Type * const type, Argument ptr, Argument offset, const string & iden="");
 		const Instruction * createPut (Argument src, Argument dest);
 		const Instruction * createStructValue (const Type * const type, std::vector <Argument> vals, const string & iden="");
 		const Instruction * createSub (const std::vector <Argument> & args);

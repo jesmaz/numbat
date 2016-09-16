@@ -24,10 +24,6 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 		type = vType->resolveType (scope);
 	}
 	assert (var);
-	std::cerr << typeid (*iden).name () << std::endl;
-	std::cerr << iden->toString () << std::endl;
-	std::cerr << iden->getIden () << std::endl;
-	
 	
 	if (init) {
 		auto val = init;
@@ -58,9 +54,6 @@ const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) 
 		type = vType->resolveType (scope);
 	}
 	assert (type);
-	std::cerr << typeid (*iden).name () << std::endl;
-	std::cerr << iden->toString () << std::endl;
-	std::cerr << iden->getIden () << std::endl;
 	
 	nir::symbol sym = nullptr;
 	if (init) sym = init->getIden ();

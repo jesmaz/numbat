@@ -17,11 +17,13 @@
 #include <nir/inst/neg.hpp>
 #include <nir/inst/pickStructMember.hpp>
 #include <nir/inst/put.hpp>
+#include <nir/inst/ptradd.hpp>
 #include <nir/inst/ret.hpp>
 #include <nir/inst/sub.hpp>
 #include <nir/type/array.hpp>
 #include <nir/type/importHandle.hpp>
 #include <nir/type/number.hpp>
+#include <nir/type/pointer.hpp>
 
 #include <iostream>
 #include <map>
@@ -175,8 +177,6 @@ const Instruction * Scope::allocateVariable (const Type * const type, const stri
 
 template <typename T>
 const Instruction * Scope::createBinary (Argument lhs, Argument rhs, const string & iden) {
-	std::cerr << lhs.toString () << std::endl;
-	std::cerr << rhs.toString () << std::endl;
 	Argument tlhs = lhs, trhs = rhs;
 	if (lhs.instr->getType ()->getDereferenceType ()) {
 		tlhs = createGet (lhs);
@@ -249,8 +249,6 @@ const Instruction * Scope::createCall (const Function * func, const std::vector 
 
 template <typename T>
 const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string & iden) {
-	std::cerr << lhs.toString () << std::endl;
-	std::cerr << rhs.toString () << std::endl;
 	Argument tlhs = lhs, trhs = rhs;
 	if (lhs.instr->getType ()->getDereferenceType ()) {
 		tlhs = createGet (lhs);
@@ -300,10 +298,6 @@ const Instruction * Scope::createDiv (const std::vector <Argument> & args) {
 }
 
 Argument Scope::createGet (Argument src) {
-	std::cerr << src.toString () << std::endl;
-	std::cerr << src.instr->getType ()->toString () << std::endl;
-	std::cerr << src.instr->getType ()->getDereferenceType ()->toString () << std::endl;
-	std::cerr << src.instr->getType ()->getPointerTo ()->toString () << std::endl;
 	auto * instr = new Get (src.instr->getType ()->getDereferenceType (), src, module->newSymbol (src.instr->printIden ()));
 	return {insertionPoint->give (instr), nullptr};
 	
@@ -313,7 +307,6 @@ const Instruction * Scope::createJump (symbol block) {return createJump ({nullpt
 
 const Instruction * Scope::createJump (Argument cond, symbol block) {
 	
-	std::cerr << "Creating Jump" << std::endl;
 	const Block * b = blocks [block];
 	auto * instr = new Jump (cond, b);
 	return insertionPoint->give (instr);
@@ -350,6 +343,13 @@ const Instruction * Scope::createParameter (const Type * const type, Argument in
 		param = new Parameter (type, iden);
 	}
 	return param;
+	
+}
+
+const Instruction * Scope::createPointerAdd (const Type * const type, Argument ptr, Argument offset, const std::string & iden) {
+	
+	auto * add = new PtrAdd (type, ptr, offset, module->newSymbol (iden));
+	return insertionPoint->give (add);
 	
 }
 
@@ -411,6 +411,12 @@ const Instruction * Scope::resolve (Argument parent, const string & iden) {
 		const Scope * scope = imp->getScope ();
 		return scope->resolve (iden, insertionPoint);
 		
+	} else if (typeid (*type) == typeid (PointerType)) {
+		
+		const Parameter * param = type->getDereferenceType ()->getParam (iden);
+		auto * add = new PtrAdd (param->getType ()->getPointerTo (), parent, param, module->newSymbol (iden));
+		return insertionPoint->give (add);
+		
 	}
 	abort ();
 	
@@ -447,13 +453,6 @@ const Instruction * Scope::resolve (const string & iden, Block * insertionPoint)
 		}
 	}
 	
-	for (auto & f : functions) {
-		std::cerr << f.first;
-		for (auto * fptr : *f.second) {
-			std::cerr << '\t' << fptr->getType ()->toString ();
-		}
-	}
-	
 	if (owner) {
 		for (const Parameter * param : owner->getArgs ()) {
 			if (iden == *param->getIden ()) {
@@ -473,9 +472,6 @@ const Instruction * Scope::staticCast (const Instruction * src, const Type * con
 	
 	if (src->getType () == target) return src;
 	
-	std::cerr << src->toString () << std::endl;
-	std::cerr << src->getType ()->toString () << std::endl;
-	std::cerr << target->toString () << std::endl;
 	if (typeid (*src->getType ()) == typeid (Number) and typeid (*target) == typeid (Number)) {
 		
 		//Cast is trivial, the assembler can handle it

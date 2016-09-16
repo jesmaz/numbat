@@ -5,7 +5,21 @@
 
 const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	
-	return ParseTreeNode::build (scope);
+	const nir::Instruction * inst = index->build (scope);
+	const nir::Instruction * s = nullptr;
+	for (PTNode node : args) {
+		const nir::Instruction * r = node->build (scope);
+		if (s) {
+			s = scope->createMul ({{s, s->getIden ()}, {r, r->getIden ()}});
+		} else {
+			s = r;
+		}
+	}
+	
+	nir::Argument array = {inst, inst->getIden ()};
+	auto * dat = scope->resolve (array, "data");
+	auto ptr = scope->createGet ({dat, dat->getIden ()});
+	return scope->createPointerAdd (ptr.instr->getType (), ptr, {s, s->getIden ()}, "index");
 	
 }
 
