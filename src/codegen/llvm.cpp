@@ -314,6 +314,23 @@ void LLVM::visit (const nir::Number & num) {
 	}
 }
 
+void LLVM::visit (const nir::PtrAdd & ptrAdd) {
+	llvm::Value * val;
+	const nir::Parameter * param = ptrAdd.getParam ();
+	auto & args = ptrAdd.getArguments ();
+	if (param) {
+		ssize_t index = args [0].instr->getType ()->getDereferenceType ()->calculateIndex (param);
+		const std::vector <llvm::Value *> indicies = {
+			irBuilder.getInt64 (0),
+			irBuilder.getInt32 (index)
+		};
+		val = irBuilder.CreateGEP (resolve (args [0]), indicies);
+	} else {
+		val = irBuilder.CreateGEP (resolve (args [0]), resolve (args [1]));
+	}
+	instrDict [ptrAdd.getIden ()] = val;
+}
+
 void LLVM::visit (const nir::Put & put) {
 	auto * src = resolve (put.getSrc ());
 	auto * dest = resolve (put.getDest ());

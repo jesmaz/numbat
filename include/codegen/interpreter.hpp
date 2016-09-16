@@ -63,6 +63,7 @@ class Interpreter : public TargetVisitor {
 		virtual void visit (const Neg & neg);
 		virtual void visit (const Number & num);
 		virtual void visit (const Parameter & param);
+		virtual void visit (const PtrAdd & ptrAdd);
 		virtual void visit (const Put & put);
 		virtual void visit (const Ret & ret);
 		virtual void visit (const Struct & stru);

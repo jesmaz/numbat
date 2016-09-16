@@ -376,6 +376,10 @@ void Interpreter::visit (const Parameter & param) {
 	
 }
 
+void Interpreter::visit (const PtrAdd & ptrAdd) {
+	assert (false);	
+}
+
 void Interpreter::visit (const Put & put) {
 	
 	Atom dest = lookupAtom (put.getDest ());

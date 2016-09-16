@@ -32,6 +32,15 @@ ssize_t nir::Struct::calculateOffset (size_t ptrSize, const string& iden) const 
 	return -1;
 }
 
+ssize_t nir::Struct::calculateIndex (const nir::Parameter * param) const {
+	size_t s=0;
+	for (const Parameter * p : memberArr) {
+		if (p == param) return s;
+		++s;
+	}
+	return -1;
+}
+
 std::string nir::Struct::strDump (text::PrintMode mode) const {
 	string s = "{";
 	for (auto & m : members) {

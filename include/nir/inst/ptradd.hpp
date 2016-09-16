@@ -2,6 +2,7 @@
 
 
 #include <nir/instruction.hpp>
+#include <nir/parameter.hpp>
 
 
 namespace nir {
@@ -20,6 +21,8 @@ class PtrAdd : public Instruction {
 				return new PtrAdd (getType (), replacmentArgs [0], param, getIden ());
 			}
 		}
+		
+		const Parameter * getParam () const {return param;}
 		
 	protected:
 	private:

@@ -14,6 +14,7 @@
 #include <nir/inst/less.hpp>
 #include <nir/inst/mul.hpp>
 #include <nir/inst/neg.hpp>
+#include <nir/inst/ptradd.hpp>
 #include <nir/inst/put.hpp>
 #include <nir/inst/ret.hpp>
 #include <nir/inst/sub.hpp>
@@ -46,6 +47,7 @@ class TargetVisitor :
 	public ConstVisitor <Neg>,
 	public ConstVisitor <Number>,
 	public ConstVisitor <Parameter>,
+	public ConstVisitor <PtrAdd>,
 	public ConstVisitor <Put>,
 	public ConstVisitor <Ret>,
 	public ConstVisitor <Struct>,
