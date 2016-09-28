@@ -43,6 +43,17 @@ Target::RegTarget LLVM::target ("llvm", []()->Target*{
 });
 
 
+llvm::Value * LLVM::resolve (const nir::AbstractValue * val) {
+	
+	auto & v = valueDict [val];
+	if (not v) {
+		val->accept (*this);
+	}
+	assert (v);
+	return v;
+	
+}
+
 llvm::Type * LLVM::resolve (const Type * type) {
 	assert (type);
 	auto * t = typeDict [type];
@@ -198,33 +209,14 @@ void LLVM::visit (const nir::Composite & comp) {
 
 void LLVM::visit (const nir::Constant & con) {
 	
-	llvm::Value * val;
-	
 	const auto & syms = con.getIdens ();
-	const auto & data = con.getData ();
-	const auto & types = con.getTypes ();
+	const auto & values = con.getValues ();
 	
-	assert (syms.size () == data.size ());
+	assert (syms.size () == values.size ());
 	
 	for (size_t i=0, l=syms.size (); i<l; ++i) {
 		
-		const Constant::Data & d = *data [i];
-		
-		switch (d.getType ()) {
-			case Constant::Data::DOUBLE:
-				val = llvm::ConstantFP::get (irBuilder.getDoubleTy (), d.asDouble ());
-				break;
-			case Constant::Data::INT:
-				val = irBuilder.getIntN (64, d.asUint ());
-				break;
-			case Constant::Data::STRING:
-				break;
-			case Constant::Data::UINT:
-				val = irBuilder.getIntN (64, d.asUint ());
-				break;
-		}
-		
-		instrDict [syms [i]] = val;
+		instrDict [syms [i]] = resolve (values [i].get ());
 		
 	}
 	

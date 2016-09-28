@@ -273,22 +273,23 @@ const Instruction * Scope::createCmpLT (const std::vector <Argument> & args) {
 const Instruction * Scope::createConstant (const Type * type, const string & val, const string & iden) {
 	
 	//TODO: Ensure the type is sensible
-	Constant * inst = new Constant ({type}, {module->newSymbol (iden)});
+	std::vector <Value> values;
 	assert (type);
 	switch (type->getArithmaticType ()) {
 		case Type::DECINT:
 		case Type::DEFAULT:
 			assert (false);
 		case Type::FPINT:
-			inst->push_back (std::stod (val));
+			values.push_back (Value (std::stod (val)));
 			break;
 		case Type::INT:
-			inst->push_back (int64_t (std::stoll (val)));
+			values.push_back (Value (int64_t (std::stoll (val))));
 			break;
 		case Type::UINT:
-			inst->push_back (uint64_t (std::stoull (val)));
+			values.push_back (Value (uint64_t (std::stoull (val))));
 			break;
 	}
+	Constant * inst = new Constant ({type}, values, {module->newSymbol (iden)});
 	return insertionPoint->give (inst);
 	
 }
@@ -315,7 +316,7 @@ const Instruction * Scope::createJump (Argument cond, symbol block) {
 
 const Instruction * Scope::createImportHandle (const Scope * scope, const string & iden) {
 	Type * type = new ImportHandle (scope);
-	Instruction * inst = new Constant ({type}, {module->newSymbol (iden)});
+	Instruction * inst = new Constant ({type}, {}, {module->newSymbol (iden)});
 	return variables [iden] = inst;
 }
 

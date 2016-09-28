@@ -3,6 +3,7 @@
 
 #include <codegen/targetVisitor.hpp>
 #include <memory>
+#include <nir/value.hpp>
 #include <set>
 #include <vector>
 
@@ -15,30 +16,7 @@ class Interpreter : public TargetVisitor {
 	
 	public:
 		
-		enum AtomicType {DATA, F32, F64, FUNCTION, POISON, PTR, S8, S16, S32, S64, STRUCT, U8, U16, U32, U64, VOID};
-		
-		union AtomicData {
-			double f64;
-			float f32;
-			int8_t s8;
-			int16_t s16;
-			int32_t s32;
-			int64_t s64;
-			uint8_t u8;
-			uint16_t u16;
-			uint32_t u32;
-			uint64_t u64;
-			uint8_t * ptr;
-			const Function * func;
-		};
-		
-		struct Atom {
-			AtomicType atomicType;
-			AtomicData data;
-			const Type * type;
-		};
-		
-		std::vector <Atom> lookupAtoms (const Instruction * val);
+		std::vector <Value> evaluate (const Instruction * val);
 		
 		string operator () (const Instruction * val);
 		
@@ -84,17 +62,17 @@ class Interpreter : public TargetVisitor {
 		
 		
 		template <typename T>
-		Interpreter::Atom binaryOpp (Argument ilhs, Argument irhs, const Type * type);
+		Value binaryOpp (Argument ilhs, Argument irhs, const Type * type);
 		template <typename T>
-		Interpreter::Atom bitwiseOpp (Argument ilhs, Argument irhs, const Type * type);
+		Value bitwiseOpp (Argument ilhs, Argument irhs, const Type * type);
 		
-		Atom lookupAtom (Argument val);
-		Atom staticCast (const Atom & source, const Type * const target);
-		static std::vector <Atom> callFunction (const Function * func, const std::vector <Atom> & args);
-		std::vector <Atom> operator () (const Block * block);
+		Value evaluate (Argument val);
+		Value staticCast (const Value & source, const Type * const target);
+		static std::vector <Value> callFunction (const Function * func, const std::vector <Value> & args);
+		std::vector <Value> operator () (const Block * block);
 		
-		std::map <symbol, Atom> lookupTable;
-		std::set <uint8_t *> ptrs;
+		
+		std::map <symbol, Value> lookupTable;
 		const Block * currentBlock=nullptr;
 		
 };

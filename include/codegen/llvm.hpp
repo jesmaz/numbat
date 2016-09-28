@@ -53,6 +53,7 @@ class LLVM : public TargetVisitor {
 	protected:
 	private:
 		
+		llvm::Value * resolve (const nir::AbstractValue * val);
 		llvm::Type * resolve (const Type * type);
 		llvm::Function * resolve (const Function * func);
 		llvm::Value * resolve (nir::Argument val);
@@ -63,6 +64,7 @@ class LLVM : public TargetVisitor {
 		llvm::DIBuilder diBuilder;
 		llvm::IRBuilder<> irBuilder;
 		
+		std::map <const nir::AbstractValue *, llvm::Value *> valueDict;
 		std::map <const Function *, llvm::Function *> funcDict;
 		std::map <symbol, llvm::Value *> instrDict;
 		std::map <const nir::Type *, llvm::Type *> typeDict;
