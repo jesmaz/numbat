@@ -399,6 +399,10 @@ PTNode parseAtom (CodeQueue * queue) {
 			break;
 	}
 	
+	if (not atom) {
+		return errorUnexpectedToken (queue, "an expression");
+	}
+	
 	PTNode oldAtom;
 	
 	do {
@@ -434,10 +438,6 @@ PTNode parseAtom (CodeQueue * queue) {
 		}
 		
 	} while (oldAtom != atom);
-	
-	if (not atom) {
-		return errorUnexpectedToken (queue, "an expression");
-	}
 	
 	return atom;
 	
