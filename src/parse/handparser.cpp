@@ -315,6 +315,7 @@ PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected) {
 	
 	numbat::lexer::token tkn = queue->peakToken ();
 	clear (queue);
+	report::logMessage (report::ERROR, "", tkn.line, 0, "Unexpected token '" + tkn.iden + "', expected " + expected);
 	return new ParseTreeError (tkn.line, 0, "Unexpected token '" + tkn.iden + "', expected " + expected);
 	
 }
@@ -408,7 +409,9 @@ PTNode parseAtom (CodeQueue * queue) {
 				// Function call
 				queue->shiftPop ();
 				atom = new ParseTreeCall (atom, parseArguments (queue));
-				assert (queue->peak () == Symbol::SYMBOL_PARENRHESES_RIGHT);
+				if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+					return errorUnexpectedToken (queue, "')'");
+				}
 				queue->shiftPop ();
 				break;
 			}
