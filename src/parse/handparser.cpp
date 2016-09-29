@@ -1,6 +1,5 @@
 #include <array>
 #include <deque>
-
 #include <parse/handparser.hpp>
 #include <parse/tree.hpp>
 #include <parse/tree/call.hpp>
@@ -18,6 +17,7 @@
 #include <parse/tree/resolvescope.hpp>
 #include <parse/tree/slice.hpp>
 #include <parse/tree/variable.hpp>
+#include <utility/report.hpp>
 
 
 enum class Symbol : char {
@@ -1092,8 +1092,12 @@ void CodeQueue::update (uint32_t n) {
 				sym = Symbol::SEMICOLON;
 				break;
 			default:
-				assert (symbolMap.count (itt->iden));
-				sym = symbolMap [itt->iden];
+				if (symbolMap.count (itt->iden)) {
+					sym = symbolMap [itt->iden];
+				} else {
+					report::logMessage (report::ERROR, "", itt->line, 0, "Unidentified symbol '" + itt->iden + "'");
+					sym = Symbol::__NONE__;
+				}
 				break;
 		}
 		syms.push_back (char (sym));
