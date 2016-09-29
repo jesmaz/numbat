@@ -139,7 +139,7 @@ PTNode operatorFactory (const string & s, const std::vector <PTNode> & v) {
 
 std::map <string, Operator> operators {
 	{" = ", {" = ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
-	{" += ", {" +=  ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" += ", {" += ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
 	{" -= ", {" -= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
 	{" ~= ", {" ~= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
 	{" *= ", {" *= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
