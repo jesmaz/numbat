@@ -200,7 +200,7 @@ const Instruction * Scope::createAssign (const std::vector <Argument> & args) {
 		tsrc = createGet (args [1]);
 	}
 	tsrc = staticCast (tsrc, args [0].instr->getType ()->getDereferenceType ());
-	return createPut (args [1], args [0]);
+	return createPut (tsrc, args [0]);
 }
 
 const Instruction * Scope::createAutoReturn (const Instruction * instr) {
