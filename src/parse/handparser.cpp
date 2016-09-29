@@ -670,7 +670,7 @@ PTNode parseProgram (CodeQueue * queue) {
 	std::vector <PTNode> body;
 	while (queue->more ()) {
 		body.push_back (parseStatement (queue));
-		while (queue->peak () == Symbol::SEMICOLON) queue->popToken ();
+		while (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) queue->popToken ();
 	}
 	if (body.empty ()) {
 		return new ParseTree (0, 0);
