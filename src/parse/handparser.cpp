@@ -456,7 +456,11 @@ PTNode parseBlock (CodeQueue * queue) {
 		} else {
 			body.push_back (parseStatement (queue));
 		}
-		while (queue->peak () == Symbol::SEMICOLON) queue->popToken ();
+		while (
+			queue->peak () != Symbol::SYMBOL_BRACE_RIGHT
+			and
+			SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT
+		) queue->popToken ();
 	}
 	
 	if (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT) {
