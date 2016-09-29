@@ -20,10 +20,15 @@ class AbstractValue : public numbat::visitor::BaseConstVisitable {
 	
 	public:
 		
-		virtual string toString (text::PrintMode mode) const=0;
+		virtual const AbstractValue & operator = (const AbstractValue & rhs)=0;
+		
+		virtual string toString (text::PrintMode mode=text::PrintMode::PLAIN) const=0;
+		
+		virtual const Type * getType () const=0;
 		
 		virtual Value dereference () const=0;
-		virtual void emplace (const Value & val)=0;
+		virtual Value operator [] (const Parameter * param) const=0;
+		virtual Value operator [] (size_t index) const=0;
 		
 		virtual operator double () const=0;
 		virtual operator int64_t () const=0;
@@ -41,7 +46,7 @@ struct Value {
 		Value ();
 		Value (AbstractValue * absVal);
 		Value (const Function * func);
-		Value (const std::vector <Value> & members);
+		Value (const std::vector <Value> & members, const Struct * layout);
 		Value (const Value & val) : val (val.val) {}
 		Value (double);
 		Value (float);
@@ -63,9 +68,11 @@ struct Value {
 		AbstractValue * get () {return val.get ();}
 		const AbstractValue * get () const {return val.get ();}
 		
-		Value referenceTo (ssize_t index=-1);
+		Value referenceTo ();
 		
-		static Value defCtr (const Type * type);
+		static Value allocate (const Type * type, int64_t amount);
+		
+		operator bool () const {return bool (val);}
 		
 	private:
 		

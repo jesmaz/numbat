@@ -1,5 +1,6 @@
 #include <codegen/interpreter.hpp>
 #include <nir/block.hpp>
+#include <nir/type/array.hpp>
 #include <nir/type/struct.hpp>
 
 #include <functional>
@@ -76,7 +77,7 @@ void Interpreter::visit (const Add & add) {
 void Interpreter::visit (const Alloc & alloc) {
 	
 	Value amount = evaluate (alloc.getAmount ());
-	lookupTable [alloc.getIden ()] = Value ().referenceTo ();
+	lookupTable [alloc.getIden ()] = Value::allocate (alloc.getType ()->getDereferenceType (), int64_t (*amount)).referenceTo ();
 	
 }
 
@@ -125,7 +126,10 @@ void Interpreter::visit (const Composite & comp) {
 	for (auto i=0ul; i<l; ++i) {
 		vals [i] = evaluate (comp.getArguments () [i]);
 	}
-	lookupTable [comp.getIden ()] = Value (vals);
+	const Struct * str = reinterpret_cast <const Struct *> (comp.getType ());
+	if (typeid (*str) == typeid (Array)) str = &reinterpret_cast <const Array *> (str)->getUnderlyingType ();
+	assert (typeid (*str) == typeid (Struct));
+	lookupTable [comp.getIden ()] = Value (vals, str);
 	
 }
 
@@ -229,14 +233,26 @@ void Interpreter::visit (const Parameter & param) {
 }
 
 void Interpreter::visit (const PtrAdd & ptrAdd) {
-	assert (false);	
+	
+	const Parameter * param = ptrAdd.getParam ();
+	auto & args = ptrAdd.getArguments ();
+	Value src = evaluate (args [0]);
+	Value val = src->dereference ();
+	if (param) {
+		val = (*val) [param];
+	} else {
+		val = (*val) [uint64_t (*evaluate (args [1]))];
+	}
+	
+	lookupTable [ptrAdd.getIden ()] = val.referenceTo ();
+	
 }
 
 void Interpreter::visit (const Put & put) {
 	
 	Value src = evaluate (put.getSrc ());
 	Value dest = evaluate (put.getDest ());
-	dest->emplace (src);
+	*(dest->dereference ()) = *src;
 	lookupTable [put.getIden ()] = src;
 	
 }
