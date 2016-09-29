@@ -26,7 +26,7 @@ bool Module::validate () const {
 void Module::registerPrimitive (Type::ArithmaticType arith, uint32_t width, const string & name) {
 	
 	if (symbol s = newSymbol (name, false)) {
-		data->types [s] = new Number (arith, width);
+		data->types [s] = Number::getNumberType (arith, width);
 	} else {
 		abort ();
 	}

@@ -53,7 +53,7 @@ struct Module {
 				bool operator ()(symbol lhs, symbol rhs) {return *lhs < *rhs;}
 			};
 			std::map <symbol, Function *> functions;
-			std::map <symbol, Type *> types;
+			std::map <symbol, const Type *> types;
 			std::set <Instruction *> init;
 			std::set <symbol, symbCmp> symbols;
 			std::set <Scope *> scopes;

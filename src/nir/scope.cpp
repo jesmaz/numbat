@@ -167,7 +167,7 @@ const Instruction * Scope::allocateBytes (const Type * const type, Argument size
 
 const Instruction * Scope::allocateVariable (const Type * const type, const string & iden) {
 	
-	Type * ctype = new Number (Type::UINT, 32);
+	const Type * ctype = Number::getNumberType (Type::UINT, 32);
 	auto * con = createConstant (ctype, "1");
 	Argument amount = {con, con->getIden ()};
 	Instruction * inst = new Alloc (type->getPointerTo (), amount, module->newSymbol (iden));
