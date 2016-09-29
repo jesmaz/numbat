@@ -1,3 +1,5 @@
+#include <iostream>
+#include <map>
 #include <nir/block.hpp>
 #include <nir/module.hpp>
 #include <nir/parameter.hpp>
@@ -24,9 +26,7 @@
 #include <nir/type/importHandle.hpp>
 #include <nir/type/number.hpp>
 #include <nir/type/pointer.hpp>
-
-#include <iostream>
-#include <map>
+#include <utility/report.hpp>
 
 
 namespace nir {
@@ -79,8 +79,7 @@ const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
 				case Type::UINT:
 					return lhs;
 				default:
-					std::cerr << "Unknown arithmetic type" << std::endl;
-					abort ();
+					report::logMessage (report::ERROR, "'" + rhs->toString (text::PLAIN) + "' is not a numeric type");
 			}
 		case Type::INT:
 			switch (rhs->getArithmaticType ()) {
@@ -91,15 +90,14 @@ const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
 				case Type::UINT:
 					return lhs;
 				default:
-					std::cerr << "Unknown arithmetic type" << std::endl;
-					abort ();
+					report::logMessage (report::ERROR, "'" + rhs->toString (text::PLAIN) + "' is not a numeric type");
 			}
 		case Type::UINT:
 			return rhs;
 		default:
-			std::cerr << "Unknown arithmetic type" << std::endl;
-			abort ();
+			report::logMessage (report::ERROR, "'" + lhs->toString (text::PLAIN) + "' is not a numeric type");
 	}
+	return lhs;
 }
 
 
@@ -120,8 +118,8 @@ const Type * Scope::resolveType (const string & iden) const {
 	if (itt != module->data->types.end ()) {
 		return itt->second;
 	}
-	std::cerr << "Could not resolve " << iden << std::endl;
-	assert (nullptr);
+	
+	report::logMessage (report::ERROR, "Could not resolve '" + iden + "' as a type");
 	return nullptr;
 	
 }
@@ -131,10 +129,8 @@ const Type * Scope::resolveType (Argument parent, const string & iden) const {
 	const Type * type = parent.instr->getType ();
 	if (typeid (*type) == typeid (Struct)) {
 		
-		const Struct * str = static_cast <const Struct *> (type);
-		const auto & memberArr = str->getMemberArr ();
-		std::cerr << "Nested structs are not yet supported" << std::endl;
-		abort ();
+		report::logMessage (report::ERROR, "Nested structs are not yet supported");
+		return nullptr;
 		
 	} else if (typeid (*type) == typeid (ImportHandle)) {
 		
@@ -143,7 +139,9 @@ const Type * Scope::resolveType (Argument parent, const string & iden) const {
 		return scope->resolveType (iden);
 		
 	}
-	abort ();
+	
+	report::logMessage (report::ERROR, "'" + type->toString (text::PLAIN) + "' doesn't support nested types");
+	return nullptr;
 	
 }
 
@@ -429,23 +427,10 @@ const Instruction * Scope::resolve (const string & iden) {
 
 const Instruction * Scope::resolve (const string & iden, Block * insertionPoint) const {
 	
-	//TODO: log error
-	
 	auto itt = variables.find (iden);
 	if (itt != variables.end ()) {
 		return itt->second;
 	}
-	
-// 	auto titt = types.find (iden);
-// 	if (titt != types.end ()) {
-// 		//TODO: get type id
-// 	}
-// 	
-// 	auto fitt_beg = functions.lower_bound (iden);
-// 	auto fitt_end = functions.upper_bound (iden);
-// 	while (fitt_beg != fitt_end) {
-// 		//TODO: get function pointers
-// 	}
 	
 	auto fitt = functions.find (iden);
 	if (fitt != functions.end ()) {
@@ -463,8 +448,8 @@ const Instruction * Scope::resolve (const string & iden, Block * insertionPoint)
 	}
 	
 	if (parent) return parent->resolve (iden);
-	std::cerr << "Could not resolve '" << iden << "'" << std::endl;
-	assert (false);
+	
+	report::logMessage (report::ERROR, "Could not resolve '" + iden + "'");
 	return nullptr;
 	
 }
