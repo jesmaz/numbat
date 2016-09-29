@@ -129,8 +129,26 @@ class GenericValue : public AbstractValue {
 	public:
 		
 		virtual const AbstractValue & operator = (const AbstractValue & rhs) {
-			assert (typeid (*this) == typeid (rhs));
-			*val = *reinterpret_cast <const GenericValue <T> &> (rhs).val;
+			if (typeid (*this) == typeid (rhs)) {
+				*val = *reinterpret_cast <const GenericValue <T> &> (rhs).val;
+			} else {
+				const Number * num = reinterpret_cast <const Number *> (rhs.getType ());
+				assert (typeid (*num) == typeid (Number));
+				switch (num->getArithmaticType ()) {
+					case Type::DECINT:
+					case Type::DEFAULT:
+						abort ();
+					case Type::FPINT:
+						*val = double (rhs);
+						break;
+					case Type::INT:
+						*val = int64_t (rhs);
+						break;
+					case Type::UINT:
+						*val = uint64_t (rhs);
+						break;
+				}
+			}
 			return *this;
 		}
 		

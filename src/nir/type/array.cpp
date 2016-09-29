@@ -1,5 +1,6 @@
 #include <nir/parameter.hpp>
 #include <nir/type/array.hpp>
+#include <nir/type/number.hpp>
 #include <nir/type/pointer.hpp>
 
 namespace nir {
@@ -16,7 +17,7 @@ Array * Array::arrayOf (const Type * t) {
 	} else {
 		Array * a = new Array ();
 		Parameter * ptr = new Parameter (t->getPointerTo (), "data");
-		Parameter * len = new Parameter (t->getPointerTo (), "len");
+		Parameter * len = new Parameter (Number::getNumberType (Type::UINT, 64), "len");
 		a->type.populate ({ptr, len});
 		return arrayTypes [t] = a;
 	}
