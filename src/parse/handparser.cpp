@@ -522,17 +522,17 @@ PTNode parseFunction (CodeQueue * queue) {
 		queue->shiftPop ();
 	}
 	
+	if (queue->peak () != Symbol::DEF) {
+		return errorUnexpectedToken (queue, "def");
+	}
+	
 	// drop def
 	queue->shiftPop ();
-	
-	//TODO: Check for extern
 	
 	if (queue->peak () != Symbol::IDENTIFIER) {
 		return errorUnexpectedToken (queue, "identifier");
 	}
 	numbat::lexer::token token = queue->popToken ();
-	
-	//TODO: Parse meta tags
 	
 	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
 		return errorUnexpectedToken (queue, "'('");
