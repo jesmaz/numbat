@@ -389,7 +389,9 @@ PTNode parseAtom (CodeQueue * queue) {
 		case Symbol::SYMBOL_PARENRHESES_LEFT:
 			queue->shiftPop ();
 			atom = parseList (queue);
-			assert (queue->peak () == Symbol::SYMBOL_PARENRHESES_RIGHT);
+			if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+				return errorUnexpectedToken (queue, "')'");
+			}
 			queue->shiftPop ();
 			break;
 		case Symbol::SYMBOL_SQUARE_LEFT:
