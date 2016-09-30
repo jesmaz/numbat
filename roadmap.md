@@ -45,8 +45,8 @@
  - [x] Semantic analysis pass
    - [x] Side effect propagation
    - [x] Transform into NIR
- - [ ] Verification pass
-   - [ ] Define what situations result in error/warning in documentation
+ - [x] Verification pass
+   - [x] Create a list of planned compiler analisis passes
 
 ##Version 0.3.1##
  - [ ] Arrays
