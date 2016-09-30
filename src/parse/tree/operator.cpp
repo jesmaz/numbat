@@ -109,7 +109,9 @@ const nir::Instruction * SpecificOperator <OPERATION::BXOR>::defBuild (nir::Scop
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPEQ>::defBuild (nir::Scope * scope) {
-	abort ();
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createCmpEQ (nodes);
 }
 
 template <>
@@ -121,7 +123,9 @@ const nir::Instruction * SpecificOperator <OPERATION::CMPGT>::defBuild (nir::Sco
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPGTE>::defBuild (nir::Scope * scope) {
-	abort ();
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createCmpGTE (nodes);
 }
 
 template <>
@@ -133,12 +137,16 @@ const nir::Instruction * SpecificOperator <OPERATION::CMPLT>::defBuild (nir::Sco
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPLTE>::defBuild (nir::Scope * scope) {
-	abort ();
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createCmpLTE (nodes);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPNE>::defBuild (nir::Scope * scope) {
-	abort ();
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createCmpNE (nodes);
 }
 
 template <>

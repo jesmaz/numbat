@@ -11,12 +11,15 @@
 #include <nir/inst/composite.hpp>
 #include <nir/inst/constant.hpp>
 #include <nir/inst/div.hpp>
+#include <nir/inst/equal.hpp>
 #include <nir/inst/functionPointer.hpp>
 #include <nir/inst/get.hpp>
 #include <nir/inst/jump.hpp>
 #include <nir/inst/less.hpp>
+#include <nir/inst/lessequal.hpp>
 #include <nir/inst/mul.hpp>
 #include <nir/inst/neg.hpp>
+#include <nir/inst/nequal.hpp>
 #include <nir/inst/pickStructMember.hpp>
 #include <nir/inst/put.hpp>
 #include <nir/inst/ptradd.hpp>
@@ -261,12 +264,28 @@ const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string &
 	return insertionPoint->give (inst);
 }
 
+const Instruction * Scope::createCmpEQ (const std::vector< Argument > & args) {
+	return createCmp <Equal> (args [0], args [1], "equal");
+}
+
 const Instruction * Scope::createCmpGT (const std::vector< Argument > & args) {
 	return createCmp <Less> (args [1], args [0], "greater");
 }
 
+const Instruction * Scope::createCmpGTE (const std::vector< Argument > & args) {
+	return createCmp <LessEqual> (args [1], args [0], "greaterequal");
+}
+
 const Instruction * Scope::createCmpLT (const std::vector <Argument> & args) {
 	return createCmp <Less> (args [0], args [1], "less");
+}
+
+const Instruction * Scope::createCmpLTE (const std::vector< Argument > & args) {
+	return createCmp <LessEqual> (args [0], args [1], "lessequal");
+}
+
+const Instruction * Scope::createCmpNE (const std::vector< Argument > & args) {
+	return createCmp <NEqual> (args [0], args [1], "nequal");
 }
 
 const Instruction * Scope::createConstant (const Type * type, const string & val, const string & iden) {

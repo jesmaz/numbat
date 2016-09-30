@@ -48,8 +48,12 @@ struct Scope {
 		const Instruction * createCall (const Function * func, const std::vector <Argument> & args);
 		template <typename T>
 		const Instruction * createCmp (Argument lhs, Argument rhs, const string & iden);
+		const Instruction * createCmpEQ (const std::vector <Argument> & args);
 		const Instruction * createCmpGT (const std::vector <Argument> & args);
+		const Instruction * createCmpGTE (const std::vector <Argument> & args);
 		const Instruction * createCmpLT (const std::vector <Argument> & args);
+		const Instruction * createCmpLTE (const std::vector <Argument> & args);
+		const Instruction * createCmpNE (const std::vector <Argument> & args);
 		const Instruction * createConstant (const Type * type, const string & val, const string & iden="");
 		const Instruction * createDiv (const std::vector <Argument> & args);
 		const Instruction * createImportHandle (const Scope * scope, const string & iden="");
