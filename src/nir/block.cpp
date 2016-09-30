@@ -1,12 +1,30 @@
 #include <nir/block.hpp>
-#include <nir/instruction.hpp> 
-#ifdef D_PRINT
-#include <iostream>
-#endif
+#include <nir/instruction.hpp>
 
 
 namespace nir {
 
+
+std::ostream & operator << (std::ostream & out, const Block::PrintIterator & itt) {
+	out << itt.block->getInstructions () [itt.pos]->toString (text::PLAIN);
+	return out;
+}
+
+
+const Block::PrintIterator & Block::PrintIterator::operator++ () {
+	++pos;
+	if (not *this) {
+		if (block->fallthrough) {
+			block = block->fallthrough;
+			pos = 0;
+		}
+	}
+	return *this;
+}
+
+Block::PrintIterator::operator bool () const {
+	return pos < block->instructions.size ();
+}
 
 bool Block::validate () const {
 	
@@ -20,9 +38,6 @@ bool Block::validate () const {
 
 const Instruction * Block::give (const Instruction * instr) {
 	instructions.push_back (instr);
-#ifdef D_PRINT
-	std::cout << instr->toString () << std::endl;
-#endif
 	return instr;
 }
 

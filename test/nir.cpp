@@ -1,7 +1,9 @@
 #include <fstream>
 #include <iostream>
+#include <nir/block.hpp>
 #include <nir/instruction.hpp>
 #include <nir/module.hpp>
+#include <nir/scope.hpp>
 #include <parse/handparser.hpp>
 #include <set>
 
@@ -28,6 +30,7 @@ int main (int argl, char ** argc) {
 		
 		nir::Module nirmodule (nullptr);
 		auto globalScope = nirmodule.getGlobalScope ();
+		auto printItt = globalScope->getCurrentBlock ()->printerBeg ();
 		
 		string line, prog;
 		while (std::getline (std::cin, line)) {
@@ -35,23 +38,36 @@ int main (int argl, char ** argc) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
 				parse (prog)->build (globalScope);
+				while (printItt) {
+					std::cout << printItt << '\n';
+					++printItt;
+				}
 				std::cout << std::endl;
 				prog = line;
 			}
 		}
 		if (not prog.empty()) {
 			parse (prog)->build (globalScope);
+			while (printItt) {
+				std::cout << printItt << '\n';
+				++printItt;
+			}
 		}
 		
 	} else {
 		for (char * f : files) {
 			nir::Module nirmodule (nullptr);
 			auto globalScope = nirmodule.getGlobalScope ();
+			auto printItt = globalScope->getCurrentBlock ()->printerBeg ();
 			std::ifstream fin (f);
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
 			parse (prog)->build (globalScope);
+			while (printItt) {
+				std::cout << printItt << std::endl;
+				++printItt;
+			}
 			std::cout << "########" << f << "########" << std::endl;
 		}
 	}

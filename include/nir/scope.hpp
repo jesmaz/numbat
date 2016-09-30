@@ -18,6 +18,7 @@ struct Scope {
 	
 	public:
 		
+		Block * getCurrentBlock () const {return insertionPoint;}
 		const Function * getOwner () const {if (owner) return owner; else if (parent) return parent->getOwner (); else return nullptr;}
 		Module * getModule () const {return module;}
 		const numbat::File * getSourceFile () const {return sourceFile;}
@@ -25,6 +26,7 @@ struct Scope {
 		Scope * declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden, LINKAGE linkage);
 		
 		symbol createBlock (const string & iden="");
+		size_t changeActiveBlock (Block * block) {return insertionPoint = block, 0;}
 		size_t changeActiveBlock (symbol block);
 		
 		const Type * resolveType (Argument parent, const string & iden) const;
@@ -83,7 +85,7 @@ struct Scope {
 	protected:
 	private:
 		
-		Scope (Module * mod, Block * insertionPoint, Function * owner) : module (mod), insertionPoint (insertionPoint), owner (owner) {}
+		Scope (Module * mod, Block * insertionPoint, Function * owner) : module (mod), insertionPoint (insertionPoint), lastCreated (insertionPoint), owner (owner) {}
 		
 		std::map <string, std::vector <Function *> *> functions;
 		std::map <string, Type *> types;
@@ -92,7 +94,7 @@ struct Scope {
 		std::set <Scope *> scopes;
 		Scope * parent=nullptr;
 		Module * module;
-		Block * insertionPoint;
+		Block * insertionPoint, * lastCreated;
 		Function * owner;
 		numbat::File * sourceFile;
 		

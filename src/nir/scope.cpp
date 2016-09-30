@@ -532,6 +532,8 @@ symbol Scope::createBlock (const string & iden) {
 	
 	symbol s = module->newSymbol (iden);
 	Block * b = new Block ();
+	lastCreated->setFallthrough (b);
+	lastCreated = b;
 	owner->pushBlock (b);
 	blocks [s] = b;
 	return s;
