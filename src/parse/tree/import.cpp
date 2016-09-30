@@ -1,11 +1,13 @@
 #include <nir/scope.hpp>
 #include <parse/tree/import.hpp>
+#include <utility/report.hpp>
 
 #define PATH_JOIN "/"
 
 const nir::Instruction * ParseTreeImport::build (nir::Scope * scope) {
 	
 	if (not sourceFile) declare (scope);
+	if (not sourceFile) return nullptr;
 	if (iden) {
 		return scope->createImportHandle (sourceFile->getScope (), iden->getIden ());
 	} else {
@@ -43,8 +45,7 @@ void ParseTreeImport::declare (nir::Scope * scope) {
 	}
 	
 	if (not sourceFile) {
-		std::cerr << "Failed to import '" << relPath << "'" << std::endl;
-		abort ();
+		report::logMessage (report::ERROR, "Failed to import '" + relPath + "'");
 	}
 	
 }
