@@ -2,6 +2,7 @@
 
 #include <ostream>
 #include <nir/forward.hpp>
+#include <utility/text.hpp>
 #include <vector>
 
 
@@ -23,7 +24,7 @@ struct Block {
 			protected:
 			private:
 				
-				PrintIterator (const Block * block) : block (block) {}
+				PrintIterator (const Block * block, text::PrintMode pm) : block (block), pm (pm) {}
 				
 				const Instruction & operator = (const Instruction &)=delete;
 				
@@ -31,6 +32,8 @@ struct Block {
 				
 				const Block * block=nullptr;
 				size_t pos=0;
+				text::PrintMode pm;
+				bool printedName=false;
 				
 		};
 		
@@ -41,15 +44,20 @@ struct Block {
 		
 		const Instruction * give (const Instruction * instr);
 		
-		PrintIterator printerBeg () const {return PrintIterator (this);}
+		PrintIterator printerBeg (text::PrintMode pm=text::PLAIN) const {return PrintIterator (this, pm);}
+		
+		symbol getName () const {return name;}
 		
 		void setFallthrough (Block * fallthrough) {this->fallthrough = fallthrough;}
+		
+		Block (symbol name) : name (name) {}
 		
 	protected:
 	private:
 		
 		std::vector <const Instruction *> instructions;
 		Block * fallthrough=nullptr;
+		symbol name;
 		
 };
 

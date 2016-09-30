@@ -531,7 +531,7 @@ size_t Scope::changeActiveBlock (symbol block) {
 symbol Scope::createBlock (const string & iden) {
 	
 	symbol s = module->newSymbol (iden);
-	Block * b = new Block ();
+	Block * b = new Block (s);
 	lastCreated->setFallthrough (b);
 	lastCreated = b;
 	owner->pushBlock (b);
