@@ -28,6 +28,7 @@ struct Module {
 		
 		Builder registerFunction (std::vector <Type> args, std::vector <Type> ret, const string & name);
 		
+		const Block * getEntry () const;
 		const std::map <symbol, Function *> getFunctions () const {return data->functions;}
 		
 		Scope * createRootScope ();
@@ -36,12 +37,12 @@ struct Module {
 		symbol findSymbol (const string & iden);
 		symbol newSymbol (const string & iden="", bool force=true);
 		
-		void build ();
+		void build (codegen::Target * target);
 		void holdInst (Instruction * inst);
 		void registerPrimitive (Type::ArithmaticType arith, uint32_t width, const string & name);
 		void registerStruct (std::vector <Type> members, const string & name);
 		
-		Module (codegen::Target * target);
+		Module ();
 		
 		friend Scope;
 		
@@ -58,7 +59,6 @@ struct Module {
 			std::set <symbol, symbCmp> symbols;
 			std::set <Scope *> scopes;
 			Scope * globalScope=nullptr;
-			codegen::Target * target;
 			size_t n=0;
 		};
 		

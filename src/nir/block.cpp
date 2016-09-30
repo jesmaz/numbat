@@ -5,6 +5,26 @@
 namespace nir {
 
 
+const Block::Iterator & Block::Iterator::operator++ () {
+	++pos;
+	if (not *this) {
+		if (block->fallthrough) {
+			block = block->fallthrough;
+			pos = 0;
+		}
+	}
+	return *this;
+}
+
+const Instruction & Block::Iterator::operator * () {
+	return *block->instructions [pos];
+}
+
+Block::Iterator::operator bool () const {
+	return pos < block->instructions.size ();
+}
+
+
 std::ostream & operator << (std::ostream & out, const Block::PrintIterator & itt) {
 	if (itt.printedName) {
 		out << itt.block->getInstructions () [itt.pos]->toString (itt.pm);

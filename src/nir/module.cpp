@@ -1,9 +1,8 @@
-#include "../../include/nir/function.hpp"
-#include "../../include/nir/module.hpp"
-#include "../../include/nir/scope.hpp"
-#include "../../include/nir/type/number.hpp"
-
 #include <cassert>
+#include <nir/function.hpp>
+#include <include/nir/module.hpp>
+#include <include/nir/scope.hpp>
+#include <include/nir/type/number.hpp>
 
 namespace nir {
 
@@ -21,6 +20,10 @@ bool Module::validate () const {
 	
 	return valid;
 	
+}
+
+const Block * Module::getEntry () const {
+	return data->globalScope->getOwner ()->getEntryPoint ();
 }
 
 void Module::registerPrimitive (Type::ArithmaticType arith, uint32_t width, const string & name) {
@@ -88,18 +91,16 @@ symbol Module::newSymbol (const string & iden, bool force) {
 	
 }
 
-void Module::build () {
+void Module::build (codegen::Target * target) {
 	
 	//TODO: pass target global variables
 	for (auto & func : data->functions) {
-		data->target->visit (func.second);
+		target->visit (func.second);
 	}
 	
 }
 
-Module::Module (codegen::Target * target) : data (new Module::Data) {
-	data->target = target;
-	
+Module::Module () : data (new Module::Data) {
 	registerPrimitive (nir::Type::UINT, 1, "bool");
 	
 	registerPrimitive (nir::Type::UINT, 8, "uint8");

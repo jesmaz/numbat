@@ -13,6 +13,26 @@ struct Block {
 	
 	public:
 		
+		struct Iterator {
+			
+			public:
+				
+				const Iterator & operator ++ ();
+				const Instruction & operator * ();
+				operator bool () const;
+				
+			protected:
+			private:
+				
+				Iterator (const Block * block) : block (block) {}
+				
+				friend Block;
+				
+				const Block * block=nullptr;
+				size_t pos=0;
+				
+		};
+		
 		struct PrintIterator {
 			
 			public:
@@ -26,7 +46,7 @@ struct Block {
 				
 				PrintIterator (const Block * block, text::PrintMode pm) : block (block), pm (pm) {}
 				
-				const Instruction & operator = (const Instruction &)=delete;
+				const PrintIterator & operator = (const PrintIterator &)=delete;
 				
 				friend Block;
 				
@@ -37,12 +57,16 @@ struct Block {
 				
 		};
 		
+		const Block * getFallthrough () const {return fallthrough;}
+		
 		bool validate () const;
 		
 		std::vector <const Instruction *> & getInstructions () {return instructions;}
 		const std::vector <const Instruction *> & getInstructions () const {return instructions;}
 		
 		const Instruction * give (const Instruction * instr);
+		
+		Iterator beg () const {return Iterator (this);}
 		
 		PrintIterator printerBeg (text::PrintMode pm=text::PLAIN) const {return PrintIterator (this, pm);}
 		

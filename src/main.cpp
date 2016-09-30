@@ -11,7 +11,7 @@ int main (int argl, char ** args) {
 	
 	codegen::Target * target = codegen::Target::find ("llvm");
 	
-	nir::Module nirModule (target);
+	nir::Module nirModule;
 	for (const string & file : cfg.files) {
 		numbat::File::compile (file, &nirModule);
 	}
@@ -20,7 +20,7 @@ int main (int argl, char ** args) {
 		return 1;
 	}
 	
-	nirModule.build ();
+	nirModule.build (target);
 	target->finalise ();
 	return 0;
 	

@@ -4,6 +4,7 @@
 #include <nir/type/struct.hpp>
 
 #include <functional>
+#include <iostream>
 
 namespace codegen {
 
@@ -11,7 +12,7 @@ using namespace nir;
 
 std::vector <Value> Interpreter::callFunction (const Function * func, const std::vector <Value> & args) {
 	
-	Interpreter call;
+	Interpreter call (func->getEntryPoint ());
 	auto & funcArgs = func->getArgs ();
 	assert (funcArgs.size () == args.size ());
 	
@@ -20,7 +21,7 @@ std::vector <Value> Interpreter::callFunction (const Function * func, const std:
 		call.lookupTable [param->getIden ()] = args [i];
 	}
 	
-	return call (func->getEntryPoint ());
+	return call ();
 	
 }
 
@@ -64,7 +65,7 @@ Value Interpreter::bitwiseOpp (Argument ilhs, Argument irhs, const Type * type) 
 
 void Interpreter::reset () {
 	cleanup ();
-	*this = Interpreter ();
+	*this = Interpreter (entry);
 }
 
 void Interpreter::visit (const Add & add) {
@@ -315,6 +316,8 @@ Value Interpreter::staticCast (const Value & source, const Type * const target) 
 
 std::string Interpreter::operator ()(const nir::Instruction * val) {
 	
+	(*this) ();
+	
 	if (const Type * type = val->getType ()->getDereferenceType ()) {
 		auto get = Get (type, {val, nullptr}, nullptr);
 		return this->operator ()(&get);
@@ -333,13 +336,13 @@ std::string Interpreter::operator ()(const nir::Instruction * val) {
 	
 }
 
-std::vector <Value> Interpreter::operator ()(const Block * block) {
+std::vector <Value> Interpreter::operator ()() {
 	
-	currentBlock = block;
 	std::vector <Value> last;
-	for (auto & val : block->getInstructions ()) {
-		last = evaluate (val);
-		if (currentBlock != block) return (*this)(currentBlock);
+	while (instItt) {
+		auto & val = *instItt;
+		++instItt;
+		last = evaluate (&val);
 	}
 	return last;
 	

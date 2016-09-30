@@ -8,10 +8,9 @@
 
 int main (int argc, char ** args) {
 	
-	codegen::Interpreter
-	interpreter;
-	nir::Module nirmodule (&interpreter);
+	nir::Module nirmodule;
 	auto globalScope = nirmodule.getGlobalScope ();
+	codegen::Interpreter interpreter (nirmodule.getEntry ());
 	
 	string line;
 	for (;;) {

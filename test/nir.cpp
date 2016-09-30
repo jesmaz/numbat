@@ -28,7 +28,7 @@ int main (int argl, char ** argc) {
 	
 	if (files.empty ()) {
 		
-		nir::Module nirmodule (nullptr);
+		nir::Module nirmodule;
 		auto globalScope = nirmodule.getGlobalScope ();
 		auto printItt = globalScope->getCurrentBlock ()->printerBeg ();
 		
@@ -56,7 +56,7 @@ int main (int argl, char ** argc) {
 		
 	} else {
 		for (char * f : files) {
-			nir::Module nirmodule (nullptr);
+			nir::Module nirmodule;
 			auto globalScope = nirmodule.getGlobalScope ();
 			auto printItt = globalScope->getCurrentBlock ()->printerBeg ();
 			std::ifstream fin (f);
