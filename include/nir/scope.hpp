@@ -85,7 +85,7 @@ struct Scope {
 	protected:
 	private:
 		
-		Scope (Module * mod, Block * insertionPoint, Function * owner) : module (mod), insertionPoint (insertionPoint), lastCreated (insertionPoint), owner (owner) {}
+		Scope (Module * mod, Block * insertionPoint, Function * owner) : module (mod), insertionPoint (insertionPoint), owner (owner) {}
 		
 		std::map <string, std::vector <Function *> *> functions;
 		std::map <string, Type *> types;
@@ -94,7 +94,7 @@ struct Scope {
 		std::set <Scope *> scopes;
 		Scope * parent=nullptr;
 		Module * module;
-		Block * insertionPoint, * lastCreated;
+		Block * insertionPoint;
 		Function * owner;
 		numbat::File * sourceFile;
 		

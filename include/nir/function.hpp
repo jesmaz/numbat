@@ -1,5 +1,4 @@
-#ifndef NIR_FUNCTION
-#define NIR_FUNCTION
+#pragma once
 
 
 #include <nir/forward.hpp>
@@ -27,7 +26,7 @@ struct Function {
 		const std::vector <const Parameter *> & getArgs () const {return args;}
 		const std::vector <const Parameter *> & getRet () const {return ret;}
 		const std::vector <const Type *> getRetTypes () const {return retTypes;}
-		void pushBlock (Block * block) {blocks.push_back (block);}
+		void pushBlock (Block * block);
 		//WARNING: Deleting the old body is the responsibility of the user of this method
 		void dirtyReplaceBody (const std::vector <Block *> & b) {blocks = b;}
 		
@@ -51,7 +50,4 @@ struct Function {
 };
 
 
-};
-
-
-#endif/*NIR_FUNCTION*/
+}

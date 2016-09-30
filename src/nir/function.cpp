@@ -35,6 +35,10 @@ bool Function::validate () const {
 	
 }
 
+void Function::pushBlock (Block * block) {
+	blocks.back ()->setFallthrough (block);
+	blocks.push_back (block);
+}
 
 Function::Function (const std::string & label, LINKAGE linkage) : entry (new Block (&(this->label))), blocks ({entry}), label (label), linkage (linkage) {}
 
