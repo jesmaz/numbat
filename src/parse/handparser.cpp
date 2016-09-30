@@ -192,8 +192,6 @@ std::map <string, Operator> operators {
 	
 	{string (" ") + char (Symbol::AS) + " ", {" as ", 400, LTR, operatorFactory <OPERATION::AS>}},
 	
-	{"++ ", {"++ ", 300, RTL, operatorFactory <OPERATION::INCREMENT>}},
-	{"-- ", {"-- ", 300, RTL, operatorFactory <OPERATION::DECREMENT>}},
 	{"- ", {"- ", 300, RTL, operatorFactory <OPERATION::NEG>}},
 	{"! ", {"! ", 300, RTL, operatorFactory <OPERATION::LNOT>}},
 	{string () + char (Symbol::NOT) + " ", {"not ", 300, RTL, operatorFactory <OPERATION::LNOT>}},
