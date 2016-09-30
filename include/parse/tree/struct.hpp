@@ -25,7 +25,7 @@ struct Struct : ParseTreeNode {
 		
 		string iden;
 		std::vector <PTNode> tplate, tags, members;
-		nir::Struct * type;
+		nir::Struct * type=nullptr;
 		
 };
 
