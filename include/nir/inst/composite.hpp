@@ -18,7 +18,16 @@ class Composite : public Instruction {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) const {return "." + getType ()->toString () + " TODO: print args";}
+		virtual string strDump (text::PrintMode mode) const {
+			string s = "composite";
+			for (const Type * t : getTypes ()) {
+				s += "." + t->toString (mode);
+			}
+			for (Argument arg : getArguments ()) {
+				s += " " + arg.toString (mode);
+			}
+			return s;
+		}
 		
 		Composite (const Type * type, std::vector <Argument> args, symbol iden) : Instruction (args, {type}, {iden}) {}
 		
