@@ -1078,12 +1078,8 @@ Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted)
 
 void CodeQueue::markDirty () {
 	if (dirty) {
-		if (itts.empty ()) update (32);
-		if (syms.empty ()) {
-			abort ();
-		} else {
-			syms = syms.substr (1);
-			itts.pop_front ();
+		if (not syms.empty () or itt != end) {
+			shiftPop ();
 			dirty = false;
 		}
 	} else {
