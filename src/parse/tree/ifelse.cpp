@@ -5,30 +5,49 @@
 const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	
 	const nir::Instruction * condition = cond->build (scope);
-	nir::symbol bodyBlock=scope->createBlock (), altBlock;
+	const nir::Instruction * bodyRet=nullptr, * altRet=nullptr;
+	nir::Block * current=scope->getCurrentBlock ();
+	nir::symbol bodyBlock=scope->createBlock (), altBlock=nullptr;
 	
 	if (alternate) {
 		altBlock=scope->createBlock ();
 	}
 	
 	nir::symbol contBlock=scope->createBlock ();
+	
+	// Build main body of if statement
+	scope->changeActiveBlock (bodyBlock);
+	bodyRet = body->build (scope);
+	
+	if (altBlock) {
+		// Build main body of else statement
+		scope->changeActiveBlock (altBlock);
+		altRet = alternate->build (scope);
+	}
+	
+	// Go back to before the if statment to allocate and branch
+	scope->changeActiveBlock (current);
+	const nir::Instruction * alloc = scope->allocateVariable (bodyRet->getType ());
 	const nir::Instruction * condJump=nullptr;
 	if (condition) {
 		condJump = scope->createJump ({condition, condition->getIden ()}, bodyBlock);
 	}
 	
-	scope->changeActiveBlock (bodyBlock);
-	body->build (scope);
-	
-	if (alternate) {
+	if (altBlock) {
 		scope->createJump (altBlock);
+		// Go back to alt block to store the result and branch
 		scope->changeActiveBlock (altBlock);
-		alternate->build (scope);
+		scope->createPut ({altRet, altRet->getIden ()}, {alloc, alloc->getIden ()});
+	} else {
+		scope->createJump (contBlock);
 	}
 	
+	// Go back to body block to store the result and branch
+	scope->changeActiveBlock (bodyBlock);
+	scope->createPut ({bodyRet, bodyRet->getIden ()}, {alloc, alloc->getIden ()});
 	scope->createJump (contBlock);
 	scope->changeActiveBlock (contBlock);
-	return condJump;
+	return scope->createGet ({alloc, alloc->getIden ()}).instr;
 	
 }
 

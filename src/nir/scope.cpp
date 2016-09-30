@@ -326,6 +326,10 @@ const Instruction * Scope::createJump (symbol block) {return createJump ({nullpt
 
 const Instruction * Scope::createJump (Argument cond, symbol block) {
 	
+	if (cond.instr and cond.instr->getType ()->getDereferenceType ()) {
+		cond = createGet (cond);
+	}
+	
 	const Block * b = blocks [block];
 	auto * instr = new Jump (cond, b);
 	return insertionPoint->give (instr);
