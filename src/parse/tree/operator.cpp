@@ -1,5 +1,6 @@
 #include <nir/scope.hpp>
 #include <parse/tree/operator.hpp>
+#include <utility/report.hpp>
 
 
 std::vector <nir::Argument> resolveNodes (nir::Scope * scope, std::vector <PTNode> args) {
@@ -190,7 +191,8 @@ const nir::Instruction * SpecificOperator <OPERATION::NEG>::defBuild (nir::Scope
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::NONE>::defBuild (nir::Scope * scope) {
-	abort ();
+	report::logMessage (report::ERROR, "", getLine (), getPos (), "Operator '" + iden + "' is not currently supported");
+	return nullptr;
 }
 
 template <>
