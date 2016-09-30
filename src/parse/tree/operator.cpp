@@ -200,7 +200,9 @@ const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope 
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::REM>::defBuild (nir::Scope * scope) {
-	abort ();
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createRem (nodes);
 }
 
 template <>
