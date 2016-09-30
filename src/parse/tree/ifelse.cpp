@@ -4,6 +4,7 @@
 
 const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	
+	//TODO: When unions are avaliable the if-else should use them when the return types are different
 	const nir::Instruction * condition = cond->build (scope);
 	const nir::Instruction * bodyRet=nullptr, * altRet=nullptr;
 	nir::Block * current=scope->getCurrentBlock ();
