@@ -11,6 +11,7 @@
 #include <nir/inst/div.hpp>
 #include <nir/inst/functionPointer.hpp>
 #include <nir/inst/get.hpp>
+#include <nir/inst/jump.hpp>
 #include <nir/inst/less.hpp>
 #include <nir/inst/mul.hpp>
 #include <nir/inst/neg.hpp>
@@ -42,6 +43,7 @@ class TargetVisitor :
 	public ConstVisitor <DirectCall>,
 	public ConstVisitor <FunctionPointer>,
 	public ConstVisitor <Get>,
+	public ConstVisitor <Jump>,
 	public ConstVisitor <Less>,
 	public ConstVisitor <Mul>,
 	public ConstVisitor <Neg>,

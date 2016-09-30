@@ -188,6 +188,19 @@ void Interpreter::visit (const Get & get) {
 	
 }
 
+void Interpreter::visit (const Jump & jump) {
+	
+	bool doJump = true;
+	if (jump.getCondition ().instr) {
+		doJump = bool (uint64_t (*evaluate (jump.getCondition ())));
+	}
+	
+	if (doJump) {
+		instItt = jump.getBlock ()->beg ();
+	}
+	
+}
+
 void Interpreter::visit (const Less & less) {
 	
 	Value res = binaryOpp <std::less <void>> (less.getLhs (), less.getRhs (), less.getType ());
@@ -342,7 +355,11 @@ std::vector <Value> Interpreter::operator ()() {
 	while (instItt) {
 		auto & val = *instItt;
 		++instItt;
-		last = evaluate (&val);
+		if (val.getIden ()) {
+			last = evaluate (&val);
+		} else {
+			val.accept (*this);
+		}
 	}
 	return last;
 	

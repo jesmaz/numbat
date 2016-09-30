@@ -35,6 +35,7 @@ class Interpreter : public TargetVisitor {
 		virtual void visit (const Function * func);
 		virtual void visit (const FunctionPointer & fptr);
 		virtual void visit (const Get & get);
+		virtual void visit (const Jump & jump);
 		virtual void visit (const Less & less);
 		virtual void visit (const Mul & mul);
 		virtual void visit (const Neg & neg);
