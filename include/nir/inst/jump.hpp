@@ -20,7 +20,7 @@ class Jump : public Instruction {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) const {return "Jump TODO: destination & condition";}
+		virtual string strDump (text::PrintMode mode) const;
 		
 		Jump (Argument condition, const Block * block) : Instruction ({condition}, {nullptr}, {nullptr}), condition (condition), block (block) {}
 		
