@@ -64,7 +64,29 @@ const nir::Instruction * SpecificOperator <OPERATION::ADD>::defBuild (nir::Scope
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope * scope) {
-	abort ();
+	
+	//TODO: Return a union
+	const nir::Type * b = scope->resolveType ("bool");
+	const nir::Instruction * res = scope->allocateVariable (b);
+	const nir::Instruction * lhs = args [0]->build (scope);
+	if (not lhs) return nullptr;
+	
+	nir::symbol rhsBlock = scope->createBlock ();
+	nir::symbol cont = scope->createBlock ();
+	
+	scope->createPut ({lhs, lhs->getIden ()}, {res, res->getIden ()});
+	const nir::Instruction * cond = scope->createBitNot ({{lhs, lhs->getIden ()}});
+	scope->createJump ({cond, cond->getIden ()}, cont);
+	scope->changeActiveBlock (rhsBlock);
+	
+	const nir::Instruction * rhs = args [1]->build (scope);
+	if (not rhs) return nullptr;
+	
+	scope->createPut ({rhs, rhs->getIden ()}, {res, res->getIden ()});
+	scope->changeActiveBlock (cont);
+	
+	return scope->createGet ({res, res->getIden ()}).instr;
+	
 }
 
 template <>
@@ -205,7 +227,28 @@ const nir::Instruction * SpecificOperator <OPERATION::NONE>::defBuild (nir::Scop
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope * scope) {
-	abort ();
+	
+	//TODO: Return a union
+	const nir::Type * b = scope->resolveType ("bool");
+	const nir::Instruction * res = scope->allocateVariable (b);
+	const nir::Instruction * lhs = args [0]->build (scope);
+	if (not lhs) return nullptr;
+	
+	nir::symbol rhsBlock = scope->createBlock ();
+	nir::symbol cont = scope->createBlock ();
+	
+	scope->createPut ({lhs, lhs->getIden ()}, {res, res->getIden ()});
+	scope->createJump ({lhs, lhs->getIden ()}, cont);
+	scope->changeActiveBlock (rhsBlock);
+	
+	const nir::Instruction * rhs = args [1]->build (scope);
+	if (not rhs) return nullptr;
+	
+	scope->createPut ({rhs, rhs->getIden ()}, {res, res->getIden ()});
+	scope->changeActiveBlock (cont);
+	
+	return scope->createGet ({res, res->getIden ()}).instr;
+	
 }
 
 template <>
