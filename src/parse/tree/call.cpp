@@ -1,6 +1,7 @@
 #include <nir/inst/functionPointer.hpp>
 #include <nir/scope.hpp>
 #include <parse/tree/call.hpp>
+#include <utility/report.hpp>
 
 auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope) {
 	std::vector <nir::Argument> conv;
@@ -18,11 +19,16 @@ auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope) {
 const nir::Instruction * ParseTreeCall::build (nir::Scope * scope) {
 	
 	const nir::Instruction * callee = iden->build (scope);
+	if (not callee) return nullptr;
 	auto & typeId = typeid (*callee);
+	
 	if (typeId == typeid (nir::FunctionPointer)) {
 		const nir::FunctionPointer * fPtr = static_cast <const nir::FunctionPointer *> (callee);
 		return scope->createCall (fPtr->getFunction (), buildArgs (args, scope));
 	}
+	
+	report::logMessage (report::ERROR, "", getLine (), getPos (), "Currently only calling functions is supported");
+	return nullptr;
 	
 }
 
