@@ -57,7 +57,9 @@
  - [ ] Operator overloading
  - [ ] Optimisation
    - [ ] Activate the static evaluator with a flag
+   - [ ] Aliasing pass
    - [ ] Dead code removal pass
+   - [ ] Redundant code consolidation
  - [ ] OS module
    - [ ] Numbat friendly wrapper (no pointers passed by the user)
    - [ ] Open, read, write, close system calls
