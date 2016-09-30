@@ -10,8 +10,11 @@ std::vector <nir::Argument> resolveNodes (nir::Scope * scope, std::vector <PTNod
 	for (size_t i=0; i<args.size(); ++i) {
 		assert (args[i]);
 		const nir::Instruction * instr = args[i]->build (scope);
-		nodes [i] = {instr, instr->getIden ()};
-		assert (instr);
+		if (instr) {
+			nodes [i] = {instr, instr->getIden ()};
+		} else {
+			return {};
+		}
 	}
 	
 	return nodes;
@@ -53,7 +56,9 @@ string GenericOperator::strDump (text::PrintMode mode) {
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::ADD>::defBuild (nir::Scope * scope) {
-	return scope->createAdd (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createAdd (nodes);
 }
 
 template <>
@@ -68,27 +73,37 @@ const nir::Instruction * SpecificOperator <OPERATION::AS>::defBuild (nir::Scope 
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::ASSIGN>::defBuild (nir::Scope * scope) {
-	return scope->createAssign (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createAssign (nodes);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BAND>::defBuild (nir::Scope * scope) {
-	return scope->createBitAnd (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createBitAnd (nodes);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BNOT>::defBuild (nir::Scope * scope) {
-	return scope->createBitNot (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createBitNot (nodes);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BOR>::defBuild (nir::Scope * scope) {
-	return scope->createBitOr (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createBitOr (nodes);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BXOR>::defBuild (nir::Scope * scope) {
-	return scope->createBitXor (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createBitXor (nodes);
 }
 
 template <>
@@ -98,7 +113,9 @@ const nir::Instruction * SpecificOperator <OPERATION::CMPEQ>::defBuild (nir::Sco
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPGT>::defBuild (nir::Scope * scope) {
-	return scope->createCmpGT (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createCmpGT (nodes);
 }
 
 template <>
@@ -108,7 +125,9 @@ const nir::Instruction * SpecificOperator <OPERATION::CMPGTE>::defBuild (nir::Sc
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPLT>::defBuild (nir::Scope * scope) {
-	return scope->createCmpLT (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createCmpLT (nodes);
 }
 
 template <>
@@ -133,7 +152,9 @@ const nir::Instruction * SpecificOperator <OPERATION::DECREMENT>::defBuild (nir:
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::DIV>::defBuild (nir::Scope * scope) {
-	return scope->createDiv (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createDiv (nodes);
 }
 
 template <>
@@ -148,17 +169,23 @@ const nir::Instruction * SpecificOperator <OPERATION::INCREMENT>::defBuild (nir:
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::LNOT>::defBuild (nir::Scope * scope) {
-	return scope->createLNot (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createLNot (nodes);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::MUL>::defBuild (nir::Scope * scope) {
-	return scope->createMul (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createMul (nodes);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::NEG>::defBuild (nir::Scope * scope) {
-	return scope->createNeg (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createNeg (nodes);
 }
 
 template <>
@@ -178,5 +205,7 @@ const nir::Instruction * SpecificOperator <OPERATION::REM>::defBuild (nir::Scope
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::SUB>::defBuild (nir::Scope * scope) {
-	return scope->createSub (resolveNodes (scope, args));
+	auto nodes = resolveNodes (scope, args);
+	if (nodes.empty ()) return nullptr;
+	return scope->createSub (nodes);
 }
