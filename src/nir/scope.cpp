@@ -196,12 +196,16 @@ const Instruction * Scope::createAdd (const std::vector <Argument> & args) {
 }
 
 const Instruction * Scope::createAssign (const std::vector <Argument> & args) {
-	//TODO: assert arg [0] is pointer
+	const Type * dref = args [0].instr->getType ()->getDereferenceType ();
+	if (not dref) {
+		report::logMessage (report::ERROR, "Can't assign to a constant");
+		return nullptr;
+	}
 	Argument tsrc = args [1];
 	if (args [1].instr->getType ()->getDereferenceType ()) {
 		tsrc = createGet (args [1]);
 	}
-	tsrc = staticCast (tsrc, args [0].instr->getType ()->getDereferenceType ());
+	tsrc = staticCast (tsrc, dref);
 	return createPut (tsrc, args [0]);
 }
 
