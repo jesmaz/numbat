@@ -12,7 +12,11 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	}
 	
 	nir::symbol contBlock=scope->createBlock ();
-	const nir::Instruction * condJump = scope->createJump ({condition, condition->getIden ()}, bodyBlock);
+	const nir::Instruction * condJump=nullptr;
+	if (condition) {
+		condJump = scope->createJump ({condition, condition->getIden ()}, bodyBlock);
+	}
+	
 	scope->changeActiveBlock (bodyBlock);
 	body->build (scope);
 	
