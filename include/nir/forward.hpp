@@ -1,5 +1,6 @@
-#ifndef NIR_FORWARD_HPP
-#define NIR_FORWARD_HPP
+#pragma once
+
+#include <string>
 
 
 namespace nir {
@@ -20,8 +21,9 @@ struct Builder;
 struct Module;
 struct Scope;
 
+using std::string;
 
-};
+typedef const string * symbol;
 
 
-#endif/*NIR_FORWARD_HPP*/
+}

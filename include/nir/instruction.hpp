@@ -10,10 +10,6 @@
 
 namespace nir {
 
-using std::string;
-
-typedef const string * symbol;
-
 struct Argument {
 	const Instruction * instr;
 	symbol sym;
