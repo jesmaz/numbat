@@ -937,6 +937,7 @@ std::vector <PTNode> parseParameterList (CodeQueue * queue) {
 		switch (queue->peak ()) {
 			case Symbol::SYMBOL_AT:
 				metaTags = parseMetaTags (queue);
+				continue;
 			case Symbol::VAL:
 			case Symbol::VAR: {
 				numbat::lexer::token token = queue->popToken ();
