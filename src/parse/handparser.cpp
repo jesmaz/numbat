@@ -268,12 +268,14 @@ struct CodeQueue {
 	Symbol peak (uint32_t index);
 	Match shiftPop (const std::string & seen, std::set <string> accepted);
 	Match shiftPop (const std::string & seen, std::set <string> accepted, int precedence);
+	void markDirty ();
 	void shiftPop ();
 	void update (uint32_t n);
 	CodeQueue (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) : itt (start), end (end) {}
 	numbat::lexer::tkstring::const_iterator itt, safeitt, end;
 	std::deque <numbat::lexer::tkstring::const_iterator> itts;
 	string syms;
+	bool dirty=false;
 };
 
 PTNode decorateNodeWithTags (const std::vector <PTNode> & metaTags, PTNode node);
@@ -313,6 +315,7 @@ PTNode decorateNodeWithTags (const std::vector <PTNode> & metaTags, PTNode node)
 
 PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected) {
 	
+	queue->markDirty ();
 	numbat::lexer::token tkn = queue->peakToken ();
 	clear (queue);
 	report::logMessage (report::ERROR, "", tkn.line, 0, "Unexpected token '" + tkn.iden + "', expected " + expected);
@@ -348,7 +351,7 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 	PTNode rhs = parseList (queue);
 	
 	
-	if (queue->peak () != Symbol::SEMICOLON) {
+	if (not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		rhs = parseAssignment (queue, rhs);
 	}
 	
@@ -1015,6 +1018,7 @@ numbat::lexer::token CodeQueue::popToken() {
 	auto t = itts.front ();
 	syms = syms.substr (1);
 	itts.pop_front ();
+	dirty = false;
 	return *t;
 	
 }
@@ -1024,6 +1028,7 @@ void CodeQueue::shiftPop () {
 	if (syms.empty ()) update (32);
 	syms = syms.substr (1);
 	itts.pop_front ();
+	dirty = false;
 	
 }
 
@@ -1045,6 +1050,7 @@ Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted,
 				
 				syms = syms.substr (match.size ()-seen.size ());
 				for (size_t i=0; i<match.size ()-seen.size (); ++i) itts.pop_front ();
+				dirty = false;
 				return {
 					opp.precedence, opp.ptn, opp.ctr
 				};
@@ -1068,6 +1074,21 @@ Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted)
 	
 	return shiftPop (seen, accepted, __INT_MAX__);
 	
+}
+
+void CodeQueue::markDirty () {
+	if (dirty) {
+		if (itts.empty ()) update (32);
+		if (syms.empty ()) {
+			abort ();
+		} else {
+			syms = syms.substr (1);
+			itts.pop_front ();
+			dirty = false;
+		}
+	} else {
+		dirty = true;
+	}
 }
 
 void CodeQueue::update (uint32_t n) {
