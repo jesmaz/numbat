@@ -11,7 +11,7 @@ std::vector <nir::Argument> resolveNodes (nir::Scope * scope, std::vector <PTNod
 	for (size_t i=0; i<args.size(); ++i) {
 		assert (args[i]);
 		const nir::Instruction * instr = args[i]->build (scope);
-		if (instr) {
+		if (instr and not instr->getIdens ().empty ()) {
 			nodes [i] = {instr, instr->getIden ()};
 		} else {
 			return {};

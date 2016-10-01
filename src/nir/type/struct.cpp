@@ -42,6 +42,7 @@ ssize_t nir::Struct::calculateIndex (const nir::Parameter * param) const {
 }
 
 std::string nir::Struct::strDump (text::PrintMode mode) const {
+	if (members.empty()) return "{}";
 	string s = "{";
 	for (auto & m : members) {
 		s += m.first + ": " + m.second->toString (mode) + ", ";

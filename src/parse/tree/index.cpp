@@ -16,7 +16,7 @@ const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 		}
 	}
 	
-	if (not inst) return nullptr;
+	if (not inst or not s) return nullptr;
 	
 	nir::Argument array = {inst, inst->getIden ()};
 	auto * dat = scope->resolve (array, "data");

@@ -9,8 +9,10 @@ auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope) {
 	for (auto & arg : args) {
 		assert (arg);
 		const nir::Instruction * instr = arg->build (scope);
-		for (nir::symbol iden : instr->getIdens ()) {
-			conv.push_back ({instr, iden});
+		if (instr) {
+			for (nir::symbol iden : instr->getIdens ()) {
+				if (iden) conv.push_back ({instr, iden});
+			}
 		}
 	}
 	return conv;

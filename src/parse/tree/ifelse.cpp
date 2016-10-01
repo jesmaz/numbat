@@ -6,7 +6,7 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	
 	//TODO: When unions are avaliable the if-else should use them when the return types are different
 	const nir::Instruction * condition = cond->build (scope);
-	const nir::Instruction * bodyRet=nullptr, * altRet=nullptr;
+	const nir::Instruction * bodyRet=nullptr, * altRet=nullptr, * alloc=nullptr;
 	nir::Block * current=scope->getCurrentBlock ();
 	nir::symbol bodyBlock=scope->createBlock (), altBlock=nullptr;
 	
@@ -28,7 +28,8 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	
 	// Go back to before the if statment to allocate and branch
 	scope->changeActiveBlock (current);
-	const nir::Instruction * alloc = scope->allocateVariable (bodyRet->getType ());
+	
+	if (bodyRet) alloc = scope->allocateVariable (bodyRet->getType ());
 	const nir::Instruction * condJump=nullptr;
 	if (condition) {
 		condJump = scope->createJump ({condition, condition->getIden ()}, bodyBlock);
@@ -38,17 +39,18 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 		scope->createJump (altBlock);
 		// Go back to alt block to store the result and branch
 		scope->changeActiveBlock (altBlock);
-		scope->createPut ({altRet, altRet->getIden ()}, {alloc, alloc->getIden ()});
+		if (alloc and altRet) scope->createPut ({altRet, altRet->getIden ()}, {alloc, alloc->getIden ()});
 	} else {
 		scope->createJump (contBlock);
 	}
 	
 	// Go back to body block to store the result and branch
 	scope->changeActiveBlock (bodyBlock);
-	scope->createPut ({bodyRet, bodyRet->getIden ()}, {alloc, alloc->getIden ()});
+	if (alloc) scope->createPut ({bodyRet, bodyRet->getIden ()}, {alloc, alloc->getIden ()});
 	scope->createJump (contBlock);
 	scope->changeActiveBlock (contBlock);
-	return scope->createGet ({alloc, alloc->getIden ()}).instr;
+	if (alloc) return scope->createGet ({alloc, alloc->getIden ()}).instr;
+	return nullptr;
 	
 }
 

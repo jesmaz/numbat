@@ -38,6 +38,7 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 		if (init->getType () != type and type) {
 			val = scope->staticCast (init, type);
 		}
+		if (not val or not var) return nullptr;
 		return scope->createPut ({val, val->getIden ()}, {var, var->getIden ()});
 	}
 	return var;
@@ -51,8 +52,12 @@ const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) 
 		init = inst->build (scope);
 	}
 	if (vType->getType () == ParseTreeNode::NodeType::KEYWORD) {
-		assert (inst);
-		assert (init);
+		if (not init) {
+			if (not inst) {
+				report::logMessage (report::ERROR, "", getLine (), getPos (), "Unable to determine the type of " + iden->getIden ());
+			}
+			return nullptr;
+		}
 		type = init->getType ();
 		if (vType->getIden () == "ref") {
 			type = type->getPointerTo ();
@@ -61,7 +66,8 @@ const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) 
 	} else {
 		type = vType->resolveType (scope);
 	}
-	assert (type);
+	
+	if (not type) return nullptr;
 	
 	nir::symbol sym = nullptr;
 	if (init) sym = init->getIden ();

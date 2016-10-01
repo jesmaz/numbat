@@ -467,6 +467,7 @@ const Instruction * Scope::resolve (Argument parent, const string & iden) {
 	} else if (typeid (*type) == typeid (PointerType)) {
 		
 		const Parameter * param = type->getDereferenceType ()->getParam (iden);
+		if (not param) return nullptr;
 		auto * add = new PtrAdd (param->getType ()->getPointerTo (), parent, param, module->newSymbol (iden));
 		return insertionPoint->give (add);
 		
@@ -522,7 +523,9 @@ const Instruction * Scope::staticCast (const Instruction * src, const Type * con
 	} else {
 		
 		//TODO: complex casting
-		assert (false);
+		report::logMessage (report::ERROR, "Non trivial casting is not yet supported");
+		return nullptr;
+		
 	}
 	
 }
@@ -538,14 +541,20 @@ Argument Scope::staticCast (Argument src, const Type * const target, const strin
 
 Struct * Scope::registerStruct (const string & iden) {
 	
-	Struct * s = new Struct;
+	Struct * s = nullptr;
 	if (iden != "") {
-		Type *& t = types [iden];
-		if (t) {
-			delete s;
-			return nullptr;
+		if (module->data->types.find (module->findSymbol (iden)) == module->data->types.end ()) {
+			Type *& t = types [iden];
+			if (!t) {
+				t = s = new Struct;
+			} else {
+				report::logMessage (report::ERROR, "Unable to override '" + iden + "'");
+			}
+		} else {
+			report::logMessage (report::ERROR, "'" + iden + "' is a reserved type");
 		}
-		t = s;
+	} else {
+		report::logMessage (report::ERROR, "Structs must have a name");
 	}
 	return s;
 	

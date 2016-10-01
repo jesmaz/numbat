@@ -14,7 +14,7 @@ const nir::Instruction * Struct::build (nir::Scope * scope) {
 	}
 	
 	if (not type) {
-		report::logMessage (report::ERROR, scope->getSourceFile ()->getFileName (), getLine (), getPos (), iden + " declared twice");
+		report::logMessage (report::ERROR, "", getLine (), getPos (), iden + " declared twice");
 		return nullptr;
 	}
 	
