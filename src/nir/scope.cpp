@@ -24,6 +24,7 @@
 #include <nir/inst/pickStructMember.hpp>
 #include <nir/inst/put.hpp>
 #include <nir/inst/ptradd.hpp>
+#include <nir/inst/reinterpret.hpp>
 #include <nir/inst/rem.hpp>
 #include <nir/inst/ret.hpp>
 #include <nir/inst/sub.hpp>
@@ -407,6 +408,10 @@ const Instruction * Scope::createPut (Argument src, Argument dest) {
 	auto * instr = new Put (dest.instr->getType ()->getDereferenceType (), src, dest, module->newSymbol ("put"));
 	return insertionPoint->give (instr);
 	
+}
+
+const Instruction * Scope::createReinterpret (Argument ptr, const Type * type, const string & iden) {
+	return insertionPoint->give (new Reinterpret (type, ptr, module->newSymbol (iden)));
 }
 
 const Instruction * Scope::createRem (const std::vector <Argument> & args) {

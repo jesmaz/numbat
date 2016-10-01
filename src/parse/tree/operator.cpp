@@ -91,7 +91,21 @@ const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::AS>::defBuild (nir::Scope * scope) {
-	abort ();
+	const nir::Instruction * lhs = args [0]->build (scope);
+	const nir::Type * type = args [1]->resolveType (scope);
+	if (not lhs or not type) return nullptr;
+	const nir::Type * ltype = lhs->getType ()->getDereferenceType ();
+	if (not ltype) {
+		report::logMessage (report::ERROR, "", getLine (), getPos (), "'" + lhs->toString (text::PLAIN) + "' can't be reinterpreted");
+		return nullptr;
+	}
+	//TODO: Ensure that lhs type is trivial (nothing that could create invalid state like a pointer)
+	if (ltype->calculateSize (sizeof (size_t)) < type->calculateSize (sizeof (size_t))) {
+		report::logMessage (report::ERROR, "", getLine (), getPos (), "'" + lhs->toString (text::PLAIN) + "' is too small, reinterpeting would lead to courupted memory");
+		return nullptr;
+	}
+	type = type->getPointerTo ();
+	return scope->createReinterpret ({lhs, lhs->getIden ()}, type);
 }
 
 template <>
