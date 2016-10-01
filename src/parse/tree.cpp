@@ -1,4 +1,4 @@
-#include "../../include/parse/tree.hpp"
+#include <parse/tree.hpp>
 
 const nir::Instruction * ParseTree::build (nir::Scope * scope) {
 	if (nirTreeScope) {
@@ -6,7 +6,7 @@ const nir::Instruction * ParseTree::build (nir::Scope * scope) {
 	} else {
 		declare (scope);
 	}
-	const nir::Instruction * last;
+	const nir::Instruction * last=nullptr;
 	for (auto * b : body) {
 		last = b->build (scope);
 	}

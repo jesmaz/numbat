@@ -93,10 +93,10 @@ struct Scope {
 		std::map <symbol, Block *> blocks;
 		std::set <Scope *> scopes;
 		Scope * parent=nullptr;
-		Module * module;
-		Block * insertionPoint;
-		Function * owner;
-		numbat::File * sourceFile;
+		Module * module=nullptr;
+		Block * insertionPoint=nullptr;
+		Function * owner=nullptr;
+		numbat::File * sourceFile=nullptr;
 		
 	
 };

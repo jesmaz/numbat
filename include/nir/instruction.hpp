@@ -11,8 +11,8 @@
 namespace nir {
 
 struct Argument {
-	const Instruction * instr;
-	symbol sym;
+	const Instruction * instr=nullptr;
+	symbol sym=nullptr;
 	string toString (text::PrintMode mode=text::PLAIN) const;
 };
 
