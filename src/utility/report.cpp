@@ -1,7 +1,8 @@
 #include <algorithm>
 #include <iostream>
 #include <utility/report.hpp>
-#include <vector>
+#include <utility/array.hpp>
+ 
 
 
 namespace report {
@@ -23,20 +24,22 @@ struct Message {
 		return false;
 	}
 	Message (Severity s, const std::string & f, uint64_t l, uint64_t p, const std::string & m) : severity (s), file (f), line(l), pos (p), message (m) {}
+	Message () {}
 };
 
 struct EstrangedMessage {
 	Severity severity;
 	std::string message;
 	EstrangedMessage (Severity s, const std::string & m) : severity (s), message (m) {}
+	EstrangedMessage () {}
 };
 
 
 bool errorReported=false;
 
 
-std::vector <EstrangedMessage> estrangedMessages;
-std::vector <Message> messages;
+DynArray <EstrangedMessage> estrangedMessages;
+DynArray <Message> messages;
 
 
 bool compilationFailed () {

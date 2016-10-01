@@ -3,11 +3,9 @@
 #include <utility/report.hpp>
 
 
-std::vector <nir::Argument> resolveNodes (nir::Scope * scope, std::vector <PTNode> args) {
+BasicArray <nir::Argument> resolveNodes (nir::Scope * scope, BasicArray <PTNode> args) {
 	
-	std::vector <nir::Argument> nodes;
-	nodes.resize (args.size (), {nullptr, nullptr});
-	//std::vector <numbat::parser::FunctionDecleration *> candidates;
+	BasicArray <nir::Argument> nodes (args.size ());
 	for (size_t i=0; i<args.size(); ++i) {
 		assert (args[i]);
 		const nir::Instruction * instr = args[i]->build (scope);
@@ -59,7 +57,7 @@ template <>
 const nir::Instruction * SpecificOperator <OPERATION::ADD>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createAdd (nodes);
+	return scope->createAdd (nodes [0], nodes [1]);
 }
 
 template <>
@@ -75,7 +73,7 @@ const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope
 	nir::symbol cont = scope->createBlock ();
 	
 	scope->createPut ({lhs, lhs->getIden ()}, {res, res->getIden ()});
-	const nir::Instruction * cond = scope->createBitNot ({{lhs, lhs->getIden ()}});
+	const nir::Instruction * cond = scope->createBitNot ({lhs, lhs->getIden ()});
 	scope->createJump ({cond, cond->getIden ()}, cont);
 	scope->changeActiveBlock (rhsBlock);
 	
@@ -112,77 +110,77 @@ template <>
 const nir::Instruction * SpecificOperator <OPERATION::ASSIGN>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createAssign (nodes);
+	return scope->createAssign (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BAND>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createBitAnd (nodes);
+	return scope->createBitAnd (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BNOT>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createBitNot (nodes);
+	return scope->createBitNot (nodes [0]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BOR>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createBitOr (nodes);
+	return scope->createBitOr (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::BXOR>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createBitXor (nodes);
+	return scope->createBitXor (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPEQ>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createCmpEQ (nodes);
+	return scope->createCmpEQ (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPGT>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createCmpGT (nodes);
+	return scope->createCmpGT (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPGTE>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createCmpGTE (nodes);
+	return scope->createCmpGTE (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPLT>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createCmpLT (nodes);
+	return scope->createCmpLT (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPLTE>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createCmpLTE (nodes);
+	return scope->createCmpLTE (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CMPNE>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createCmpNE (nodes);
+	return scope->createCmpNE (nodes [0], nodes [1]);
 }
 
 template <>
@@ -200,7 +198,7 @@ template <>
 const nir::Instruction * SpecificOperator <OPERATION::DIV>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createDiv (nodes);
+	return scope->createDiv (nodes [0], nodes [1]);
 }
 
 template <>
@@ -218,21 +216,21 @@ template <>
 const nir::Instruction * SpecificOperator <OPERATION::LNOT>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createLNot (nodes);
+	return scope->createLNot (nodes [0]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::MUL>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createMul (nodes);
+	return scope->createMul (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::NEG>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createNeg (nodes);
+	return scope->createNeg (nodes [0]);
 }
 
 template <>
@@ -271,12 +269,12 @@ template <>
 const nir::Instruction * SpecificOperator <OPERATION::REM>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createRem (nodes);
+	return scope->createRem (nodes [0], nodes [1]);
 }
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::SUB>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
-	return scope->createSub (nodes);
+	return scope->createSub (nodes [0], nodes [1]);
 }

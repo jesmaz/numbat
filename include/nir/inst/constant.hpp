@@ -18,16 +18,16 @@ class Constant : public Instruction {
 		
 		bool validate () const {return true;}
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {abort ();}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {abort ();}
 		
-		const std::vector <Value> & getValues () const {return values;}
+		const BasicArray <Value> & getValues () const {return values;}
 		
-		Constant (const std::vector <const Type *> & types, const std::vector <Value> & values, const std::vector <symbol> & idens) : Instruction ({}, types, idens), values (values) {}
+		Constant (const BasicArray <const Type *> & types, const BasicArray <Value> & values, const BasicArray <symbol> & idens) : Instruction ({}, types, idens), values (values) {}
 		
 	protected:
 	private:
 		
-		std::vector <Value> values;
+		BasicArray <Value> values;
 		
 		friend Scope;
 		

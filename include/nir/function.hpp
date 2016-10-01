@@ -3,7 +3,7 @@
 
 #include <nir/forward.hpp>
 #include <string>
-#include <vector>
+#include <utility/array.hpp>
 
 
 namespace nir {
@@ -22,27 +22,27 @@ struct Function {
 		const LINKAGE getLinkage () const {return linkage;}
 		const Type * getType () const {return type;}
 		const std::string getLabel () const {return label;}
-		const std::vector <Block *> getBody () const {return blocks;}
-		const std::vector <const Parameter *> & getArgs () const {return args;}
-		const std::vector <const Parameter *> & getRet () const {return ret;}
-		const std::vector <const Type *> getRetTypes () const {return retTypes;}
+		const BasicArray <Block *> getBody () const {return blocks;}
+		const BasicArray <const Parameter *> & getArgs () const {return args;}
+		const BasicArray <const Parameter *> & getRet () const {return ret;}
+		const BasicArray <const Type *> getRetTypes () const {return retTypes;}
 		void pushBlock (Block * block);
 		//WARNING: Deleting the old body is the responsibility of the user of this method
-		void dirtyReplaceBody (const std::vector <Block *> & b) {blocks = b;}
+		void dirtyReplaceBody (const BasicArray <Block *> & b) {blocks = b;}
 		
 		Function (const std::string & label, LINKAGE linkage);
-		Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret, const std::string & label, LINKAGE linkage);
+		Function (const BasicArray <const Parameter *> & args, const BasicArray <const Parameter *> & ret, const std::string & label, LINKAGE linkage);
 		
 	protected:
 	private:
 		
 		Block * entry=nullptr;
-		std::vector <Block *> blocks;
+		DynArray <Block *> blocks;
 		
 		
 		std::string label;
-		std::vector <const Parameter *> args, ret;
-		std::vector <const Type *> retTypes;
+		BasicArray <const Parameter *> args, ret;
+		BasicArray <const Type *> retTypes;
 		const Type * type;
 		CallConv cc = CallConv::NCC;
 		LINKAGE linkage;

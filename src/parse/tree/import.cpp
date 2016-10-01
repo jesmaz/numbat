@@ -16,7 +16,7 @@ const nir::Instruction * ParseTreeImport::build (nir::Scope * scope) {
 	
 }
 
-string joinPath (const std::vector <PTNode> & path) {
+string joinPath (const BasicArray <PTNode> & path) {
 	string relPath = path.front ()->getIden ();
 	for (size_t i=1; i<path.size (); ++i) {
 		relPath += PATH_JOIN + path [i]->getIden ();

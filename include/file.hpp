@@ -38,7 +38,7 @@ struct File {
 		static bool asyncEnabled;
 		static std::atomic_uint files, processed;
 		static std::map <string, std::unique_ptr <File>> compiledFiles;
-		static std::vector <string> includeDirs;
+		static DynArray <string> includeDirs;
 		
 		nir::Scope * scope;
 		string directory, fileName;

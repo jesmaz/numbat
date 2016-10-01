@@ -13,7 +13,7 @@ class NEqual : public Instruction {
 		
 		bool validate () const {return true;}
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 2); return new NEqual (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 2); return new NEqual (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());}
 		
 		Argument getLhs () const {return lhs;}
 		Argument getRhs () const {return rhs;}

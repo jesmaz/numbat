@@ -13,7 +13,7 @@ class Parameter : public Instruction {
 		
 		bool validate () const {return true;}
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {abort ();}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {abort ();}
 		
 		Argument getDefVal () const {return defVal;}
 		

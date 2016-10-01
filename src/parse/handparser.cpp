@@ -82,7 +82,7 @@ struct Operator {
 	string ptn;
 	int precedence;
 	RuleType rule;
-	PTNode(*ctr)(const string &, const std::vector <PTNode> &);
+	PTNode(*ctr)(const string &, const BasicArray <PTNode> &);
 };
 
 
@@ -133,8 +133,8 @@ std::map <string, Symbol> symbolMap {
 };
 
 template <OPERATION opp>
-PTNode operatorFactory (const string & s, const std::vector <PTNode> & v) {
-	return new SpecificOperator <opp> (s, v);
+PTNode operatorFactory (const string & s, const BasicArray <PTNode> & v) {
+	return new SpecificOperator <opp> (s, {v.begin (), v.end ()});
 }
 
 std::map <string, Operator> operators {
@@ -221,7 +221,7 @@ namespace SymbolFlags {
 	enum Flags : uint8_t {NONE=0, EXPRESSION_START=0b1, TERMINATE_STATEMENT=0b10, SEGMENT_BEGIN=0b100, SEGMENT_END=0b1000};
 	std::array <SymbolFlags::Flags, __UINT8_MAX__> map = {SymbolFlags::NONE};
 	struct SetSymbols {
-		SetSymbols (const std::vector <std::pair <Symbol, uint8_t>> & flags) {
+		SetSymbols (const BasicArray <std::pair <Symbol, uint8_t>> & flags) {
 			for (auto & p : flags) {
 				assert (size_t (p.first) < __UINT8_MAX__);
 				map [size_t (p.first)] = Flags (p.second);
@@ -254,7 +254,7 @@ namespace SymbolFlags {
 struct Match {
 	int precedence;
 	string iden;
-	PTNode(*ctr)(const string &, const std::vector <PTNode> &);
+	PTNode(*ctr)(const string &, const BasicArray <PTNode> &);
 };
 
 
@@ -276,7 +276,7 @@ struct CodeQueue {
 	bool dirty=false;
 };
 
-PTNode decorateNodeWithTags (const std::vector <PTNode> & metaTags, PTNode node);
+PTNode decorateNodeWithTags (const BasicArray <PTNode> & metaTags, PTNode node);
 
 PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected);
 
@@ -290,9 +290,9 @@ PTNode parseStatement (CodeQueue * queue);
 PTNode parseStruct (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
-std::vector <PTNode> parseArguments (CodeQueue * queue);
-std::vector <PTNode> parseMetaTags (CodeQueue * queue);
-std::vector <PTNode> parseParameterList (CodeQueue * queue);
+BasicArray <PTNode> parseArguments (CodeQueue * queue);
+BasicArray <PTNode> parseMetaTags (CodeQueue * queue);
+BasicArray <PTNode> parseParameterList (CodeQueue * queue);
 
 
 void clear (CodeQueue * queue) {
@@ -307,8 +307,8 @@ void clear (CodeQueue * queue) {
 	
 }
 
-PTNode decorateNodeWithTags (const std::vector <PTNode> & metaTags, PTNode node) {
-	return new MetaTags (metaTags, node);
+PTNode decorateNodeWithTags (const BasicArray <PTNode> & metaTags, PTNode node) {
+	return new MetaTags ({metaTags.begin (), metaTags.end ()}, node);
 }
 
 PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected) {
@@ -415,7 +415,8 @@ PTNode parseAtom (CodeQueue * queue) {
 			case Symbol::SYMBOL_PARENRHESES_LEFT: {
 				// Function call
 				queue->shiftPop ();
-				atom = new ParseTreeCall (atom, parseArguments (queue));
+				auto args = parseArguments (queue);
+				atom = new ParseTreeCall (atom, {args.begin (), args.end ()});
 				if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
 					return errorUnexpectedToken (queue, "')'");
 				}
@@ -448,7 +449,7 @@ PTNode parseAtom (CodeQueue * queue) {
 
 PTNode parseBlock (CodeQueue * queue) {
 	
-	std::vector <PTNode> body;
+	DynArray <PTNode> body;
 	while (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT and queue->peak () != Symbol::__NONE__) {
 		if (queue->peak () == Symbol::SYMBOL_AT) {
 			auto tags = parseMetaTags (queue);
@@ -540,7 +541,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	}
 	queue->shiftPop ();
 	
-	std::vector <PTNode> params = parseParameterList (queue), type;
+	BasicArray <PTNode> params = parseParameterList (queue), type;
 	
 	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
 		return errorUnexpectedToken (queue, "')'");
@@ -568,7 +569,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	if (linkage != nir::LINKAGE::EXTERNAL and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		body = parseStatement (queue);
 	}
-	return new Function (token.line, 0, token.iden, params, type, body, linkage);
+	return new Function (token.line, 0, token.iden, {params.begin (), params.end ()}, {type.begin (), type.end ()}, body, linkage);
 	
 }
 
@@ -609,7 +610,7 @@ PTNode parseImport (CodeQueue * queue) {
 	// drop import token
 	queue->shiftPop ();
 	
-	std::vector <PTNode> path;
+	DynArray <PTNode> path;
 	
 	for (;;) {
 		
@@ -646,13 +647,13 @@ PTNode parseImport (CodeQueue * queue) {
 		}
 	}
 	
-	return new ParseTreeImport (new ParseTreeImportPath (path), iden);
+	return new ParseTreeImport (new ParseTreeImportPath ({path.begin (), path.end ()}), iden);
 	
 }
 
 PTNode parseList (CodeQueue * queue, PTNode prev) {
 	
-	std::vector <PTNode> args;
+	DynArray <PTNode> args;
 	if (prev) {
 		args.push_back (prev);
 	} else {
@@ -665,7 +666,7 @@ PTNode parseList (CodeQueue * queue, PTNode prev) {
 	}
 	
 	if (args.size () != 1) {
-		return new ParseTreeList (args);
+		return new ParseTreeList ({args.begin (), args.end ()});
 	} else {
 		return args [0];
 	}
@@ -674,7 +675,7 @@ PTNode parseList (CodeQueue * queue, PTNode prev) {
 
 PTNode parseProgram (CodeQueue * queue) {
 	
-	std::vector <PTNode> body;
+	DynArray <PTNode> body;
 	while (queue->more ()) {
 		body.push_back (parseStatement (queue));
 		while (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) queue->popToken ();
@@ -690,7 +691,7 @@ PTNode parseProgram (CodeQueue * queue) {
 PTNode parseStatement (CodeQueue * queue) {
 	
 	PTNode lhs=nullptr;
-	std::vector <PTNode> metaTags = parseMetaTags (queue);
+	BasicArray <PTNode> metaTags = parseMetaTags (queue);
 	
 	switch (queue->peak ()) {
 		case Symbol::DEF:
@@ -830,7 +831,7 @@ PTNode parseStruct (CodeQueue * queue) {
 		iden = token.iden;
 	}
 	
-	std::vector <PTNode> members;
+	BasicArray <PTNode> members;
 	if (queue->peak () == Symbol::SYMBOL_BRACE_LEFT) {
 		queue->shiftPop ();
 		members = parseParameterList (queue);
@@ -842,7 +843,7 @@ PTNode parseStruct (CodeQueue * queue) {
 		queue->shiftPop ();
 	}
 	
-	return new Struct (token.line, 0, iden, members);
+	return new Struct (token.line, 0, iden, {members.begin (), members.end ()});
 	
 }
 
@@ -875,12 +876,12 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 }
 
 
-std::vector <PTNode> parseArguments (CodeQueue * queue) {
+BasicArray <PTNode> parseArguments (CodeQueue * queue) {
 	
 	Symbol next = queue->peak ();
 	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT) return {};
 	
-	std::vector <PTNode> args;
+	DynArray <PTNode> args;
 	do {
 		
 		if (next == Symbol::IDENTIFIER and queue->peak (1) == Symbol::COLON) {
@@ -901,9 +902,9 @@ std::vector <PTNode> parseArguments (CodeQueue * queue) {
 	
 }
 
-std::vector <PTNode> parseMetaTags (CodeQueue * queue) {
+BasicArray <PTNode> parseMetaTags (CodeQueue * queue) {
 	
-	std::vector <PTNode> metaTags;
+	DynArray <PTNode> metaTags;
 	while (queue->peak () == Symbol::SYMBOL_AT) {
 		
 		queue->popToken ();
@@ -927,12 +928,12 @@ std::vector <PTNode> parseMetaTags (CodeQueue * queue) {
 	
 }
 
-std::vector <PTNode> parseParameterList (CodeQueue * queue) {
+BasicArray <PTNode> parseParameterList (CodeQueue * queue) {
 	
 	Symbol next = queue->peak ();
 	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT or next == Symbol::SYMBOL_BRACE_RIGHT) return {};
 	
-	std::vector <PTNode> args, metaTags;
+	DynArray <PTNode> args, metaTags;
 	for (;;) {
 		PTNode atom;
 		switch (queue->peak ()) {

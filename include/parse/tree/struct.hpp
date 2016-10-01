@@ -4,7 +4,7 @@
 
 #include "base.hpp"
 
-#include <vector>
+ 
 
 
 struct Struct : ParseTreeNode {
@@ -16,7 +16,7 @@ struct Struct : ParseTreeNode {
 		void declare (nir::Scope * scope);
 		
 		Struct (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		Struct (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & members) : ParseTreeNode (line, pos), iden (iden), members (members) {}
+		Struct (uint32_t line, uint32_t pos, const string & iden, const BasicArray <PTNode> & members) : ParseTreeNode (line, pos), iden (iden), members (members) {}
 		
 	protected:
 	private:
@@ -24,7 +24,7 @@ struct Struct : ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		string iden;
-		std::vector <PTNode> tplate, tags, members;
+		BasicArray <PTNode> tplate, tags, members;
 		nir::Struct * type=nullptr;
 		
 };

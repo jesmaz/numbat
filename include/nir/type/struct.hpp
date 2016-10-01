@@ -5,7 +5,7 @@
 #include "../type.hpp"
 
 #include <map>
-#include <vector>
+ 
 
 
 namespace nir {
@@ -20,9 +20,9 @@ class Struct : public Type {
 		virtual ssize_t calculateOffset (size_t ptrSize, const string & iden) const;
 		virtual ssize_t calculateIndex (const Parameter * param) const;
 		
-		const std::vector <const Parameter *> & getMemberArr () const {return memberArr;}
+		const BasicArray <const Parameter *> & getMemberArr () const {return memberArr;}
 		
-		void populate (const std::vector <const Parameter *> & memberArr);
+		void populate (const BasicArray <const Parameter *> & memberArr);
 		
 		Struct () {}
 		
@@ -30,7 +30,7 @@ class Struct : public Type {
 	private:
 		
 		std::map <string, const Parameter *> members;
-		std::vector <const Parameter *> memberArr;
+		BasicArray <const Parameter *> memberArr;
 		
 		virtual string strDump (text::PrintMode mode) const;
 		

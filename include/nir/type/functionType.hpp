@@ -2,10 +2,10 @@
 #define NIR_POINTER_TYPE
 
 
-#include "../type.hpp"
-
 #include <map>
-#include <vector>
+#include <nir/type.hpp>
+#include <utility/array.hpp>
+ 
 
 
 namespace nir {
@@ -15,7 +15,7 @@ class FunctionType : public Type {
 	CONST_VISITABLE
 	public:
 		
-		static string toString (const std::vector <const Type *> & args, text::PrintMode mode=text::PLAIN) {
+		static string toString (const BasicArray <const Type *> & args, text::PrintMode mode=text::PLAIN) {
 			if (args.empty ()) {
 				return "()";
 			}
@@ -26,10 +26,10 @@ class FunctionType : public Type {
 			}
 			return ret;
 		}
-		static string toString (const std::vector <const Type *> & args, const std::vector <const Type *> & ret, text::PrintMode mode=text::PLAIN) {
+		static string toString (const BasicArray <const Type *> & args, const BasicArray <const Type *> & ret, text::PrintMode mode=text::PLAIN) {
 			return toString (args, mode) + " -> " + toString (ret, mode);
 		}
-		static const FunctionType * get (const std::vector <const Type *> & args, const std::vector <const Type *> & ret) {
+		static const FunctionType * get (const BasicArray <const Type *> & args, const BasicArray <const Type *> & ret) {
 			string search = toString (args, ret);
 			auto itt = functionTypes.find (search);
 			if (itt != functionTypes.end ()) {
@@ -45,12 +45,12 @@ class FunctionType : public Type {
 	protected:
 	private:
 		
-		FunctionType (const std::vector <const Type *> & args, const std::vector <const Type *> & ret) : args (args), ret (ret) {}
+		FunctionType (const BasicArray <const Type *> & args, const BasicArray <const Type *> & ret) : args (args), ret (ret) {}
 		
 		virtual string strDump (text::PrintMode mode) const {return toString (args, ret, mode);}
 		
 		
-		const std::vector <const Type *> args, ret;
+		const BasicArray <const Type *> args, ret;
 		
 		static std::map <string, FunctionType *> functionTypes;
 		

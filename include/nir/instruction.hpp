@@ -1,11 +1,11 @@
 #pragma once
 
+#include <cassert>
 #include <nir/forward.hpp>
 #include <nir/type.hpp>
+#include <utility/array.hpp>
+ 
 #include <visitor.hpp>
-
-#include <cassert>
-#include <vector>
 
 
 namespace nir {
@@ -16,8 +16,8 @@ struct Argument {
 	string toString (text::PrintMode mode=text::PLAIN) const;
 };
 
-std::vector <const Type *> argumentToType (const std::vector <Argument> & args);
-std::vector <symbol> argumentToSymbol (const std::vector <Argument> & args);
+BasicArray <const Type *> argumentToType (const BasicArray <Argument> & args);
+BasicArray <symbol> argumentToSymbol (const BasicArray <Argument> & args);
 
 class Instruction : public numbat::visitor::BaseConstVisitable {
 	
@@ -31,26 +31,26 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 		string toString (text::PrintMode mode=text::PLAIN) const;
 		symbol getIden () const {return idens [0];}
 		
-		const std::vector <Argument> & getArguments () const {return arguments;}
-		const std::vector <const Type *> & getTypes () const {return types;}
-		const std::vector <symbol> & getIdens () const {return idens;}
+		const BasicArray <Argument> & getArguments () const {return arguments;}
+		const BasicArray <const Type *> & getTypes () const {return types;}
+		const BasicArray <symbol> & getIdens () const {return idens;}
 		
-		virtual const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const=0;
+		virtual const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const=0;
 		
 		virtual const nir::Type * resolveType (const string & iden) const {return nullptr;}
 		virtual const nir::Instruction * resolve (nir::Scope * scope, const string & iden) const {return nullptr;}
 		
 	protected:
 		
-		Instruction (const std::vector <Argument> & arguments, const std::vector <const Type *> & types, const std::vector <symbol> & idens) : arguments (arguments), types (types), idens (idens) {}
+		Instruction (const BasicArray <Argument> & arguments, const BasicArray <const Type *> & types, const BasicArray <symbol> & idens) : arguments (arguments), types (types), idens (idens) {assert (types.size () == idens.size ());}
 		
 	private:
 		
 		virtual string strDump (text::PrintMode mode) const=0;
 		
-		std::vector <Argument> arguments;
-		std::vector <const Type *> types;
-		std::vector <symbol> idens;
+		BasicArray <Argument> arguments;
+		BasicArray <const Type *> types;
+		BasicArray <symbol> idens;
 		
 };
 

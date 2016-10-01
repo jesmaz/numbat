@@ -6,8 +6,9 @@
 #include <nir/forward.hpp>
 #include <string>
 #include <typeinfo>
+#include <utility/array.hpp>
 #include <utility/text.hpp>
-#include <vector>
+ 
 
 
 using std::string;
@@ -30,10 +31,10 @@ class ParseTreeNode {
 		
 		virtual bool isAggregate () {return false;}
 		virtual bool isList () {return false;}
-		virtual const std::vector <ParseTreeNode *> & getArgs () const {return defaultArgs;}
-		virtual const std::vector <ParseTreeNode *> releaseArgs () {return defaultArgs;}
-		virtual const std::vector <ParseTreeNode *> & getTags () const {return defaultArgs;}
-		virtual const std::vector <ParseTreeNode *> & getTemplate () const {return defaultArgs;}
+		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return defaultArgs;}
+		virtual const BasicArray <ParseTreeNode *> releaseArgs () {return defaultArgs;}
+		virtual const BasicArray <ParseTreeNode *> & getTags () const {return defaultArgs;}
+		virtual const BasicArray <ParseTreeNode *> & getTemplate () const {return defaultArgs;}
 		virtual const string & getIden () const {return defaultStr;}
 		virtual Function * asFunction () {return nullptr;}
 		virtual Struct * asStruct () {return nullptr;}
@@ -60,7 +61,7 @@ class ParseTreeNode {
 		
 		NodeType type=NodeType::EXPRESSION;
 		uint32_t line, pos;
-		const static std::vector <ParseTreeNode *> defaultArgs;
+		const static BasicArray <ParseTreeNode *> defaultArgs;
 		const static string defaultStr;
 		
 };

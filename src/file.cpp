@@ -3,6 +3,7 @@
 #include <nir/scope.hpp>
 #include <mutex>
 #include <parse/handparser.hpp>
+#include <utility/array.hpp>
 
 
 namespace numbat {
@@ -31,7 +32,7 @@ string joinPaths (const string & lhs, const string & rhs) {
 bool File::asyncEnabled=false;
 std::atomic_uint File::files, File::processed;
 std::map <string, std::unique_ptr <File>> File::compiledFiles;
-std::vector <string> File::includeDirs = {"/usr/include/numbat", "."};
+DynArray <string> File::includeDirs = {"/usr/include/numbat", "."};
 
 std::mutex fileMutex;
 

@@ -13,7 +13,7 @@ class Reinterpret : public Instruction {
 		
 		bool validate () const {return true;}
 		
-		const nir::Reinterpret * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Reinterpret (getType (), replacmentArgs [0], getIden ());}
+		const nir::Reinterpret * recreate (const BasicArray <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Reinterpret (getType (), replacmentArgs [0], getIden ());}
 		
 		Argument getArg () const {return arg;}
 		

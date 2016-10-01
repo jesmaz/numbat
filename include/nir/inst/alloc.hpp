@@ -9,7 +9,7 @@ class Alloc : public Instruction {
 	CONST_VISITABLE
 	public:
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Alloc (getType (), replacmentArgs [0], getIden ());}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Alloc (getType (), replacmentArgs [0], getIden ());}
 		
 		Argument getAmount () const {return amount;}
 		

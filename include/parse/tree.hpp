@@ -5,16 +5,16 @@
 #include "tree/function.hpp"
 #include "tree/struct.hpp"
 
-#include <vector>
+ 
 
 
 class ParseTree : public ParseTreeNode {
 	
 	public:
 		
-		const std::vector <Function *> & getFunctions () const {return functions;}
-		const std::vector <PTNode> & getBody () const {return body;}
-		const std::vector <Struct *> & getStructs () const {return structs;}
+		const BasicArray <Function *> & getFunctions () const {return functions;}
+		const BasicArray <PTNode> & getBody () const {return body;}
+		const BasicArray <Struct *> & getStructs () const {return structs;}
 		
 		const nir::Instruction * build (nir::Scope * scope);
 		
@@ -25,7 +25,6 @@ class ParseTree : public ParseTreeNode {
 		ParseTree (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		template <typename container>
 		ParseTree (container nodes) : ParseTreeNode (nodes.front ()->getLine (), nodes.front ()->getPos ()) {
-			body.reserve (nodes.size ());
 			for (PTNode node : nodes) {
 				switch (node->getType ()) {
 					case ParseTreeNode::NodeType::FUNCTION:
@@ -49,9 +48,9 @@ class ParseTree : public ParseTreeNode {
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		std::vector <PTNode> body, import;
-		std::vector <Function *> functions;
-		std::vector <Struct *> structs;
+		DynArray <PTNode> body, import;
+		DynArray <Function *> functions;
+		DynArray <Struct *> structs;
 		
 		nir::Scope * nirTreeScope=nullptr;
 		

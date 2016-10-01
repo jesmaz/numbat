@@ -10,7 +10,7 @@ const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	for (PTNode node : args) {
 		const nir::Instruction * r = node->build (scope);
 		if (s) {
-			s = scope->createMul ({{s, s->getIden ()}, {r, r->getIden ()}});
+			s = scope->createMul ({s, s->getIden ()}, {r, r->getIden ()});
 		} else {
 			s = r;
 		}
@@ -32,7 +32,7 @@ const nir::Instruction * ParseTreeIndex::buildAllocate (nir::Scope * scope, cons
 	for (PTNode node : args) {
 		const nir::Instruction * r = node->build (scope);
 		if (s) {
-			s = scope->createMul ({{s, s->getIden ()}, {r, r->getIden ()}});
+			s = scope->createMul ({s, s->getIden ()}, {r, r->getIden ()});
 		} else {
 			s = r;
 		}

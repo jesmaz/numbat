@@ -14,7 +14,7 @@ class PtrAdd : public Instruction {
 		
 		bool validate () const {return true;}
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {
 			if (param) {
 				return new PtrAdd (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());
 			} else {

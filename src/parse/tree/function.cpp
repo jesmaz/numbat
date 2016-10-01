@@ -3,16 +3,15 @@
 #include <parse/tree/function.hpp>
 
 
-auto buildParams = [](const std::vector <PTNode> & args, nir::Scope * scope) {
-	std::vector <const nir::Parameter *> conv;
-	conv.reserve (args.size ());
+auto buildParams = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
+	DynArray <const nir::Parameter *> conv;
 	for (auto & arg : args) {
 		auto * p = arg->buildParameter (scope);
 		if (p) {
 			assert (typeid (*p) == typeid (nir::Parameter));
 			conv.push_back (static_cast <const nir::Parameter *> (p));
 		} else {
-			return std::vector <const nir::Parameter *> ();
+			return DynArray <const nir::Parameter *> ();
 		}
 	}
 	return conv;
@@ -24,7 +23,7 @@ const nir::Instruction * Function::build (nir::Scope * scope) {
 		//Must be anon
 		auto nirParams = buildParams (params, scope);
 		auto nirTypes = buildParams (type, scope);
-		fScope = scope->declareFunction (nirParams, nirTypes, "", linkage);
+		fScope = scope->declareFunction ({nirParams.begin (), nirParams.end ()}, {nirTypes.begin (), nirTypes.end ()}, "", linkage);
 	}
 	
 	if (body) {
@@ -39,7 +38,7 @@ void Function::declare (nir::Scope * scope) {
 	
 	auto nirParams = buildParams (params, scope);
 	auto nirTypes = buildParams (type, scope);
-	fScope = scope->declareFunction (nirParams, nirTypes, iden, linkage);
+	fScope = scope->declareFunction ({nirParams.begin (), nirParams.end ()}, {nirTypes.begin (), nirTypes.end ()}, iden, linkage);
 	
 }
 
@@ -65,17 +64,17 @@ Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : Pars
 		if (params->isList ()) {
 			this->params = params->getArgs ();
 		} else {
-			this->params.push_back (params);
+			this->params = {params};
 		}
 	}
 	if (type) {
 		if (type->isList ()) {
 			this->type = type->getArgs ();
 		} else {
-			this->type.push_back (type);
+			this->type = {type};
 		}
 	}
 	this->body = body;
 }
 
-Function::Function (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & params, const std::vector <PTNode> & type, PTNode body, nir::LINKAGE linkage) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), params (params), type (type), iden (iden), body (body), linkage (linkage) {}
+Function::Function (uint32_t line, uint32_t pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), params (params), type (type), iden (iden), body (body), linkage (linkage) {}

@@ -13,7 +13,7 @@ class Composite : public Instruction {
 		
 		bool validate () const {return true;}
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {return new Composite (getType (), replacmentArgs, getIden ());}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {return new Composite (getType (), replacmentArgs, getIden ());}
 		
 	protected:
 	private:
@@ -29,7 +29,7 @@ class Composite : public Instruction {
 			return s;
 		}
 		
-		Composite (const Type * type, std::vector <Argument> args, symbol iden) : Instruction (args, {type}, {iden}) {}
+		Composite (const Type * type, const BasicArray <Argument> & args, symbol iden) : Instruction (args, {type}, {iden}) {}
 		
 		friend Scope;
 		

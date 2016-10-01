@@ -4,7 +4,7 @@
 
 #include "base.hpp"
 
-#include <vector>
+ 
 
 
 class ParseTreeCall : public ParseTreeNode {
@@ -13,12 +13,12 @@ class ParseTreeCall : public ParseTreeNode {
 		
 		
 		virtual bool isAggregate () {return true;}
-		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
+		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return args;}
 		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		ParseTreeCall (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeCall (const PTNode & iden, const std::vector <PTNode> & args) : ParseTreeNode (iden->getLine (), iden->getPos ()), iden (iden), args (args) {}
+		ParseTreeCall (const PTNode & iden, const BasicArray <PTNode> & args) : ParseTreeNode (iden->getLine (), iden->getPos ()), iden (iden), args (args) {}
 		virtual ~ParseTreeCall () {for (PTNode n : args) delete n;}
 		
 	protected:
@@ -27,7 +27,7 @@ class ParseTreeCall : public ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		PTNode iden;
-		std::vector <PTNode> args;
+		BasicArray <PTNode> args;
 		
 };
 

@@ -12,7 +12,7 @@ class Put : public Instruction {
 		Argument getDest () const {return dest;}
 		Argument getSrc () const {return src;}
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 2); return new Put (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 2); return new Put (getType (), replacmentArgs [0], replacmentArgs [1], getIden ());}
 		
 		virtual bool validate () const {return true;}
 		

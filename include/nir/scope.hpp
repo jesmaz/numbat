@@ -7,7 +7,7 @@
 #include <nir/instruction.hpp>
 #include <nir/type/struct.hpp>
 #include <set>
-#include <vector>
+ 
 
 
 namespace nir {
@@ -23,7 +23,7 @@ struct Scope {
 		Module * getModule () const {return module;}
 		const numbat::File * getSourceFile () const {return sourceFile;}
 		
-		Scope * declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden, LINKAGE linkage);
+		Scope * declareFunction (const BasicArray <const Parameter *> params, const BasicArray <const Parameter *> ret, const string iden, LINKAGE linkage);
 		
 		symbol createBlock (const string & iden="");
 		size_t changeActiveBlock (Block * block) {return insertionPoint = block, 0;}
@@ -40,37 +40,37 @@ struct Scope {
 		const Instruction * allocateVariable (const Type * const type, const string & iden="");
 		template <typename T>
 		const Instruction * createBinary (Argument lhs, Argument rhs, const string & iden);
-		const Instruction * createAdd (const std::vector <Argument> & args);
-		const Instruction * createAssign (const std::vector <Argument> & args);
+		const Instruction * createAdd (Argument lhs, Argument rhs);
+		const Instruction * createAssign (Argument lhs, Argument rhs);
 		const Instruction * createAutoReturn (const Instruction * instr);
-		const Instruction * createBitAnd (const std::vector <Argument> & args);
-		const Instruction * createBitNot (const std::vector <Argument> & args);
-		const Instruction * createBitOr (const std::vector <Argument> & args);
-		const Instruction * createBitXor (const std::vector <Argument> & args);
-		const Instruction * createCall (const Function * func, const std::vector <Argument> & args);
+		const Instruction * createBitAnd (Argument lhs, Argument rhs);
+		const Instruction * createBitNot (Argument arg);
+		const Instruction * createBitOr (Argument lhs, Argument rhs);
+		const Instruction * createBitXor (Argument lhs, Argument rhs);
+		const Instruction * createCall (const Function * func, const BasicArray <Argument> & args);
 		template <typename T>
 		const Instruction * createCmp (Argument lhs, Argument rhs, const string & iden);
-		const Instruction * createCmpEQ (const std::vector <Argument> & args);
-		const Instruction * createCmpGT (const std::vector <Argument> & args);
-		const Instruction * createCmpGTE (const std::vector <Argument> & args);
-		const Instruction * createCmpLT (const std::vector <Argument> & args);
-		const Instruction * createCmpLTE (const std::vector <Argument> & args);
-		const Instruction * createCmpNE (const std::vector <Argument> & args);
+		const Instruction * createCmpEQ (Argument lhs, Argument rhs);
+		const Instruction * createCmpGT (Argument lhs, Argument rhs);
+		const Instruction * createCmpGTE (Argument lhs, Argument rhs);
+		const Instruction * createCmpLT (Argument lhs, Argument rhs);
+		const Instruction * createCmpLTE (Argument lhs, Argument rhs);
+		const Instruction * createCmpNE (Argument lhs, Argument rhs);
 		const Instruction * createConstant (const Type * type, const string & val, const string & iden="");
-		const Instruction * createDiv (const std::vector <Argument> & args);
+		const Instruction * createDiv (Argument lhs, Argument rhs);
 		const Instruction * createImportHandle (const Scope * scope, const string & iden="");
 		const Instruction * createJump (symbol block);
 		const Instruction * createJump (Argument cond, symbol block);
-		const Instruction * createLNot (const std::vector <Argument> & args);
-		const Instruction * createMul (const std::vector <Argument> & args);
-		const Instruction * createNeg (const std::vector <Argument> & args);
+		const Instruction * createLNot (Argument arg);
+		const Instruction * createMul (Argument lhs, Argument rhs);
+		const Instruction * createNeg (Argument arg);
 		const Instruction * createParameter (const Type * const type, Argument init={nullptr, nullptr}, const string & iden="");
 		const Instruction * createPointerAdd (const Type * const type, Argument ptr, Argument offset, const string & iden="");
 		const Instruction * createPut (Argument src, Argument dest);
 		const Instruction * createReinterpret (Argument ptr, const Type * type, const string & iden="");
-		const Instruction * createRem (const std::vector <Argument> & args);
-		const Instruction * createStructValue (const Type * const type, std::vector <Argument> vals, const string & iden="");
-		const Instruction * createSub (const std::vector <Argument> & args);
+		const Instruction * createRem (Argument lhs, Argument rhs);
+		const Instruction * createStructValue (const Type * const type, BasicArray <Argument> vals, const string & iden="");
+		const Instruction * createSub (Argument lhs, Argument rhs);
 		const Instruction * getFunctionPointer ();
 		const Instruction * resolve (Argument parent, const string & iden);
 		const Instruction * resolve (const string & iden);
@@ -88,7 +88,7 @@ struct Scope {
 		
 		Scope (Module * mod, Block * insertionPoint, Function * owner) : module (mod), insertionPoint (insertionPoint), owner (owner) {}
 		
-		std::map <string, std::vector <Function *> *> functions;
+		std::map <string, DynArray <Function *> *> functions;
 		std::map <string, Type *> types;
 		std::map <string, const Instruction *> variables;
 		std::map <symbol, Block *> blocks;

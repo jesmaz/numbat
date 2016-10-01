@@ -4,15 +4,15 @@
 
 #include "base.hpp"
 
-#include <vector>
+ 
 
 
 struct Function : ParseTreeNode {
 	
 	public:
 		
-		const std::vector <PTNode> & getParams () const {return params;}
-		const std::vector <PTNode> & getType () const {return type;}
+		const BasicArray <PTNode> & getParams () const {return params;}
+		const BasicArray <PTNode> & getType () const {return type;}
 		
 		const nir::Instruction * build (nir::Scope * scope);
 		
@@ -24,14 +24,14 @@ struct Function : ParseTreeNode {
 		
 		Function (uint32_t line, uint32_t pos) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), body (nullptr) {}
 		Function (PTNode iden, PTNode params, PTNode type, PTNode body);
-		Function (uint32_t line, uint32_t pos, const string & iden, const std::vector <PTNode> & params, const std::vector <PTNode> & type, PTNode body, nir::LINKAGE linkage);
+		Function (uint32_t line, uint32_t pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage);
 		
 	protected:
 	private:
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		std::vector <PTNode> tplate, tags, params, type;
+		BasicArray <PTNode> tplate, tags, params, type;
 		string iden;
 		PTNode body;
 		nir::LINKAGE linkage;

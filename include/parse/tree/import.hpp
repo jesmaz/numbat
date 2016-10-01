@@ -5,7 +5,7 @@
 #include "base.hpp"
 #include <file.hpp>
 
-#include <vector>
+ 
 
 
 class ParseTreeImport : public ParseTreeNode {
@@ -37,11 +37,11 @@ class ParseTreeImportPath : public ParseTreeNode {
 	public:
 		
 		virtual bool isAggregate () {return true;}
-		virtual const std::vector <ParseTreeNode *> releaseArgs () {auto a = path; path = std::vector <PTNode> (); return a;}
-		virtual const std::vector <ParseTreeNode *> & getArgs () const {return path;}
+		virtual const BasicArray <ParseTreeNode *> releaseArgs () {auto a = path; path = BasicArray <PTNode> (); return a;}
+		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return path;}
 		
 		ParseTreeImportPath (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeImportPath (const std::vector <PTNode> & path) : ParseTreeNode (path[assert (not path.empty ()), 0]->getLine (), path[0]->getPos ()), path (path) {}
+		ParseTreeImportPath (const BasicArray <PTNode> & path) : ParseTreeNode (path[assert (not path.empty ()), 0]->getLine (), path[0]->getPos ()), path (path) {}
 		virtual ~ParseTreeImportPath () {for (auto p: path) delete p;}
 		
 	protected:
@@ -49,7 +49,7 @@ class ParseTreeImportPath : public ParseTreeNode {
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		std::vector <PTNode> path;
+		BasicArray <PTNode> path;
 		
 };
 

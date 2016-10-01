@@ -2,8 +2,9 @@
 
 #include <ostream>
 #include <nir/forward.hpp>
+#include <utility/array.hpp>
 #include <utility/text.hpp>
-#include <vector>
+ 
 
 
 namespace nir {
@@ -61,8 +62,8 @@ struct Block {
 		
 		bool validate () const;
 		
-		std::vector <const Instruction *> & getInstructions () {return instructions;}
-		const std::vector <const Instruction *> & getInstructions () const {return instructions;}
+		BasicArray <const Instruction *> & getInstructions () {return instructions;}
+		const BasicArray <const Instruction *> & getInstructions () const {return instructions;}
 		
 		const Instruction * give (const Instruction * instr);
 		
@@ -79,7 +80,7 @@ struct Block {
 	protected:
 	private:
 		
-		std::vector <const Instruction *> instructions;
+		DynArray <const Instruction *> instructions;
 		Block * fallthrough=nullptr;
 		symbol name;
 		

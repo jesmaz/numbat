@@ -1,12 +1,11 @@
 #pragma once
 
 
-#include "../nir/forward.hpp"
-
 #include <cinttypes>
 #include <map>
+#include <nir/forward.hpp>
 #include <string>
-#include <vector>
+#include <utility/array.hpp>
 
 
 namespace codegen {
@@ -38,7 +37,7 @@ class Target {
 		
 	private:
 		
-		virtual void generate (const nir::Function * func, std::vector <uint8_t> & output) {}
+		virtual void generate (const nir::Function * func, BasicArray <uint8_t> & output) {}
 		
 		static std::map <string, FFunc> * targets;
 		

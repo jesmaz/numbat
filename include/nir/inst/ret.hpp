@@ -9,9 +9,9 @@ class Ret : public Instruction {
 	CONST_VISITABLE
 	public:
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {return new Ret (replacmentArgs);}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {return new Ret (replacmentArgs);}
 		
-		const std::vector <Argument> & getArgs () const {return args;}
+		const BasicArray <Argument> & getArgs () const {return args;}
 		
 		virtual bool validate () const {return true;}
 		
@@ -20,9 +20,9 @@ class Ret : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "ret TODO: return values";}
 		
-		Ret (const std::vector <Argument> & args) : Instruction ({args}, argumentToType (args), argumentToSymbol (args)), args (args) {}
+		Ret (const BasicArray <Argument> & args) : Instruction ({args}, argumentToType (args), argumentToSymbol (args)), args (args) {}
 		
-		std::vector <Argument> args;
+		BasicArray <Argument> args;
 		
 		friend Scope;
 		

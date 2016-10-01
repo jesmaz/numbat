@@ -52,7 +52,7 @@ std::string nir::Struct::strDump (text::PrintMode mode) const {
 	return s;
 }
 
-void nir::Struct::populate (const std::vector <const nir::Parameter *> & mem) {
+void nir::Struct::populate (const BasicArray <const nir::Parameter *> & mem) {
 	
 	memberArr = mem;
 	

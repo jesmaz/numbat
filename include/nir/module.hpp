@@ -12,7 +12,7 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <vector>
+ 
 
 namespace nir {
 
@@ -26,7 +26,7 @@ struct Module {
 		
 		bool validate () const;
 		
-		Builder registerFunction (std::vector <Type> args, std::vector <Type> ret, const string & name);
+		Builder registerFunction (DynArray <Type> args, DynArray <Type> ret, const string & name);
 		
 		const Block * getEntry () const;
 		const std::map <symbol, Function *> getFunctions () const {return data->functions;}
@@ -40,7 +40,7 @@ struct Module {
 		void build (codegen::Target * target);
 		void holdInst (Instruction * inst);
 		void registerPrimitive (Type::ArithmaticType arith, uint32_t width, const string & name);
-		void registerStruct (std::vector <Type> members, const string & name);
+		void registerStruct (DynArray <Type> members, const string & name);
 		
 		Module ();
 		

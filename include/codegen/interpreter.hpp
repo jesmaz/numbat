@@ -6,7 +6,6 @@
 #include <nir/block.hpp>
 #include <nir/value.hpp>
 #include <set>
-#include <vector>
 
 
 namespace codegen {
@@ -55,7 +54,7 @@ class Interpreter : public TargetVisitor {
 		
 	protected:
 		
-		std::vector <Value> evaluate (const Instruction * val);
+		BasicArray <Value> evaluate (const Instruction * val);
 		
 	private:
 		
@@ -63,7 +62,7 @@ class Interpreter : public TargetVisitor {
 		
 		Interpreter & operator = (const Interpreter & other)=default;
 		
-		virtual void generate (const Function * func, std::vector <uint8_t> & output) {}
+		virtual void generate (const Function * func, BasicArray <uint8_t> & output) {}
 		
 		
 		template <typename T>
@@ -73,8 +72,8 @@ class Interpreter : public TargetVisitor {
 		
 		Value evaluate (Argument val);
 		Value staticCast (const Value & source, const Type * const target);
-		static std::vector <Value> callFunction (const Function * func, const std::vector <Value> & args);
-		std::vector <Value> operator () ();
+		static BasicArray <Value> callFunction (const Function * func, const BasicArray <Value> & args);
+		BasicArray <Value> operator () ();
 		
 		
 		std::map <symbol, Value> lookupTable;

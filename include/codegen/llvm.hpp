@@ -59,7 +59,7 @@ class LLVM : public TargetVisitor {
 		llvm::Function * resolve (const Function * func);
 		llvm::Value * resolve (nir::Argument val);
 		
-		virtual void generate (const Function * func, std::vector <uint8_t> & output) {}
+		virtual void generate (const Function * func, BasicArray <uint8_t> & output) {}
 		
 		llvm::Module * module;
 		llvm::DIBuilder diBuilder;

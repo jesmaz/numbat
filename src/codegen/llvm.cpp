@@ -28,6 +28,7 @@
 #include <nir/function.hpp>
 #include <nir/type/number.hpp>
 #include <utility/config.hpp>
+#include <vector>
 
 
 namespace codegen {

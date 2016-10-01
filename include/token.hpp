@@ -2,7 +2,7 @@
 #define TOKEN_HPP
 
 #include <string>
-#include <vector>
+#include <utility/array.hpp>
 
 
 namespace numbat {
@@ -62,7 +62,7 @@ struct token {
 	token (TOKEN type, const std::string & iden, size_t line=0) : type (type), line (line), iden (iden) {}
 };
 
-typedef std::vector <token> tkstring;
+typedef DynArray <token, 128> tkstring;
 
 
 inline tkstring::const_iterator findEOF (tkstring::const_iterator itt, const tkstring::const_iterator & end) {

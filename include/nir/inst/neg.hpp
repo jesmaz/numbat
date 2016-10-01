@@ -12,7 +12,7 @@ class Neg : public Instruction {
 		
 		bool validate () const {return arg.instr->validate ();}
 		
-		const nir::Instruction * recreate (const std::vector <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Neg (replacmentArgs [0], getIden ());}
+		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Neg (replacmentArgs [0], getIden ());}
 		
 		Argument getArg () const {return arg;}
 		

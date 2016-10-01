@@ -11,11 +11,11 @@ class ParseTreeList : public ParseTreeNode {
 		
 		virtual bool isAggregate () {return true;}
 		virtual bool isList () {return true;}
-		virtual const std::vector <ParseTreeNode *> & getArgs () const {return args;}
-		virtual const std::vector <ParseTreeNode *> releaseArgs () {auto a = args; args = std::vector <PTNode> (); return a;}
+		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return args;}
+		virtual const BasicArray <ParseTreeNode *> releaseArgs () {auto a = args; args = BasicArray <PTNode> (); return a;}
 		
 		ParseTreeList (uint32_t line, uint32_t pos) : ParseTreeNode (ParseTreeNode::NodeType::LIST, line, pos) {}
-		ParseTreeList (const std::vector <PTNode> & args) : ParseTreeNode (ParseTreeNode::NodeType::LIST, args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
+		ParseTreeList (const BasicArray <PTNode> & args) : ParseTreeNode (ParseTreeNode::NodeType::LIST, args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
 		virtual ~ParseTreeList () {for (PTNode n : args) delete n;}
 		
 	protected:
@@ -23,7 +23,7 @@ class ParseTreeList : public ParseTreeNode {
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		std::vector <PTNode> args;
+		BasicArray <PTNode> args;
 		
 };
 

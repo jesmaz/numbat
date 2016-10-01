@@ -13,7 +13,7 @@ void printHelp (char * cmd) {
 
 int main (int argl, char ** argc) {
 	
-	std::vector <char *> files;
+	DynArray <char *> files;
 	
 	for (int i=1; i<argl; ++i) {
 		if (argc [i][0] == '-') {

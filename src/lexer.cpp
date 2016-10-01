@@ -59,7 +59,6 @@ std::string next (const char * source, size_t & pos, size_t length) {
     return str;
 }
 
-
 tkstring lex (const char * source, size_t length) {
 	size_t pos=0, line=0;
 	tkstring tks;

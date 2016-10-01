@@ -350,7 +350,7 @@ Value fromData (const adv_ptr <uint8_t> & ptr, const Type * type) {
 Value::Value () {}
 Value::Value (AbstractValue * absVal) : val (absVal) {}
 Value::Value (const Function * func) {abort ();}
-Value::Value (const std::vector <Value> & members, const Struct * layout) {
+Value::Value (const DynArray <Value> & members, const Struct * layout) {
 	auto & mem = layout->getMemberArr ();
 	assert (mem.size () == members.size ());
 	adv_ptr <uint8_t> bytes (layout->calculateSize (sizeof (Value)), 0);

@@ -38,7 +38,7 @@
 namespace nir {
 
 
-Scope * Scope::declareFunction (const std::vector <const Parameter *> params, const std::vector <const Parameter *> ret, const string iden, LINKAGE linkage) {
+Scope * Scope::declareFunction (const BasicArray <const Parameter *> params, const BasicArray <const Parameter *> ret, const string iden, LINKAGE linkage) {
 	
 	string label = "nbt_" + iden;// + "_-";
 	//for (Type * p : params) label += p->getIden () + "-";
@@ -55,7 +55,7 @@ Scope * Scope::declareFunction (const std::vector <const Parameter *> params, co
 		s = module->newSymbol (iden);
 	} else {
 		auto & fSet = functions [iden];
-		if (!fSet) fSet = new std::vector <Function *>;
+		if (!fSet) fSet = new DynArray <Function *>;
 		fSet->push_back (func);
 		s = module->newSymbol (iden);
 	}
@@ -193,22 +193,22 @@ const Instruction * Scope::createBinary (Argument lhs, Argument rhs, const strin
 	return insertionPoint->give (inst);
 }
 
-const Instruction * Scope::createAdd (const std::vector <Argument> & args) {
-	return createBinary <Add> (args [0], args [1], "add");
+const Instruction * Scope::createAdd (Argument lhs, Argument rhs) {
+	return createBinary <Add> (lhs, rhs, "add");
 }
 
-const Instruction * Scope::createAssign (const std::vector <Argument> & args) {
-	const Type * dref = args [0].instr->getType ()->getDereferenceType ();
+const Instruction * Scope::createAssign (Argument lhs, Argument rhs) {
+	const Type * dref = lhs.instr->getType ()->getDereferenceType ();
 	if (not dref) {
 		report::logMessage (report::ERROR, "Can't assign to a constant");
 		return nullptr;
 	}
-	Argument tsrc = args [1];
-	if (args [1].instr->getType ()->getDereferenceType ()) {
-		tsrc = createGet (args [1]);
+	Argument tsrc = rhs;
+	if (rhs.instr->getType ()->getDereferenceType ()) {
+		tsrc = createGet (rhs);
 	}
 	tsrc = staticCast (tsrc, dref);
-	return createPut (tsrc, args [0]);
+	return createPut (tsrc, lhs);
 }
 
 const Instruction * Scope::createAutoReturn (const Instruction * instr) {
@@ -217,40 +217,39 @@ const Instruction * Scope::createAutoReturn (const Instruction * instr) {
 		Instruction * ret = new Ret ({});
 		return insertionPoint->give (ret);
 	} else {
-		std::vector <Argument> args;
-		for (symbol s : instr->getIdens ()) {
-			args.push_back ({instr, s});
-		}
+		auto args = instr->getIdens ().map <Argument> ([=](symbol s){return Argument {instr, s};});
 		Instruction * ret = new Ret (args);
 		return insertionPoint->give (ret);
 	}
 	
 }
 
-const Instruction * Scope::createBitAnd (const std::vector< Argument > & args) {
-	return createBinary <BitAnd> (args [0], args [1], "bitand");
+const Instruction * Scope::createBitAnd (Argument lhs, Argument rhs) {
+	return createBinary <BitAnd> (lhs, rhs, "bitand");
 }
 
-const Instruction * Scope::createBitNot (const std::vector <Argument> & args) {
-	return insertionPoint->give (new BitNot (args [0], module->newSymbol ("bitnot")));
+const Instruction * Scope::createBitNot (Argument arg) {
+	return insertionPoint->give (new BitNot (arg, module->newSymbol ("bitnot")));
 }
 
-const Instruction * Scope::createBitOr (const std::vector< Argument > & args) {
-	return createBinary <BitOr> (args [0], args [1], "bitor");
+const Instruction * Scope::createBitOr (Argument lhs, Argument rhs) {
+	return createBinary <BitOr> (lhs, rhs, "bitor");
 }
 
-const Instruction * Scope::createBitXor (const std::vector< Argument > & args) {
-	return createBinary <BitXor> (args [0], args [1], "bitxor");
+const Instruction * Scope::createBitXor (Argument lhs, Argument rhs) {
+	return createBinary <BitXor> (lhs, rhs, "bitxor");
 }
 
-const Instruction * Scope::createCall (const Function * func, const std::vector <Argument> & args) {
+const Instruction * Scope::createCall (const Function * func, const BasicArray <Argument> & args) {
 	
 	//TODO: appropriate casting
-	std::vector <symbol> idens (func->getRet ().size (), nullptr);
+	BasicArray <symbol> idens (func->getRet ().size ());
 	for (symbol & s : idens) {
 		s = module->newSymbol ("");
 	}
-	Instruction * inst = new DirectCall (func, args, idens);
+	BasicArray <Argument> svArgs (args.size ());
+	std::copy (args.begin (), args.end (), svArgs.begin ());
+	Instruction * inst = new DirectCall (func, svArgs, idens);
 	return insertionPoint->give (inst);
 	
 }
@@ -270,34 +269,34 @@ const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string &
 	return insertionPoint->give (inst);
 }
 
-const Instruction * Scope::createCmpEQ (const std::vector< Argument > & args) {
-	return createCmp <Equal> (args [0], args [1], "equal");
+const Instruction * Scope::createCmpEQ (Argument lhs, Argument rhs) {
+	return createCmp <Equal> (lhs, rhs, "equal");
 }
 
-const Instruction * Scope::createCmpGT (const std::vector< Argument > & args) {
-	return createCmp <Less> (args [1], args [0], "greater");
+const Instruction * Scope::createCmpGT (Argument lhs, Argument rhs) {
+	return createCmp <Less> (lhs, rhs, "greater");
 }
 
-const Instruction * Scope::createCmpGTE (const std::vector< Argument > & args) {
-	return createCmp <LessEqual> (args [1], args [0], "greaterequal");
+const Instruction * Scope::createCmpGTE (Argument lhs, Argument rhs) {
+	return createCmp <LessEqual> (lhs, rhs, "greaterequal");
 }
 
-const Instruction * Scope::createCmpLT (const std::vector <Argument> & args) {
-	return createCmp <Less> (args [0], args [1], "less");
+const Instruction * Scope::createCmpLT (Argument lhs, Argument rhs) {
+	return createCmp <Less> (lhs, rhs, "less");
 }
 
-const Instruction * Scope::createCmpLTE (const std::vector< Argument > & args) {
-	return createCmp <LessEqual> (args [0], args [1], "lessequal");
+const Instruction * Scope::createCmpLTE (Argument lhs, Argument rhs) {
+	return createCmp <LessEqual> (lhs, rhs, "lessequal");
 }
 
-const Instruction * Scope::createCmpNE (const std::vector< Argument > & args) {
-	return createCmp <NEqual> (args [0], args [1], "nequal");
+const Instruction * Scope::createCmpNE (Argument lhs, Argument rhs) {
+	return createCmp <NEqual> (lhs, rhs, "nequal");
 }
 
 const Instruction * Scope::createConstant (const Type * type, const string & val, const string & iden) {
 	
 	//TODO: Ensure the type is sensible
-	std::vector <Value> values;
+	BasicArray <Value> values (1);
 	assert (type);
 	errno = 0;
 	int err = 0;
@@ -309,19 +308,19 @@ const Instruction * Scope::createConstant (const Type * type, const string & val
 		case Type::FPINT: {
 			double d = std::strtod (val.c_str (), &end);
 			err = errno;
-			values.push_back (Value (d));
+			values [0] = Value (d);
 			break;
 		}
 		case Type::INT: {
 			int64_t i = std::strtoll (val.c_str (), &end, 0);
 			err = errno;
-			values.push_back (Value (i));
+			values [0] = Value (i);
 			break;
 		}
 		case Type::UINT: {
 			uint64_t u = std::strtoull (val.c_str (), &end, 0);
 			err = errno;
-			values.push_back (Value (u));
+			values [0] = Value (u);
 			break;
 		}
 	}
@@ -339,8 +338,8 @@ const Instruction * Scope::createConstant (const Type * type, const string & val
 	
 }
 
-const Instruction * Scope::createDiv (const std::vector <Argument> & args) {
-	return createBinary <Div> (args [0], args [1], "div");
+const Instruction * Scope::createDiv (Argument lhs, Argument rhs) {
+	return createBinary <Div> (lhs, rhs, "div");
 }
 
 Argument Scope::createGet (Argument src) {
@@ -369,17 +368,17 @@ const Instruction * Scope::createImportHandle (const Scope * scope, const string
 	return variables [iden] = inst;
 }
 
-const Instruction * Scope::createLNot (const std::vector< Argument > & args) {
-	return insertionPoint->give (new BitNot (resolveType ("bool"), args [0], module->newSymbol ("bitnot")));
+const Instruction * Scope::createLNot (Argument arg) {
+	return insertionPoint->give (new BitNot (resolveType ("bool"), arg, module->newSymbol ("bitnot")));
 }
 
-const Instruction * Scope::createMul (const std::vector <Argument> & args) {
-	return createBinary <Mul> (args [0], args [1], "mul");
+const Instruction * Scope::createMul (Argument lhs, Argument rhs) {
+	return createBinary <Mul> (lhs, rhs, "mul");
 }
 
-const Instruction * Scope::createNeg (const std::vector <Argument> & args) {
+const Instruction * Scope::createNeg (Argument arg) {
 	
-	Instruction * instr = new Neg (args [0], module->newSymbol ("neg"));
+	Instruction * instr = new Neg (arg, module->newSymbol ("neg"));
 	return insertionPoint->give (instr);
 	
 }
@@ -414,23 +413,23 @@ const Instruction * Scope::createReinterpret (Argument ptr, const Type * type, c
 	return insertionPoint->give (new Reinterpret (type, ptr, module->newSymbol (iden)));
 }
 
-const Instruction * Scope::createRem (const std::vector <Argument> & args) {
-	return createBinary <Rem> (args [0], args [1], "rem");
+const Instruction * Scope::createRem (Argument lhs, Argument rhs) {
+	return createBinary <Rem> (lhs, rhs, "rem");
 }
 
-const Instruction * Scope::createStructValue (const Type * const type, std::vector <Argument> vals, const string & iden) {
+const Instruction * Scope::createStructValue (const Type * const type, BasicArray <Argument> vals, const string & iden) {
 	
-	const Instruction * inst = new Composite (type, vals, module->newSymbol (iden));
+	const Instruction * inst = new Composite (type, {vals.begin (), vals.end ()}, module->newSymbol (iden));
 	return insertionPoint->give (inst);
 	
 }
 
-const Instruction * Scope::createSub (const std::vector <Argument> & args) {
-	if (typeid (*args [0].instr) == typeid (Constant) and typeid (*args [1].instr) == typeid (Constant) and args [0].instr->getType ()->getArithmaticType () == Type::UINT) {
-		Instruction * inst = new Sub (resolveType ("int64"), args [0], args [1], module->newSymbol ("sub"));
+const Instruction * Scope::createSub (Argument lhs, Argument rhs) {
+	if (typeid (*lhs.instr) == typeid (Constant) and typeid (*rhs.instr) == typeid (Constant) and lhs.instr->getType ()->getArithmaticType () == Type::UINT) {
+		Instruction * inst = new Sub (resolveType ("int64"), lhs, rhs, module->newSymbol ("sub"));
 		return insertionPoint->give (inst);
 	} else {
-		return createBinary <Sub> (args [0], args [1], "sub");
+		return createBinary <Sub> (lhs, rhs, "sub");
 	}
 }
 

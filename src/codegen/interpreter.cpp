@@ -10,7 +10,7 @@ namespace codegen {
 
 using namespace nir;
 
-std::vector <Value> Interpreter::callFunction (const Function * func, const std::vector <Value> & args) {
+BasicArray <Value> Interpreter::callFunction (const Function * func, const BasicArray <Value> & args) {
 	
 	Interpreter call (func->getEntryPoint ());
 	auto & funcArgs = func->getArgs ();
@@ -123,7 +123,7 @@ void Interpreter::visit (const Block & block) {
 void Interpreter::visit (const Composite & comp) {
 	
 	auto l = comp.getArguments ().size ();
-	std::vector <Value> vals (l);
+	DynArray <Value> vals (l);
 	for (auto i=0ul; i<l; ++i) {
 		vals [i] = evaluate (comp.getArguments () [i]);
 	}
@@ -158,8 +158,7 @@ void Interpreter::visit (const Div & div) {
 
 void Interpreter::visit (const DirectCall & call) {
 	
-	std::vector <Value> args;
-	args.reserve (call.getArgs ().size ());
+	DynArray <Value> args;
 	for (auto & a : call.getArgs ()) {
 		args.push_back (evaluate (a));
 	}
@@ -349,9 +348,9 @@ std::string Interpreter::operator ()(const nir::Instruction * val) {
 	
 }
 
-std::vector <Value> Interpreter::operator ()() {
+BasicArray <Value> Interpreter::operator ()() {
 	
-	std::vector <Value> last;
+	DynArray <Value> last;
 	while (instItt) {
 		auto & val = *instItt;
 		++instItt;
@@ -365,10 +364,10 @@ std::vector <Value> Interpreter::operator ()() {
 	
 }
 
-std::vector <Value> Interpreter::evaluate (const Instruction * val) {
+BasicArray <Value> Interpreter::evaluate (const Instruction * val) {
 	
 	size_t l=val->getIdens ().size ();
-	std::vector <Value> vals (l);
+	DynArray <Value> vals (l);
 	const auto & idens = val->getIdens ();
 	bool calc = false;
 	

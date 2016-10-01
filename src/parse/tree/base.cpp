@@ -1,7 +1,7 @@
 #include <parse/tree/base.hpp>
 #include <utility/report.hpp>
 
-const std::vector <ParseTreeNode *> ParseTreeNode::defaultArgs;
+const BasicArray <ParseTreeNode *> ParseTreeNode::defaultArgs;
 const string ParseTreeNode::defaultStr;
 
 const nir::Instruction * ParseTreeNode::build (nir::Scope *) {

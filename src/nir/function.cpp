@@ -7,13 +7,8 @@
 namespace nir {
 
 
-auto getInstType = [](const std::vector <const Parameter *> & args) {
-	std::vector <const Type *> type;
-	type.reserve (args.size ());
-	for (auto * arg : args) {
-		type.push_back (arg->getType ());
-	}
-	return type;
+auto getInstType = [](const BasicArray <const Parameter *> & args) {
+	return args.map <const Type *> ([](const Parameter * p){return p->getType ();});
 };
 
 
@@ -42,7 +37,7 @@ void Function::pushBlock (Block * block) {
 
 Function::Function (const std::string & label, LINKAGE linkage) : entry (new Block (&(this->label))), blocks ({entry}), label (label), linkage (linkage) {}
 
-Function::Function (std::vector <const Parameter *> args, std::vector <const Parameter *> ret, const std::string & label, LINKAGE linkage) : entry (new Block (&(this->label))), blocks ({entry}), args (args), ret (ret), retTypes (getInstType (ret)), type (FunctionType::get (getInstType (args), retTypes)), label (label), linkage (linkage) {}
+Function::Function (const BasicArray <const Parameter *> & args, const BasicArray <const Parameter *> & ret, const std::string & label, LINKAGE linkage) : entry (new Block (&(this->label))), blocks ({entry}), args (args), ret (ret), retTypes (getInstType (ret)), type (FunctionType::get (getInstType (args), retTypes)), label (label), linkage (linkage) {}
 
 
 };

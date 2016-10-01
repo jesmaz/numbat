@@ -17,7 +17,7 @@ class CTimeInterpreter : public Interpreter {
 	public:
 		
 		const nir::Instruction * tryfold (const nir::Instruction * instr);
-		void replaceBody (const std::vector <nir::Block *> & body);
+		void replaceBody (const DynArray <nir::Block *> & body);
 		
 		void visit (const nir::DirectCall & call);
 		
@@ -109,7 +109,7 @@ const nir::Instruction * CTimeInterpreter::tryfold (const nir::Instruction * ins
 }
 
 
-void CTimeInterpreter::replaceBody (const std::vector <nir::Block *> & body) {
+void CTimeInterpreter::replaceBody (const DynArray <nir::Block *> & body) {
 	
 	for (nir::Block * block : body) {
 		for (const nir::Instruction *& instr : block->getInstructions ()) {

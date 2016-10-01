@@ -1,11 +1,11 @@
 #include <nir/inst/functionPointer.hpp>
 #include <nir/scope.hpp>
 #include <parse/tree/call.hpp>
+#include <utility/array.hpp>
 #include <utility/report.hpp>
 
-auto buildArgs = [](const std::vector <PTNode> & args, nir::Scope * scope) {
-	std::vector <nir::Argument> conv;
-	conv.reserve (args.size ());
+auto buildArgs = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
+	DynArray <nir::Argument> conv;
 	for (auto & arg : args) {
 		assert (arg);
 		const nir::Instruction * instr = arg->build (scope);
