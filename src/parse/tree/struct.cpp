@@ -22,9 +22,10 @@ const nir::Instruction * Struct::build (nir::Scope * scope) {
 	conv.reserve (members.size ());
 	for (auto & arg : members) {
 		auto * p = arg->buildParameter (scope);
-		assert (p);
-		assert (typeid (*p) == typeid (nir::Parameter));
-		conv.push_back (static_cast <const nir::Parameter *> (p));
+		if (p) {
+			assert (typeid (*p) == typeid (nir::Parameter));
+			conv.push_back (static_cast <const nir::Parameter *> (p));
+		}
 	}
 	type->populate (conv);
 	return scope->createParameter (type);

@@ -8,9 +8,12 @@ auto buildParams = [](const std::vector <PTNode> & args, nir::Scope * scope) {
 	conv.reserve (args.size ());
 	for (auto & arg : args) {
 		auto * p = arg->buildParameter (scope);
-		assert (p);
-		assert (typeid (*p) == typeid (nir::Parameter));
-		conv.push_back (static_cast <const nir::Parameter *> (p));
+		if (p) {
+			assert (typeid (*p) == typeid (nir::Parameter));
+			conv.push_back (static_cast <const nir::Parameter *> (p));
+		} else {
+			return std::vector <const nir::Parameter *> ();
+		}
 	}
 	return conv;
 };

@@ -449,7 +449,9 @@ const Instruction * Scope::resolve (Argument parent, const string & iden) {
 		return insertionPoint->give (add);
 		
 	}
-	abort ();
+	
+	report::logMessage (report::ERROR, "Can't resolve '" + iden + "'");
+	return nullptr;
 	
 }
 

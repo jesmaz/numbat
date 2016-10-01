@@ -6,7 +6,9 @@ const nir::Instruction * ParseTreeIdentifier::build (nir::Scope * scope) {
 }
 
 const nir::Instruction * ParseTreeIdentifier::buildAllocate (nir::Scope * scope, const string & iden) {
-	return scope->allocateVariable (resolveType (scope), iden);
+	auto * t = resolveType (scope);
+	if (not t) return nullptr;
+	return scope->allocateVariable (t, iden);
 }
 
 const nir::Type * ParseTreeIdentifier::resolveType (nir::Scope * scope) {

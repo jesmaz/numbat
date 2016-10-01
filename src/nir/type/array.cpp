@@ -15,6 +15,7 @@ Array * Array::arrayOf (const Type * t) {
 	if (itt != arrayTypes.end ()) {
 		return itt->second;
 	} else {
+		if (not t) return nullptr;
 		Array * a = new Array ();
 		Parameter * ptr = new Parameter (t->getPointerTo (), "data");
 		Parameter * len = new Parameter (Number::getNumberType (Type::UINT, 64), "len");
