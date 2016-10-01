@@ -37,7 +37,9 @@ const nir::Instruction * ParseTreeIndex::buildAllocate (nir::Scope * scope, cons
 		}
 	}
 	
-	return scope->allocateArray (index->resolveType (scope), {s, s->getIden ()}, iden);
+	auto * t = index->resolveType (scope);
+	if (not t or not s) return nullptr;
+	return scope->allocateArray (t, {s, s->getIden ()}, iden);
 	
 }
 
