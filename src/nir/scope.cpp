@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <iostream>
 #include <map>
 #include <nir/block.hpp>
@@ -297,20 +298,41 @@ const Instruction * Scope::createConstant (const Type * type, const string & val
 	//TODO: Ensure the type is sensible
 	std::vector <Value> values;
 	assert (type);
+	errno = 0;
+	int err = 0;
+	char * end=nullptr;
 	switch (type->getArithmaticType ()) {
 		case Type::DECINT:
 		case Type::DEFAULT:
 			assert (false);
-		case Type::FPINT:
-			values.push_back (Value (std::stod (val)));
+		case Type::FPINT: {
+			double d = std::strtod (val.c_str (), &end);
+			err = errno;
+			values.push_back (Value (d));
 			break;
-		case Type::INT:
-			values.push_back (Value (int64_t (std::stoll (val))));
+		}
+		case Type::INT: {
+			int64_t i = std::strtoll (val.c_str (), &end, 0);
+			err = errno;
+			values.push_back (Value (i));
 			break;
-		case Type::UINT:
-			values.push_back (Value (uint64_t (std::stoull (val))));
+		}
+		case Type::UINT: {
+			uint64_t u = std::strtoull (val.c_str (), &end, 0);
+			err = errno;
+			values.push_back (Value (u));
 			break;
+		}
 	}
+	
+	if (err == ERANGE) {
+		
+		report::logMessage (report::WARNING, "'" + val + "' is out of range, actual value will be capped at the maximum");
+		
+	} else if (*end) {
+		report::logMessage (report::ERROR, "'" + val + "' is not a valid number");
+	}
+	
 	Constant * inst = new Constant ({type}, values, {module->newSymbol (iden)});
 	return insertionPoint->give (inst);
 	
