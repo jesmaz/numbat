@@ -187,7 +187,8 @@ const nir::Instruction * SpecificOperator <OPERATION::CMPNE>::defBuild (nir::Sco
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CONCAT>::defBuild (nir::Scope * scope) {
-	abort ();
+	report::logMessage (report::ERROR, "", getLine (), getPos (), "Can't concatenate '" + args [0]->toString (text::PLAIN) + "' to '" + args [0]->toString (text::PLAIN) + "'");
+	return nullptr;
 }
 
 template <>
@@ -204,7 +205,8 @@ const nir::Instruction * SpecificOperator <OPERATION::DIV>::defBuild (nir::Scope
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::IN>::defBuild (nir::Scope * scope) {
-	abort ();
+	report::logMessage (report::ERROR, "", getLine (), getPos (), "'" + args [0]->toString (text::PLAIN) + "' does not support the in operation");
+	return nullptr;
 }
 
 template <>
