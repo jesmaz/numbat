@@ -60,6 +60,7 @@ struct Module {
 			std::set <Scope *> scopes;
 			Scope * globalScope=nullptr;
 			size_t n=0;
+			~Data ();
 		};
 		
 		std::shared_ptr <Data> data;

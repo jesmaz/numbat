@@ -119,5 +119,14 @@ Module::Module () : data (new Module::Data) {
 	registerPrimitive (nir::Type::FPINT, 128, "quad");
 }
 
+Module::Data::~Data () {
+	for (symbol s : symbols) {
+		delete s;
+	}
+	delete globalScope;
+	for (const Scope * s : scopes) {
+		delete s;
+	}
+}
 
 };
