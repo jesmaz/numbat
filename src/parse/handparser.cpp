@@ -18,7 +18,8 @@
 #include <parse/tree/slice.hpp>
 #include <parse/tree/variable.hpp>
 #include <utility/report.hpp>
-
+#define __ENABLE__PROFILING__
+#include <utility/timer.hpp>
 
 enum class Symbol : char {
 	AND,
@@ -268,7 +269,7 @@ struct CodeQueue {
 	Match shiftPop (const std::string & seen, std::set <string> accepted, int precedence);
 	void markDirty ();
 	void shiftPop ();
-	void update (uint32_t n);
+	void update (uint32_t n=128);
 	CodeQueue (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) : itt (start), end (end) {}
 	numbat::lexer::tkstring::const_iterator itt, safeitt, end;
 	std::deque <numbat::lexer::tkstring::const_iterator> itts;
@@ -337,14 +338,17 @@ PTNode parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkst
 }
 
 PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
-	
+	PROFILE ("parseAssignment");
 	if (not lhs) {
 		lhs = parseList (queue);
 	}
 	
 	Match opp = queue->shiftPop (" ", allocateOperators);
 	
-	if (opp.ctr == nullptr) return errorUnexpectedToken (queue, "an assignment operation");
+	if (opp.ctr == nullptr) {
+		delete lhs;
+		return errorUnexpectedToken (queue, "an assignment operation");
+	}
 	
 	PTNode rhs = parseList (queue);
 	
@@ -358,7 +362,7 @@ PTNode parseAssignment (CodeQueue * queue, PTNode lhs=nullptr) {
 }
 
 PTNode parseAtom (CodeQueue * queue) {
-	
+	PROFILE ("parseAtom");
 	PTNode atom = nullptr;
 	switch (queue->peak ()) {
 		case Symbol::DO:
@@ -391,6 +395,7 @@ PTNode parseAtom (CodeQueue * queue) {
 			queue->shiftPop ();
 			atom = parseList (queue);
 			if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+				delete atom;
 				return errorUnexpectedToken (queue, "')'");
 			}
 			queue->shiftPop ();
@@ -416,10 +421,12 @@ PTNode parseAtom (CodeQueue * queue) {
 				// Function call
 				queue->shiftPop ();
 				auto args = parseArguments (queue);
-				atom = new ParseTreeCall (atom, {args.begin (), args.end ()});
 				if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+					delete atom;
+					delAll (args);
 					return errorUnexpectedToken (queue, "')'");
 				}
+				atom = new ParseTreeCall (atom, {args.begin (), args.end ()});
 				queue->shiftPop ();
 				break;
 			}
@@ -427,6 +434,7 @@ PTNode parseAtom (CodeQueue * queue) {
 				// Scope resolution
 				queue->shiftPop ();
 				if (queue->peak () != Symbol::IDENTIFIER) {
+					delete atom;
 					return errorUnexpectedToken (queue, "an identifier");
 				}
 				numbat::lexer::token token = queue->popToken ();
@@ -448,7 +456,7 @@ PTNode parseAtom (CodeQueue * queue) {
 }
 
 PTNode parseBlock (CodeQueue * queue) {
-	
+	PROFILE ("parseBlock");
 	DynArray <PTNode> body;
 	while (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT and queue->peak () != Symbol::__NONE__) {
 		if (queue->peak () == Symbol::SYMBOL_AT) {
@@ -466,6 +474,7 @@ PTNode parseBlock (CodeQueue * queue) {
 	}
 	
 	if (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT) {
+		delAll (body);
 		return errorUnexpectedToken (queue, "'}'");
 	}
 	
@@ -479,7 +488,7 @@ PTNode parseBlock (CodeQueue * queue) {
 }
 
 PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lhs=nullptr) {
-	
+	PROFILE ("parseExpression");
 	if (not lhs) {
 		
 		Match opp = queue->shiftPop ("", prefixOperators);
@@ -517,7 +526,7 @@ PTNode parseExpression (CodeQueue * queue, int precedence=__INT_MAX__, PTNode lh
 }
 
 PTNode parseFunction (CodeQueue * queue) {
-	
+	PROFILE ("parseFunction");
 	nir::LINKAGE linkage = nir::LINKAGE::LOCAL;
 	if (queue->peak () == Symbol::EXTERN) {
 		linkage = nir::LINKAGE::EXTERNAL;
@@ -544,6 +553,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	BasicArray <PTNode> params = parseParameterList (queue), type;
 	
 	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+		delAll (params);
 		return errorUnexpectedToken (queue, "')'");
 	}
 	queue->shiftPop ();
@@ -552,6 +562,7 @@ PTNode parseFunction (CodeQueue * queue) {
 		queue->shiftPop ();
 		queue->shiftPop ();
 		if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
+			delAll (params);
 			return errorUnexpectedToken (queue, "'('");
 		}
 		queue->shiftPop ();
@@ -559,6 +570,8 @@ PTNode parseFunction (CodeQueue * queue) {
 		type = parseParameterList (queue);
 		
 		if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+			delAll (params);
+			delAll (type);
 			return errorUnexpectedToken (queue, "')'");
 		}
 		queue->shiftPop ();
@@ -574,7 +587,7 @@ PTNode parseFunction (CodeQueue * queue) {
 }
 
 PTNode parseIfElse (CodeQueue * queue) {
-	
+	PROFILE ("parseIfElse");
 	// drop if token
 	queue->shiftPop ();
 	
@@ -586,6 +599,7 @@ PTNode parseIfElse (CodeQueue * queue) {
 	PTNode cond = parseExpression (queue);
 	
 	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+		delete cond;
 		return errorUnexpectedToken (queue, "')'");
 	}
 	queue->shiftPop ();
@@ -606,7 +620,7 @@ PTNode parseIfElse (CodeQueue * queue) {
 }
 
 PTNode parseImport (CodeQueue * queue) {
-	
+	PROFILE ("parseImport");
 	// drop import token
 	queue->shiftPop ();
 	
@@ -623,6 +637,7 @@ PTNode parseImport (CodeQueue * queue) {
 			path.push_back (new ParseTreeIdentifier (tkn.line, 0, tkn.iden));
 			
 		} else {
+			delAll (path);
 			return errorUnexpectedToken (queue, "a literal or an identifier");
 		}
 		
@@ -643,6 +658,7 @@ PTNode parseImport (CodeQueue * queue) {
 			iden = new ParseTreeIdentifier (tkn.line, 0, tkn.iden);
 			
 		} else {
+			delAll (path);
 			return errorUnexpectedToken (queue, "an identifier");
 		}
 	}
@@ -652,7 +668,7 @@ PTNode parseImport (CodeQueue * queue) {
 }
 
 PTNode parseList (CodeQueue * queue, PTNode prev) {
-	
+	PROFILE ("parseList");
 	DynArray <PTNode> args;
 	if (prev) {
 		args.push_back (prev);
@@ -674,7 +690,7 @@ PTNode parseList (CodeQueue * queue, PTNode prev) {
 }
 
 PTNode parseProgram (CodeQueue * queue) {
-	
+	PROFILE ("parseProgram");
 	DynArray <PTNode> body;
 	while (queue->more ()) {
 		body.push_back (parseStatement (queue));
@@ -689,7 +705,7 @@ PTNode parseProgram (CodeQueue * queue) {
 }
 
 PTNode parseStatement (CodeQueue * queue) {
-	
+	PROFILE ("parseStatement");
 	PTNode lhs=nullptr;
 	BasicArray <PTNode> metaTags = parseMetaTags (queue);
 	
@@ -744,7 +760,7 @@ PTNode parseStatement (CodeQueue * queue) {
 }
 
 PTNode parseSlice (CodeQueue * queue, PTNode owner) {
-	
+	PROFILE ("parseSlice");
 	//Drop '['
 	queue->shiftPop ();
 	
@@ -757,6 +773,8 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 			queue->shiftPop ();
 			return new ParseTreeSliceForEach (tkn.line, 0, tkn.iden, range);
 		}
+		
+		delete range;
 		return errorUnexpectedToken (queue, "]");
 		
 	}
@@ -812,16 +830,22 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 			}
 		}
 		
+		delete index;
+		delete end;
+		delete step;
 		return errorUnexpectedToken (queue, "slice");
 		
 	}
 	
+	delete index;
+	delete end;
+	delete step;
 	return errorUnexpectedToken (queue, "]");
 	
 }
 
 PTNode parseStruct (CodeQueue * queue) {
-	
+	PROFILE ("parseStruct");
 	// Drop struct keyword
 	numbat::lexer::token token = queue->popToken ();
 	
@@ -836,6 +860,7 @@ PTNode parseStruct (CodeQueue * queue) {
 		queue->shiftPop ();
 		members = parseParameterList (queue);
 		if (queue->peak () != Symbol::SYMBOL_BRACE_RIGHT) {
+			delAll (members);
 			PTNode err = errorUnexpectedToken (queue, "'}' or ','");
 			if (queue->peak () == Symbol::SYMBOL_BRACE_RIGHT) queue->shiftPop ();
 			return err;
@@ -848,7 +873,7 @@ PTNode parseStruct (CodeQueue * queue) {
 }
 
 PTNode parseVariable (CodeQueue * queue, PTNode type) {
-	
+	PROFILE ("parseVariable");
 	numbat::lexer::token token = queue->popToken ();
 	
 	if (queue->peak () == Symbol::COLON) {
@@ -871,13 +896,14 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 		
 	}
 	
+	delete type;
 	return errorUnexpectedToken (queue, "':' or end of expression");;
 	
 }
 
 
 BasicArray <PTNode> parseArguments (CodeQueue * queue) {
-	
+	PROFILE ("parseArguments");
 	Symbol next = queue->peak ();
 	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT) return {};
 	
@@ -903,7 +929,7 @@ BasicArray <PTNode> parseArguments (CodeQueue * queue) {
 }
 
 BasicArray <PTNode> parseMetaTags (CodeQueue * queue) {
-	
+	PROFILE ("parseMetaTags");
 	DynArray <PTNode> metaTags;
 	while (queue->peak () == Symbol::SYMBOL_AT) {
 		
@@ -929,7 +955,7 @@ BasicArray <PTNode> parseMetaTags (CodeQueue * queue) {
 }
 
 BasicArray <PTNode> parseParameterList (CodeQueue * queue) {
-	
+	PROFILE ("parseParameterList");
 	Symbol next = queue->peak ();
 	if (next == Symbol::SYMBOL_PARENRHESES_RIGHT or next == Symbol::SYMBOL_BRACE_RIGHT) return {};
 	
@@ -977,14 +1003,14 @@ BasicArray <PTNode> parseParameterList (CodeQueue * queue) {
 
 bool CodeQueue::more() {
 	
-	if (itts.empty ()) update (32);
+	if (itts.empty ()) update ();
 	return not itts.empty ();
 	
 }
 
 Symbol CodeQueue::peak () {
 	
-	if (itts.empty ()) update (32);
+	if (itts.empty ()) update ();
 	if (syms.empty ()) {
 		return Symbol::__NONE__;
 	}
@@ -1004,7 +1030,7 @@ Symbol CodeQueue::peak (uint32_t index) {
 
 numbat::lexer::token CodeQueue::peakToken() {
 	
-	if (syms.empty ()) update (32);
+	if (syms.empty ()) update ();
 	if (syms.empty ()) return *safeitt;
 	auto t = itts.front ();
 	return *t;
@@ -1013,7 +1039,7 @@ numbat::lexer::token CodeQueue::peakToken() {
 
 numbat::lexer::token CodeQueue::popToken() {
 	
-	if (syms.empty ()) update (32);
+	if (syms.empty ()) update ();
 	auto t = itts.front ();
 	syms = syms.substr (1);
 	itts.pop_front ();
@@ -1024,7 +1050,7 @@ numbat::lexer::token CodeQueue::popToken() {
 
 void CodeQueue::shiftPop () {
 	
-	if (syms.empty ()) update (32);
+	if (syms.empty ()) update ();
 	syms = syms.substr (1);
 	itts.pop_front ();
 	dirty = false;
@@ -1032,8 +1058,8 @@ void CodeQueue::shiftPop () {
 }
 
 Match CodeQueue::shiftPop (const std::string & seen, std::set <string> accepted, int precedence) {
-	
-	if (syms.size () < 8) update (32);
+	PROFILE ("shiftPop");
+	if (syms.size () < 8) update ();
 	string match = seen + syms.substr (0, 1);
 	uint8_t index=1;
 	auto acpItt = accepted.lower_bound (match);
@@ -1087,9 +1113,10 @@ void CodeQueue::markDirty () {
 }
 
 void CodeQueue::update (uint32_t n) {
-	
+	PROFILE ("update");
 	while (syms.size () < n) {
 		
+		PROFILE ("update - loop body");
 		while (itt != end and (itt->type == numbat::lexer::TOKEN::whitespace or itt->type == numbat::lexer::TOKEN::indent)) ++itt;
 		if (itt==end) return;
 		
@@ -1117,14 +1144,18 @@ void CodeQueue::update (uint32_t n) {
 			case numbat::lexer::TOKEN::semicolon:
 				sym = Symbol::SEMICOLON;
 				break;
-			default:
-				if (symbolMap.count (itt->iden)) {
-					sym = symbolMap [itt->iden];
+			default: {
+				PROFILE ("update - loop body - symb lookup");
+				auto sym_itt = symbolMap.find (itt->iden);
+				if (sym_itt != symbolMap.end ()) {
+					sym = sym_itt->second;;
 				} else {
+					PROFILE ("update - loop body - symb lookup - log");
 					report::logMessage (report::ERROR, "", itt->line, 0, "Unidentified symbol '" + itt->iden + "'");
 					sym = Symbol::__NONE__;
 				}
 				break;
+			}
 		}
 		syms.push_back (char (sym));
 		++itt;

@@ -43,6 +43,8 @@ class ParseTree : public ParseTreeNode {
 			}
 		}
 		
+		virtual ~ParseTree () {delAll (body);}
+		
 	protected:
 	private:
 		

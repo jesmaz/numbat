@@ -24,7 +24,7 @@ class MetaTags : public ParseTreeNode {
 		virtual void push_back (ParseTreeNode * e) {componant->push_back (e);}
 		
 		MetaTags (const BasicArray <PTNode> & tags, PTNode componant) : ParseTreeNode (componant->getType (), componant->getLine (), componant->getPos ()), tags (tags), componant (componant) {}
-		virtual ~MetaTags () {for (auto t : tags) delete t; delete componant;}
+		virtual ~MetaTags () {delAll (tags); delete componant;}
 		
 	protected:
 	private:

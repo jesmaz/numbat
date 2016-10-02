@@ -76,6 +76,7 @@ struct Block {
 		void setFallthrough (Block * fallthrough) {this->fallthrough = fallthrough;}
 		
 		Block (symbol name) : name (name) {}
+		~Block ();
 		
 	protected:
 	private:

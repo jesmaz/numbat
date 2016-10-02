@@ -127,6 +127,9 @@ Module::Data::~Data () {
 	for (const Scope * s : scopes) {
 		delete s;
 	}
+	for (auto pair : functions) {
+		delete pair.second;
+	}
 }
 
 };

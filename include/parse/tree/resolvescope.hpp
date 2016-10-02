@@ -18,6 +18,8 @@ struct ResolveScope : ParseTreeNode {
 		
 		ResolveScope (PTNode parent, const string & iden) : ParseTreeNode (ParseTreeNode::NodeType::EXPRESSION, parent->getLine (), parent->getPos ()), parent (parent), iden (iden) {}
 		
+		virtual ~ResolveScope () {delete parent;}
+		
 	protected:
 	private:
 		

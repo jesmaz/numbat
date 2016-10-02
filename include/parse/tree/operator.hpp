@@ -18,7 +18,7 @@ class GenericOperator : public ParseTreeNode {
 		
 		GenericOperator (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		GenericOperator (const string & iden, std::initializer_list <PTNode> args) : ParseTreeNode ((*args.begin ())->getLine (), (*args.begin ())->getPos ()), iden (iden), args (args) {}
-		virtual ~GenericOperator () {for (PTNode n : args) delete n;}
+		virtual ~GenericOperator () {delAll (args);}
 		
 	protected:
 		

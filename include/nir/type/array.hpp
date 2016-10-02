@@ -2,6 +2,7 @@
 
 
 #include <map>
+#include <memory>
 #include <nir/type.hpp>
 #include <nir/type/struct.hpp>
 
@@ -31,7 +32,7 @@ class Array : public Type {
 		
 		Struct type;
 		
-		static std::map <const Type *, Array *> arrayTypes;
+		static std::map <const Type *, std::unique_ptr <Array>> arrayTypes;
 		
 };
 

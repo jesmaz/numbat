@@ -65,6 +65,10 @@ struct StopWatch {
 std::set <string> StopWatch::SW_Report= {};
 size_t StopWatch::SW_Count = 0;
 
+#ifdef __ENABLE__PROFILING__
 #define PROFILE(str) \
 static StopWatch __PROFIER_SW__ (str); \
 StopWatch::Lap __PROFIER_SW__LAP__ (__PROFIER_SW__);
+#else
+#define PROFILE(str)
+#endif

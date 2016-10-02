@@ -292,3 +292,11 @@ struct DynArray : public BasicArray <T> {
 		size_t capacity;
 		
 };
+
+
+template <typename T>
+inline void delAll (const BasicArray <T *> & arr) {
+	for (T * n : arr) {
+		delete n;
+	}
+}

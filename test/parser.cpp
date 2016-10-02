@@ -39,13 +39,17 @@ int main (int argl, char ** argc) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				print (parse (prog));
+				auto n = parse (prog);
+				print (n);
+				delete n;
 				std::cout << std::endl;
 				prog = line;
 			}
 		}
 		if (not prog.empty()) {
-			print (parse (prog));
+			auto n = parse (prog);
+			print (n);
+			delete n;
 		}
 		
 	} else {
@@ -54,7 +58,9 @@ int main (int argl, char ** argc) {
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
-			print (parse (prog));
+			auto n = parse (prog);
+			print (n);
+			delete n;
 			std::cout << "########" << f << "########" << std::endl;
 		}
 	}

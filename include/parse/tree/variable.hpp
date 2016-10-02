@@ -20,6 +20,8 @@ class ParseTreeVariable : public ParseTreeNode {
 		ParseTreeVariable (PTNode vType, PTNode iden) : ParseTreeNode (iden->getLine (), iden->getPos ()), vType (vType), iden (iden), inst (nullptr) {}
 		ParseTreeVariable (PTNode vType, PTNode iden, PTNode inst) : ParseTreeNode (iden->getLine (), iden->getPos ()), vType (vType), iden (iden), inst (inst) {}
 		
+		virtual ~ParseTreeVariable () {delete vType; delete iden; delete inst;}
+		
 	protected:
 	private:
 		

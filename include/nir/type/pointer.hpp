@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <nir/type.hpp>
 
 namespace nir {
@@ -19,9 +20,9 @@ class PointerType : public Type {
 		static PointerType * pointerTo (const Type * t) {
 			auto itt = pointerTypes.find (t);
 			if (itt != pointerTypes.end ()) {
-				return itt->second;
+				return itt->second.get ();
 			} else {
-				return pointerTypes [t] = new PointerType (t);
+				return (pointerTypes [t] = std::unique_ptr <PointerType> (new PointerType (t))).get ();
 			}
 		}
 		
@@ -35,7 +36,7 @@ class PointerType : public Type {
 		
 		const Type * type;
 		
-		static std::map <const Type *, PointerType *> pointerTypes;
+		static std::map <const Type *, std::unique_ptr <PointerType>> pointerTypes;
 		
 };
 

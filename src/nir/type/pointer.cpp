@@ -3,7 +3,7 @@
 namespace nir {
 
 
-std::map <const Type *, PointerType *> PointerType::pointerTypes;
+std::map <const Type *, std::unique_ptr <PointerType>> PointerType::pointerTypes;
 
 
 };

@@ -26,6 +26,8 @@ struct Function : ParseTreeNode {
 		Function (PTNode iden, PTNode params, PTNode type, PTNode body);
 		Function (uint32_t line, uint32_t pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage);
 		
+		virtual ~Function () {delAll (tplate); delAll (tags); delAll (params); delAll (type); delete body;}
+		
 	protected:
 	private:
 		

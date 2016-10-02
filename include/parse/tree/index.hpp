@@ -14,7 +14,7 @@ class ParseTreeIndex : public ParseTreeNode {
 		
 		ParseTreeIndex (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		ParseTreeIndex (PTNode index, const BasicArray <PTNode> & args) : ParseTreeNode (index->getLine (), index->getPos ()), index (index), args (args) {}
-		virtual ~ParseTreeIndex () {delete index;}
+		virtual ~ParseTreeIndex () {delAll (args); delete index;}
 		
 	protected:
 	private:
@@ -22,6 +22,6 @@ class ParseTreeIndex : public ParseTreeNode {
 		virtual string strDump (text::PrintMode mode);
 		
 		PTNode index;
-		DynArray <PTNode> args;
+		BasicArray <PTNode> args;
 		
 };

@@ -33,8 +33,13 @@ struct Function {
 		Function (const std::string & label, LINKAGE linkage);
 		Function (const BasicArray <const Parameter *> & args, const BasicArray <const Parameter *> & ret, const std::string & label, LINKAGE linkage);
 		
+		~Function ();
+		
 	protected:
 	private:
+		
+		Function (const Function & func)=delete;
+		const Function & operator = (const Function & func)=delete;
 		
 		Block * entry=nullptr;
 		DynArray <Block *> blocks;

@@ -16,7 +16,7 @@ class ParseTreeList : public ParseTreeNode {
 		
 		ParseTreeList (uint32_t line, uint32_t pos) : ParseTreeNode (ParseTreeNode::NodeType::LIST, line, pos) {}
 		ParseTreeList (const BasicArray <PTNode> & args) : ParseTreeNode (ParseTreeNode::NodeType::LIST, args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
-		virtual ~ParseTreeList () {for (PTNode n : args) delete n;}
+		virtual ~ParseTreeList () {delAll (args);}
 		
 	protected:
 	private:

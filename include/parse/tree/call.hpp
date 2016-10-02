@@ -19,7 +19,7 @@ class ParseTreeCall : public ParseTreeNode {
 		
 		ParseTreeCall (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
 		ParseTreeCall (const PTNode & iden, const BasicArray <PTNode> & args) : ParseTreeNode (iden->getLine (), iden->getPos ()), iden (iden), args (args) {}
-		virtual ~ParseTreeCall () {for (PTNode n : args) delete n;}
+		virtual ~ParseTreeCall () {delAll (args); delete iden;}
 		
 	protected:
 	private:

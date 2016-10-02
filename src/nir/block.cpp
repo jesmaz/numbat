@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <iostream>
 #include <nir/block.hpp>
 #include <nir/instruction.hpp>
 
@@ -66,8 +68,15 @@ bool Block::validate () const {
 }
 
 const Instruction * Block::give (const Instruction * instr) {
+	//assert (std::find (instructions.begin (), instructions.end (), instr) == instructions.end ());
 	instructions.push_back (instr);
 	return instr;
 }
+
+
+Block::~Block () {
+	delAll (instructions);
+}
+
 
 }

@@ -36,6 +36,7 @@ struct adv_ptr {
 			details->start = ptr;
 			details->end = ptr + amount;
 			details->del = [](void * ptr) {delete [] reinterpret_cast <T*> (ptr);};
+			details->child = nullptr;
 		}
 		adv_ptr (size_t amount, const T & val) : adv_ptr (amount) {
 			std::fill (ptr, ptr + amount, val);
@@ -47,6 +48,7 @@ struct adv_ptr {
 				details->start = ptr;
 				details->end = ptr + 1;
 				details->del = [](void * ptr) {delete reinterpret_cast <T*> (ptr);};
+				details->child = nullptr;
 			}
 		}
 		adv_ptr (const adv_ptr <T> & other) : ptr (other.ptr), details (other.details) {

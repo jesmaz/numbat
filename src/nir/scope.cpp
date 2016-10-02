@@ -158,7 +158,7 @@ const Instruction * Scope::allocateArray (const Type * const type, Argument size
 	const Instruction * var = allocateVariable (s, iden);
 	const Instruction * val = createStructValue (s, {{ptr, ptr->getIden ()}, size});
 	const Instruction * inst = createPut ({val, val->getIden ()}, {var, var->getIden ()});
-	return insertionPoint->give (inst);
+	return inst;
 	
 }
 
