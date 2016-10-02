@@ -37,21 +37,25 @@ int main (int argl, char ** argc) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				parse (prog)->build (globalScope);
+				auto node = parse (prog);
+				node->build (globalScope);
 				while (printItt) {
 					std::cout << printItt << '\n';
 					++printItt;
 				}
 				std::cout << std::endl;
 				prog = line;
+				delete node;
 			}
 		}
 		if (not prog.empty()) {
-			parse (prog)->build (globalScope);
+			auto node = parse (prog);
+			node->build (globalScope);
 			while (printItt) {
 				std::cout << printItt << '\n';
 				++printItt;
 			}
+			delete node;
 		}
 		
 	} else {
@@ -63,12 +67,14 @@ int main (int argl, char ** argc) {
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
-			parse (prog)->build (globalScope);
+			auto node = parse (prog);
+			node->build (globalScope);
 			while (printItt) {
 				std::cout << printItt << std::endl;
 				++printItt;
 			}
 			std::cout << "########" << f << "########" << std::endl;
+			delete node;
 		}
 	}
 	
