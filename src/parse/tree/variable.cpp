@@ -18,6 +18,9 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 				report::logMessage (report::ERROR, "", getLine (), getPos (), "Unable to determine the type of " + iden->getIden ());
 			}
 			return nullptr;
+		} else if (init->getTypes ().empty ()) {
+			report::logMessage (report::ERROR, "", inst->getLine (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
+			return nullptr;
 		}
 		
 		type = init->getType ();
@@ -34,6 +37,10 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 	}
 	
 	if (var and init) {
+		if (init->getTypes ().empty ()) {
+			report::logMessage (report::ERROR, "", inst->getLine (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
+			return nullptr;
+		}
 		auto val = init;
 		if (init->getType () != type and type) {
 			val = scope->staticCast (init, type);
@@ -56,6 +63,9 @@ const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) 
 			if (not inst) {
 				report::logMessage (report::ERROR, "", getLine (), getPos (), "Unable to determine the type of " + iden->getIden ());
 			}
+			return nullptr;
+		} else if (init->getTypes ().empty ()) {
+			report::logMessage (report::ERROR, "", inst->getLine (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
 			return nullptr;
 		}
 		type = init->getType ();

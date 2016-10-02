@@ -385,9 +385,13 @@ const Instruction * Scope::createNeg (Argument arg) {
 
 const Instruction * Scope::createParameter (const Type * const type, Argument init, const string & iden) {
 	
-	Parameter * param;
+	Parameter * param=nullptr;
 	if (init.instr) {
-		param = new Parameter (staticCast (init, type), iden);
+		auto t = staticCast (init, type);
+		if (t.instr) {
+			param = new Parameter (t, iden);
+		}
+		
 	} else {
 		param = new Parameter (type, iden);
 	}

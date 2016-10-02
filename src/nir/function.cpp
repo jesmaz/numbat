@@ -37,7 +37,7 @@ void Function::pushBlock (Block * block) {
 
 Function::Function (const std::string & label, LINKAGE linkage) : entry (new Block (&(this->label))), blocks ({entry}), label (label), linkage (linkage) {}
 
-Function::Function (const BasicArray <const Parameter *> & args, const BasicArray <const Parameter *> & ret, const std::string & label, LINKAGE linkage) : entry (new Block (&(this->label))), blocks ({entry}), args (args), ret (ret), retTypes (getInstType (ret)), type (FunctionType::get (getInstType (args), retTypes)), label (label), linkage (linkage) {}
+Function::Function (const BasicArray <const Parameter *> & args, const BasicArray <const Parameter *> & ret, const std::string & label, LINKAGE linkage) : entry (new Block (&(this->label))), blocks ({entry}), label (label), args (args), ret (ret), retTypes (getInstType (ret)), type (FunctionType::get (getInstType (args), retTypes)), linkage (linkage) {}
 
 
 };

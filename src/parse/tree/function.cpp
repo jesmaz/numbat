@@ -28,7 +28,9 @@ const nir::Instruction * Function::build (nir::Scope * scope) {
 	
 	if (body) {
 		auto b = body->build (fScope);
-		fScope->createAutoReturn (b);
+		if (b) {
+			fScope->createAutoReturn (b);
+		}
 	}
 	return fScope->getFunctionPointer ();
 	

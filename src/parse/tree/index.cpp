@@ -2,6 +2,7 @@
 #include <nir/parameter.hpp>
 #include <nir/scope.hpp>
 #include <nir/type/array.hpp>
+#include <utility/report.hpp>
 
 const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	
@@ -17,6 +18,14 @@ const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	}
 	
 	if (not inst or not s) return nullptr;
+	if (inst->getTypes ().empty ()) {
+		report::logMessage (report::ERROR, "", index->getLine (), index->getPos (), "'" + inst->toString (text::PLAIN) + "' can't be indexed");
+		return nullptr;
+	}
+	if (s->getIdens ().empty ()) {
+		report::logMessage (report::ERROR, "", index->getLine (), index->getPos (), "'" + args [0]->toString (text::PLAIN) + "' is not a value");
+		return nullptr;
+	}
 	
 	nir::Argument array = {inst, inst->getIden ()};
 	auto * dat = scope->resolve (array, "data");

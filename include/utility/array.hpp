@@ -20,6 +20,7 @@ struct BasicArray {
 			len = other.len;
 			data = new T [len];
 			std::copy (other.data, other.data + len, data);
+			return *this;
 		}
 		const BasicArray <T> & operator = (BasicArray <T> && other) {
 			if (data) delete [] data;
@@ -27,6 +28,7 @@ struct BasicArray {
 			data = other.data;
 			other.data = nullptr;
 			other.len = 0;
+			return *this;
 		}
 		
 		T & operator [] (size_t index) {assert (index < len); return data [index];}
