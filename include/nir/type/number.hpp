@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <nir/type.hpp>
 
 namespace nir {
@@ -24,7 +25,7 @@ class Number : public Type {
 		
 		virtual string strDump (text::PrintMode mode) const {return char (arith) + std::to_string (width);}
 		
-		static std::map <std::pair <Type::ArithmaticType, uint32_t>, const Number *> numericalTypes;
+		static std::map <std::pair <Type::ArithmaticType, uint32_t>, std::unique_ptr <const Number>> numericalTypes;
 		
 };
 
