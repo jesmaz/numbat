@@ -82,7 +82,7 @@ struct Operator {
 	string ptn;
 	int precedence;
 	RuleType rule;
-	PTNode(*ctr)(const string &, const BasicArray <PTNode> &);
+	PTNode(*ctr)(const string &, std::initializer_list <PTNode>);
 };
 
 
@@ -133,8 +133,8 @@ std::map <string, Symbol> symbolMap {
 };
 
 template <OPERATION opp>
-PTNode operatorFactory (const string & s, const BasicArray <PTNode> & v) {
-	return new SpecificOperator <opp> (s, {v.begin (), v.end ()});
+PTNode operatorFactory (const string & s, std::initializer_list <PTNode> v) {
+	return new SpecificOperator <opp> (s, v);
 }
 
 std::map <string, Operator> operators {
@@ -254,7 +254,7 @@ namespace SymbolFlags {
 struct Match {
 	int precedence;
 	string iden;
-	PTNode(*ctr)(const string &, const BasicArray <PTNode> &);
+	PTNode(*ctr)(const string &, std::initializer_list <PTNode>);
 };
 
 
@@ -569,7 +569,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	if (linkage != nir::LINKAGE::EXTERNAL and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		body = parseStatement (queue);
 	}
-	return new Function (token.line, 0, token.iden, {params.begin (), params.end ()}, {type.begin (), type.end ()}, body, linkage);
+	return new Function (token.line, 0, token.iden, params, type, body, linkage);
 	
 }
 

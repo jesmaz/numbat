@@ -17,7 +17,7 @@ class GenericOperator : public ParseTreeNode {
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		GenericOperator (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		GenericOperator (const string & iden, const BasicArray <PTNode> & args) : ParseTreeNode (args.front ()->getLine (), args.front ()->getPos ()), iden (iden), args (args) {}
+		GenericOperator (const string & iden, std::initializer_list <PTNode> args) : ParseTreeNode ((*args.begin ())->getLine (), (*args.begin ())->getPos ()), iden (iden), args (args) {}
 		virtual ~GenericOperator () {for (PTNode n : args) delete n;}
 		
 	protected:
@@ -39,7 +39,7 @@ class SpecificOperator : public GenericOperator {
 	public:
 		
 		SpecificOperator (uint32_t line, uint32_t pos) : GenericOperator (line, pos) {}
-		SpecificOperator (const string & iden, const BasicArray <PTNode> & args) : GenericOperator (iden, args) {}
+		SpecificOperator (const string & iden, std::initializer_list <PTNode> args) : GenericOperator (iden, args) {}
 		
 	protected:
 		
