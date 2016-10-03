@@ -2,11 +2,12 @@
 #include <iostream>
 #include <nir/module.hpp>
 #include <parse/handparser.hpp>
+#include <utility/config.hpp>
 #include <utility/report.hpp>
 
 
 
-int main (int argc, char ** args) {
+int numbatMain (const Config & cfg) {
 	
 	nir::Module nirmodule;
 	auto globalScope = nirmodule.getGlobalScope ();

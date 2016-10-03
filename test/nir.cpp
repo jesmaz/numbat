@@ -6,28 +6,17 @@
 #include <nir/scope.hpp>
 #include <parse/handparser.hpp>
 #include <set>
+#include <utility/config.hpp>
 
 void printHelp (char * cmd) {
 	std::cerr << "Usage: " << cmd << " [Option]... [File...]\n";
 }
 
-int main (int argl, char ** argc) {
+int numbatMain (const Config & cfg) {
 	
 	numbat::File dummyFile;
-	DynArray <char *> files;
 	
-	for (int i=1; i<argl; ++i) {
-		if (argc [i][0] == '-') {
-			if (string (argc [i]) == "--help") {
-				printHelp (argc [0]);
-				return 0;
-			}
-		} else {
-			files.push_back (argc [i]);
-		}
-	}
-	
-	if (files.empty ()) {
+	if (cfg.files.empty ()) {
 		
 		nir::Module nirmodule;
 		auto globalScope = nirmodule.getGlobalScope ();
@@ -60,7 +49,7 @@ int main (int argl, char ** argc) {
 		}
 		
 	} else {
-		for (char * f : files) {
+		for (auto & f : cfg.files) {
 			nir::Module nirmodule;
 			auto globalScope = nirmodule.getGlobalScope ();
 			auto printItt = globalScope->getCurrentBlock ()->printerBeg ();

@@ -57,3 +57,10 @@ void Config::initalise (int argl, char ** args) {
 	}
 	
 }
+
+int numbatMain (const Config & cfg);
+
+int main (int argl, char ** args) {
+	Config::initalise (argl, args);
+	return numbatMain (config);
+}

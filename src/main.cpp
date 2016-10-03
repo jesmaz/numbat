@@ -5,10 +5,7 @@
 #include <utility/config.hpp>
 
 
-int main (int argl, char ** args) {
-	
-	Config::initalise (argl, args);
-	const Config & cfg = Config::globalConfig ();
+int numbatMain (const Config & cfg) {
 	
 	codegen::Target * target = codegen::Target::find ("llvm");
 	

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <parse/handparser.hpp>
 #include <parse/tree.hpp>
+#include <utility/config.hpp>
 
 
 void printHelp (char * cmd) {
@@ -18,23 +19,11 @@ void print (PTNode node) {
 	}
 }
 
-int main (int argl, char ** argc) {
+int numbatMain (const Config & cfg) {
 	
-	DynArray <char *> files;
 	numbat::File dummyFile;
 	
-	for (int i=1; i<argl; ++i) {
-		if (argc [i][0] == '-') {
-			if (string (argc [i]) == "--help") {
-				printHelp (argc [0]);
-				return 0;
-			}
-		} else {
-			files.push_back (argc [i]);
-		}
-	}
-	
-	if (files.empty ()) {
+	if (cfg.files.empty ()) {
 		
 		string line, prog;
 		while (std::getline (std::cin, line)) {
@@ -55,7 +44,7 @@ int main (int argl, char ** argc) {
 		}
 		
 	} else {
-		for (char * f : files) {
+		for (auto & f : cfg.files) {
 			std::ifstream fin (f);
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
