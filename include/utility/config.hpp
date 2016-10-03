@@ -2,6 +2,7 @@
 
 #include <set>
 #include <string>
+#include <utility/text.hpp>
 
 
 struct Config {
@@ -14,6 +15,7 @@ struct Config {
 	bool link = true;
 	bool emitLLVM = false;
 	bool jit = false;
+	text::PrintMode printMode = text::PLAIN, printModeSTDERR = text::PLAIN;
 	std::set <std::string> files;
 	
 };

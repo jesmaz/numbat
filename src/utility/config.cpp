@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <unistd.h>
 #include <utility/config.hpp>
 
 
@@ -11,6 +12,13 @@ const Config & Config::globalConfig () {
 }
 
 void Config::initalise (int argl, char ** args) {
+	
+	if (isatty (stdout->_fileno)) {
+		config.printMode = text::COLOUR;
+	}
+	if (isatty (stderr->_fileno)) {
+		config.printModeSTDERR = text::COLOUR;
+	}
 	
 	for (int i=1; i<argl; ++i) {
 		char * str = args [i];
