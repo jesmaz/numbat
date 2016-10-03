@@ -1,7 +1,8 @@
 #include <algorithm>
 #include <iostream>
-#include <utility/report.hpp>
 #include <utility/array.hpp>
+#include <utility/config.hpp>
+#include <utility/report.hpp>
  
 
 
@@ -50,6 +51,17 @@ bool empty () {
 }
 
 
+const string & getPrintMode (Severity sev) {
+	switch (sev) {
+		case Severity::ERROR:
+			return text::red;
+		case Severity::NOTICE:
+			return text::cyn;
+		case Severity::WARNING:
+			return text::yel;
+	}
+}
+
 void clearLogs () {
 	estrangedMessages.clear ();
 	messages.clear ();
@@ -61,8 +73,8 @@ void dumpLogs () {
 	clearLogs ();
 }
 
-void dumpLogs (std::ostream & ostream) {
-	printLogs (ostream);
+void dumpLogs (std::ostream & ostream, text::PrintMode mode) {
+	printLogs (ostream, mode);
 	clearLogs ();
 }
 
@@ -80,16 +92,21 @@ void logMessage (Severity severity, const std::string & message) {
 
 
 void printLogs () {
-	printLogs (std::cerr);
+	text::PrintMode mode = Config::globalConfig ().printModeSTDERR;
+	printLogs (std::cerr, mode);
 }
 
-void printLogs (std::ostream & ostream) {
+void printLogs (std::ostream & ostream, text::PrintMode mode) {
 	
 	for (const Message & msg : messages) {
+		if (mode == text::COLOUR) ostream << getPrintMode (msg.severity);
 		ostream << msg.severity << ": " << msg.file << ":" << msg.pos.line << ":" << msg.pos.col << ": " << msg.message << "\n";
+		if (mode == text::COLOUR) ostream << text::reset;
 	}
 	for (const EstrangedMessage & msg : estrangedMessages) {
+		if (mode == text::COLOUR) ostream << getPrintMode (msg.severity);
 		ostream << msg.severity << ": " << msg.message << "\n";
+		if (mode == text::COLOUR) ostream << text::reset;
 	}
 	ostream << std::flush;
 	
