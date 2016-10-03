@@ -1,6 +1,7 @@
 #include <codegen/target.hpp>
 #include <codegen/llvm.hpp>
 #include <file.hpp>
+#include <nir/module.hpp>
 #include <utility/config.hpp>
 
 

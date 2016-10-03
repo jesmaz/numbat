@@ -60,7 +60,8 @@ std::string next (const char * source, size_t & pos, size_t length) {
 }
 
 tkstring lex (const char * source, size_t length) {
-	size_t pos=0, line=0;
+	size_t pos=0;
+	uint32_t line=0;
 	tkstring tks;
 	while (pos < length) {
 		auto tstr = lexline (source, pos, length, ++line);
@@ -77,14 +78,15 @@ tkstring lex (const char * source, size_t length) {
 	return tks;
 }
 
-tkstring lexline (const char * source, size_t & pos, size_t length, size_t line) {
+tkstring lexline (const char * source, size_t & pos, size_t length, uint32_t line) {
 	tkstring str;
 	std::string buffer;
+	size_t lineStart = pos;
 	
 	token init;
 	init.type = TOKEN::indent;
 	init.iden = "";
-	init.line = line;
+	init.pos = {line, 0};
 	while (pos < length and (source [pos] == ' ' or source [pos] == '\t')) {
 		init.iden += source [pos];
 		++pos;
@@ -95,7 +97,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 		//std::cout << buffer << std::endl;
 		if (buffer.length ()) {
 			token t = lexToken (buffer);
-			t.line = line;
+			init.pos = {line, uint32_t (pos - lineStart - t.iden.size ())};
 			str += t;
 		}
 	}
@@ -115,7 +117,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, size_t line)
 			token t;
 			t.type = TOKEN::semicolon;
 			t.iden = "";
-			t.line = line;
+			t.pos = {line, uint32_t (pos - lineStart)};
 			str += t;
 	}
 	

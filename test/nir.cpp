@@ -13,6 +13,7 @@ void printHelp (char * cmd) {
 
 int main (int argl, char ** argc) {
 	
+	numbat::File dummyFile;
 	DynArray <char *> files;
 	
 	for (int i=1; i<argl; ++i) {
@@ -37,7 +38,7 @@ int main (int argl, char ** argc) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				auto node = parse (prog);
+				auto node = parse (prog, &dummyFile);
 				node->build (globalScope);
 				while (printItt) {
 					std::cout << printItt << '\n';
@@ -49,7 +50,7 @@ int main (int argl, char ** argc) {
 			}
 		}
 		if (not prog.empty()) {
-			auto node = parse (prog);
+			auto node = parse (prog, &dummyFile);
 			node->build (globalScope);
 			while (printItt) {
 				std::cout << printItt << '\n';
@@ -67,7 +68,7 @@ int main (int argl, char ** argc) {
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
-			auto node = parse (prog);
+			auto node = parse (prog, &dummyFile);
 			node->build (globalScope);
 			while (printItt) {
 				std::cout << printItt << std::endl;

@@ -1,4 +1,5 @@
 #include <fstream>
+#include <file.hpp>
 #include <iostream>
 #include <parse/handparser.hpp>
 #include <parse/tree.hpp>
@@ -20,6 +21,7 @@ void print (PTNode node) {
 int main (int argl, char ** argc) {
 	
 	DynArray <char *> files;
+	numbat::File dummyFile;
 	
 	for (int i=1; i<argl; ++i) {
 		if (argc [i][0] == '-') {
@@ -39,7 +41,7 @@ int main (int argl, char ** argc) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				auto n = parse (prog);
+				auto n = parse (prog, &dummyFile);
 				print (n);
 				delete n;
 				std::cout << std::endl;
@@ -47,7 +49,7 @@ int main (int argl, char ** argc) {
 			}
 		}
 		if (not prog.empty()) {
-			auto n = parse (prog);
+			auto n = parse (prog, &dummyFile);
 			print (n);
 			delete n;
 		}
@@ -58,7 +60,7 @@ int main (int argl, char ** argc) {
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
-			auto n = parse (prog);
+			auto n = parse (prog, &dummyFile);
 			print (n);
 			delete n;
 			std::cout << "########" << f << "########" << std::endl;

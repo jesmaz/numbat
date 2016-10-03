@@ -1,8 +1,10 @@
 #pragma once
 
 
+#include <file.hpp>
 #include <ostream>
 #include <string>
+#include <token.hpp>
 
 
 namespace report {
@@ -25,8 +27,8 @@ void dumpLogs ();
 void dumpLogs (std::ostream & ostream);
 
 // Logs a new message. Messages are ordered by file, line, and position.
-void logMessage (Severity, const std::string & file, uint64_t line, uint64_t pos, const std::string & message);
-void logMessage (Severity, const std::string & message);
+void logMessage (Severity severity, const numbat::File * file, numbat::lexer::position pos, const std::string & message);
+void logMessage (Severity severity, const std::string & message);
 
 // Prints all logs to the stream.
 // If no stream is specified std::cerr is used.

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <nir/forward.hpp>
 #include <string>
+#include <token.hpp>
 #include <typeinfo>
 #include <utility/array.hpp>
 #include <utility/text.hpp>
@@ -26,8 +27,7 @@ class ParseTreeNode {
 		
 		string toString (text::PrintMode mode=text::PLAIN) {if (this) return strDump (mode); else return "nullptr";}
 		
-		uint32_t getLine () {return line;}
-		uint32_t getPos () {return pos;}
+		numbat::lexer::position getPos () {return pos;}
 		
 		virtual bool isAggregate () {return false;}
 		virtual bool isList () {return false;}
@@ -47,8 +47,8 @@ class ParseTreeNode {
 		virtual void declare (nir::Scope * scope);
 		virtual void push_back (ParseTreeNode * e);
 		
-		ParseTreeNode (uint32_t line, uint32_t pos) : type (NodeType::EXPRESSION), line (line), pos (pos) {}
-		ParseTreeNode (NodeType nodeType, uint32_t line, uint32_t pos) : type (nodeType), line (line), pos (pos) {}
+		ParseTreeNode (numbat::lexer::position pos) : type (NodeType::EXPRESSION), pos (pos) {}
+		ParseTreeNode (NodeType nodeType, numbat::lexer::position pos) : type (nodeType), pos (pos) {}
 		virtual ~ParseTreeNode () {}
 		
 	protected:
@@ -60,7 +60,7 @@ class ParseTreeNode {
 		virtual string strDump (text::PrintMode mode)=0;
 		
 		NodeType type=NodeType::EXPRESSION;
-		uint32_t line, pos;
+		numbat::lexer::position pos;
 		const static BasicArray <ParseTreeNode *> defaultArgs;
 		const static string defaultStr;
 		

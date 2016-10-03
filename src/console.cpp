@@ -11,6 +11,7 @@ int main (int argc, char ** args) {
 	nir::Module nirmodule;
 	auto globalScope = nirmodule.getGlobalScope ();
 	codegen::Interpreter interpreter (nirmodule.getEntry ());
+	numbat::File dummyFile;
 	
 	string line;
 	for (;;) {
@@ -21,7 +22,7 @@ int main (int argc, char ** args) {
 		if (not std::getline (std::cin, line)) {
 			break;
 		}
-		auto parseTree = parse (line);
+		auto parseTree = parse (line, &dummyFile);
 		std::cerr << parseTree->toString () << std::endl;
 		
 		if (report::compilationFailed ()) {

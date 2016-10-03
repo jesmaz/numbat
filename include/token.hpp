@@ -51,15 +51,19 @@ enum class TOKEN {
 	whitespace,
 };
 
+struct position {
+	uint32_t line, col;
+};
+
 struct token {
 	TOKEN type;
-	size_t line;
+	position pos;
 	std::string iden;
 	const bool operator < (const token & rhs) const {return  (type == rhs.type) ? iden < rhs.iden : type < rhs.type;}
 	const bool operator == (const token & rhs) const {return type == rhs.type and iden == rhs.iden;}
 	const bool operator != (const token & rhs) const {return type != rhs.type or iden != rhs.iden;}
 	token () {}
-	token (TOKEN type, const std::string & iden, size_t line=0) : type (type), line (line), iden (iden) {}
+	token (TOKEN type, const std::string & iden, position pos={0,0}) : type (type), pos (pos), iden (iden) {}
 };
 
 typedef DynArray <token, 128> tkstring;

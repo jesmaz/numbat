@@ -270,10 +270,11 @@ struct CodeQueue {
 	void markDirty ();
 	void shiftPop ();
 	void update (uint32_t n=128);
-	CodeQueue (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) : itt (start), end (end) {}
+	CodeQueue (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end, const numbat::File * file) : itt (start), end (end), file (file) {}
 	numbat::lexer::tkstring::const_iterator itt, safeitt, end;
 	std::deque <numbat::lexer::tkstring::const_iterator> itts;
 	string syms;
+	const numbat::File * file;
 	bool dirty=false;
 };
 
@@ -317,22 +318,22 @@ PTNode errorUnexpectedToken (CodeQueue * queue, const string & expected) {
 	queue->markDirty ();
 	numbat::lexer::token tkn = queue->peakToken ();
 	clear (queue);
-	report::logMessage (report::ERROR, "", tkn.line, 0, "Unexpected token '" + tkn.iden + "', expected " + expected);
-	return new ParseTreeError (tkn.line, 0, "Unexpected token '" + tkn.iden + "', expected " + expected);
+	report::logMessage (report::ERROR, queue->file, tkn.pos, "Unexpected token '" + tkn.iden + "', expected " + expected);
+	return new ParseTreeError (tkn.pos, "Unexpected token '" + tkn.iden + "', expected " + expected);
 	
 }
 
 
-PTNode parse (const string & program) {
+PTNode parse (const string & program, const numbat::File * file) {
 	
 	numbat::lexer::tkstring prog = numbat::lexer::lex (program);
-	return parse (prog.begin (), prog.end ());
+	return parse (prog.begin (), prog.end (), file);
 	
 }
 
-PTNode parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end) {
+PTNode parse (numbat::lexer::tkstring::const_iterator start, numbat::lexer::tkstring::const_iterator end, const numbat::File * file) {
 	
-	CodeQueue queue (start, end);
+	CodeQueue queue (start, end, file);
 	return parseProgram (&queue);
 	
 }
@@ -373,7 +374,7 @@ PTNode parseAtom (CodeQueue * queue) {
 			break;
 		case Symbol::IDENTIFIER: {
 			numbat::lexer::token token = queue->popToken ();
-			atom = new ParseTreeIdentifier (token.line, 0, token.iden);
+			atom = new ParseTreeIdentifier (token.pos, token.iden);
 			break;
 		}
 		case Symbol::IF:
@@ -381,7 +382,7 @@ PTNode parseAtom (CodeQueue * queue) {
 			break;
 		case Symbol::LITERAL: {
 			numbat::lexer::token token = queue->popToken ();
-			atom = new ParseTreeLiteral (token.line, 0, token.iden, token.type);
+			atom = new ParseTreeLiteral (token.pos, token.iden, token.type);
 			break;
 		}
 		case Symbol::WHILE:
@@ -480,7 +481,7 @@ PTNode parseBlock (CodeQueue * queue) {
 	
 	queue->shiftPop ();
 	if (body.empty ()) {
-		return new ParseTree (0, 0);
+		return new ParseTree ({0, 0});
 	} else {
 		return new ParseTree (body);
 	}
@@ -538,7 +539,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	}
 	
 	// drop def
-	queue->shiftPop ();
+	auto pos = queue->popToken ().pos;
 	
 	if (queue->peak () != Symbol::IDENTIFIER) {
 		return errorUnexpectedToken (queue, "identifier");
@@ -582,7 +583,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	if (linkage != nir::LINKAGE::EXTERNAL and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		body = parseStatement (queue);
 	}
-	return new Function (token.line, 0, token.iden, params, type, body, linkage);
+	return new Function (pos, token.iden, params, type, body, linkage);
 	
 }
 
@@ -622,7 +623,7 @@ PTNode parseIfElse (CodeQueue * queue) {
 PTNode parseImport (CodeQueue * queue) {
 	PROFILE ("parseImport");
 	// drop import token
-	queue->shiftPop ();
+	auto pos = queue->popToken ().pos;
 	
 	DynArray <PTNode> path;
 	
@@ -630,11 +631,11 @@ PTNode parseImport (CodeQueue * queue) {
 		
 		if (queue->peak () == Symbol::LITERAL) {
 			auto tkn = queue->popToken ();
-			path.push_back (new ParseTreeLiteral (tkn.line, 0, tkn.iden, tkn.type));
+			path.push_back (new ParseTreeLiteral (tkn.pos, tkn.iden, tkn.type));
 			
 		} else if (queue->peak () == Symbol::IDENTIFIER) {
 			auto tkn = queue->popToken ();
-			path.push_back (new ParseTreeIdentifier (tkn.line, 0, tkn.iden));
+			path.push_back (new ParseTreeIdentifier (tkn.pos, tkn.iden));
 			
 		} else {
 			delAll (path);
@@ -655,7 +656,7 @@ PTNode parseImport (CodeQueue * queue) {
 		queue->shiftPop ();
 		if (queue->peak () == Symbol::IDENTIFIER) {
 			auto tkn = queue->popToken ();
-			iden = new ParseTreeIdentifier (tkn.line, 0, tkn.iden);
+			iden = new ParseTreeIdentifier (tkn.pos, tkn.iden);
 			
 		} else {
 			delAll (path);
@@ -697,7 +698,7 @@ PTNode parseProgram (CodeQueue * queue) {
 		while (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) queue->popToken ();
 	}
 	if (body.empty ()) {
-		return new ParseTree (0, 0);
+		return new ParseTree ({0, 0});
 	} else {
 		return new ParseTree (body);
 	}
@@ -727,7 +728,7 @@ PTNode parseStatement (CodeQueue * queue) {
 		case Symbol::VAL:
 		case Symbol::VAR: {
 			numbat::lexer::token token = queue->popToken ();
-			lhs = new ParseTreeKeyword (token.line, 0, token.iden);
+			lhs = new ParseTreeKeyword (token.pos, token.iden);
 			break;
 		}
 		default:
@@ -762,7 +763,7 @@ PTNode parseStatement (CodeQueue * queue) {
 PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 	PROFILE ("parseSlice");
 	//Drop '['
-	queue->shiftPop ();
+	auto pos = queue->popToken ().pos;
 	
 	if (queue->peak () == Symbol::IDENTIFIER and queue->peak (1) == Symbol::IN) {
 		
@@ -771,7 +772,7 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 		PTNode range = parseExpression (queue);
 		if (queue->peak () == Symbol::SYMBOL_SQUARE_RIGHT) {
 			queue->shiftPop ();
-			return new ParseTreeSliceForEach (tkn.line, 0, tkn.iden, range);
+			return new ParseTreeSliceForEach (pos, tkn.iden, range);
 		}
 		
 		delete range;
@@ -816,7 +817,7 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 		
 		if (trueSlice) {
 			
-			PTNode slice = new ParseTreeSlice (0, 0, index, end, step);
+			PTNode slice = new ParseTreeSlice (pos, index, end, step);
 			if (owner) {
 				return new ParseTreeSliceDecorator (owner, slice);
 			}
@@ -847,7 +848,7 @@ PTNode parseSlice (CodeQueue * queue, PTNode owner) {
 PTNode parseStruct (CodeQueue * queue) {
 	PROFILE ("parseStruct");
 	// Drop struct keyword
-	numbat::lexer::token token = queue->popToken ();
+	auto pos = queue->popToken ().pos;
 	
 	string iden;
 	if (queue->peak () == Symbol::IDENTIFIER) {
@@ -868,7 +869,7 @@ PTNode parseStruct (CodeQueue * queue) {
 		queue->shiftPop ();
 	}
 	
-	return new Struct (token.line, 0, iden, {members.begin (), members.end ()});
+	return new Struct (pos, iden, {members.begin (), members.end ()});
 	
 }
 
@@ -879,20 +880,20 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 	if (queue->peak () == Symbol::COLON) {
 		
 		queue->popToken ();
-		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden), parseList (queue));
+		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.pos, token.iden), parseList (queue));
 		
 	} else if (queue->peak () == Symbol::SEMICOLON) {
 		
 		queue->shiftPop ();
-		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
+		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.pos, token.iden));
 		
 	} else if (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) {
 		
-		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
+		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.pos, token.iden));
 		
 	} else if (queue->peak () == Symbol::SYMBOL_COMMA) {
 		
-		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.line, 0, token.iden));
+		return new ParseTreeVariable (type, new ParseTreeIdentifier (token.pos, token.iden));
 		
 	}
 	
@@ -911,7 +912,7 @@ BasicArray <PTNode> parseArguments (CodeQueue * queue) {
 	do {
 		
 		if (next == Symbol::IDENTIFIER and queue->peak (1) == Symbol::COLON) {
-			args.push_back (new ParseTreeError (0, 0, "Named arguments are not yet supported"));
+			args.push_back (new ParseTreeError (queue->peakToken ().pos, "Named arguments are not yet supported"));
 		} else {
 			args.push_back (parseExpression (queue));
 		}
@@ -969,7 +970,7 @@ BasicArray <PTNode> parseParameterList (CodeQueue * queue) {
 			case Symbol::VAL:
 			case Symbol::VAR: {
 				numbat::lexer::token token = queue->popToken ();
-				atom = new ParseTreeKeyword (token.line, 0, token.iden);
+				atom = new ParseTreeKeyword (token.pos, token.iden);
 				break;
 			}
 			default:
@@ -1151,7 +1152,7 @@ void CodeQueue::update (uint32_t n) {
 					sym = sym_itt->second;;
 				} else {
 					PROFILE ("update - loop body - symb lookup - log");
-					report::logMessage (report::ERROR, "", itt->line, 0, "Unidentified symbol '" + itt->iden + "'");
+					report::logMessage (report::ERROR, file, itt->pos, "Unidentified symbol '" + itt->iden + "'");
 					sym = Symbol::__NONE__;
 				}
 				break;

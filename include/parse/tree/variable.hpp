@@ -16,9 +16,9 @@ class ParseTreeVariable : public ParseTreeNode {
 		PTNode releaseInst () {auto e = inst; inst = 0; return e;}
 		PTNode releaseVType () {auto e = vType; vType = 0; return e;}
 		
-		ParseTreeVariable (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeVariable (PTNode vType, PTNode iden) : ParseTreeNode (iden->getLine (), iden->getPos ()), vType (vType), iden (iden), inst (nullptr) {}
-		ParseTreeVariable (PTNode vType, PTNode iden, PTNode inst) : ParseTreeNode (iden->getLine (), iden->getPos ()), vType (vType), iden (iden), inst (inst) {}
+		ParseTreeVariable (numbat::lexer::position pos) : ParseTreeNode (pos) {}
+		ParseTreeVariable (PTNode vType, PTNode iden) : ParseTreeNode (iden->getPos ()), vType (vType), iden (iden), inst (nullptr) {}
+		ParseTreeVariable (PTNode vType, PTNode iden, PTNode inst) : ParseTreeNode (iden->getPos ()), vType (vType), iden (iden), inst (inst) {}
 		
 		virtual ~ParseTreeVariable () {delete vType; delete iden; delete inst;}
 		

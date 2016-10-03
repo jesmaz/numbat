@@ -15,7 +15,7 @@ class ParseTreeIdentifier : public ParseTreeNode {
 		
 		const string & getIden () const {return iden;}
 		
-		ParseTreeIdentifier (uint32_t line, uint32_t pos, const string & iden) : ParseTreeNode (line, pos), iden (iden) {}
+		ParseTreeIdentifier (numbat::lexer::position pos, const string & iden) : ParseTreeNode (pos), iden (iden) {}
 		
 	protected:
 	private:

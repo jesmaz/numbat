@@ -2,11 +2,12 @@
 
 
 #include <atomic>
+#include <forward.hpp>
+#include <istream>
 #include <map>
 #include <memory>
-#include <nir/module.hpp>
-#include <parse/tree/base.hpp>
 #include <string>
+#include <utility/array.hpp>
 
 
 namespace numbat {

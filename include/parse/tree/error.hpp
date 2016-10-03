@@ -9,7 +9,7 @@ class ParseTreeError : public ParseTreeNode {
 	
 	public:
 		
-		ParseTreeError (uint32_t line, uint32_t pos, const string & err) : ParseTreeNode (line, pos), err (err) {}
+		ParseTreeError (numbat::lexer::position pos, const string & err) : ParseTreeNode (pos), err (err) {}
 		
 	protected:
 	private:

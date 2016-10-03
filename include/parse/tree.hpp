@@ -22,9 +22,9 @@ class ParseTree : public ParseTreeNode {
 		void declareInline ();
 		void push_back (PTNode node);
 		
-		ParseTree (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
+		ParseTree (numbat::lexer::position pos) : ParseTreeNode (pos) {}
 		template <typename container>
-		ParseTree (container nodes) : ParseTreeNode (nodes.front ()->getLine (), nodes.front ()->getPos ()) {
+		ParseTree (container nodes) : ParseTreeNode (nodes.front ()->getPos ()) {
 			for (PTNode node : nodes) {
 				switch (node->getType ()) {
 					case ParseTreeNode::NodeType::FUNCTION:

@@ -17,8 +17,8 @@ class ParseTreeCall : public ParseTreeNode {
 		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		
-		ParseTreeCall (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeCall (const PTNode & iden, const BasicArray <PTNode> & args) : ParseTreeNode (iden->getLine (), iden->getPos ()), iden (iden), args (args) {}
+		ParseTreeCall (numbat::lexer::position pos) : ParseTreeNode (pos) {}
+		ParseTreeCall (const PTNode & iden, const BasicArray <PTNode> & args) : ParseTreeNode (iden->getPos ()), iden (iden), args (args) {}
 		virtual ~ParseTreeCall () {delAll (args); delete iden;}
 		
 	protected:

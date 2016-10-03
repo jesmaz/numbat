@@ -23,7 +23,7 @@ class MetaTags : public ParseTreeNode {
 		virtual void declare (nir::Scope * scope);
 		virtual void push_back (ParseTreeNode * e) {componant->push_back (e);}
 		
-		MetaTags (const BasicArray <PTNode> & tags, PTNode componant) : ParseTreeNode (componant->getType (), componant->getLine (), componant->getPos ()), tags (tags), componant (componant) {}
+		MetaTags (const BasicArray <PTNode> & tags, PTNode componant) : ParseTreeNode (componant->getType (), componant->getPos ()), tags (tags), componant (componant) {}
 		virtual ~MetaTags () {delAll (tags); delete componant;}
 		
 	protected:

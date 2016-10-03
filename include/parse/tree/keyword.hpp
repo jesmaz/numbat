@@ -11,7 +11,7 @@ class ParseTreeKeyword : public ParseTreeNode {
 		
 		const string & getIden () const {return sym;}
 		
-		ParseTreeKeyword (uint32_t line, uint32_t pos, string sym) : ParseTreeNode (ParseTreeNode::NodeType::KEYWORD, line, pos), sym (sym) {}
+		ParseTreeKeyword (numbat::lexer::position pos, string sym) : ParseTreeNode (ParseTreeNode::NodeType::KEYWORD, pos), sym (sym) {}
 		
 	protected:
 	private:

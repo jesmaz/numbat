@@ -94,12 +94,12 @@ const nir::Instruction * SpecificOperator <OPERATION::AS>::defBuild (nir::Scope 
 	if (not lhs or not type) return nullptr;
 	const nir::Type * ltype = lhs->getType ()->getDereferenceType ();
 	if (not ltype) {
-		report::logMessage (report::ERROR, "", getLine (), getPos (), "'" + lhs->toString (text::PLAIN) + "' can't be reinterpreted");
+		report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "'" + lhs->toString (text::PLAIN) + "' can't be reinterpreted");
 		return nullptr;
 	}
 	//TODO: Ensure that lhs type is trivial (nothing that could create invalid state like a pointer)
 	if (ltype->calculateSize (sizeof (size_t)) < type->calculateSize (sizeof (size_t))) {
-		report::logMessage (report::ERROR, "", getLine (), getPos (), "'" + lhs->toString (text::PLAIN) + "' is too small, reinterpeting would lead to courupted memory");
+		report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "'" + lhs->toString (text::PLAIN) + "' is too small, reinterpeting would lead to courupted memory");
 		return nullptr;
 	}
 	type = type->getPointerTo ();
@@ -185,7 +185,7 @@ const nir::Instruction * SpecificOperator <OPERATION::CMPNE>::defBuild (nir::Sco
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CONCAT>::defBuild (nir::Scope * scope) {
-	report::logMessage (report::ERROR, "", getLine (), getPos (), "Can't concatenate '" + args [0]->toString (text::PLAIN) + "' to '" + args [0]->toString (text::PLAIN) + "'");
+	report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Can't concatenate '" + args [0]->toString (text::PLAIN) + "' to '" + args [0]->toString (text::PLAIN) + "'");
 	return nullptr;
 }
 
@@ -203,7 +203,7 @@ const nir::Instruction * SpecificOperator <OPERATION::DIV>::defBuild (nir::Scope
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::IN>::defBuild (nir::Scope * scope) {
-	report::logMessage (report::ERROR, "", getLine (), getPos (), "'" + args [0]->toString (text::PLAIN) + "' does not support the in operation");
+	report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "'" + args [0]->toString (text::PLAIN) + "' does not support the in operation");
 	return nullptr;
 }
 
@@ -235,7 +235,7 @@ const nir::Instruction * SpecificOperator <OPERATION::NEG>::defBuild (nir::Scope
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::NONE>::defBuild (nir::Scope * scope) {
-	report::logMessage (report::ERROR, "", getLine (), getPos (), "Operator '" + iden + "' is not currently supported");
+	report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Operator '" + iden + "' is not currently supported");
 	return nullptr;
 }
 

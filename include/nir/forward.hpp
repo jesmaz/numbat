@@ -8,7 +8,7 @@ namespace nir {
 
 enum class LINKAGE {EXTERNAL, LOCAL};
 
-class Function;
+struct Function;
 class Instruction;
 class Number;
 class Parameter;

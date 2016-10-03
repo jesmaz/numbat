@@ -14,8 +14,8 @@ class ParseTreeList : public ParseTreeNode {
 		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return args;}
 		virtual const BasicArray <ParseTreeNode *> releaseArgs () {auto a = args; args = BasicArray <PTNode> (); return a;}
 		
-		ParseTreeList (uint32_t line, uint32_t pos) : ParseTreeNode (ParseTreeNode::NodeType::LIST, line, pos) {}
-		ParseTreeList (const BasicArray <PTNode> & args) : ParseTreeNode (ParseTreeNode::NodeType::LIST, args.front ()->getLine (), args.front ()->getPos ()), args (args) {}
+		ParseTreeList (numbat::lexer::position pos) : ParseTreeNode (ParseTreeNode::NodeType::LIST, pos) {}
+		ParseTreeList (const BasicArray <PTNode> & args) : ParseTreeNode (ParseTreeNode::NodeType::LIST, args.front ()->getPos ()), args (args) {}
 		virtual ~ParseTreeList () {delAll (args);}
 		
 	protected:

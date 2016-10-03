@@ -58,7 +58,7 @@ string Function::strDump (text::PrintMode mode) {
 	
 }
 
-Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, (iden ? iden : params)->getLine (), (iden ? iden : params)->getPos ()) {
+Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, (iden ? iden : params)->getPos ()) {
 	if (iden){
 		this->iden = iden->getIden ();
 	}
@@ -79,4 +79,4 @@ Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : Pars
 	this->body = body;
 }
 
-Function::Function (uint32_t line, uint32_t pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), params (params), type (type), iden (iden), body (body), linkage (linkage) {}
+Function::Function (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, pos), params (params), type (type), iden (iden), body (body), linkage (linkage) {}

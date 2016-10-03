@@ -12,8 +12,8 @@ class ParseTreeLiteral : public ParseTreeNode {
 		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		
-		ParseTreeLiteral (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		ParseTreeLiteral (uint32_t line, uint32_t pos, const string & literal, numbat::lexer::TOKEN tokenType) : ParseTreeNode (line, pos), literal (literal), tokenType(tokenType) {}
+		ParseTreeLiteral (numbat::lexer::position pos) : ParseTreeNode (pos) {}
+		ParseTreeLiteral (numbat::lexer::position pos, const string & literal, numbat::lexer::TOKEN tokenType) : ParseTreeNode (pos), literal (literal), tokenType(tokenType) {}
 		
 	protected:
 	private:

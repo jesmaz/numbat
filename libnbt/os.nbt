@@ -4,23 +4,23 @@ struct sockethandle {int32 handle, int32 status}
 
 
 # File handling system functions
-extern def close @cstyle @local (int32 handle)
-extern def dup @cstyle @local (int32 handle) -> (int32 copy)
-extern def lseek @cstyle @local (int32 handle, int64 offset, int32 whence) -> (int64 pos)
-extern def open @cstyle @local (ptrint filename, int32 flags, int32 mode) -> (int32 handle)
-extern def read @cstyle @local (int32 handle, ptrint data, int64 length) -> (int64 bytes)
+extern def close (int32 handle)
+extern def dup (int32 handle) -> (int32 copy)
+extern def lseek (int32 handle, int64 offset, int32 whence) -> (int64 pos)
+extern def open (ptrint filename, int32 flags, int32 mode) -> (int32 handle)
+extern def read (int32 handle, ptrint data, int64 length) -> (int64 bytes)
 extern def write @cstyle (int32 handle, ptrint data, int64 length) -> (int64 bytes)
 
 # Socket system functions
-extern def accept @cstyle @local (int32 handle, ref int8 sockaddr, ref uint32 length) -> (int32 status)
-extern def bind @cstyle @local (int32 handle, ref int8 sockaddr, uint32 length) -> (int32 status)
-extern def connect @cstyle @local (int32 handle, ref int8 sockaddr, uint32 length) -> (int32 status)
-extern def listen @cstyle @local (int32 handle, int32 backlog) -> (int32 status)
-extern def recv @cstyle @local (int32 handle, ref int8 buffer, uint64 length, uint32 flags) -> (int64 recvd)
-extern def recvfrom @cstyle @local (int32 handle, ref int8 buffer, uint64 length, uint32 flags, ref int8 sockaddr, ref uint32 addrlength) -> (int64 recvd)
-extern def send @cstyle @local (int32 handle, ref int8 buffer, uint64 length, uint32 flags) -> (int64 sent)
-extern def sendto @cstyle @local (int32 handle, ref int8 buffer, uint64 length, uint32 flags, ref int8 sockaddr, ref uint32 addrlength) -> (int64 sent)
-extern def socket @cstyle @local (int32 domain, int32 type, int32 protocol) -> (int32 handle)
+extern def accept (int32 handle, ref int8 sockaddr, ref uint32 length) -> (int32 status)
+extern def bind (int32 handle, ref int8 sockaddr, uint32 length) -> (int32 status)
+extern def connect (int32 handle, ref int8 sockaddr, uint32 length) -> (int32 status)
+extern def listen (int32 handle, int32 backlog) -> (int32 status)
+extern def recv (int32 handle, ref int8 buffer, uint64 length, uint32 flags) -> (int64 recvd)
+extern def recvfrom (int32 handle, ref int8 buffer, uint64 length, uint32 flags, ref int8 sockaddr, ref uint32 addrlength) -> (int64 recvd)
+extern def send (int32 handle, ref int8 buffer, uint64 length, uint32 flags) -> (int64 sent)
+extern def sendto (int32 handle, ref int8 buffer, uint64 length, uint32 flags, ref int8 sockaddr, ref uint32 addrlength) -> (int64 sent)
+extern def socket (int32 domain, int32 type, int32 protocol) -> (int32 handle)
 
 
 

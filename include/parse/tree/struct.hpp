@@ -15,8 +15,8 @@ struct Struct : ParseTreeNode {
 		
 		void declare (nir::Scope * scope);
 		
-		Struct (uint32_t line, uint32_t pos) : ParseTreeNode (line, pos) {}
-		Struct (uint32_t line, uint32_t pos, const string & iden, const BasicArray <PTNode> & members) : ParseTreeNode (line, pos), iden (iden), members (members) {}
+		Struct (numbat::lexer::position pos) : ParseTreeNode (pos) {}
+		Struct (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & members) : ParseTreeNode (pos), iden (iden), members (members) {}
 		
 		virtual ~Struct () {delAll (tplate); delAll (tags); delAll (members);}
 		

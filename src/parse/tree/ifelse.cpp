@@ -34,7 +34,7 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	const nir::Instruction * condJump=nullptr;
 	if (condition) {
 		if (condition->getIdens ().empty ()) {
-			report::logMessage (report::ERROR, "", cond->getLine (), cond->getPos (), "'" + cond->toString (text::PLAIN) + "' is not a ");
+			report::logMessage (report::ERROR, scope->getSourceFile (), cond->getPos (), "'" + cond->toString (text::PLAIN) + "' is not a ");
 			return nullptr;
 		}
 		condJump = scope->createJump ({condition, condition->getIden ()}, bodyBlock);

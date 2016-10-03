@@ -1,5 +1,6 @@
 #include <file.hpp>
 #include <fstream>
+#include <nir/module.hpp>
 #include <nir/scope.hpp>
 #include <mutex>
 #include <parse/handparser.hpp>
@@ -72,7 +73,7 @@ File * File::compile (const string & path, nir::Module * module) {
 		std::string buffer;
 		while (std::getline (fin, buffer))
 			file += buffer + "\n";
-		parseTree = parse (file);
+		parseTree = parse (file, f);
 		std::cerr << file << std::endl;
 		std::cerr << parseTree->toString () << std::endl;
 	}

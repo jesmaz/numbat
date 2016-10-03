@@ -15,11 +15,11 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 	if (vType->getType () == ParseTreeNode::NodeType::KEYWORD) {
 		if (not init) {
 			if (not inst) {
-				report::logMessage (report::ERROR, "", getLine (), getPos (), "Unable to determine the type of " + iden->getIden ());
+				report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Unable to determine the type of " + iden->getIden ());
 			}
 			return nullptr;
 		} else if (init->getTypes ().empty ()) {
-			report::logMessage (report::ERROR, "", inst->getLine (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
+			report::logMessage (report::ERROR, scope->getSourceFile (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
 			return nullptr;
 		}
 		
@@ -38,7 +38,7 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 	
 	if (var and init) {
 		if (init->getTypes ().empty ()) {
-			report::logMessage (report::ERROR, "", inst->getLine (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
+			report::logMessage (report::ERROR, scope->getSourceFile (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
 			return nullptr;
 		}
 		auto val = init;
@@ -61,11 +61,11 @@ const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) 
 	if (vType->getType () == ParseTreeNode::NodeType::KEYWORD) {
 		if (not init) {
 			if (not inst) {
-				report::logMessage (report::ERROR, "", getLine (), getPos (), "Unable to determine the type of " + iden->getIden ());
+				report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Unable to determine the type of " + iden->getIden ());
 			}
 			return nullptr;
 		} else if (init->getTypes ().empty ()) {
-			report::logMessage (report::ERROR, "", inst->getLine (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
+			report::logMessage (report::ERROR, scope->getSourceFile (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
 			return nullptr;
 		}
 		type = init->getType ();

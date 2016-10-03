@@ -22,9 +22,9 @@ struct Function : ParseTreeNode {
 		virtual Function * asFunction () {return this;}
 		virtual const string & getIden () const {return iden;}
 		
-		Function (uint32_t line, uint32_t pos) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, line, pos), body (nullptr) {}
+		Function (numbat::lexer::position pos) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, pos), body (nullptr) {}
 		Function (PTNode iden, PTNode params, PTNode type, PTNode body);
-		Function (uint32_t line, uint32_t pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage);
+		Function (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage);
 		
 		virtual ~Function () {delAll (tplate); delAll (tags); delAll (params); delAll (type); delete body;}
 		

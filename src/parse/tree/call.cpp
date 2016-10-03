@@ -29,7 +29,7 @@ const nir::Instruction * ParseTreeCall::build (nir::Scope * scope) {
 		return scope->createCall (fPtr->getFunction (), buildArgs (args, scope));
 	}
 	
-	report::logMessage (report::ERROR, "", getLine (), getPos (), "Currently only calling functions is supported");
+	report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Currently only calling functions is supported");
 	return nullptr;
 	
 }
