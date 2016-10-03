@@ -53,6 +53,9 @@
    - [ ] Copying elements with a overloaded assignment operator
    - [ ] Destruction
    - [ ] Initialisation
+ - [ ] Error messages
+   - [ ] Must contain accurate file/line/pos
+   - [ ] Should be in colour
  - [ ] LLVM upgrade to a more recent version
  - [ ] Operator overloading
  - [ ] Optimisation
