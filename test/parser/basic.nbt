@@ -1,0 +1,10 @@
+a + b
+a - b
+a * b
+a / b
+a << b
+a >> b
+a = b
+var a
+val b
+var a : c

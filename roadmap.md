@@ -33,28 +33,48 @@
  - [x] Make errors display line and file data correctly
 
 ##Version 0.3##
- - [ ] High level optimisation pass
- - [ ] Replace ASTnumbatInstruction with a more robust solution
- - [ ] Rewrite (and properly document) code generator
- - [ ] Rewrite parser
-   - [ ] Parser should be bottom up
-   - [ ] Parser should not handle semantics, only syntax
-   - [ ] Parser should still accept arbitrary operators
- - [ ] Separate the Abstract syntax tree from the concrete syntax tree
- - [ ] Verification pass
-   - [ ] Define what situations result in error/warning in documentation
+ - [x] High level optimisation pass
+   - [x] Static code evaluation
+ - [x] Replace ASTnumbatInstruction with a more robust solution
+ - [x] Rewrite (and properly document) code generator
+ - [x] Rewrite parser
+   - [x] Parser should be bottom up
+   - [x] Parser should not handle semantics, only syntax
+   - [x] Parser should still accept arbitrary operators
+   - [x] Testing, lots of testing
+ - [x] Semantic analysis pass
+   - [x] Side effect propagation
+   - [x] Transform into NIR
+ - [x] Verification pass
+   - [x] Create a list of planned compiler analisis passes
 
 ##Version 0.3.1##
- - [ ] Array of complex data types
-   - [ ] Copying
+ - [ ] Arrays
+   - [ ] Copying elements with a overloaded assignment operator
    - [ ] Destruction
    - [ ] Initialisation
+ - [ ] LLVM upgrade to a more recent version
+ - [ ] Operator overloading
+ - [ ] Optimisation
+   - [ ] Activate the static evaluator with a flag
+   - [ ] Aliasing pass
+   - [ ] Dead code removal pass
+   - [ ] Redundant code consolidation
+ - [ ] OS module
+   - [ ] Numbat friendly wrapper (no pointers passed by the user)
+   - [ ] Open, read, write, close system calls
  - [ ] Smart pointers (reference counting)
+ - [ ] Templates (required for smart pointers)
+   - [ ] Parse variables/parameters with a template
 
 ##Version 0.3.2##
  - [ ] Enum parser
  - [ ] Enum printer
  - [ ] Flagged enums
+ - [ ] Meta tags
+ - [ ] Optimisation
+   - [ ] Branch elimination pass
+   - [ ] Generic correctness test, ensures correctness of all optimisation passes
 
 ##Version 0.3.3##
  - [ ] Partial file I/O

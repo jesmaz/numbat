@@ -1,0 +1,13 @@
+a < b
+a > b
+a == b
+a != b
+a <= b
+a >= b
+not a
+a and b
+a or b
+a or b or c or d
+a == b or c < d
+not a or b < d
+not a < b

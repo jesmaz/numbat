@@ -1,59 +1,64 @@
 ```
-Arguments			=>	'(' [ExpressionList] ')'
+Atom				=>	'{' Body '}'
+					|	'(' List ')'
+					|	Atom '(' Arguments ')'
+					|	Atom '.' Identifier
+					|	Atom Slice
+					|	Do
+					|	For
+					|	Identifier
+					|	IfElse
+					|	Literal
+					|	While
 ```
 ```
-Array				=>	'[' [Expression] [ ',' [expression] ] ']'
+Arguments			=>	Identifier ':' Expression
+					|	Identifier ':' Expression ',' Arguments
+					|	Expression
+					|	Expression ',' Arguments
+					|	ε
 ```
 ```
-Associativity		=>	'ltr'
-					|	'rtl'
+Assignment			=>	List AssignOpp List
+					|	List AssignOpp Assignment
 ```
 ```
-BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'or' | ',' | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
+AssignOpp			=>	'=' | '+=' | '-=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|=' | '=>'
 ```
 ```
-Block				=>	'{' (TopLevelExpression;)* '}'
+BinaryOp			=>	'.' | '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '&' | '^' | '|' | '<' | '<=' | '>' | '>=' | '==' | '!=' | 'and' | 'as' | 'is' | 'or'
 ```
 ```
-Call				=>	Arguments
-					|	Lvalue [Template] Arguments
-					|	PrefixUnaryOp Expression
-					|	Expression PostfixUnaryOp
-					|	Expression BinaryOp Expression
-					|	Expression TernaryOp Expression
+Body				=>	Body Statement
+					|	Body MetaTags Statement
+					|	ε
 ```
 ```
 CharArrayLiteral	=>	<string single quotes>
 ```
 ```
-Decl				=>	ExternDecl
-					|	FunctionDecl
-					|	OperatorDecl
-					|	StructDecl
-					|	VariableDecl
+Decl				=>	Statement
+					|	MetaTags Statement
 ```
 ```
-Expression			=>	Call
-					|	VariableDecl
-					|	Literal
-					|	Identifier
-					|	'(' Expression ')'
-```
-```
-ExpressionList		=>	Expression [',' Expression]*
-```
-```
-ExternDecl			=>	'extern' FunctionDecl
+Expression			=>	Atom
+					|	Atom AssignOpp Expression
+					|	Expression BinaryOp Expression
+					|	LambdaExpression
+					|	PrefixUnaryOp Expression
 ```
 ```
 FloatLiteral		=>	['0' ... '9']* '.' ('0' ... '9')+ [('e' | 'E') ['+' | '-'] ('0' ... '9')+] ['f' | 'F' | 'h' | 'H' | 'q' | 'Q']
 ```
 ```
-FunctionDecl		=>	'def' [Template] ['~'] FunctionID MetaTag* Paramaters ['->' Paramaters] Block
+Function			=>	'extern' 'def' FunctionID Template LambdaExpression
+					|	'def' FunctionID Template LambdaExpression
 ```
 ```
-FunctionID			=>	Identifier
+FunctionID			=>	'~' CharArrayLiteral
+					|	'~' Identifier
 					|	CharArrayLiteral
+					|	Identifier
 ```
 ```
 Identifier			=>	ID_start [ID_continue]*
@@ -67,10 +72,20 @@ ID_continue			=>	ID_start
 					|	<numbers>
 ```
 ```
+IfElse				=>	'if' '(' Expression ')' Expression
+					|	'if' '(' Expression ')' Expression 'else' Expression
+					|	'if' '(' Expression ')' Expression 'else' IfElse
+```
+```
 IntLiteral			=>	['1' ... '9'] ('0' ... '9')+
 					|	'0' ('b' | 'B') ('0' | '1')+
 					|	'0' ('o' | 'O') ('0' ... '7')+
 					|	'0' ('x' | 'X') ('0' ... '9' | 'a' ... 'f' | 'A' ... 'F')+
+```
+```
+LambdaExpression	=>	'(' Parameters ')' '{' Program '}'
+					|	'(' Parameters ')' '->' '(' Parameters ')'
+					|	'(' Parameters ')' '->' '(' Parameters ')' '{' Program '}'
 ```
 ```
 Literal				=>	CharArrayLiteral
@@ -79,63 +94,58 @@ Literal				=>	CharArrayLiteral
 					|	StringLiteral
 ```
 ```
-Lvalue				=>	Identifier
-					|	Call
+List				=>	Expression
+					|	Expression ',' List
+					|	ε
 ```
 ```
-MetaTag				=>	'@'Identifier
+MetaTags			=>	'@'Atom
+					|	'@'Atom MetaTags
 ```
 ```
-##DEPRECATED##
-OperatorDecl		=>	'operator' CharArrayLiteral ':' IntLiteral Associativity
+Param				=>	Expression
+					|	Variable
 ```
 ```
-Paramaters			=>	'(' [TypedArgsList] ')'
+Parameters			=>	MetaTags Param
+					|	MetaTags Param ',' Parameters
+					|	Param
+					|	Param ',' Parameters
+					|	ε
 ```
 ```
-PostfixUnaryOp		=>	'++' | '--'
+PrefixUnaryOp		=>	'-' | '!' | 'not' | '~'
 ```
 ```
-PrefixUnaryOp		=>	'++' | '--' | '+' | '-' | '!' | 'not' | '~'
+Program				=>	Decl Program
+					|	ε
 ```
 ```
-TopLevelExpression	=>	Expression
-					|	ReturnExpression
-```
-```
-Program				=>	Decl+
-```
-```
-ReturnExpression	=>	'return' [Expression]
+Statement			=>	Assignment
+					|	Enum
+					|	Expression
+					|	Function
+					|	Import
+					|	List
+					|	Struct
+					|	Union
+					|	Variable
+					|	'return' Expression
 ```
 ```
 StringLiteral		=>	<string double quotes>
 ```
 ```
-StructDecl			=>	struct Identifier MetaTag* [Template] TypeParamaters ;
+Struct				=>	'struct' Identifier Template '{' Parameters '}'
 ```
 ```
-Template			=>	'[' [ TypedArgsList ] ']'
+Template			=>	TBD
+					|	ε
 ```
 ```
-Type				=>	[Template] Type [Array]
-					|	Identifier
-					|	'{' TypedArgsList '}'
-					|	'type'
-					|	TypeModifier Type
-					|	TypeParamaters Paramaters
+Variable			=>	Atom Identifier
+					|	Atom Identifier ':' Expression
 ```
 ```
-TypedArgsList		=>	VariableDecl (',' VariableDecl)*
-```
-```
-TypeModifier		=>	'ref'
-					|	'atomic'
-					|	'const'
-```
-```
-TypeParamaters		=>	'{' [TypedArgsList] '}'
-```
-```
-VariableDecl		=>	Type Identifier
+While				=>	'while' '(' Expression ')' Expression
 ```
