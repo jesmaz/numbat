@@ -177,6 +177,9 @@ class GenericValue : public AbstractValue {
 		virtual Value operator [] (size_t index) const {
 			return Value (new GenericValue <T> (val + index, numType));
 		}
+		virtual Value reinterpret (const Type * type) const {
+			return fromData (val.template reinterpret <uint8_t> (), type);
+		}
 		
 		virtual operator double () const {return double (*val);}
 		virtual operator int64_t () const {return int64_t (*val);}
@@ -238,6 +241,9 @@ class TupleValue : public AbstractValue {
 			adv_ptr <uint8_t> ptr = bytes + index * layout->calculateSize (sizeof (Value));
 			return Value (new TupleValue (ptr, layout));
 		}
+		virtual Value reinterpret (const Type * type) const {
+			return fromData (bytes, type);
+		}
 		
 		virtual operator double () const {abort ();}
 		virtual operator int64_t () const {abort ();}
@@ -255,6 +261,7 @@ class TupleValue : public AbstractValue {
 		
 };
 
+template <bool REINTERPRETED=false>
 class PointerValue : public AbstractValue {
 	CONST_VISITABLE
 	public:
@@ -277,14 +284,22 @@ class PointerValue : public AbstractValue {
 		virtual const Type * getType () const {return ptrType;}
 		
 		virtual Value dereference () const {
-			const Type * type = ptrType->getDereferenceType ();
-			const Value & value = *ptr;
-			assert (value->getType () == type);
-			return value;
+			if (REINTERPRETED) {
+				return (*ptr)->reinterpret (ptrType->getDereferenceType ());
+			} else {
+				const Type * type = ptrType->getDereferenceType ();
+				const Value & value = *ptr;
+				assert (value->getType () == type);
+				return value;
+			}
 		}
 		
 		virtual Value operator [] (const Parameter *) const {abort ();}
 		virtual Value operator [] (size_t) const {abort ();}
+		virtual Value reinterpret (const Type * type) const {
+			assert (typeid (*type) == typeid (PointerType));
+			return new PointerValue <true> (ptr, reinterpret_cast <const PointerType *> (type));
+		}
 		
 		virtual operator double () const {abort ();}
 		virtual operator int64_t () const {abort ();}
@@ -318,7 +333,7 @@ Value TupleValue::operator [] (const Parameter * param) const {
 
 Value fromData (const adv_ptr <uint8_t> & ptr, const Type * type) {
 	if (typeid (*type) == typeid (PointerType)) {
-		return Value (new PointerValue (ptr.reinterpret <Value> (), reinterpret_cast <const PointerType *> (type)));
+		return Value (new PointerValue <> (ptr.reinterpret <Value> (), reinterpret_cast <const PointerType *> (type)));
 	} else if (typeid (*type) == typeid (Struct)) {
 		return Value (new TupleValue (ptr, reinterpret_cast <const Struct *> (type)));
 	} else if (typeid (*type) == typeid (Array)) {
@@ -386,14 +401,14 @@ Value::Value (uint64_t d) : val (new GenericValue <uint64_t> (d, Number::getNumb
 Value Value::referenceTo () {
 	adv_ptr <Value> ptr (new Value (*this));
 	const Type * type = val->getType ()->getPointerTo ();
-	return Value (new PointerValue (ptr, reinterpret_cast <const PointerType *> (type)));
+	return Value (new PointerValue <> (ptr, reinterpret_cast <const PointerType *> (type)));
 }
 
 
 Value Value::allocate (const Type * type, int64_t amount) {
 	if (typeid (*type) == typeid (PointerType)) {
 		adv_ptr <Value> ptr (amount);
-		return Value (new PointerValue (ptr, reinterpret_cast <const PointerType *> (type)));
+		return Value (new PointerValue <> (ptr, reinterpret_cast <const PointerType *> (type)));
 	} else if (typeid (*type) == typeid (Struct)) {
 		return Value (new TupleValue (amount, reinterpret_cast <const Struct *> (type)));
 	} else if (typeid (*type) == typeid (Array)) {

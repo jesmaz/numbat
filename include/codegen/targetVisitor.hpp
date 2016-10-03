@@ -21,6 +21,7 @@
 #include <nir/inst/ptradd.hpp>
 #include <nir/inst/put.hpp>
 #include <nir/inst/ret.hpp>
+#include <nir/inst/reinterpret.hpp>
 #include <nir/inst/sub.hpp>
 #include <nir/parameter.hpp>
 #include <nir/type/number.hpp>
@@ -57,6 +58,7 @@ class TargetVisitor :
 	public ConstVisitor <Parameter>,
 	public ConstVisitor <PtrAdd>,
 	public ConstVisitor <Put>,
+	public ConstVisitor <Reinterpret>,
 	public ConstVisitor <Ret>,
 	public ConstVisitor <Struct>,
 	public ConstVisitor <Sub> {};

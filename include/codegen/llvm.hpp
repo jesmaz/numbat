@@ -48,6 +48,7 @@ class LLVM : public TargetVisitor {
 		virtual void visit (const PtrAdd & ptrAdd);
 		virtual void visit (const Put & put);
 		virtual void visit (const Ret & ret);
+		virtual void visit (const Reinterpret & reinterpret) {}
 		virtual void visit (const Struct & stru);
 		virtual void visit (const Sub & sub);
 		virtual void visit (const Type * type);

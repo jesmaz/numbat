@@ -1,6 +1,7 @@
 #include <codegen/interpreter.hpp>
 #include <nir/block.hpp>
 #include <nir/type/array.hpp>
+#include <nir/type/pointer.hpp>
 #include <nir/type/struct.hpp>
 
 #include <functional>
@@ -296,6 +297,13 @@ void Interpreter::visit (const Ret & ret) {
 	for (Argument arg : ret.getArgs ()) {
 		evaluate (arg);
 	}
+	
+}
+
+void Interpreter::visit (const Reinterpret & reinterpret) {
+	
+	const Type * type = reinterpret.getType ();
+	lookupTable [reinterpret.getIden ()] = evaluate (reinterpret.getArg ())->reinterpret (type);
 	
 }
 

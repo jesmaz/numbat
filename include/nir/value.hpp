@@ -29,6 +29,7 @@ class AbstractValue : public numbat::visitor::BaseConstVisitable {
 		virtual Value dereference () const=0;
 		virtual Value operator [] (const Parameter * param) const=0;
 		virtual Value operator [] (size_t index) const=0;
+		virtual Value reinterpret (const Type * type) const=0;
 		
 		virtual operator double () const=0;
 		virtual operator int64_t () const=0;
