@@ -36,7 +36,7 @@
  - [x] High level optimisation pass
    - [x] Static code evaluation
  - [x] Replace ASTnumbatInstruction with a more robust solution
- - [ ] Rewrite (and properly document) code generator
+ - [x] Rewrite (and properly document) code generator
  - [x] Rewrite parser
    - [x] Parser should be bottom up
    - [x] Parser should not handle semantics, only syntax
