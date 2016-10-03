@@ -9,11 +9,14 @@
 #include <nir/inst/composite.hpp>
 #include <nir/inst/constant.hpp>
 #include <nir/inst/div.hpp>
+#include <nir/inst/equal.hpp>
 #include <nir/inst/functionPointer.hpp>
 #include <nir/inst/get.hpp>
 #include <nir/inst/jump.hpp>
 #include <nir/inst/less.hpp>
+#include <nir/inst/lessequal.hpp>
 #include <nir/inst/mul.hpp>
+#include <nir/inst/nequal.hpp>
 #include <nir/inst/neg.hpp>
 #include <nir/inst/ptradd.hpp>
 #include <nir/inst/put.hpp>
@@ -41,12 +44,15 @@ class TargetVisitor :
 	public ConstVisitor <Constant>,
 	public ConstVisitor <Div>,
 	public ConstVisitor <DirectCall>,
+	public ConstVisitor <Equal>,
 	public ConstVisitor <FunctionPointer>,
 	public ConstVisitor <Get>,
 	public ConstVisitor <Jump>,
 	public ConstVisitor <Less>,
+	public ConstVisitor <LessEqual>,
 	public ConstVisitor <Mul>,
 	public ConstVisitor <Neg>,
+	public ConstVisitor <NEqual>,
 	public ConstVisitor <Number>,
 	public ConstVisitor <Parameter>,
 	public ConstVisitor <PtrAdd>,

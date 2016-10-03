@@ -31,13 +31,16 @@ class Interpreter : public TargetVisitor {
 		virtual void visit (const Constant & con);
 		virtual void visit (const Div & div);
 		virtual void visit (const DirectCall & call);
+		virtual void visit (const Equal & equal);
 		virtual void visit (const Function * func);
 		virtual void visit (const FunctionPointer & fptr);
 		virtual void visit (const Get & get);
 		virtual void visit (const Jump & jump);
 		virtual void visit (const Less & less);
+		virtual void visit (const LessEqual & lessequal);
 		virtual void visit (const Mul & mul);
 		virtual void visit (const Neg & neg);
+		virtual void visit (const NEqual & nequal);
 		virtual void visit (const Number & num);
 		virtual void visit (const Parameter & param);
 		virtual void visit (const PtrAdd & ptrAdd);

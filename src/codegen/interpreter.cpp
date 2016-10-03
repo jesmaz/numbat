@@ -171,6 +171,13 @@ void Interpreter::visit (const DirectCall & call) {
 	
 }
 
+void Interpreter::visit (const Equal & equal) {
+	
+	Value res = binaryOpp <std::equal_to <void>> (equal.getLhs (), equal.getRhs (), equal.getType ());
+	lookupTable [equal.getIden ()] = res;
+	
+}
+
 void Interpreter::visit (const Function * func) {
 	
 }
@@ -207,6 +214,13 @@ void Interpreter::visit (const Less & less) {
 	
 }
 
+void Interpreter::visit (const LessEqual & lessequal) {
+	
+	Value res = binaryOpp <std::less_equal <void>> (lessequal.getLhs (), lessequal.getRhs (), lessequal.getType ());
+	lookupTable [lessequal.getIden ()] = res;
+	
+}
+
 void Interpreter::visit (const Mul & mul) {
 	
 	Value res = binaryOpp <std::multiplies <void>> (mul.getLhs (), mul.getRhs (), mul.getType ());
@@ -232,6 +246,13 @@ void Interpreter::visit (const Neg & neg) {
 			break;
 	}
 	lookupTable [neg.getIden ()] = ret;
+	
+}
+
+void Interpreter::visit (const NEqual & nequal) {
+	
+	Value res = binaryOpp <std::not_equal_to <void>> (nequal.getLhs (), nequal.getRhs (), nequal.getType ());
+	lookupTable [nequal.getIden ()] = res;
 	
 }
 
