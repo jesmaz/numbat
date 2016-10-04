@@ -4,6 +4,9 @@
 #include <parse/tree/base.hpp>
 
 
+namespace parser {
+
+
 class MetaTags : public ParseTreeNode {
 	
 	public:
@@ -35,3 +38,6 @@ class MetaTags : public ParseTreeNode {
 		PTNode componant;
 		
 };
+
+
+}

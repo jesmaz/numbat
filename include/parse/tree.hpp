@@ -1,11 +1,10 @@
-#ifndef PARSETREE_HPP
-#define PARSETREE_HPP
+#pragma once
 
 
-#include "tree/function.hpp"
-#include "tree/struct.hpp"
+#include <parse/tree/base.hpp>
 
- 
+
+namespace parser {
 
 
 class ParseTree : public ParseTreeNode {
@@ -59,4 +58,4 @@ class ParseTree : public ParseTreeNode {
 };
 
 
-#endif /*PARSERTREE_HPP*/
+}

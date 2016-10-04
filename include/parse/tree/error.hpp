@@ -1,8 +1,10 @@
-#ifndef PARSETREEERROR_HPP
-#define PARSETREEERROR_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
+
+
+namespace parser {
 
 
 class ParseTreeError : public ParseTreeNode {
@@ -21,4 +23,4 @@ class ParseTreeError : public ParseTreeNode {
 };
 
 
-#endif /*PARSETREEERROR_HPP*/
+}

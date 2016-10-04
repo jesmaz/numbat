@@ -2,6 +2,10 @@
 #include <parse/tree/literal.hpp>
 #include <string>
 
+
+namespace parser {
+
+
 const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope) {
 	
 	switch (tokenType) {
@@ -40,4 +44,7 @@ const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope) {
 
 string ParseTreeLiteral::strDump (text::PrintMode mode) {
 	return mode & text::COLOUR ? text::yel + literal + text::reset : literal;
+}
+
+
 }

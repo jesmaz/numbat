@@ -1,4 +1,8 @@
-#include "../../../include/parse/tree/slice.hpp"
+#include <parse/tree/slice.hpp>
+
+
+namespace parser {
+
 
 string ParseTreeSlice::strDump (text::PrintMode mode) {
 	string s = text::PrintMode::COLOUR & mode ? text::red + "[" + text::reset : "[";
@@ -26,4 +30,7 @@ string ParseTreeSliceForEach::strDump (text::PrintMode mode) {
 	s += range->toString (mode);
 	s += text::PrintMode::COLOUR & mode ? text::red + "]" + text::reset : "]";
 	return s;
+}
+
+
 }

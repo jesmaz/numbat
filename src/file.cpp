@@ -67,13 +67,13 @@ File * File::compile (const string & path, nir::Module * module) {
 		f->fileName = path.substr (0, pos);
 	}
 	
-	PTNode parseTree;
+	parser::PTNode parseTree;
 	{
 		std::string file;
 		std::string buffer;
 		while (std::getline (fin, buffer))
 			file += buffer + "\n";
-		parseTree = parse (file, f);
+		parseTree = parser::parse (file, f);
 		std::cerr << file << std::endl;
 		std::cerr << parseTree->toString () << std::endl;
 	}

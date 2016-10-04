@@ -3,6 +3,9 @@
 #include <utility/report.hpp>
 
 
+namespace parser {
+
+
 const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	
 	//TODO: When unions are avaliable the if-else should use them when the return types are different
@@ -67,4 +70,7 @@ string ParseTreeIfElse::strDump (text::PrintMode mode) {
 	}
 	return s;
 	
+}
+
+
 }

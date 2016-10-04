@@ -4,6 +4,9 @@
 #include <parse/tree/base.hpp>
 
 
+namespace parser {
+
+
 class ParseTreeIndex : public ParseTreeNode {
 	
 	public:
@@ -25,3 +28,6 @@ class ParseTreeIndex : public ParseTreeNode {
 		BasicArray <PTNode> args;
 		
 };
+
+
+}

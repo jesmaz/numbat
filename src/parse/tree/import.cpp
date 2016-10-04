@@ -2,6 +2,10 @@
 #include <parse/tree/import.hpp>
 #include <utility/report.hpp>
 
+
+namespace parser {
+
+
 #define PATH_JOIN "/"
 
 const nir::Instruction * ParseTreeImport::build (nir::Scope * scope) {
@@ -48,4 +52,7 @@ void ParseTreeImport::declare (nir::Scope * scope) {
 		report::logMessage (report::ERROR, "Failed to import '" + relPath + "'");
 	}
 	
+}
+
+
 }

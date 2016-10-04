@@ -1,5 +1,9 @@
 #include <parse/tree/metaTags.hpp>
 
+
+namespace parser {
+
+
 const nir::Instruction * MetaTags::build (nir::Scope * scope) {
 	
 	const auto * cmpt = componant->build (scope);
@@ -16,4 +20,7 @@ const nir::Instruction * MetaTags::build (nir::Scope * scope) {
 
 void MetaTags::declare (nir::Scope * scope) {
 	componant->declare (scope);
+}
+
+
 }

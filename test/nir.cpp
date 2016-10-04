@@ -27,7 +27,7 @@ int numbatMain (const Config & cfg) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				auto node = parse (prog, &dummyFile);
+				auto node = parser::parse (prog, &dummyFile);
 				node->build (globalScope);
 				while (printItt) {
 					std::cout << printItt << '\n';
@@ -39,7 +39,7 @@ int numbatMain (const Config & cfg) {
 			}
 		}
 		if (not prog.empty()) {
-			auto node = parse (prog, &dummyFile);
+			auto node = parser::parse (prog, &dummyFile);
 			node->build (globalScope);
 			while (printItt) {
 				std::cout << printItt << '\n';
@@ -57,7 +57,7 @@ int numbatMain (const Config & cfg) {
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
-			auto node = parse (prog, &dummyFile);
+			auto node = parser::parse (prog, &dummyFile);
 			node->build (globalScope);
 			while (printItt) {
 				std::cout << printItt << std::endl;

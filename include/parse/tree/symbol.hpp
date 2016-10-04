@@ -1,8 +1,10 @@
-#ifndef PARSETREESYMBOL_HPP
-#define PARSETREESYMBOL_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
+
+
+namespace parser {
 
 
 class ParseTreeSymbol : public ParseTreeNode {
@@ -21,4 +23,4 @@ class ParseTreeSymbol : public ParseTreeNode {
 };
 
 
-#endif /*PARSETREESYMBOL_HPP*/
+}

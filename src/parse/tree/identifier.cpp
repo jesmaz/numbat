@@ -1,6 +1,10 @@
 #include <nir/scope.hpp>
 #include <parse/tree/identifier.hpp>
 
+
+namespace parser {
+
+
 const nir::Instruction * ParseTreeIdentifier::build (nir::Scope * scope) {
 	return scope->resolve (iden);
 }
@@ -17,4 +21,7 @@ const nir::Type * ParseTreeIdentifier::resolveType (nir::Scope * scope) {
 
 string ParseTreeIdentifier::strDump (text::PrintMode mode) {
 	return iden;
+}
+
+
 }

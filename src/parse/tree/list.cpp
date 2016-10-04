@@ -1,4 +1,8 @@
-#include "../../../include/parse/tree/list.hpp"
+#include <parse/tree/list.hpp>
+
+
+namespace parser {
+
 
 string ParseTreeList::strDump (text::PrintMode mode) {
 	if (args.size ()) {
@@ -8,4 +12,7 @@ string ParseTreeList::strDump (text::PrintMode mode) {
 	} else {
 		return "()";
 	}
+}
+
+
 }

@@ -6,6 +6,8 @@
 #include <utility/report.hpp>
 
 
+namespace parser {
+
 
 const nir::Instruction * Struct::build (nir::Scope * scope) {
 	
@@ -44,4 +46,7 @@ string Struct::strDump (text::PrintMode mode) {
 	string s = (mode&text::COLOUR ? text::blu + "struct " + text::reset : "struct ") + iden;
 	s += " {" + text::listPtrToStr (members.begin (), members.end (), mode) + "}";
 	return s;
+}
+
+
 }

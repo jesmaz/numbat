@@ -3,6 +3,9 @@
 #include <utility/report.hpp>
 
 
+namespace parser {
+
+
 BasicArray <nir::Argument> resolveNodes (nir::Scope * scope, BasicArray <PTNode> args) {
 	
 	BasicArray <nir::Argument> nodes (args.size ());
@@ -277,4 +280,7 @@ const nir::Instruction * SpecificOperator <OPERATION::SUB>::defBuild (nir::Scope
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
 	return scope->createSub (nodes [0], nodes [1]);
+}
+
+
 }

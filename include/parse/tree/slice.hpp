@@ -1,10 +1,10 @@
-#ifndef PARSETREESLICE_HPP
-#define PARSETREESLICE_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
 
- 
+
+namespace parser {
 
 
 class ParseTreeSlice : public ParseTreeNode {
@@ -60,4 +60,4 @@ class ParseTreeSliceForEach : public ParseTreeNode {
 };
 
 
-#endif /*PARSETREESLICE_HPP*/
+}

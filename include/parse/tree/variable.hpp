@@ -1,8 +1,10 @@
-#ifndef PARSETREEVARIABLE_HPP
-#define PARSETREEVARIABLE_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
+
+
+namespace parser {
 
 
 class ParseTreeVariable : public ParseTreeNode {
@@ -32,4 +34,4 @@ class ParseTreeVariable : public ParseTreeNode {
 };
 
 
-#endif /*PARSETREEVARIABLE_HPP*/
+}

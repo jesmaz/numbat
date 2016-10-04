@@ -1,9 +1,10 @@
 #pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
 
- 
+
+namespace parser {
 
 
 struct ResolveScope : ParseTreeNode {
@@ -29,3 +30,6 @@ struct ResolveScope : ParseTreeNode {
 		string iden;
 		
 };
+
+
+}

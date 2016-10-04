@@ -1,4 +1,9 @@
+#include <parse/tree/function.hpp>
 #include <parse/tree.hpp>
+
+
+namespace parser {
+
 
 const nir::Instruction * ParseTree::build (nir::Scope * scope) {
 	if (nirTreeScope) {
@@ -52,4 +57,7 @@ void ParseTree::push_back (PTNode node) {
 					break;
 	}
 	body.push_back (node);
+}
+
+
 }

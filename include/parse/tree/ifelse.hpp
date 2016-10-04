@@ -1,9 +1,10 @@
 #pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
 
- 
+
+namespace parser {
 
 
 struct ParseTreeIfElse : ParseTreeNode {
@@ -25,3 +26,6 @@ struct ParseTreeIfElse : ParseTreeNode {
 		PTNode cond, body, alternate;
 		
 };
+
+
+}

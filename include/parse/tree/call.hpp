@@ -1,10 +1,10 @@
-#ifndef CALL_HPP
-#define CALL_HPP
+#pragma once
 
 
 #include "base.hpp"
 
- 
+
+namespace parser {
 
 
 class ParseTreeCall : public ParseTreeNode {
@@ -32,4 +32,4 @@ class ParseTreeCall : public ParseTreeNode {
 };
 
 
-#endif /*CALL_HPP*/
+}

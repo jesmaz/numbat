@@ -1,9 +1,11 @@
-#ifndef PARSETREELITERAL_HPP
-#define PARSETREELITERAL_HPP
+#pragma once
 
 
-#include "base.hpp"
-#include "../../token.hpp"
+#include <parse/tree/base.hpp>
+#include <token.hpp>
+
+
+namespace parser {
 
 
 class ParseTreeLiteral : public ParseTreeNode {
@@ -26,4 +28,4 @@ class ParseTreeLiteral : public ParseTreeNode {
 };
 
 
-#endif /*PARSETREELITERAL_HPP*/
+}

@@ -1,11 +1,11 @@
-#ifndef IMPORT_HPP
-#define IMPORT_HPP
+#pragma once
 
 
-#include "base.hpp"
 #include <file.hpp>
+#include <parse/tree/base.hpp>
 
- 
+
+namespace parser {
 
 
 class ParseTreeImport : public ParseTreeNode {
@@ -54,4 +54,4 @@ class ParseTreeImportPath : public ParseTreeNode {
 };
 
 
-#endif /*IMPORT_HPP*/
+}

@@ -1,8 +1,10 @@
-#ifndef PARSETREEKWYWORD_HPP
-#define PARSETREEKWYWORD_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
+
+
+namespace parser {
 
 
 class ParseTreeKeyword : public ParseTreeNode {
@@ -23,4 +25,4 @@ class ParseTreeKeyword : public ParseTreeNode {
 };
 
 
-#endif /*PARSETREEKWYWORD_HPP*/
+}

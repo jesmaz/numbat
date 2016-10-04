@@ -16,10 +16,15 @@
 #include <parse/tree/operator.hpp>
 #include <parse/tree/resolvescope.hpp>
 #include <parse/tree/slice.hpp>
+#include <parse/tree/struct.hpp>
 #include <parse/tree/variable.hpp>
 #include <utility/report.hpp>
 #define __ENABLE__PROFILING__
 #include <utility/timer.hpp>
+
+
+namespace parser {
+
 
 enum class Symbol : char {
 	AND,
@@ -869,7 +874,7 @@ PTNode parseStruct (CodeQueue * queue) {
 		queue->shiftPop ();
 	}
 	
-	return new Struct (pos, iden, {members.begin (), members.end ()});
+	return new Struct (pos, iden, members);
 	
 }
 
@@ -1163,4 +1168,7 @@ void CodeQueue::update (uint32_t n) {
 		
 	}
 	
+}
+
+
 }

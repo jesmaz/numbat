@@ -23,7 +23,7 @@ int numbatMain (const Config & cfg) {
 		if (not std::getline (std::cin, line)) {
 			break;
 		}
-		auto parseTree = parse (line, &dummyFile);
+		auto parseTree = parser::parse (line, &dummyFile);
 		std::cerr << parseTree->toString () << std::endl;
 		
 		if (report::compilationFailed ()) {

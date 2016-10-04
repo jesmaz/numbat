@@ -1,4 +1,8 @@
-#include "../../../include/parse/tree/error.hpp"
+#include <parse/tree/error.hpp>
+
+
+namespace parser {
+
 
 string ParseTreeError::strDump (text::PrintMode mode) {
 	string s = "error:" + std::to_string (getPos ().line) + ":" + std::to_string (getPos ().col) + ": " + err;
@@ -7,4 +11,7 @@ string ParseTreeError::strDump (text::PrintMode mode) {
 	} else {
 		return s;
 	}
+}
+
+
 }

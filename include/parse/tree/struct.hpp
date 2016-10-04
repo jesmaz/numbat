@@ -1,10 +1,10 @@
-#ifndef STRUCT_HPP
-#define STRUCT_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
 
- 
+
+namespace parser {
 
 
 struct Struct : ParseTreeNode {
@@ -32,4 +32,4 @@ struct Struct : ParseTreeNode {
 };
 
 
-#endif /*STRUCT_HPP*/
+}

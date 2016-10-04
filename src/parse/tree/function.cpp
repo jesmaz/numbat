@@ -3,6 +3,9 @@
 #include <parse/tree/function.hpp>
 
 
+namespace parser {
+
+
 auto buildParams = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
 	DynArray <const nir::Parameter *> conv;
 	for (auto & arg : args) {
@@ -80,3 +83,6 @@ Function::Function (PTNode iden, PTNode params, PTNode type, PTNode body) : Pars
 }
 
 Function::Function (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage) : ParseTreeNode (ParseTreeNode::NodeType::FUNCTION, pos), params (params), type (type), iden (iden), body (body), linkage (linkage) {}
+
+
+}

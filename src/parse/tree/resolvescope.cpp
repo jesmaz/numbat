@@ -3,6 +3,9 @@
 #include <parse/tree/resolvescope.hpp>
 
 
+namespace parser {
+
+
 const nir::Instruction * ResolveScope::build (nir::Scope * scope) {
 	const nir::Instruction * p = parent->build (scope);
 	if (not p or p->getIdens ().empty ()) return nullptr;
@@ -26,4 +29,7 @@ string ResolveScope::strDump (text::PrintMode mode) {
 	
 	return parent->toString (mode) + "." + iden;
 	
+}
+
+
 }

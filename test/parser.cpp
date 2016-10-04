@@ -10,10 +10,10 @@ void printHelp (char * cmd) {
 	std::cerr << "Usage: " << cmd << " [Option]... [File...]\n";
 }
 
-void print (PTNode node) {
-	ParseTree * ptree = dynamic_cast <ParseTree *> (node);
+void print (parser::PTNode node) {
+	parser::ParseTree * ptree = dynamic_cast <parser::ParseTree *> (node);
 	if (ptree) {
-		for (PTNode n : ptree->getBody ()) {
+		for (parser::PTNode n : ptree->getBody ()) {
 			std::cout << n->toString (text::COLOUR) << std::endl;
 		}
 	}
@@ -30,7 +30,7 @@ int numbatMain (const Config & cfg) {
 			if (not line.empty ()) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
-				auto n = parse (prog, &dummyFile);
+				auto n = parser::parse (prog, &dummyFile);
 				print (n);
 				delete n;
 				std::cout << std::endl;
@@ -38,7 +38,7 @@ int numbatMain (const Config & cfg) {
 			}
 		}
 		if (not prog.empty()) {
-			auto n = parse (prog, &dummyFile);
+			auto n = parser::parse (prog, &dummyFile);
 			print (n);
 			delete n;
 		}
@@ -49,7 +49,7 @@ int numbatMain (const Config & cfg) {
 			string buff, prog;
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
-			auto n = parse (prog, &dummyFile);
+			auto n = parser::parse (prog, &dummyFile);
 			print (n);
 			delete n;
 			std::cout << "########" << f << "########" << std::endl;

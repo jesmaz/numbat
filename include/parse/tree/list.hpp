@@ -1,8 +1,10 @@
-#ifndef LIST_HPP
-#define LIST_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
+
+
+namespace parser {
 
 
 class ParseTreeList : public ParseTreeNode {
@@ -28,4 +30,4 @@ class ParseTreeList : public ParseTreeNode {
 };
 
 
-#endif /*LIST_HPP*/
+}

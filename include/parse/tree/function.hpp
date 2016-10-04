@@ -1,10 +1,10 @@
-#ifndef FUNCTION_HPP
-#define FUNCTION_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
 
- 
+
+namespace parser {
 
 
 struct Function : ParseTreeNode {
@@ -43,4 +43,4 @@ struct Function : ParseTreeNode {
 };
 
 
-#endif /*FUNCTION_HPP*/
+}

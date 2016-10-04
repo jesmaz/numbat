@@ -1,8 +1,10 @@
-#ifndef PARSETREEIDENTIFIER_HPP
-#define PARSETREEIDENTIFIER_HPP
+#pragma once
 
 
-#include "base.hpp"
+#include <parse/tree/base.hpp>
+
+
+namespace parser {
 
 
 class ParseTreeIdentifier : public ParseTreeNode {
@@ -27,4 +29,4 @@ class ParseTreeIdentifier : public ParseTreeNode {
 };
 
 
-#endif /*PARSETREEIDENTIFIER_HPP*/
+}

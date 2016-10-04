@@ -4,6 +4,10 @@
 #include <utility/array.hpp>
 #include <utility/report.hpp>
 
+
+namespace parser {
+
+
 auto buildArgs = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
 	DynArray <nir::Argument> conv;
 	for (auto & arg : args) {
@@ -43,4 +47,7 @@ string ParseTreeCall::strDump (text::PrintMode mode) {
 		}
 	}
 	return s + ")";
+}
+
+
 }

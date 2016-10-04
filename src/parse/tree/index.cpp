@@ -4,6 +4,10 @@
 #include <nir/type/array.hpp>
 #include <utility/report.hpp>
 
+
+namespace parser {
+
+
 const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	
 	const nir::Instruction * inst = index->build (scope);
@@ -64,4 +68,7 @@ string ParseTreeIndex::strDump (text::PrintMode mode) {
 		for (size_t i=1; i<args.size (); ++i) s += args [i]->toString (mode);
 	}
 	return s + (text::PrintMode::COLOUR & mode ? text::red + "]" + text::reset : "]") + ")";
+}
+
+
 }

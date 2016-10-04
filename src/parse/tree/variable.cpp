@@ -4,6 +4,9 @@
 #include <utility/report.hpp>
 
 
+namespace parser {
+
+
 const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 	
 	const nir::Instruction * init = nullptr, * var = nullptr;
@@ -90,4 +93,7 @@ string ParseTreeVariable::strDump (text::PrintMode mode) {
 		s = "(" + s + " : " + inst->toString (mode) + ")";
 	}
 	return s;
+}
+
+
 }

@@ -1,6 +1,10 @@
 #include <parse/tree/base.hpp>
 #include <utility/report.hpp>
 
+
+namespace parser {
+
+
 const BasicArray <ParseTreeNode *> ParseTreeNode::defaultArgs;
 const string ParseTreeNode::defaultStr;
 
@@ -30,4 +34,7 @@ void ParseTreeNode::declare (nir::Scope *) {
 
 void ParseTreeNode::push_back (ParseTreeNode * e) {
 	report::logMessage (report::ERROR, string ("virtual 'push_back' not implemented for: ") + typeid (*this).name ());
+}
+
+
 }

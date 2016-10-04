@@ -3,19 +3,17 @@
 
 #include <cassert>
 #include <iostream>
+#include <forward.hpp>
 #include <nir/forward.hpp>
 #include <string>
 #include <token.hpp>
 #include <typeinfo>
 #include <utility/array.hpp>
 #include <utility/text.hpp>
- 
 
 
-using std::string;
+namespace parser {
 
-struct Function;
-struct Struct;
 
 class ParseTreeNode {
 	
@@ -31,10 +29,10 @@ class ParseTreeNode {
 		
 		virtual bool isAggregate () {return false;}
 		virtual bool isList () {return false;}
-		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return defaultArgs;}
-		virtual const BasicArray <ParseTreeNode *> releaseArgs () {return defaultArgs;}
-		virtual const BasicArray <ParseTreeNode *> & getTags () const {return defaultArgs;}
-		virtual const BasicArray <ParseTreeNode *> & getTemplate () const {return defaultArgs;}
+		virtual const BasicArray <PTNode> & getArgs () const {return defaultArgs;}
+		virtual const BasicArray <PTNode> releaseArgs () {return defaultArgs;}
+		virtual const BasicArray <PTNode> & getTags () const {return defaultArgs;}
+		virtual const BasicArray <PTNode> & getTemplate () const {return defaultArgs;}
 		virtual const string & getIden () const {return defaultStr;}
 		virtual Function * asFunction () {return nullptr;}
 		virtual Struct * asStruct () {return nullptr;}
@@ -45,7 +43,7 @@ class ParseTreeNode {
 		virtual const nir::Type * resolveType (nir::Scope * scope);
 		
 		virtual void declare (nir::Scope * scope);
-		virtual void push_back (ParseTreeNode * e);
+		virtual void push_back (PTNode e);
 		
 		ParseTreeNode (numbat::lexer::position pos) : type (NodeType::EXPRESSION), pos (pos) {}
 		ParseTreeNode (NodeType nodeType, numbat::lexer::position pos) : type (nodeType), pos (pos) {}
@@ -61,9 +59,10 @@ class ParseTreeNode {
 		
 		NodeType type=NodeType::EXPRESSION;
 		numbat::lexer::position pos;
-		const static BasicArray <ParseTreeNode *> defaultArgs;
+		const static BasicArray <PTNode> defaultArgs;
 		const static string defaultStr;
 		
 };
 
-typedef ParseTreeNode * PTNode;
+
+}
