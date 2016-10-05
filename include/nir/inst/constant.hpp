@@ -22,7 +22,7 @@ class Constant : public Instruction {
 		
 		const BasicArray <Value> & getValues () const {return values;}
 		
-		Constant (const BasicArray <const Type *> & types, const BasicArray <Value> & values, const BasicArray <symbol> & idens) : Instruction ({}, types, idens), values (values) {}
+		Constant (const BasicArray <const Type *> & types, const BasicArray <Value> & values, const BasicArray <symbol> & idens) : Instruction ({}, combine <Result> (types, idens)), values (values) {}
 		
 	protected:
 	private:

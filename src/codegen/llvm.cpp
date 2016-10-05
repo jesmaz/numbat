@@ -191,7 +191,7 @@ void LLVM::visit (const nir::Block & block) {
 	for (const nir::Instruction * val : block.getInstructions ()) {
 		std::cerr << val->toString () << " " << typeid (*val).name () << " " << (void*)val << std::endl;
 		val->accept (*this);
-		if (not val->getIdens ().empty ()) {
+		if (not val->getResults ().empty ()) {
 			instrDict [val->getIden ()]->dump ();
 		}
 	}
@@ -210,14 +210,14 @@ void LLVM::visit (const nir::Composite & comp) {
 
 void LLVM::visit (const nir::Constant & con) {
 	
-	const auto & syms = con.getIdens ();
+	const auto & res = con.getResults ();
 	const auto & values = con.getValues ();
 	
-	assert (syms.size () == values.size ());
+	assert (res.size () == values.size ());
 	
-	for (size_t i=0, l=syms.size (); i<l; ++i) {
+	for (size_t i=0, l=res.size (); i<l; ++i) {
 		
-		instrDict [syms [i]] = resolve (values [i].get ());
+		instrDict [res [i].iden] = resolve (values [i].get ());
 		
 	}
 	

@@ -14,8 +14,8 @@ auto buildArgs = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
 		assert (arg);
 		const nir::Instruction * instr = arg->build (scope);
 		if (instr) {
-			for (nir::symbol iden : instr->getIdens ()) {
-				if (iden) conv.push_back ({instr, iden});
+			for (auto & r : instr->getResults ()) {
+				if (r.iden) conv.push_back ({instr, r.iden});
 			}
 		}
 	}

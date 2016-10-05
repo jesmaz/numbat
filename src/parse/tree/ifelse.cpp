@@ -33,10 +33,10 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	// Go back to before the if statment to allocate and branch
 	scope->changeActiveBlock (current);
 	
-	if (bodyRet and not bodyRet->getTypes ().empty ()) alloc = scope->allocateVariable (bodyRet->getType ());
+	if (bodyRet and not bodyRet->getResults ().empty ()) alloc = scope->allocateVariable (bodyRet->getType ());
 	const nir::Instruction * condJump=nullptr;
 	if (condition) {
-		if (condition->getIdens ().empty ()) {
+		if (condition->getResults ().empty ()) {
 			report::logMessage (report::ERROR, scope->getSourceFile (), cond->getPos (), "'" + cond->toString (text::PLAIN) + "' is not a ");
 			return nullptr;
 		}
@@ -47,7 +47,7 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 		scope->createJump (altBlock);
 		// Go back to alt block to store the result and branch
 		scope->changeActiveBlock (altBlock);
-		if (alloc and altRet and not altRet->getTypes ().empty ()) scope->createPut ({altRet, altRet->getIden ()}, {alloc, alloc->getIden ()});
+		if (alloc and altRet and not altRet->getResults ().empty ()) scope->createPut ({altRet, altRet->getIden ()}, {alloc, alloc->getIden ()});
 	} else {
 		scope->createJump (contBlock);
 	}

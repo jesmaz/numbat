@@ -22,11 +22,11 @@ const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	}
 	
 	if (not inst or not s) return nullptr;
-	if (inst->getTypes ().empty ()) {
+	if (inst->getResults ().empty ()) {
 		report::logMessage (report::ERROR, scope->getSourceFile (), index->getPos (), "'" + inst->toString (text::PLAIN) + "' can't be indexed");
 		return nullptr;
 	}
-	if (s->getIdens ().empty ()) {
+	if (s->getResults ().empty ()) {
 		report::logMessage (report::ERROR, scope->getSourceFile (), index->getPos (), "'" + args [0]->toString (text::PLAIN) + "' is not a value");
 		return nullptr;
 	}

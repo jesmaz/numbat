@@ -16,6 +16,11 @@ struct Argument {
 	string toString (text::PrintMode mode=text::PLAIN) const;
 };
 
+struct Result {
+	const Type * type;
+	symbol iden;
+};
+
 BasicArray <const Type *> argumentToType (const BasicArray <Argument> & args);
 BasicArray <symbol> argumentToSymbol (const BasicArray <Argument> & args);
 
@@ -25,15 +30,14 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 		
 		virtual bool validate () const=0;
 		
-		const Type * getType () const {return types [0];}
+		const Type * getType () const {return results [0].type;}
 		
 		string printIden (text::PrintMode mode=text::PLAIN) const;
 		string toString (text::PrintMode mode=text::PLAIN) const;
-		symbol getIden () const {return idens [0];}
+		symbol getIden () const {return results [0].iden;}
 		
 		const BasicArray <Argument> & getArguments () const {return arguments;}
-		const BasicArray <const Type *> & getTypes () const {return types;}
-		const BasicArray <symbol> & getIdens () const {return idens;}
+		const BasicArray <Result> & getResults () const {return results;}
 		
 		virtual const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const=0;
 		
@@ -42,15 +46,14 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 		
 	protected:
 		
-		Instruction (const BasicArray <Argument> & arguments, const BasicArray <const Type *> & types, const BasicArray <symbol> & idens) : arguments (arguments), types (types), idens (idens) {assert (types.size () == idens.size ());}
+		Instruction (const BasicArray <Argument> & arguments, const BasicArray <Result> & results) : arguments (arguments), results (results) {}
 		
 	private:
 		
 		virtual string strDump (text::PrintMode mode) const=0;
 		
-		BasicArray <Argument> arguments;
-		BasicArray <const Type *> types;
-		BasicArray <symbol> idens;
+		const BasicArray <Argument> arguments;
+		const BasicArray <Result> results;
 		
 };
 

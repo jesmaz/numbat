@@ -22,7 +22,7 @@ class Jump : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const;
 		
-		Jump (Argument condition, const Block * block) : Instruction ({condition}, {nullptr}, {nullptr}), condition (condition), block (block) {}
+		Jump (Argument condition, const Block * block) : Instruction ({condition}, {{nullptr, nullptr}}), condition (condition), block (block) {}
 		
 		Argument condition;
 		const Block * block;

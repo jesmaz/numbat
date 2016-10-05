@@ -15,7 +15,7 @@ class Get : public Instruction {
 		
 		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {assert (replacmentArgs.size () == 1); return new Get (getType (), replacmentArgs [0], getIden ());}
 		
-		Get (const Type * type, Argument src, symbol iden) : Instruction ({src}, {type}, {iden}), src (src) {}
+		Get (const Type * type, Argument src, symbol iden) : Instruction ({src}, {{type, iden}}), src (src) {}
 		
 	protected:
 	private:

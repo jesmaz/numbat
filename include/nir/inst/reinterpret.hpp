@@ -22,7 +22,7 @@ class Reinterpret : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "reinterpret." + getType ()->toString (mode) + " " + arg.toString (mode);}
 		
-		Reinterpret (const Type * type, Argument arg, symbol iden) : Instruction ({arg}, {type}, {iden}), arg (arg) {}
+		Reinterpret (const Type * type, Argument arg, symbol iden) : Instruction ({arg}, {{type, iden}}), arg (arg) {}
 		
 		Argument arg;
 		

@@ -12,7 +12,7 @@ BasicArray <nir::Argument> resolveNodes (nir::Scope * scope, BasicArray <PTNode>
 	for (size_t i=0; i<args.size(); ++i) {
 		assert (args[i]);
 		const nir::Instruction * instr = args[i]->build (scope);
-		if (instr and not instr->getIdens ().empty ()) {
+		if (instr and not instr->getResults ().empty ()) {
 			nodes [i] = {instr, instr->getIden ()};
 		} else {
 			return {};
@@ -70,7 +70,7 @@ const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope
 	const nir::Type * b = scope->resolveType ("bool");
 	const nir::Instruction * res = scope->allocateVariable (b);
 	const nir::Instruction * lhs = args [0]->build (scope);
-	if (not lhs or lhs->getIdens ().empty ()) return nullptr;
+	if (not lhs or lhs->getResults ().empty ()) return nullptr;
 	
 	nir::symbol rhsBlock = scope->createBlock ();
 	nir::symbol cont = scope->createBlock ();
@@ -81,7 +81,7 @@ const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope
 	scope->changeActiveBlock (rhsBlock);
 	
 	const nir::Instruction * rhs = args [1]->build (scope);
-	if (not rhs or rhs->getIdens ().empty ()) return nullptr;
+	if (not rhs or rhs->getResults ().empty ()) return nullptr;
 	
 	scope->createPut ({rhs, rhs->getIden ()}, {res, res->getIden ()});
 	scope->changeActiveBlock (cont);
@@ -249,7 +249,7 @@ const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope 
 	const nir::Type * b = scope->resolveType ("bool");
 	const nir::Instruction * res = scope->allocateVariable (b);
 	const nir::Instruction * lhs = args [0]->build (scope);
-	if (not lhs or lhs->getIdens ().empty ()) return nullptr;
+	if (not lhs or lhs->getResults ().empty ()) return nullptr;
 	
 	nir::symbol rhsBlock = scope->createBlock ();
 	nir::symbol cont = scope->createBlock ();
@@ -259,7 +259,7 @@ const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope 
 	scope->changeActiveBlock (rhsBlock);
 	
 	const nir::Instruction * rhs = args [1]->build (scope);
-	if (not rhs or rhs->getIdens ().empty ()) return nullptr;
+	if (not rhs or rhs->getResults ().empty ()) return nullptr;
 	
 	scope->createPut ({rhs, rhs->getIden ()}, {res, res->getIden ()});
 	scope->changeActiveBlock (cont);

@@ -22,7 +22,7 @@ class PickStructMember : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return parent.toString (mode) + "." + memIden;}
 		
-		PickStructMember (const Type * type, Argument parent, size_t index, const string & memIden, symbol iden) : Instruction ({parent}, {type}, {iden}), parent (parent), index (index), memIden (memIden) {}
+		PickStructMember (const Type * type, Argument parent, size_t index, const string & memIden, symbol iden) : Instruction ({parent}, {{type, iden}}), parent (parent), index (index), memIden (memIden) {}
 		
 		Argument parent;
 		size_t index;

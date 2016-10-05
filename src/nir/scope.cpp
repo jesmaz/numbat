@@ -217,7 +217,7 @@ const Instruction * Scope::createAutoReturn (const Instruction * instr) {
 		Instruction * ret = new Ret ({});
 		return insertionPoint->give (ret);
 	} else {
-		auto args = instr->getIdens ().map <Argument> ([=](symbol s){return Argument {instr, s};});
+		auto args = instr->getResults ().map <Argument> ([=](auto & r){return Argument {instr, r.iden};});
 		Instruction * ret = new Ret (args);
 		return insertionPoint->give (ret);
 	}

@@ -20,8 +20,8 @@ class Composite : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {
 			string s = "composite";
-			for (const Type * t : getTypes ()) {
-				s += "." + t->toString (mode);
+			for (auto & r : getResults ()) {
+				s += "." + r.type->toString (mode);
 			}
 			for (Argument arg : getArguments ()) {
 				s += " " + arg.toString (mode);
@@ -29,7 +29,7 @@ class Composite : public Instruction {
 			return s;
 		}
 		
-		Composite (const Type * type, const BasicArray <Argument> & args, symbol iden) : Instruction (args, {type}, {iden}) {}
+		Composite (const Type * type, const BasicArray <Argument> & args, symbol iden) : Instruction (args, {{type, iden}}) {}
 		
 		friend Scope;
 		

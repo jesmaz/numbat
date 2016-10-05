@@ -20,7 +20,7 @@ class Alloc : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "alloc." + getType ()->toString () + " " + amount.toString (mode);}
 		
-		Alloc (const Type * type, Argument amount, symbol iden) : Instruction ({amount}, {type}, {iden}), amount (amount) {}
+		Alloc (const Type * type, Argument amount, symbol iden) : Instruction ({amount}, {{type, iden}}), amount (amount) {}
 		
 		Argument amount;
 		

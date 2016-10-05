@@ -293,6 +293,16 @@ struct DynArray : public BasicArray <T> {
 		
 };
 
+template <typename R, typename T, typename Y>
+inline BasicArray <R> combine (const BasicArray <T> & lhs, const BasicArray <Y> & rhs) {
+	assert (lhs.size () == rhs.size ());
+	BasicArray <R> res (lhs.size ());
+	for (size_t i=0; i<res.size (); ++i) {
+		res [i] = R {lhs [i], rhs [i]};
+	}
+	return res;
+}
+
 
 template <typename T>
 inline void delAll (const BasicArray <T *> & arr) {

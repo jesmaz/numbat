@@ -23,7 +23,7 @@ class NEqual : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "nequal." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);}
 		
-		NEqual (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
+		NEqual (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {{type, iden}}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		

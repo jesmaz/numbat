@@ -137,14 +137,14 @@ void Interpreter::visit (const Composite & comp) {
 
 void Interpreter::visit (const Constant & con) {
 	
-	const auto & syms = con.getIdens ();
+	const auto & res = con.getResults ();
 	const auto & values = con.getValues ();
 	
-	assert (syms.size () == values.size ());
+	assert (res.size () == values.size ());
 	
-	for (size_t i=0, l=syms.size (); i<l; ++i) {
+	for (size_t i=0, l=res.size (); i<l; ++i) {
 		
-		lookupTable [syms [i]] = values [i];
+		lookupTable [res [i].iden] = values [i];
 		
 	}
 	
@@ -164,10 +164,10 @@ void Interpreter::visit (const DirectCall & call) {
 		args.push_back (evaluate (a));
 	}
 	auto ret = callFunction (call.getFunc (), args);
-	assert (ret.size () == call.getIdens ().size ());
-	const auto & idens = call.getIdens ();
+	assert (ret.size () == call.getResults ().size ());
+	const auto & res = call.getResults ();
 	for (size_t i=0, l=ret.size (); i<l; ++i) {
-		lookupTable [idens [i]] = ret [i];
+		lookupTable [res [i].iden] = ret [i];
 	}
 	
 }
@@ -395,13 +395,13 @@ BasicArray <Value> Interpreter::operator ()() {
 
 BasicArray <Value> Interpreter::evaluate (const Instruction * val) {
 	
-	size_t l=val->getIdens ().size ();
+	size_t l=val->getResults ().size ();
 	DynArray <Value> vals (l);
-	const auto & idens = val->getIdens ();
+	const auto & res = val->getResults ();
 	bool calc = false;
 	
 	for (size_t i=0; i<l; ++i) {
-		auto itt = lookupTable.find (idens [i]);
+		auto itt = lookupTable.find (res [i].iden);
 		
 		if (itt != lookupTable.end ()) {
 			vals [i] = itt->second;
@@ -415,7 +415,7 @@ BasicArray <Value> Interpreter::evaluate (const Instruction * val) {
 	val->accept (*this);
 	
 	for (size_t i=0; i<l; ++i) {
-		auto itt = lookupTable.find (idens [i]);
+		auto itt = lookupTable.find (res [i].iden);
 		
 		if (itt != lookupTable.end ()) {
 			vals [i] = itt->second;

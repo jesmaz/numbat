@@ -25,7 +25,7 @@ class BitAnd : public Instruction {
 			return "bitand." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);
 		}
 		
-		BitAnd (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
+		BitAnd (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {{type, iden}}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		
@@ -50,8 +50,8 @@ class BitNot : public Instruction {
 			return "bitnot." + getType ()->toString (mode) + " " + arg.toString (mode);
 		}
 		
-		BitNot (Argument arg, symbol iden) : Instruction ({arg}, {arg.instr->getType ()}, {iden}), arg (arg) {}
-		BitNot (const Type * type, Argument arg, symbol iden) : Instruction ({arg}, {type}, {iden}), arg (arg) {}
+		BitNot (Argument arg, symbol iden) : Instruction ({arg}, {{arg.instr->getType (), iden}}), arg (arg) {}
+		BitNot (const Type * type, Argument arg, symbol iden) : Instruction ({arg}, {{type, iden}}), arg (arg) {}
 		
 		Argument arg;
 		
@@ -77,7 +77,7 @@ class BitOr : public Instruction {
 			return "bitor." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);
 		}
 		
-		BitOr (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
+		BitOr (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {{type, iden}}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		
@@ -103,7 +103,7 @@ class BitXor : public Instruction {
 			return "bitxor." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);
 		}
 		
-		BitXor (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
+		BitXor (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {{type, iden}}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		

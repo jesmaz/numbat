@@ -8,7 +8,7 @@ namespace parser {
 
 const nir::Instruction * ResolveScope::build (nir::Scope * scope) {
 	const nir::Instruction * p = parent->build (scope);
-	if (not p or p->getIdens ().empty ()) return nullptr;
+	if (not p or p->getResults ().empty ()) return nullptr;
 	return scope->resolve ({p, p->getIden ()}, iden);
 }
 
@@ -20,7 +20,7 @@ const nir::Instruction * ResolveScope::buildAllocate (nir::Scope * scope, const 
 
 const nir::Type * ResolveScope::resolveType (nir::Scope * scope) {
 	const nir::Instruction * p = parent->build (scope);
-	if (not p or p->getIdens ().empty ()) return nullptr;
+	if (not p or p->getResults ().empty ()) return nullptr;
 	return scope->resolveType ({p, p->getIden ()}, iden);
 }
 

@@ -23,7 +23,7 @@ class Rem : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "rem." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);}
 		
-		Rem (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
+		Rem (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {{type, iden}}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		

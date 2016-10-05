@@ -23,7 +23,7 @@ class Equal : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "equal." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);}
 		
-		Equal (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
+		Equal (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {{type, iden}}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		

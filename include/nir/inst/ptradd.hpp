@@ -37,8 +37,8 @@ class PtrAdd : public Instruction {
 			return s;
 		}
 		
-		PtrAdd (const Type * type, Argument src, Argument offset, symbol iden) : Instruction ({src, offset}, {type}, {iden}), param (nullptr) {}
-		PtrAdd (const Type * type, Argument src, const Parameter * param, symbol iden) : Instruction ({src}, {type}, {iden}), param (param) {}
+		PtrAdd (const Type * type, Argument src, Argument offset, symbol iden) : Instruction ({src, offset}, {{type, iden}}), param (nullptr) {}
+		PtrAdd (const Type * type, Argument src, const Parameter * param, symbol iden) : Instruction ({src}, {{type, iden}}), param (param) {}
 		
 		const Parameter * param;
 		

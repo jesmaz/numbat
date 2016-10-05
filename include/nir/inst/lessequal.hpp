@@ -23,7 +23,7 @@ class LessEqual : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "lessequal." + getType ()->toString (mode) + " " + lhs.toString (mode) + " " + rhs.toString (mode);}
 		
-		LessEqual (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {type}, {iden}), lhs (lhs), rhs (rhs) {}
+		LessEqual (const Type * type, Argument lhs, Argument rhs, symbol iden) : Instruction ({lhs, rhs}, {{type, iden}}), lhs (lhs), rhs (rhs) {}
 		
 		Argument lhs, rhs;
 		

@@ -37,9 +37,9 @@ string Argument::toString (text::PrintMode mode) const {
 string Instruction::printIden (text::PrintMode mode) const {
 	if (this) {
 		string s;
-		for (auto iden : idens) {
-			if (iden) {
-				s += *iden;
+		for (auto res : results) {
+			if (res.iden) {
+				s += *res.iden;
 			} else {
 				s += strDump (mode);
 			}
@@ -55,9 +55,9 @@ string Instruction::printIden (text::PrintMode mode) const {
 string Instruction::toString (text::PrintMode mode) const {
 	if (this) {
 		string s;
-		for (auto iden : idens) {
-			if (iden) {
-				s += *iden;
+		for (auto & r : getResults ()) {
+			if (r.iden) {
+				s += *r.iden;
 			}
 		}
 		return s + ": " + strDump (mode);;
