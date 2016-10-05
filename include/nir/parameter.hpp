@@ -1,31 +1,38 @@
 #pragma once
 
-#include "forward.hpp"
-#include "instruction.hpp"
+#include <nir/forward.hpp>
+#include <nir/type.hpp>
+#include <parse/tree/base.hpp>
 
 
 namespace nir {
 
 
-class Parameter : public Instruction {
-	CONST_VISITABLE
+struct Parameter {
 	public:
 		
 		bool validate () const {return true;}
 		
-		const nir::Instruction * recreate (const BasicArray <Argument> & replacmentArgs) const {abort ();}
+		parser::PTNode getDefVal () const {return defVal;}
+		const string & getIden () const {return iden;}
+		const Type * getType () const {return type;}
 		
-		Argument getDefVal () const {return defVal;}
+		string toString (text::PrintMode mode) const {
+			string s = type->toString (mode) + " " + iden;
+			if (defVal) {
+				s += ": " + defVal->toString (mode);
+			}
+			return s;
+		}
 		
-		Parameter (Argument instruction, const string & iden) : Instruction ({instruction}, instruction.instr->getTypes (), {&(this->iden)}), defVal (instruction), iden (iden) {}
-		Parameter (const Type * type, const string & iden) : Instruction ({}, {type}, {&(this->iden)}), iden (iden) {}
+		Parameter (parser::PTNode instruction, const Type * type, const string & iden) : defVal (instruction), type (type), iden (iden) {}
+		Parameter (const Type * type, const string & iden) : defVal (nullptr), type (type), iden (iden) {}
 		
 	protected:
 	private:
 		
-		string strDump (text::PrintMode mode) const {return "NYI Parameter.strDump";}
-		
-		Argument defVal;
+		parser::PTNode defVal;
+		const Type * type;
 		string iden;
 		
 };

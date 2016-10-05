@@ -19,7 +19,7 @@ BasicArray <Value> Interpreter::callFunction (const Function * func, const Basic
 	
 	for (size_t i=0, l=args.size (); i<l; ++i) {
 		const Parameter * param = funcArgs [i];
-		call.lookupTable [param->getIden ()] = args [i];
+		call.lookupTable [&param->getIden ()] = args [i];
 	}
 	
 	return call ();

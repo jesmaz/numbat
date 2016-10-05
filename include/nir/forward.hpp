@@ -11,7 +11,7 @@ enum class LINKAGE {EXTERNAL, LOCAL};
 struct Function;
 class Instruction;
 class Number;
-class Parameter;
+struct Parameter;
 class PointerType;
 class Struct;
 class Type;

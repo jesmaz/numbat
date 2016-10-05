@@ -18,7 +18,7 @@ const nir::Instruction * ParseTreeNode::buildAllocate (nir::Scope *, const strin
 	return nullptr;
 }
 
-const nir::Instruction * ParseTreeNode::buildParameter (nir::Scope *) {
+const nir::Parameter * ParseTreeNode::buildParameter (nir::Scope *) {
 	report::logMessage (report::ERROR, string (typeid (*this).name ()) + " is not a valid parameter");
 	return nullptr;
 }

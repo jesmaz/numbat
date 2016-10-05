@@ -30,7 +30,7 @@ class PtrAdd : public Instruction {
 		virtual string strDump (text::PrintMode mode) const {
 			string s = "ptradd." + getType ()->toString (mode) + " " + getArguments () [0].toString (mode) + " ";
 			if (param) {
-				s += *param->getIden ();
+				s += param->getIden ();
 			} else {
 				s += getArguments () [1].toString (mode);
 			}

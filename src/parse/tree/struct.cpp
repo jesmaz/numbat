@@ -22,17 +22,10 @@ const nir::Instruction * Struct::build (nir::Scope * scope) {
 	
 	bool success = true;
 	auto conv = members.map <const nir::Parameter *> ([&scope, &success](ParseTreeNode *& arg){
-		auto * p = arg->buildParameter (scope);
-		if (p) {
-			assert (typeid (*p) == typeid (nir::Parameter));
-			return static_cast <const nir::Parameter *> (p);
-		} else {
-			success = false;
-			return (const nir::Parameter *) (nullptr);
-		}
+		return arg->buildParameter (scope);
 	});
 	if (success) type->populate (conv);
-	return scope->createParameter (type);
+	return nullptr;
 	
 }
 

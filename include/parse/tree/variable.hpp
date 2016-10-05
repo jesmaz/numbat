@@ -12,7 +12,7 @@ class ParseTreeVariable : public ParseTreeNode {
 	public:
 		
 		virtual const nir::Instruction * build (nir::Scope * scope);
-		virtual const nir::Instruction * buildParameter (nir::Scope * scope);
+		virtual const nir::Parameter * buildParameter (nir::Scope * scope);
 		
 		PTNode releaseIden () {auto e = iden; iden = 0; return e;}
 		PTNode releaseInst () {auto e = inst; inst = 0; return e;}

@@ -39,7 +39,7 @@ class ParseTreeNode {
 		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
-		virtual const nir::Instruction * buildParameter (nir::Scope * scope);
+		virtual const nir::Parameter * buildParameter (nir::Scope * scope);
 		virtual const nir::Type * resolveType (nir::Scope * scope);
 		
 		virtual void declare (nir::Scope * scope);

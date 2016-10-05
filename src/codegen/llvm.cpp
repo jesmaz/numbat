@@ -254,7 +254,7 @@ void LLVM::visit (const nir::Function * func) {
 	auto argEnd = llFunc->arg_end ();
 	for (const Parameter * param : func->getArgs ()) {
 		assert (argItt != argEnd);
-		instrDict [param->getIden ()] = argItt;
+		instrDict [&param->getIden ()] = argItt;
 		++argItt;
 	}
 	

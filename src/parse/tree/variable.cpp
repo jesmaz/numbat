@@ -1,4 +1,5 @@
 #include <nir/instruction.hpp>
+#include <nir/parameter.hpp>
 #include <nir/scope.hpp>
 #include <parse/tree/variable.hpp>
 #include <utility/report.hpp>
@@ -55,7 +56,7 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 	
 }
 
-const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) {
+const nir::Parameter * ParseTreeVariable::buildParameter (nir::Scope * scope) {
 	const nir::Instruction * init = nullptr, * var = nullptr;
 	const nir::Type * type = nullptr;
 	if (inst) {
@@ -84,7 +85,11 @@ const nir::Instruction * ParseTreeVariable::buildParameter (nir::Scope * scope) 
 	
 	nir::symbol sym = nullptr;
 	if (init) sym = init->getIden ();
-	return scope->createParameter (type, {init, sym}, iden->getIden ());
+	if (inst) {
+		return new nir::Parameter (inst, type, iden->getIden ());
+	} else {
+		return new nir::Parameter (type, iden->getIden ());
+	}
 }
 
 string ParseTreeVariable::strDump (text::PrintMode mode) {

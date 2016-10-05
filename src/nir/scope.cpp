@@ -389,13 +389,13 @@ const Instruction * Scope::createParameter (const Type * const type, Argument in
 	if (init.instr) {
 		auto t = staticCast (init, type);
 		if (t.instr) {
-			param = new Parameter (t, iden);
+			abort ();//param = new Parameter (t, iden);
 		}
 		
 	} else {
 		param = new Parameter (type, iden);
 	}
-	return param;
+	abort ();//return param;
 	
 }
 
@@ -461,7 +461,7 @@ const Instruction * Scope::resolve (Argument parent, const string & iden) {
 		
 		for (size_t i=0; i<memberArr.size (); ++i) {
 			const Parameter * param = memberArr [i];
-			if (*param->getIden () == iden) {
+			if (param->getIden () == iden) {
 				return insertionPoint->give (new PickStructMember (param->getType (), parent, i, iden, module->newSymbol (iden)));
 			}
 		}
@@ -506,8 +506,8 @@ const Instruction * Scope::resolve (const string & iden, Block * insertionPoint)
 	
 	if (owner) {
 		for (const Parameter * param : owner->getArgs ()) {
-			if (iden == *param->getIden ()) {
-				return param;
+			if (iden == param->getIden ()) {
+				abort ();
 			}
 		}
 	}
