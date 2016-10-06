@@ -51,7 +51,7 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 	protected:
 		
 		Instruction (const BasicArray <Argument> & arguments, const BasicArray <Result> & results) : arguments (arguments), results (results) {
-			for (auto & a : arguments) {assert (a.type);}
+			for (auto & a : arguments) {assert (a.type and a.sym or not a.type and not a.sym);}
 		}
 		
 	private:
