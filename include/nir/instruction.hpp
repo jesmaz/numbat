@@ -11,8 +11,12 @@
 namespace nir {
 
 struct Argument {
-	const Instruction * instr=nullptr;
 	symbol sym=nullptr;
+	const Type * type=nullptr;
+	Argument ()=default;
+	Argument (const Instruction * instr, size_t index=0);
+	Argument (const Instruction * instr, symbol s);
+	Argument (symbol sym, const Type * type) : sym (sym), type (type) {}
 	string toString (text::PrintMode mode=text::PLAIN) const;
 };
 
@@ -46,7 +50,9 @@ class Instruction : public numbat::visitor::BaseConstVisitable {
 		
 	protected:
 		
-		Instruction (const BasicArray <Argument> & arguments, const BasicArray <Result> & results) : arguments (arguments), results (results) {}
+		Instruction (const BasicArray <Argument> & arguments, const BasicArray <Result> & results) : arguments (arguments), results (results) {
+			for (auto & a : arguments) {assert (a.type);}
+		}
 		
 	private:
 		

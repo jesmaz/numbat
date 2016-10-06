@@ -86,7 +86,7 @@ const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope
 	scope->createPut ({rhs, rhs->getIden ()}, {res, res->getIden ()});
 	scope->changeActiveBlock (cont);
 	
-	return scope->createGet ({res, res->getIden ()}).instr;
+	return scope->createGet ({res, res->getIden ()});
 	
 }
 
@@ -264,7 +264,7 @@ const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope 
 	scope->createPut ({rhs, rhs->getIden ()}, {res, res->getIden ()});
 	scope->changeActiveBlock (cont);
 	
-	return scope->createGet ({res, res->getIden ()}).instr;
+	return scope->createGet ({res, res->getIden ()});
 	
 }
 

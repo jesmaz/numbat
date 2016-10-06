@@ -132,7 +132,7 @@ const Type * Scope::resolveType (const string & iden) const {
 
 const Type * Scope::resolveType (Argument parent, const string & iden) const {
 	
-	const Type * type = parent.instr->getType ();
+	const Type * type = parent.type;
 	if (typeid (*type) == typeid (Struct)) {
 		
 		report::logMessage (report::ERROR, "Nested structs are not yet supported");
@@ -182,13 +182,17 @@ const Instruction * Scope::allocateVariable (const Type * const type, const stri
 template <typename T>
 const Instruction * Scope::createBinary (Argument lhs, Argument rhs, const string & iden) {
 	Argument tlhs = lhs, trhs = rhs;
-	if (lhs.instr->getType ()->getDereferenceType ()) {
-		tlhs = createGet (lhs);
+	if (lhs.type->getDereferenceType ()) {
+		auto * g = createGet (lhs);
+		tlhs.type = g->getType ();
+		tlhs.sym = g->getIden ();
 	}
-	if (rhs.instr->getType ()->getDereferenceType ()) {
-		trhs = createGet (rhs);
+	if (rhs.type->getDereferenceType ()) {
+		auto * g = createGet (rhs);
+		trhs.type = g->getType ();
+		trhs.sym = g->getIden ();
 	}
-	auto * t = promoteArithmatic (tlhs.instr->getType (), trhs.instr->getType ());
+	auto * t = promoteArithmatic (tlhs.type, trhs.type);
 	Instruction * inst = new T (t, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
 	return insertionPoint->give (inst);
 }
@@ -198,14 +202,16 @@ const Instruction * Scope::createAdd (Argument lhs, Argument rhs) {
 }
 
 const Instruction * Scope::createAssign (Argument lhs, Argument rhs) {
-	const Type * dref = lhs.instr->getType ()->getDereferenceType ();
+	const Type * dref = lhs.type->getDereferenceType ();
 	if (not dref) {
 		report::logMessage (report::ERROR, "Can't assign to a constant");
 		return nullptr;
 	}
 	Argument tsrc = rhs;
-	if (rhs.instr->getType ()->getDereferenceType ()) {
-		tsrc = createGet (rhs);
+	if (rhs.type->getDereferenceType ()) {
+		auto * g = createGet (rhs);
+		tsrc.type = g->getType ();
+		tsrc.sym = g->getIden ();
 	}
 	tsrc = staticCast (tsrc, dref);
 	return createPut (tsrc, lhs);
@@ -257,13 +263,17 @@ const Instruction * Scope::createCall (const Function * func, const BasicArray <
 template <typename T>
 const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string & iden) {
 	Argument tlhs = lhs, trhs = rhs;
-	if (lhs.instr->getType ()->getDereferenceType ()) {
-		tlhs = createGet (lhs);
+	if (lhs.type->getDereferenceType ()) {
+		auto * g = createGet (lhs);
+		tlhs.type = g->getType ();
+		tlhs.sym = g->getIden ();
 	}
-	if (rhs.instr->getType ()->getDereferenceType ()) {
-		trhs = createGet (rhs);
+	if (rhs.type->getDereferenceType ()) {
+		auto * g = createGet (rhs);
+		trhs.type = g->getType ();
+		trhs.sym = g->getIden ();
 	}
-	auto * t = promoteArithmatic (tlhs.instr->getType (), trhs.instr->getType ());
+	auto * t = promoteArithmatic (tlhs.type, trhs.type);
 	auto * b = resolveType ("bool");
 	Instruction * inst = new T (b, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
 	return insertionPoint->give (inst);
@@ -342,18 +352,20 @@ const Instruction * Scope::createDiv (Argument lhs, Argument rhs) {
 	return createBinary <Div> (lhs, rhs, "div");
 }
 
-Argument Scope::createGet (Argument src) {
-	auto * instr = new Get (src.instr->getType ()->getDereferenceType (), src, module->newSymbol (src.instr->printIden ()));
-	return {insertionPoint->give (instr), nullptr};
+const Instruction * Scope::createGet (Argument src) {
+	auto * instr = new Get (src.type->getDereferenceType (), src, module->newSymbol (*src.sym));
+	return insertionPoint->give (instr);
 	
 }
 
-const Instruction * Scope::createJump (symbol block) {return createJump ({nullptr, nullptr}, block);}
+const Instruction * Scope::createJump (symbol block) {return createJump (Argument (), block);}
 
 const Instruction * Scope::createJump (Argument cond, symbol block) {
 	
-	if (cond.instr and cond.instr->getType ()->getDereferenceType ()) {
-		cond = createGet (cond);
+	if (cond.sym and cond.type->getDereferenceType ()) {
+		auto * g = createGet (cond);
+		cond.sym = g->getIden ();
+		cond.type = g->getType ();
 	}
 	
 	const Block * b = blocks [block];
@@ -386,9 +398,9 @@ const Instruction * Scope::createNeg (Argument arg) {
 const Instruction * Scope::createParameter (const Type * const type, Argument init, const string & iden) {
 	
 	Parameter * param=nullptr;
-	if (init.instr) {
+	if (init.sym) {
 		auto t = staticCast (init, type);
-		if (t.instr) {
+		if (t.sym) {
 			abort ();//param = new Parameter (t, iden);
 		}
 		
@@ -408,7 +420,7 @@ const Instruction * Scope::createPointerAdd (const Type * const type, Argument p
 
 const Instruction * Scope::createPut (Argument src, Argument dest) {
 	
-	auto * instr = new Put (dest.instr->getType ()->getDereferenceType (), src, dest, module->newSymbol ("put"));
+	auto * instr = new Put (dest.type->getDereferenceType (), src, dest, module->newSymbol ("put"));
 	return insertionPoint->give (instr);
 	
 }
@@ -429,12 +441,7 @@ const Instruction * Scope::createStructValue (const Type * const type, BasicArra
 }
 
 const Instruction * Scope::createSub (Argument lhs, Argument rhs) {
-	if (typeid (*lhs.instr) == typeid (Constant) and typeid (*rhs.instr) == typeid (Constant) and lhs.instr->getType ()->getArithmaticType () == Type::UINT) {
-		Instruction * inst = new Sub (resolveType ("int64"), lhs, rhs, module->newSymbol ("sub"));
-		return insertionPoint->give (inst);
-	} else {
-		return createBinary <Sub> (lhs, rhs, "sub");
-	}
+	return createBinary <Sub> (lhs, rhs, "sub");
 }
 
 const Instruction * Scope::getFunctionPointer () {
@@ -453,7 +460,7 @@ const Instruction * Scope::getFunctionPointer () {
 
 const Instruction * Scope::resolve (Argument parent, const string & iden) {
 	
-	const Type * type = parent.instr->getType ();
+	const Type * type = parent.type;
 	if (typeid (*type) == typeid (Struct)) {
 		
 		const Struct * str = static_cast <const Struct *> (type);
@@ -519,14 +526,14 @@ const Instruction * Scope::resolve (const string & iden, Block * insertionPoint)
 	
 }
 
-const Instruction * Scope::staticCast (const Instruction * src, const Type * const target, const string & iden) {
+const Instruction * Scope::staticCast (const Type * src, const Type * const target, const string & iden) {
 	
-	if (src->getType () == target) return src;
+	if (src == target) return nullptr;
 	
-	if (typeid (*src->getType ()) == typeid (Number) and typeid (*target) == typeid (Number)) {
+	if (typeid (*src) == typeid (Number) and typeid (*target) == typeid (Number)) {
 		
 		//Cast is trivial, the assembler can handle it
-		return src;
+		return nullptr;
 		
 	} else {
 		
@@ -540,8 +547,8 @@ const Instruction * Scope::staticCast (const Instruction * src, const Type * con
 
 Argument Scope::staticCast (Argument src, const Type * const target, const string & iden) {
 	
-	const Instruction * instr = staticCast (src.instr, target, iden);
-	if (instr == src.instr) return src;
+	const Instruction * instr = staticCast (src.type, target, iden);
+	if (not instr) return src;
 	return {instr, nullptr};
 	
 }

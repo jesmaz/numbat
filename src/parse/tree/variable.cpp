@@ -47,7 +47,7 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 		}
 		auto val = init;
 		if (init->getType () != type and type) {
-			val = scope->staticCast (init, type);
+			val = scope->staticCast (init->getType (), type);
 		}
 		if (not val or not var) return nullptr;
 		return scope->createPut ({val, val->getIden ()}, {var, var->getIden ()});

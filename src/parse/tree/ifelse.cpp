@@ -57,7 +57,7 @@ const nir::Instruction * ParseTreeIfElse::build (nir::Scope * scope) {
 	if (alloc) scope->createPut ({bodyRet, bodyRet->getIden ()}, {alloc, alloc->getIden ()});
 	scope->createJump (contBlock);
 	scope->changeActiveBlock (contBlock);
-	if (alloc) return scope->createGet ({alloc, alloc->getIden ()}).instr;
+	if (alloc) return scope->createGet ({alloc, alloc->getIden ()});
 	return nullptr;
 	
 }

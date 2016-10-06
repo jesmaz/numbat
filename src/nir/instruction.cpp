@@ -1,35 +1,39 @@
-#include "../../include/nir/instruction.hpp"
+#include <nir/instruction.hpp>
 
 
 namespace nir {
 
 
+Argument::Argument (const Instruction * instr, size_t index) {
+	auto res = instr->getResults () [index];
+	sym = res.iden;
+	type = res.type;
+}
+
+Argument::Argument (const Instruction * instr, symbol s) : sym (s), type (nullptr) {
+	for (auto & res : instr->getResults ()) {
+		if (res.iden == s) {
+			type = res.type;
+		}
+	}
+	assert (type);
+}
+
+
 BasicArray <const Type *> argumentToType (const BasicArray <Argument> & args) {
-	return args.map <const Type *> ([](const Argument & a){return a.instr->getType ();});
+	return args.map <const Type *> ([](const Argument & a){return a.type;});
 }
 
 BasicArray <symbol> argumentToSymbol (const BasicArray <Argument> & args) {
 	return args.map <symbol> ([](const Argument & arg){
-		if (arg.sym) {
-			return arg.sym;
-		} else {
-			return arg.instr->getIden ();
-		}
+		return arg.sym;
 	});
 }
 
 
 string Argument::toString (text::PrintMode mode) const {
 	
-	if (instr) {
-		if (sym) {
-			return *sym;
-		} else {
-			return instr->printIden (mode);
-		}
-	} else {
-		return "nullptr";
-	}
+	return *sym;
 	
 }
 

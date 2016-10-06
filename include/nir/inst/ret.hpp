@@ -20,7 +20,7 @@ class Ret : public Instruction {
 		
 		virtual string strDump (text::PrintMode mode) const {return "ret TODO: return values";}
 		
-		Ret (const BasicArray <Argument> & args) : Instruction ({args}, args.map <Result> ([](auto & t)->Result{return {t.instr->getType (), t.sym};})), args (args) {}
+		Ret (const BasicArray <Argument> & args) : Instruction ({args}, args.map <Result> ([](auto & t)->Result{return {t.type, t.sym};})), args (args) {}
 		
 		BasicArray <Argument> args;
 		

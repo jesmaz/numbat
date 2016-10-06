@@ -50,7 +50,7 @@ class BitNot : public Instruction {
 			return "bitnot." + getType ()->toString (mode) + " " + arg.toString (mode);
 		}
 		
-		BitNot (Argument arg, symbol iden) : Instruction ({arg}, {{arg.instr->getType (), iden}}), arg (arg) {}
+		BitNot (Argument arg, symbol iden) : Instruction ({arg}, {{arg.type, iden}}), arg (arg) {}
 		BitNot (const Type * type, Argument arg, symbol iden) : Instruction ({arg}, {{type, iden}}), arg (arg) {}
 		
 		Argument arg;

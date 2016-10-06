@@ -97,10 +97,7 @@ llvm::Function * LLVM::resolve (const nir::Function * func) {
 
 llvm::Value * LLVM::resolve (nir::Argument val) {
 	auto & v = instrDict [val.sym];
-	if (not val.sym or not v) {
-		val.instr->accept (*this);
-		assert (v);
-	}
+	assert (v);
 	return v;
 }
 
@@ -312,7 +309,7 @@ void LLVM::visit (const nir::PtrAdd & ptrAdd) {
 	const nir::Parameter * param = ptrAdd.getParam ();
 	auto & args = ptrAdd.getArguments ();
 	if (param) {
-		ssize_t index = args [0].instr->getType ()->getDereferenceType ()->calculateIndex (param);
+		ssize_t index = args [0].type->getDereferenceType ()->calculateIndex (param);
 		const std::vector <llvm::Value *> indicies = {
 			irBuilder.getInt64 (0),
 			irBuilder.getInt32 (index)

@@ -198,7 +198,7 @@ void Interpreter::visit (const Get & get) {
 void Interpreter::visit (const Jump & jump) {
 	
 	bool doJump = true;
-	if (jump.getCondition ().instr) {
+	if (jump.getCondition ().sym) {
 		doJump = bool (uint64_t (*evaluate (jump.getCondition ())));
 	}
 	
@@ -324,17 +324,12 @@ void Interpreter::visit (const Type * type) {
 
 Value Interpreter::evaluate (Argument val) {
 	
-	auto itt = lookupTable.find (val.sym ? val.sym : val.instr->getIden ());
+	auto itt = lookupTable.find (val.sym);
 	if (itt != lookupTable.end ()) {
 		return itt->second;
 	}
 	
-	val.instr->accept (*this);
-	itt = lookupTable.find (val.sym ? val.sym : val.instr->getIden ());
-	if (itt != lookupTable.end ()) {
-		return itt->second;
-	}
-	return Value ();
+	abort ();
 	
 }
 
@@ -360,7 +355,7 @@ std::string Interpreter::operator ()(const nir::Instruction * val) {
 	(*this) ();
 	
 	if (const Type * type = val->getType ()->getDereferenceType ()) {
-		auto get = Get (type, {val, nullptr}, nullptr);
+		auto get = Get (type, {val->getIden (), val->getType ()}, nullptr);
 		return this->operator ()(&get);
 	}
 	

@@ -19,7 +19,7 @@ class Put : public Instruction {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) const {return "put." + getType ()->toString () + " " + src.instr->printIden () + " " + dest.instr->printIden ();}
+		virtual string strDump (text::PrintMode mode) const {return "put." + getType ()->toString () + " " + *src.sym + " " + *dest.sym;}
 		
 		Put (const Type * type, Argument src, Argument dest, symbol iden) : Instruction ({src, dest}, {{type, iden}}), src (src), dest (dest) {}
 		

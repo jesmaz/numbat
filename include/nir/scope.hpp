@@ -32,7 +32,6 @@ struct Scope {
 		const Type * resolveType (Argument parent, const string & iden) const;
 		const Type * resolveType (const string & iden) const;
 		
-		Argument createGet (Argument src);
 		Argument staticCast (Argument src, const Type * const target, const string & iden="");
 		
 		const Instruction * allocateArray (const Type * const type, Argument size, const string & iden="");
@@ -58,13 +57,14 @@ struct Scope {
 		const Instruction * createCmpNE (Argument lhs, Argument rhs);
 		const Instruction * createConstant (const Type * type, const string & val, const string & iden="");
 		const Instruction * createDiv (Argument lhs, Argument rhs);
+		const Instruction * createGet (Argument src);
 		const Instruction * createImportHandle (const Scope * scope, const string & iden="");
 		const Instruction * createJump (symbol block);
 		const Instruction * createJump (Argument cond, symbol block);
 		const Instruction * createLNot (Argument arg);
 		const Instruction * createMul (Argument lhs, Argument rhs);
 		const Instruction * createNeg (Argument arg);
-		const Instruction * createParameter (const Type * const type, Argument init={nullptr, nullptr}, const string & iden="");
+		const Instruction * createParameter (const Type * const type, Argument init = Argument (), const string & iden="");
 		const Instruction * createPointerAdd (const Type * const type, Argument ptr, Argument offset, const string & iden="");
 		const Instruction * createPut (Argument src, Argument dest);
 		const Instruction * createReinterpret (Argument ptr, const Type * type, const string & iden="");
@@ -75,7 +75,7 @@ struct Scope {
 		const Instruction * resolve (Argument parent, const string & iden);
 		const Instruction * resolve (const string & iden);
 		const Instruction * resolve (const string & iden, Block * insertionPoint) const;
-		const Instruction * staticCast (const Instruction * src, const Type * const target, const string & iden="");
+		const Instruction * staticCast (const Type * src, const Type * const target, const string & iden="");
 		
 		Struct * registerStruct (const std::string & iden);
 		
