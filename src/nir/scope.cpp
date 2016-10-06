@@ -235,6 +235,10 @@ const Instruction * Scope::createBitAnd (Argument lhs, Argument rhs) {
 }
 
 const Instruction * Scope::createBitNot (Argument arg) {
+	if (arg.type->getDereferenceType()) {
+		auto * r = createGet (arg);
+		arg = Argument (r, size_t (0));
+	}
 	return insertionPoint->give (new BitNot (arg, module->newSymbol ("bitnot")));
 }
 
@@ -381,6 +385,10 @@ const Instruction * Scope::createImportHandle (const Scope * scope, const string
 }
 
 const Instruction * Scope::createLNot (Argument arg) {
+	if (arg.type->getDereferenceType()) {
+		auto * r = createGet (arg);
+		arg = Argument (r, size_t (0));
+	}
 	return insertionPoint->give (new BitNot (resolveType ("bool"), arg, module->newSymbol ("bitnot")));
 }
 
