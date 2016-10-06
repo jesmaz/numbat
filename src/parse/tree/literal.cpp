@@ -25,7 +25,7 @@ const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope) {
 			} else if (literal.find ('.') != string::npos) {
 				t = scope->resolveType ("double");
 			} else {
-				t = scope->resolveType ("uint64");
+				t = scope->resolveType ("int64");
 			}
 			return scope->createConstant (t, literal);
 		}
