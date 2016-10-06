@@ -267,6 +267,11 @@ struct DynArray : public BasicArray <T> {
 			this->len += 1;
 		}
 		
+		void clear () {
+			BasicArray <T>::clear ();
+			capacity = 0;
+		}
+		
 		DynArray () : BasicArray <T> (), capacity (this->size ()) {}
 		DynArray (size_t len) : DynArray <T, GROWTH> (len, T ()) {}
 		DynArray (size_t len, const T & d) : BasicArray <T> (len, d), capacity (this->size ()) {}
