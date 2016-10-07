@@ -352,16 +352,11 @@ Value Interpreter::staticCast (const Value & source, const Type * const target) 
 
 std::string Interpreter::operator ()(const nir::Instruction * val) {
 	
-	(*this) ();
-	
-	if (const Type * type = val->getType ()->getDereferenceType ()) {
-		auto get = Get (type, {val->getIden (), val->getType ()}, nullptr);
-		return this->operator ()(&get);
-	}
+	auto vals = (*this) ();
 	
 	std::string s;
 	
-	for (const Value & v : evaluate (val)) {
+	for (const Value & v : vals) {
 		
 		s += v->toString (text::PrintMode::PLAIN) + " ";
 		
