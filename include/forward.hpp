@@ -31,6 +31,9 @@ namespace parser {
 using std::string;
 
 
+enum class OPERATION {ADD, AND, AS, ASSIGN, BAND, BNOT, BOR, BXOR, CMPEQ, CMPGT, CMPGTE, CMPLT, CMPLTE, CMPNE, CONCAT, DECREMENT, DIV, IN, INCREMENT, LNOT, MUL, NEG, NONE, OR, REM, SUB};
+
+
 class ParseTreeNode;
 struct Function;
 struct Struct;

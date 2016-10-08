@@ -7,9 +7,6 @@
 namespace parser {
 
 
-enum class OPERATION {ADD, AND, AS, ASSIGN, BAND, BNOT, BOR, BXOR, CMPEQ, CMPGT, CMPGTE, CMPLT, CMPLTE, CMPNE, CONCAT, DECREMENT, DIV, IN, INCREMENT, LNOT, MUL, NEG, NONE, OR, REM, SUB};
-
-
 class GenericOperator : public ParseTreeNode {
 	
 	public:
