@@ -17,6 +17,7 @@
 #include <parse/tree/resolvescope.hpp>
 #include <parse/tree/slice.hpp>
 #include <parse/tree/struct.hpp>
+#include <parse/tree/typemodifier.hpp>
 #include <parse/tree/variable.hpp>
 #include <utility/report.hpp>
 #define __ENABLE__PROFILING__
@@ -55,6 +56,7 @@ enum class Symbol : char {
 	UNION,
 	VAL,
 	VAR,
+	VREF,
 	WHILE,
 	SYMBOL_ASTERISK='*',
 	SYMBOL_AT='@',
@@ -112,6 +114,7 @@ std::map <string, Symbol> symbolMap {
 	{"union", Symbol::UNION},
 	{"val", Symbol::VAL},
 	{"var", Symbol::VAR},
+	{"vref", Symbol::VREF},
 	{"while", Symbol::WHILE},
 	{"*", Symbol::SYMBOL_ASTERISK},
 	{"@", Symbol::SYMBOL_AT},
@@ -224,7 +227,7 @@ std::set <string> prefixOperators = oppPrecRangeInc (300, 300);
 
 
 namespace SymbolFlags {
-	enum Flags : uint8_t {NONE=0, EXPRESSION_START=0b1, TERMINATE_STATEMENT=0b10, SEGMENT_BEGIN=0b100, SEGMENT_END=0b1000};
+	enum Flags : uint8_t {NONE=0, EXPRESSION_START=0b1, TERMINATE_STATEMENT=0b10, SEGMENT_BEGIN=0b100, SEGMENT_END=0b1000, VARIABLE_DEL=0b10000};
 	std::array <SymbolFlags::Flags, __UINT8_MAX__> map = {SymbolFlags::NONE};
 	struct SetSymbols {
 		SetSymbols (const BasicArray <std::pair <Symbol, uint8_t>> & flags) {
@@ -236,6 +239,7 @@ namespace SymbolFlags {
 		
 	};
 	SetSymbols __set_valuues__ ({
+		{Symbol::COLON,                    VARIABLE_DEL},
 		{Symbol::ELSE,                     TERMINATE_STATEMENT},
 		{Symbol::IDENTIFIER,               EXPRESSION_START},
 		{Symbol::IF,                       EXPRESSION_START},
@@ -246,6 +250,7 @@ namespace SymbolFlags {
 		{Symbol::SYMBOL_BANG,              EXPRESSION_START},
 		{Symbol::SYMBOL_BRACE_LEFT,        EXPRESSION_START | SEGMENT_BEGIN},
 		{Symbol::SYMBOL_BRACE_RIGHT,       TERMINATE_STATEMENT | SEGMENT_END},
+		{Symbol::SYMBOL_COMMA,             VARIABLE_DEL},
 		{Symbol::SYMBOL_MINUS,             EXPRESSION_START},
 		{Symbol::SYMBOL_PARENRHESES_LEFT,  EXPRESSION_START | SEGMENT_BEGIN},
 		{Symbol::SYMBOL_PARENRHESES_RIGHT, TERMINATE_STATEMENT | SEGMENT_END},
@@ -295,6 +300,7 @@ PTNode parseProgram (CodeQueue * queue);
 PTNode parseSlice (CodeQueue * queue, PTNode owner=nullptr);
 PTNode parseStatement (CodeQueue * queue);
 PTNode parseStruct (CodeQueue * queue);
+PTNode parseVariable (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
 
 BasicArray <PTNode> parseArguments (CodeQueue * queue);
@@ -731,10 +737,9 @@ PTNode parseStatement (CodeQueue * queue) {
 			break;
 		case Symbol::REF:
 		case Symbol::VAL:
-		case Symbol::VAR: {
-			numbat::lexer::token token = queue->popToken ();
-			lhs = new ParseTreeKeyword (token.pos, token.iden);
-			break;
+		case Symbol::VAR:
+		case Symbol::VREF: {
+			return parseVariable (queue);
 		}
 		default:
 			break;
@@ -878,8 +883,30 @@ PTNode parseStruct (CodeQueue * queue) {
 	
 }
 
+PTNode parseVariable (CodeQueue * queue) {
+	PROFILE ("parseVariable(2)");
+	numbat::lexer::token token = queue->popToken ();
+	PTNode type;
+	
+	if (SymbolFlags::map [size_t (queue->peak (1))] & SymbolFlags::VARIABLE_DEL) {
+		type = new ParseTreeKeyword (token.pos, token.iden);
+		
+	} else if (queue->peak (1) == Symbol::SEMICOLON) {
+		delete type;
+		return errorUnexpectedToken (queue, "an identifier");
+		
+	} else {
+		type = parseAtom (queue);
+		type = new ParseTreeTypeModifier (type, token.pos, token.iden);
+		
+	}
+	
+	return parseVariable (queue, type);
+	
+}
+
 PTNode parseVariable (CodeQueue * queue, PTNode type) {
-	PROFILE ("parseVariable");
+	PROFILE ("parseVariable(3)");
 	numbat::lexer::token token = queue->popToken ();
 	
 	if (queue->peak () == Symbol::COLON) {
