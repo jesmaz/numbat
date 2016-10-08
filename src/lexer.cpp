@@ -1,4 +1,4 @@
-#include "../include/lexer.hpp"
+#include <lexer.hpp>
 
 namespace numbat {
 namespace lexer {
@@ -141,8 +141,6 @@ token lexToken (const std::string & source) {
 		t.type = TOKEN::atsym;
 	} else if (source == ":") {
 		t.type = TOKEN::colon;
-	} else if (source == "ref") {
-		t.type = TOKEN::typemodifier;
 	} else if (source == "as") {
 		t.type = TOKEN::as;
 	} else if (source == "asm") {
@@ -197,7 +195,7 @@ token lexToken (const std::string & source) {
 		t.type = TOKEN::whiletkn;
 	} else if (source == ";") {
 		t.type = TOKEN::semicolon;
-	}else if (source == "and" or source == "in" or source == "not" or source == "or" or source == "var" or source == "val") {
+	}else if (source == "and" or source == "in" or source == "not" or source == "or" or source == "ref" or source == "var" or source == "vref" or source == "val") {
 		t.type = TOKEN::symbol;
 	} else if (isalpha (source [0]) or source [0] == '_') {
 		t.type = TOKEN::identifier;
