@@ -151,6 +151,31 @@ const Type * Scope::resolveType (Argument parent, const string & iden) const {
 	
 }
 
+
+Argument Scope::loadReference (Argument arg) {
+	if (not arg.type->getDereferenceType ()) {
+		report::logMessage (report::ERROR, "Reference required");
+		return nullptr;
+	}
+	if (arg.type->getDereferenceType ()->getDereferenceType ()) {
+		return createGet (arg);
+	}
+	return arg;
+}
+
+Argument Scope::loadValue (Argument arg) {
+	if (arg.type->getDereferenceType ()) {
+		arg = createGet (arg);
+	} else {
+		return arg;
+	}
+	if (arg.type->getDereferenceType ()) {
+		arg = createGet (arg);
+	}
+	return arg;
+}
+
+
 const Instruction * Scope::allocateArray (const Type * const type, Argument size, const string & iden) {
 	
 	Array * s = Array::arrayOf (type);
@@ -181,17 +206,8 @@ const Instruction * Scope::allocateVariable (const Type * const type, const stri
 
 template <typename T>
 const Instruction * Scope::createBinary (Argument lhs, Argument rhs, const string & iden) {
-	Argument tlhs = lhs, trhs = rhs;
-	if (lhs.type->getDereferenceType ()) {
-		auto * g = createGet (lhs);
-		tlhs.type = g->getType ();
-		tlhs.sym = g->getIden ();
-	}
-	if (rhs.type->getDereferenceType ()) {
-		auto * g = createGet (rhs);
-		trhs.type = g->getType ();
-		trhs.sym = g->getIden ();
-	}
+	Argument tlhs = loadValue (lhs), trhs = loadValue (rhs);
+	
 	auto * t = promoteArithmatic (tlhs.type, trhs.type);
 	Instruction * inst = new T (t, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
 	return insertionPoint->give (inst);
@@ -207,14 +223,10 @@ const Instruction * Scope::createAssign (Argument lhs, Argument rhs) {
 		report::logMessage (report::ERROR, "Can't assign to a constant");
 		return nullptr;
 	}
-	Argument tsrc = rhs;
-	if (rhs.type->getDereferenceType ()) {
-		auto * g = createGet (rhs);
-		tsrc.type = g->getType ();
-		tsrc.sym = g->getIden ();
-	}
-	tsrc = staticCast (tsrc, dref);
-	return createPut (tsrc, lhs);
+	lhs = loadReference (lhs);
+	dref = lhs.type->getDereferenceType ();
+	rhs = staticCast (loadValue (rhs), dref);
+	return createPut (rhs, lhs);
 }
 
 const Instruction * Scope::createAutoReturn (const Instruction * instr) {
@@ -235,11 +247,7 @@ const Instruction * Scope::createBitAnd (Argument lhs, Argument rhs) {
 }
 
 const Instruction * Scope::createBitNot (Argument arg) {
-	if (arg.type->getDereferenceType()) {
-		auto * r = createGet (arg);
-		arg = Argument (r, size_t (0));
-	}
-	return insertionPoint->give (new BitNot (arg, module->newSymbol ("bitnot")));
+	return insertionPoint->give (new BitNot (loadValue (arg), module->newSymbol ("bitnot")));
 }
 
 const Instruction * Scope::createBitOr (Argument lhs, Argument rhs) {
@@ -266,17 +274,8 @@ const Instruction * Scope::createCall (const Function * func, const BasicArray <
 
 template <typename T>
 const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string & iden) {
-	Argument tlhs = lhs, trhs = rhs;
-	if (lhs.type->getDereferenceType ()) {
-		auto * g = createGet (lhs);
-		tlhs.type = g->getType ();
-		tlhs.sym = g->getIden ();
-	}
-	if (rhs.type->getDereferenceType ()) {
-		auto * g = createGet (rhs);
-		trhs.type = g->getType ();
-		trhs.sym = g->getIden ();
-	}
+	Argument tlhs = loadValue (lhs), trhs = loadValue (rhs);
+	
 	auto * t = promoteArithmatic (tlhs.type, trhs.type);
 	auto * b = resolveType ("bool");
 	Instruction * inst = new T (b, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
@@ -365,12 +364,7 @@ const Instruction * Scope::createGet (Argument src) {
 const Instruction * Scope::createJump (symbol block) {return createJump (Argument (), block);}
 
 const Instruction * Scope::createJump (Argument cond, symbol block) {
-	
-	if (cond.sym and cond.type->getDereferenceType ()) {
-		auto * g = createGet (cond);
-		cond.sym = g->getIden ();
-		cond.type = g->getType ();
-	}
+	cond = loadValue (cond);
 	
 	const Block * b = blocks [block];
 	auto * instr = new Jump (cond, b);
@@ -385,11 +379,7 @@ const Instruction * Scope::createImportHandle (const Scope * scope, const string
 }
 
 const Instruction * Scope::createLNot (Argument arg) {
-	if (arg.type->getDereferenceType()) {
-		auto * r = createGet (arg);
-		arg = Argument (r, size_t (0));
-	}
-	return insertionPoint->give (new BitNot (resolveType ("bool"), arg, module->newSymbol ("bitnot")));
+	return insertionPoint->give (new BitNot (resolveType ("bool"), loadValue (arg), module->newSymbol ("bitnot")));
 }
 
 const Instruction * Scope::createMul (Argument lhs, Argument rhs) {

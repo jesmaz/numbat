@@ -32,6 +32,8 @@ struct Scope {
 		const Type * resolveType (Argument parent, const string & iden) const;
 		const Type * resolveType (const string & iden) const;
 		
+		Argument loadReference (Argument arg);
+		Argument loadValue (Argument arg);
 		Argument staticCast (Argument src, const Type * const target, const string & iden="");
 		
 		const Instruction * allocateArray (const Type * const type, Argument size, const string & iden="");
