@@ -12,6 +12,7 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 	
 	const nir::Instruction * init = nullptr, * var = nullptr;
 	const nir::Type * type = nullptr;
+	bool ref = false;
 	if (inst) {
 		init = inst->build (scope);
 	}
@@ -28,8 +29,12 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 		}
 		
 		type = init->getType ();
+		if (type->getDereferenceType ()) {
+			type = type->getDereferenceType ();
+		}
 		if (vType->getIden () == "ref") {
 			type = type->getPointerTo ();
+			ref = true;
 		}
 		//TODO: make type const if needed
 		var = scope->allocateVariable (type, iden->getIden ());
@@ -45,12 +50,17 @@ const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {
 			report::logMessage (report::ERROR, scope->getSourceFile (), inst->getPos (), "'" + inst->toString (text::PLAIN) + "' has no type ");
 			return nullptr;
 		}
-		auto val = init;
-		if (init->getType () != type and type) {
-			val = scope->staticCast (init->getType (), type);
+		nir::Argument val;
+		if (ref) {
+			val = scope->loadReference (init);
+		} else {
+			val = scope->loadValue (init);
 		}
-		if (not val or not var) return nullptr;
-		return scope->createPut ({val, val->getIden ()}, {var, var->getIden ()});
+		if (val.type != type and type) {
+			val = scope->staticCast (val.type, type);
+		}
+		if (not val.type or not var) return nullptr;
+		return scope->createPut (val, {var, var->getIden ()});
 	}
 	return var;
 	
