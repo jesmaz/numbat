@@ -117,6 +117,8 @@ Module::Module () : data (new Module::Data) {
 	registerPrimitive (nir::Type::FPINT, 32, "float");
 	registerPrimitive (nir::Type::FPINT, 64, "double");
 	registerPrimitive (nir::Type::FPINT, 128, "quad");
+	
+	registerPrimitive (nir::Type::UINT, 0, "ptrsize");
 }
 
 Module::Data::~Data () {

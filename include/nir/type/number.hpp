@@ -11,7 +11,7 @@ class Number : public Type {
 	public:
 		
 		virtual ArithmaticType getArithmaticType () const {return arith;}
-		virtual size_t calculateSize (size_t ptrSize) const {return (width+7)/8;}
+		virtual size_t calculateSize (size_t ptrSize) const {if (width) return (width+7)/8; else return ptrSize;}
 		
 		static const Number * getNumberType (Type::ArithmaticType arith, uint32_t width);
 		
