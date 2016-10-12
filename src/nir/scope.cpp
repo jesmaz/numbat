@@ -146,7 +146,7 @@ const Type * Scope::resolveType (Argument parent, const string & iden, numbat::l
 		
 	}
 	
-	report::logMessage (report::ERROR, "'" + type->toString (text::PLAIN) + "' doesn't support nested types");
+	report::logMessage (report::ERROR, sourceFile, pos, "'" + type->toString (text::PLAIN) + "' doesn't support nested types");
 	return nullptr;
 	
 }
