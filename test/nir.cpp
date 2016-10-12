@@ -7,6 +7,7 @@
 #include <parse/handparser.hpp>
 #include <set>
 #include <utility/config.hpp>
+#include <utility/report.hpp>
 
 void printHelp (char * cmd) {
 	std::cerr << "Usage: " << cmd << " [Option]... [File...]\n";
@@ -36,6 +37,7 @@ int numbatMain (const Config & cfg) {
 				std::cout << std::endl;
 				prog = line;
 				delete node;
+				report::dumpLogs ();
 			}
 		}
 		if (not prog.empty()) {
@@ -46,6 +48,7 @@ int numbatMain (const Config & cfg) {
 				++printItt;
 			}
 			delete node;
+			report::dumpLogs ();
 		}
 		
 	} else {
@@ -65,6 +68,7 @@ int numbatMain (const Config & cfg) {
 			}
 			std::cout << "########" << f << "########" << std::endl;
 			delete node;
+			report::dumpLogs ();
 		}
 	}
 	
