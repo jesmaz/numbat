@@ -9,6 +9,17 @@
 namespace report {
 
 
+std::ostream & operator << (std::ostream & os, Severity sev) {
+	switch (sev) {
+		case ERROR:
+			return os << "ERROR";
+		case NOTICE:
+			return os << "NOTICE";
+		case WARNING:
+			return os << "WARNING";
+	}
+}
+
 struct Message {
 	Severity severity;
 	std::string file;
