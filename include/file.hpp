@@ -24,6 +24,8 @@ struct File {
 		const string & getDirectory () const {return directory;}
 		const string & getFileName () const {return fileName;}
 		
+		// Returns the built in file (this is where all built in constructs are held)
+		static File * builtIn ();
 		// Compile the provided file
 		static File * compile (const string & path, nir::Module * module);
 		// Searches the system for the requested file and compile it
@@ -39,6 +41,7 @@ struct File {
 		static bool asyncEnabled;
 		static std::atomic_uint files, processed;
 		static std::map <string, std::unique_ptr <File>> compiledFiles;
+		static std::unique_ptr <File> builtInPtr;
 		static DynArray <string> includeDirs;
 		
 		nir::Scope * scope;

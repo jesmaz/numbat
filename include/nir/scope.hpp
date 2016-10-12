@@ -1,12 +1,12 @@
-#ifndef NIR_SCOPE
-#define NIR_SCOPE
+#pragma once
 
 
-#include <file.hpp>
+#include <forward.hpp>
 #include <map>
 #include <nir/instruction.hpp>
 #include <nir/type/struct.hpp>
 #include <set>
+#include <token.hpp>
  
 
 
@@ -88,7 +88,7 @@ struct Scope {
 	protected:
 	private:
 		
-		Scope (Module * mod, Block * insertionPoint, Function * owner) : module (mod), insertionPoint (insertionPoint), owner (owner) {}
+		Scope (Module * mod, Block * insertionPoint, Function * owner, const numbat::File * sourceFile) : module (mod), insertionPoint (insertionPoint), owner (owner), sourceFile (sourceFile) {}
 		
 		std::map <string, DynArray <Function *> *> functions;
 		std::map <string, Type *> types;
@@ -99,12 +99,9 @@ struct Scope {
 		Module * module=nullptr;
 		Block * insertionPoint=nullptr;
 		Function * owner=nullptr;
-		numbat::File * sourceFile=nullptr;
+		const numbat::File * sourceFile=nullptr;
 		
 	
 };
 
-};
-
-
-#endif/*NIR_SCOPE*/
+}

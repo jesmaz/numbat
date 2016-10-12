@@ -1,4 +1,5 @@
 #include <cassert>
+#include <file.hpp>
 #include <nir/function.hpp>
 #include <nir/module.hpp>
 #include <nir/scope.hpp>
@@ -36,7 +37,7 @@ void Module::registerPrimitive (Type::ArithmaticType arith, uint32_t width, cons
 	
 }
 
-Scope * Module::createRootScope () {
+Scope * Module::createRootScope (const numbat::File * source) {
 	
 	Scope * global = getGlobalScope ();
 	symbol sym = newSymbol ("__entry__");
@@ -44,7 +45,7 @@ Scope * Module::createRootScope () {
 	Function * func = new Function (*sym, LINKAGE::LOCAL);
 	data->functions [sym] = func;
 	global->createCall (func, {});
-	Scope * scope = new Scope (this, func->getEntryPoint (), func);
+	Scope * scope = new Scope (this, func->getEntryPoint (), func, source);
 	data->scopes.insert (scope);
 	return scope;
 	
@@ -57,7 +58,7 @@ Scope * Module::getGlobalScope () {
 		assert (sym);
 		Function * func = new Function (*sym, LINKAGE::LOCAL);
 		data->functions [sym] = func;
-		data->globalScope = new Scope (this, func->getEntryPoint (), func);
+		data->globalScope = new Scope (this, func->getEntryPoint (), func, numbat::File::builtIn ());
 	}
 	return data->globalScope;
 	

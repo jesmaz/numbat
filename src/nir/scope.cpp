@@ -64,7 +64,7 @@ Scope * Scope::declareFunction (const BasicArray <const Parameter *> params, con
 		return nullptr;
 	}
 	module->data->functions [s] = func;
-	Scope * scope = new Scope (module, func->getEntryPoint (), func);
+	Scope * scope = new Scope (module, func->getEntryPoint (), func, sourceFile);
 	scope->parent = this;
 	scopes.insert (scope);
 	return scope;

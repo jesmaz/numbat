@@ -33,9 +33,20 @@ string joinPaths (const string & lhs, const string & rhs) {
 bool File::asyncEnabled=false;
 std::atomic_uint File::files, File::processed;
 std::map <string, std::unique_ptr <File>> File::compiledFiles;
+std::unique_ptr <File> File::builtInPtr;
 DynArray <string> File::includeDirs = {"/usr/include/numbat", "."};
 
 std::mutex fileMutex;
+
+File * File::builtIn () {
+	if (not builtInPtr) {
+		File * f;
+		builtInPtr = std::unique_ptr <File> (f = new File);
+		f->directory = "";
+		f->fileName = "numbat";
+	}
+	return builtInPtr.get ();
+}
 
 File * File::compile (const string & path, nir::Module * module) {
 	
@@ -78,7 +89,7 @@ File * File::compile (const string & path, nir::Module * module) {
 		std::cerr << parseTree->toString () << std::endl;
 	}
 	
-	nir::Scope * root = module->createRootScope ();
+	nir::Scope * root = module->createRootScope (f);
 	parseTree->declare (root);
 	parseTree->build (root);
 	f->scope = root;

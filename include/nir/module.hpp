@@ -1,15 +1,13 @@
-#ifndef NIR_MODULE
-#define NIR_MODULE
+#pragma once
 
 
-#include "../codegen/target.hpp"
-#include "forward.hpp"
-#include "function.hpp"
-#include "type.hpp"
-
-
+#include <codegen/target.hpp>
+#include <forward.hpp>
 #include <map>
 #include <memory>
+#include <nir/forward.hpp>
+#include <nir/function.hpp>
+#include <nir/type.hpp>
 #include <set>
 #include <string>
  
@@ -31,7 +29,7 @@ struct Module {
 		const Block * getEntry () const;
 		const std::map <symbol, Function *> getFunctions () const {return data->functions;}
 		
-		Scope * createRootScope ();
+		Scope * createRootScope (const numbat::File * source);
 		Scope * getGlobalScope ();
 		
 		symbol findSymbol (const string & iden);
@@ -70,6 +68,4 @@ struct Module {
 	
 };
 
-};
-
-#endif/*NIR_MODULE*/
+}
