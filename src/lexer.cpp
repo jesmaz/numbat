@@ -97,7 +97,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, uint32_t lin
 		//std::cout << buffer << std::endl;
 		if (buffer.length ()) {
 			token t = lexToken (buffer);
-			init.pos = {line, uint32_t (pos - lineStart - t.iden.size ())};
+			t.pos = {line, uint32_t (pos + 1 - lineStart - t.iden.size ())};
 			str += t;
 		}
 	}
@@ -117,7 +117,7 @@ tkstring lexline (const char * source, size_t & pos, size_t length, uint32_t lin
 			token t;
 			t.type = TOKEN::semicolon;
 			t.iden = "";
-			t.pos = {line, uint32_t (pos - lineStart)};
+			t.pos = {line, uint32_t (pos + 1 - lineStart)};
 			str += t;
 	}
 	
