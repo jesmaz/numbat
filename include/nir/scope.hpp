@@ -29,8 +29,8 @@ struct Scope {
 		size_t changeActiveBlock (Block * block) {return insertionPoint = block, 0;}
 		size_t changeActiveBlock (symbol block);
 		
-		const Type * resolveType (Argument parent, const string & iden) const;
-		const Type * resolveType (const string & iden) const;
+		const Type * resolveType (Argument parent, const string & iden, numbat::lexer::position pos) const;
+		const Type * resolveType (const string & iden, numbat::lexer::position pos) const;
 		
 		Argument loadReference (Argument arg);
 		Argument loadValue (Argument arg);
@@ -74,9 +74,9 @@ struct Scope {
 		const Instruction * createStructValue (const Type * const type, BasicArray <Argument> vals, const string & iden="");
 		const Instruction * createSub (Argument lhs, Argument rhs);
 		const Instruction * getFunctionPointer ();
-		const Instruction * resolve (Argument parent, const string & iden);
-		const Instruction * resolve (const string & iden);
-		const Instruction * resolve (const string & iden, Block * insertionPoint) const;
+		const Instruction * resolve (Argument parent, const string & iden, numbat::lexer::position pos);
+		const Instruction * resolve (const string & iden, numbat::lexer::position pos);
+		const Instruction * resolve (const string & iden, Block * insertionPoint, numbat::lexer::position pos) const;
 		const Instruction * staticCast (const Type * src, const Type * const target, const string & iden="");
 		
 		Struct * registerStruct (const std::string & iden);

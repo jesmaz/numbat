@@ -32,7 +32,7 @@ const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	}
 	
 	nir::Argument array = {inst, inst->getIden ()};
-	auto * dat = scope->resolve (array, "data");
+	auto * dat = scope->resolve (array, "data", index->getPos ());
 	if (not dat) return nullptr;
 	auto ptr = scope->createGet ({dat, dat->getIden ()});
 	return scope->createPointerAdd (ptr->getType (), {ptr, ptr->getIden ()}, {s, s->getIden ()}, "index");

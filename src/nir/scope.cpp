@@ -107,7 +107,7 @@ const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
 }
 
 
-const Type * Scope::resolveType (const string & iden) const {
+const Type * Scope::resolveType (const string & iden, numbat::lexer::position pos) const {
 	
 	auto titt = types.find (iden);
 	if (titt != types.end ()) {
@@ -118,31 +118,31 @@ const Type * Scope::resolveType (const string & iden) const {
 		return vitt->second->getType ();
 	}
 	if (parent) {
-		return parent->resolveType (iden);
+		return parent->resolveType (iden, pos);
 	}
 	auto itt = module->data->types.find (module->findSymbol (iden));
 	if (itt != module->data->types.end ()) {
 		return itt->second;
 	}
 	
-	report::logMessage (report::ERROR, "Could not resolve '" + iden + "' as a type");
+	report::logMessage (report::ERROR, sourceFile, pos, "Could not resolve '" + iden + "' as a type");
 	return nullptr;
 	
 }
 
-const Type * Scope::resolveType (Argument parent, const string & iden) const {
+const Type * Scope::resolveType (Argument parent, const string & iden, numbat::lexer::position pos) const {
 	
 	const Type * type = parent.type;
 	if (typeid (*type) == typeid (Struct)) {
 		
-		report::logMessage (report::ERROR, "Nested structs are not yet supported");
+		report::logMessage (report::ERROR, sourceFile, pos, "Nested structs are not yet supported");
 		return nullptr;
 		
 	} else if (typeid (*type) == typeid (ImportHandle)) {
 		
 		const ImportHandle * imp = static_cast <const ImportHandle *> (type);
 		const Scope * scope = imp->getScope ();
-		return scope->resolveType (iden);
+		return scope->resolveType (iden, pos);
 		
 	}
 	
@@ -277,7 +277,7 @@ const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string &
 	Argument tlhs = loadValue (lhs), trhs = loadValue (rhs);
 	
 	auto * t = promoteArithmatic (tlhs.type, trhs.type);
-	auto * b = resolveType ("bool");
+	auto * b = resolveType ("bool", {1,1});
 	Instruction * inst = new T (b, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
 	return insertionPoint->give (inst);
 }
@@ -379,7 +379,7 @@ const Instruction * Scope::createImportHandle (const Scope * scope, const string
 }
 
 const Instruction * Scope::createLNot (Argument arg) {
-	return insertionPoint->give (new BitNot (resolveType ("bool"), loadValue (arg), module->newSymbol ("bitnot")));
+	return insertionPoint->give (new BitNot (resolveType ("bool", {1,1}), loadValue (arg), module->newSymbol ("bitnot")));
 }
 
 const Instruction * Scope::createMul (Argument lhs, Argument rhs) {
@@ -456,7 +456,7 @@ const Instruction * Scope::getFunctionPointer () {
 	
 }
 
-const Instruction * Scope::resolve (Argument parent, const string & iden) {
+const Instruction * Scope::resolve (Argument parent, const string & iden, numbat::lexer::position pos) {
 	
 	const Type * type = parent.type;
 	if (typeid (*type) == typeid (Struct)) {
@@ -475,7 +475,7 @@ const Instruction * Scope::resolve (Argument parent, const string & iden) {
 		
 		const ImportHandle * imp = static_cast <const ImportHandle *> (type);
 		const Scope * scope = imp->getScope ();
-		return scope->resolve (iden, insertionPoint);
+		return scope->resolve (iden, insertionPoint, pos);
 		
 	} else if (typeid (*type) == typeid (PointerType)) {
 		
@@ -486,16 +486,16 @@ const Instruction * Scope::resolve (Argument parent, const string & iden) {
 		
 	}
 	
-	report::logMessage (report::ERROR, "Can't resolve '" + iden + "'");
+	report::logMessage (report::ERROR, sourceFile, pos, "Can't resolve '" + iden + "'");
 	return nullptr;
 	
 }
 
-const Instruction * Scope::resolve (const string & iden) {
-	return resolve (iden, insertionPoint);
+const Instruction * Scope::resolve (const string & iden, numbat::lexer::position pos) {
+	return resolve (iden, insertionPoint, pos);
 }
 
-const Instruction * Scope::resolve (const string & iden, Block * insertionPoint) const {
+const Instruction * Scope::resolve (const string & iden, Block * insertionPoint, numbat::lexer::position pos) const {
 	
 	auto itt = variables.find (iden);
 	if (itt != variables.end ()) {
@@ -517,9 +517,9 @@ const Instruction * Scope::resolve (const string & iden, Block * insertionPoint)
 		}
 	}
 	
-	if (parent) return parent->resolve (iden);
+	if (parent) return parent->resolve (iden, pos);
 	
-	report::logMessage (report::ERROR, "Could not resolve '" + iden + "'");
+	report::logMessage (report::ERROR, sourceFile, pos, "Could not resolve '" + iden + "'");
 	return nullptr;
 	
 }

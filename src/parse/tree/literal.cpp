@@ -17,15 +17,15 @@ const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope) {
 		case numbat::lexer::TOKEN::numericliteral: {
 			const nir::Type * t;
 			if (literal.back () == 'f') {
-				t = scope->resolveType ("float");
+				t = scope->resolveType ("float", getPos ());
 			} else if (literal.back () == 'h') {
-				t = scope->resolveType ("half");
+				t = scope->resolveType ("half", getPos ());
 			} else if (literal.back () == 'q') {
-				t = scope->resolveType ("quad");
+				t = scope->resolveType ("quad", getPos ());
 			} else if (literal.find ('.') != string::npos) {
-				t = scope->resolveType ("double");
+				t = scope->resolveType ("double", getPos ());
 			} else {
-				t = scope->resolveType ("int64");
+				t = scope->resolveType ("int64", getPos ());
 			}
 			return scope->createConstant (t, literal);
 		}

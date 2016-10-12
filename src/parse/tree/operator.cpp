@@ -67,7 +67,7 @@ template <>
 const nir::Instruction * SpecificOperator <OPERATION::AND>::defBuild (nir::Scope * scope) {
 	
 	//TODO: Return a union
-	const nir::Type * b = scope->resolveType ("bool");
+	const nir::Type * b = scope->resolveType ("bool", getPos ());
 	const nir::Instruction * res = scope->allocateVariable (b);
 	const nir::Instruction * lhs = args [0]->build (scope);
 	if (not lhs or lhs->getResults ().empty ()) return nullptr;
@@ -246,7 +246,7 @@ template <>
 const nir::Instruction * SpecificOperator <OPERATION::OR>::defBuild (nir::Scope * scope) {
 	
 	//TODO: Return a union
-	const nir::Type * b = scope->resolveType ("bool");
+	const nir::Type * b = scope->resolveType ("bool", getPos ());
 	const nir::Instruction * res = scope->allocateVariable (b);
 	const nir::Instruction * lhs = args [0]->build (scope);
 	if (not lhs or lhs->getResults ().empty ()) return nullptr;
