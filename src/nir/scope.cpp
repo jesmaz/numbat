@@ -552,7 +552,7 @@ Argument Scope::staticCast (Argument src, const Type * const target, const strin
 }
 
 
-Struct * Scope::registerStruct (const string & iden) {
+Struct * Scope::registerStruct (const string & iden, numbat::lexer::position pos) {
 	
 	Struct * s = nullptr;
 	if (iden != "") {
@@ -561,13 +561,13 @@ Struct * Scope::registerStruct (const string & iden) {
 			if (!t) {
 				t = s = new Struct;
 			} else {
-				report::logMessage (report::ERROR, "Unable to override '" + iden + "'");
+				report::logMessage (report::ERROR, sourceFile, pos, "Unable to override '" + iden + "'");
 			}
 		} else {
-			report::logMessage (report::ERROR, "'" + iden + "' is a reserved type");
+			report::logMessage (report::ERROR, sourceFile, pos, "'" + iden + "' is a reserved type");
 		}
 	} else {
-		report::logMessage (report::ERROR, "Structs must have a name");
+		report::logMessage (report::ERROR, sourceFile, pos, "Structs must have a name");
 	}
 	return s;
 	

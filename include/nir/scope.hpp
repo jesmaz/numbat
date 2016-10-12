@@ -79,7 +79,7 @@ struct Scope {
 		const Instruction * resolve (const string & iden, Block * insertionPoint, numbat::lexer::position pos) const;
 		const Instruction * staticCast (const Type * src, const Type * const target, const string & iden="");
 		
-		Struct * registerStruct (const std::string & iden);
+		Struct * registerStruct (const std::string & iden, numbat::lexer::position pos);
 		
 		void declareFunction ();
 		
