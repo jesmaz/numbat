@@ -31,7 +31,7 @@ const nir::Instruction * Struct::build (nir::Scope * scope) {
 
 void Struct::declare (nir::Scope * scope) {
 	
-	type = scope->registerStruct (iden);
+	type = scope->registerStruct (iden, getPos ());
 	
 }
 

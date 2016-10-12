@@ -197,7 +197,7 @@ const Instruction * Scope::allocateBytes (const Type * const type, Argument size
 const Instruction * Scope::allocateVariable (const Type * const type, const string & iden) {
 	
 	const Type * ctype = Number::getNumberType (Type::UINT, 32);
-	auto * con = createConstant (ctype, "1");
+	auto * con = createConstant (ctype, "1", {1,1});
 	Argument amount = {con, con->getIden ()};
 	Instruction * inst = new Alloc (type->getPointerTo (), amount, module->newSymbol (iden));
 	return variables [iden] = insertionPoint->give (inst);
@@ -306,7 +306,7 @@ const Instruction * Scope::createCmpNE (Argument lhs, Argument rhs) {
 	return createCmp <NEqual> (lhs, rhs, "nequal");
 }
 
-const Instruction * Scope::createConstant (const Type * type, const string & val, const string & iden) {
+const Instruction * Scope::createConstant (const Type * type, const string & val, numbat::lexer::position pos, const string & iden) {
 	
 	//TODO: Ensure the type is sensible
 	BasicArray <Value> values (1);
@@ -340,10 +340,10 @@ const Instruction * Scope::createConstant (const Type * type, const string & val
 	
 	if (err == ERANGE) {
 		
-		report::logMessage (report::WARNING, "'" + val + "' is out of range, actual value will be capped at the maximum");
+		report::logMessage (report::WARNING, sourceFile, pos, "'" + val + "' is out of range, actual value will be capped at the maximum");
 		
 	} else if (*end) {
-		report::logMessage (report::ERROR, "'" + val + "' is not a valid number");
+		report::logMessage (report::ERROR, sourceFile, pos, "'" + val + "' is not a valid number");
 	}
 	
 	Constant * inst = new Constant ({type}, values, {module->newSymbol (iden)});

@@ -27,7 +27,7 @@ const nir::Instruction * ParseTreeLiteral::build (nir::Scope * scope) {
 			} else {
 				t = scope->resolveType ("int64", getPos ());
 			}
-			return scope->createConstant (t, literal);
+			return scope->createConstant (t, literal, getPos ());
 		}
 			
 		case numbat::lexer::TOKEN::stringliteral: {
