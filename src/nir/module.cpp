@@ -42,7 +42,7 @@ Scope * Module::createRootScope (const numbat::File * source) {
 	Scope * global = getGlobalScope ();
 	symbol sym = newSymbol ("__entry__");
 	assert (sym);
-	Function * func = new Function (*sym, LINKAGE::LOCAL);
+	Function * func = new Function (sym, LINKAGE::LOCAL);
 	data->functions [sym] = func;
 	global->createCall (func, {});
 	Scope * scope = new Scope (this, func->getEntryPoint (), func, source);
@@ -56,7 +56,7 @@ Scope * Module::getGlobalScope () {
 	if (not data->globalScope) {
 		symbol sym = newSymbol ("__entry__", true);
 		assert (sym);
-		Function * func = new Function (*sym, LINKAGE::LOCAL);
+		Function * func = new Function (sym, LINKAGE::LOCAL);
 		data->functions [sym] = func;
 		data->globalScope = new Scope (this, func->getEntryPoint (), func, numbat::File::builtIn ());
 	}
@@ -66,7 +66,8 @@ Scope * Module::getGlobalScope () {
 
 symbol Module::findSymbol (const string & iden) {
 	auto & sym = data->symbols;
-	auto itt = sym.find (&iden);
+	symbol_t s (iden);
+	auto itt = sym.find (&s);
 	if (itt != sym.end ()) {
 		return *itt;
 	}
@@ -77,15 +78,16 @@ symbol Module::newSymbol (const string & iden, bool force) {
 	
 	auto & sym = data->symbols;
 	if (iden != "") {
-		auto itt = sym.find (&iden);
+		symbol_t s (iden);
+		auto itt = sym.find (&s);
 		if (itt == sym.end ()) {
-			symbol s = new string (iden);
+			symbol s = new symbol_t (iden);
 			sym.insert (s);
 			return s;
 		}
 	}
 	if (not force) return nullptr;
-	symbol s = new string (iden + "%" + std::to_string (data->n));
+	symbol s = new symbol_t (iden + "%" + std::to_string (data->n));
 	data->n += 1;
 	sym.insert (s);
 	return s;

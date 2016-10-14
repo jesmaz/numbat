@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nir/forward.hpp>
+#include <nir/symbol.hpp>
 #include <nir/type.hpp>
 #include <parse/tree/base.hpp>
 
@@ -14,7 +15,7 @@ struct Parameter {
 		bool validate () const {return true;}
 		
 		parser::PTNode getDefVal () const {return defVal;}
-		const string & getIden () const {return iden;}
+		const symbol getIden () const {return &iden;}
 		const Type * getType () const {return type;}
 		
 		string toString (text::PrintMode mode) const {
@@ -25,15 +26,15 @@ struct Parameter {
 			return s;
 		}
 		
-		Parameter (parser::PTNode instruction, const Type * type, const string & iden) : defVal (instruction), type (type), iden (iden) {}
-		Parameter (const Type * type, const string & iden) : defVal (nullptr), type (type), iden (iden) {}
+		Parameter (parser::PTNode instruction, const Type * type, symbol_t iden) : defVal (instruction), type (type), iden (iden) {}
+		Parameter (const Type * type, symbol_t iden) : defVal (nullptr), type (type), iden (iden) {}
 		
 	protected:
 	private:
 		
 		parser::PTNode defVal;
 		const Type * type;
-		string iden;
+		symbol_t iden;
 		
 };
 

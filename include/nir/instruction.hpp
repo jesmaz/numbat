@@ -2,9 +2,9 @@
 
 #include <cassert>
 #include <nir/forward.hpp>
+#include <nir/symbol.hpp>
 #include <nir/type.hpp>
 #include <utility/array.hpp>
- 
 #include <visitor.hpp>
 
 

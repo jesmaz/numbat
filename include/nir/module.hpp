@@ -7,6 +7,7 @@
 #include <memory>
 #include <nir/forward.hpp>
 #include <nir/function.hpp>
+#include <nir/symbol.hpp>
 #include <nir/type.hpp>
 #include <set>
 #include <string>
@@ -15,8 +16,6 @@
 namespace nir {
 
 using std::string;
-
-typedef const string * symbol;
 
 struct Module {
 	
@@ -49,7 +48,7 @@ struct Module {
 		
 		struct Data {
 			struct symbCmp {
-				bool operator ()(symbol lhs, symbol rhs) {return *lhs < *rhs;}
+				bool operator ()(symbol lhs, symbol rhs) {return lhs->iden < rhs->iden;}
 			};
 			std::map <symbol, Function *> functions;
 			std::map <symbol, const Type *> types;

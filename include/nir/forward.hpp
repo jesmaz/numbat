@@ -20,10 +20,11 @@ struct Block;
 struct Builder;
 struct Module;
 struct Scope;
+struct symbol_t;
 
 using std::string;
 
-typedef const string * symbol;
+typedef const symbol_t * symbol;
 
 
 }

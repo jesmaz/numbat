@@ -24,7 +24,7 @@ size_t nir::Struct::calculateSize (size_t ptrSize) const {
 ssize_t nir::Struct::calculateOffset (size_t ptrSize, const string& iden) const {
 	size_t s=0;
 	for (const Parameter * p : memberArr) {
-		if (p->getIden () == iden) {
+		if (p->getIden ()->iden == iden) {
 			return s;
 		}
 		s += p->getType ()->calculateSize (ptrSize);
@@ -57,7 +57,7 @@ void nir::Struct::populate (const BasicArray <const nir::Parameter *> & mem) {
 	memberArr = mem;
 	
 	for (const Parameter * p : memberArr) {
-		members [p->getIden ()] = p;
+		members [p->getIden ()->iden] = p;
 	}
 	
 }

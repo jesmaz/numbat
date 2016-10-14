@@ -323,7 +323,7 @@ class PointerValue : public AbstractValue {
 
 
 Value TupleValue::operator [] (const Parameter * param) const {
-	ssize_t offset = layout->calculateOffset (sizeof (Value), param->getIden ());
+	ssize_t offset = layout->calculateOffset (sizeof (Value), param->getIden ()->iden);
 	assert (offset >= 0);
 	adv_ptr <uint8_t> ptr = bytes + offset;
 	const Type * type = param->getType ();

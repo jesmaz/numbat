@@ -47,17 +47,15 @@ Scope * Scope::declareFunction (const BasicArray <const Parameter *> params, con
 	label += "_" + std::to_string (params.size ());
 	label += "_" + std::to_string (ret.size ());
 	
-	Function * func = new Function (params, ret, label, linkage);
+	symbol s = module->newSymbol (iden);
 	
-	symbol s;
+	Function * func = new Function (params, ret, s, linkage);
 	if (iden == "") {
 		//Anonymous
-		s = module->newSymbol (iden);
 	} else {
 		auto & fSet = functions [iden];
 		if (!fSet) fSet = new DynArray <Function *>;
 		fSet->push_back (func);
-		s = module->newSymbol (iden);
 	}
 	if (not s) {
 		assert (false);
@@ -403,7 +401,7 @@ const Instruction * Scope::createParameter (const Type * const type, Argument in
 		}
 		
 	} else {
-		param = new Parameter (type, iden);
+		//param = new Parameter (type, iden);
 	}
 	abort ();//return param;
 	
@@ -466,7 +464,7 @@ const Instruction * Scope::resolve (Argument parent, const string & iden, numbat
 		
 		for (size_t i=0; i<memberArr.size (); ++i) {
 			const Parameter * param = memberArr [i];
-			if (param->getIden () == iden) {
+			if (param->getIden ()->iden == iden) {
 				return insertionPoint->give (new PickStructMember (param->getType (), parent, i, iden, module->newSymbol (iden)));
 			}
 		}
@@ -511,7 +509,7 @@ const Instruction * Scope::resolve (const string & iden, Block * insertionPoint,
 	
 	if (owner) {
 		for (const Parameter * param : owner->getArgs ()) {
-			if (iden == param->getIden ()) {
+			if (iden == param->getIden ()->iden) {
 				abort ();
 			}
 		}

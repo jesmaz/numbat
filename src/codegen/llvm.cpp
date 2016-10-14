@@ -91,7 +91,7 @@ llvm::Function * LLVM::resolve (const nir::Function * func) {
 	}
 	
 	llvm::FunctionType * ft = llvm::FunctionType::get (retType, params, false);
-	return f = llvm::Function::Create (ft, llvm::Function::ExternalLinkage, func->getLabel (), module);
+	return f = llvm::Function::Create (ft, llvm::Function::ExternalLinkage, func->getLabel ()->iden, module);
 	
 }
 
@@ -251,7 +251,7 @@ void LLVM::visit (const nir::Function * func) {
 	auto argEnd = llFunc->arg_end ();
 	for (const Parameter * param : func->getArgs ()) {
 		assert (argItt != argEnd);
-		instrDict [&param->getIden ()] = argItt;
+		instrDict [param->getIden ()] = argItt;
 		++argItt;
 	}
 	
