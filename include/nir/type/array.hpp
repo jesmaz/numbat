@@ -19,18 +19,20 @@ class Array : public Type {
 		virtual ssize_t calculateOffset (size_t ptrSize, const string & iden) const {return type.calculateOffset (ptrSize, iden);}
 		
 		const Struct & getUnderlyingType () const {return type;}
+		const Type * getElementType () const {return elementType;}
 		
 		static Array * arrayOf (const Type * t);
 		
 	protected:
 	private:
 		
-		Array () {}
+		Array (const Type * elementType) : elementType (elementType) {}
 		
 		virtual string strDump (text::PrintMode mode) const {return type.toString (mode);}
 		
 		
 		Struct type;
+		const Type * elementType;
 		
 		static std::map <const Type *, std::unique_ptr <Array>> arrayTypes;
 		

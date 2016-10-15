@@ -1,4 +1,5 @@
 #include <nir/scope.hpp>
+#include <nir/type/array.hpp>
 #include <parse/tree/operator.hpp>
 #include <utility/report.hpp>
 
@@ -188,7 +189,38 @@ const nir::Instruction * SpecificOperator <OPERATION::CMPNE>::defBuild (nir::Sco
 
 template <>
 const nir::Instruction * SpecificOperator <OPERATION::CONCAT>::defBuild (nir::Scope * scope) {
-	report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Can't concatenate '" + args [0]->toString (text::PLAIN) + "' to '" + args [0]->toString (text::PLAIN) + "'");
+	const nir::Instruction * lhs = args [0]->build (scope);
+	const nir::Instruction * rhs = args [1]->build (scope);
+	
+	auto * lhsType = lhs->getType ()->getValueType ();
+	auto * rhsType = rhs->getType ()->getValueType ();
+	if (typeid (*lhsType) == typeid (nir::Array)) {
+		auto * lhsArrType = reinterpret_cast <const nir::Array *> (lhsType);
+		
+		auto * lhsLen = scope->resolve (lhs, "len", args [0]->getPos ());
+		auto * rhsLen = lhsLen;
+		
+		if (lhsType == rhsType) {
+			auto * rhsLen = scope->resolve (rhs, "len", args [1]->getPos ());
+			
+		} else if (lhsType == nir::Array::arrayOf (rhsType)) {
+			rhsLen = scope->createConstant (lhsLen->getType (), "1", args [0]->getPos ());
+			
+		} else {
+			report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Can't concatenate '" + args [0]->toString (text::PLAIN) + "' to '" + args [0]->toString (text::PLAIN) + "' they have incompatible types");
+			return nullptr;
+			
+		}
+		
+		auto * len = scope->createAdd (lhsLen, rhsLen);
+		auto * newArr = scope->allocateArray (lhsArrType->getElementType (), len);
+		
+		return newArr;
+		
+	}
+	
+	
+	report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Can't concatenate '" + args [0]->toString (text::PLAIN) + "' to '" + args [0]->toString (text::PLAIN) + "' the left hand side must be an array");
 	return nullptr;
 }
 

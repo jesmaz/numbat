@@ -16,7 +16,7 @@ Array * Array::arrayOf (const Type * t) {
 		return itt->second.get ();
 	} else {
 		if (not t) return nullptr;
-		Array * a = new Array ();
+		Array * a = new Array (t);
 		Parameter * ptr = new Parameter (t->getPointerTo (), symbol_t ("data"));
 		Parameter * len = new Parameter (Number::getNumberType (Type::UINT, 64), symbol_t ("len"));
 		a->type.populate ({ptr, len});

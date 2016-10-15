@@ -15,6 +15,8 @@ class PointerType : public Type {
 		
 		virtual ArithmaticType getArithmaticType () const {return Type::ArithmaticType::UINT;}
 		virtual const Type * getDereferenceType () const {return type;}
+		virtual const Type * getReferenceType () const {auto reft = type->getReferenceType (); return reft ? reft : this;}
+		virtual const Type * getValueType () const {return type->getValueType ();}
 		virtual size_t calculateSize (size_t ptrSize) const {return ptrSize;}
 		
 		static PointerType * pointerTo (const Type * t) {

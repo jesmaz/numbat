@@ -22,6 +22,8 @@ class Type : public numbat::visitor::BaseConstVisitable {
 		string toString (text::PrintMode mode=text::PLAIN) const {if (this) return strDump (mode); else return "nullptr";}
 		
 		virtual const Type * getDereferenceType () const {return nullptr;}
+		virtual const Type * getReferenceType () const {return nullptr;}
+		virtual const Type * getValueType () const {return this;}
 		const Type * getPointerTo () const;
 		
 		virtual const Parameter * getParam (const string & str) const {return nullptr;}
