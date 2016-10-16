@@ -214,6 +214,12 @@ const nir::Instruction * SpecificOperator <OPERATION::CONCAT>::defBuild (nir::Sc
 		
 		auto * len = scope->createAdd (lhsLen, rhsLen);
 		auto * newArr = scope->allocateArray (lhsArrType->getElementType (), len);
+		auto dest1 = scope->loadReference (scope->resolve (newArr, "data", getPos ()));
+		auto src1 = scope->loadReference (scope->resolve (lhs, "data", args [0]->getPos ()));
+		scope->createCopy (dest1, src1, lhsLen);
+		auto dest2 = scope->createPointerAdd (dest1.type, dest1, lhsLen);
+		auto src2 = scope->loadReference (scope->resolve (rhs, "data", args [1]->getPos ()));
+		scope->createCopy (dest2, src2, rhsLen);
 		
 		return newArr;
 		
