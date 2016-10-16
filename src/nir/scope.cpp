@@ -18,6 +18,7 @@
 #include <nir/inst/jump.hpp>
 #include <nir/inst/less.hpp>
 #include <nir/inst/lessequal.hpp>
+#include <nir/inst/memcpy.hpp>
 #include <nir/inst/mul.hpp>
 #include <nir/inst/neg.hpp>
 #include <nir/inst/nequal.hpp>
@@ -180,8 +181,8 @@ const Instruction * Scope::allocateArray (const Type * const type, Argument size
 	const Instruction * ptr = allocateBytes (type, size, iden + "_ptr");
 	const Instruction * var = allocateVariable (s, iden);
 	const Instruction * val = createStructValue (s, {{ptr, ptr->getIden ()}, size});
-	const Instruction * inst = createPut ({val, val->getIden ()}, {var, var->getIden ()});
-	return inst;
+	createPut ({val, val->getIden ()}, {var, var->getIden ()});
+	return var;
 	
 }
 
@@ -346,6 +347,12 @@ const Instruction * Scope::createConstant (const Type * type, const string & val
 	
 	Constant * inst = new Constant ({type}, values, {module->newSymbol (iden)});
 	return insertionPoint->give (inst);
+	
+}
+
+const Instruction * Scope::createCopy (Argument src, Argument dest, Argument count) {
+	
+	return insertionPoint->give (new MemCpy (src, dest, count, module->newSymbol ("memcpy")));
 	
 }
 

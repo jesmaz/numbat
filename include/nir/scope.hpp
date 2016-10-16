@@ -58,6 +58,7 @@ struct Scope {
 		const Instruction * createCmpLTE (Argument lhs, Argument rhs);
 		const Instruction * createCmpNE (Argument lhs, Argument rhs);
 		const Instruction * createConstant (const Type * type, const string & val, numbat::lexer::position pos, const string & iden="");
+		const Instruction * createCopy (Argument src, Argument dest, Argument count);
 		const Instruction * createDiv (Argument lhs, Argument rhs);
 		const Instruction * createGet (Argument src);
 		const Instruction * createImportHandle (const Scope * scope, const string & iden="");
