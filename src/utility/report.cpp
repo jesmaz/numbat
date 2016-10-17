@@ -38,18 +38,9 @@ struct Message {
 	Message () {}
 };
 
-struct EstrangedMessage {
-	Severity severity;
-	std::string message;
-	EstrangedMessage (Severity s, const std::string & m) : severity (s), message (m) {}
-	EstrangedMessage () {}
-};
-
 
 bool errorReported=false;
 
-
-DynArray <EstrangedMessage> estrangedMessages;
 DynArray <Message> messages;
 
 
@@ -58,7 +49,7 @@ bool compilationFailed () {
 }
 
 bool empty () {
-	return estrangedMessages.empty () and messages.empty ();
+	return messages.empty ();
 }
 
 
@@ -74,7 +65,6 @@ const string & getPrintMode (Severity sev) {
 }
 
 void clearLogs () {
-	estrangedMessages.clear ();
 	messages.clear ();
 }
 
@@ -96,11 +86,6 @@ void logMessage (Severity severity, const numbat::File * file, numbat::lexer::po
 	if (not errorReported or severity == ERROR) errorReported = true;
 }
 
-void logMessage (Severity severity, const std::string & message) {
-	estrangedMessages.push_back (EstrangedMessage (severity, message));
-	if (not errorReported or severity == ERROR) errorReported = true;
-}
-
 
 void printLogs () {
 	text::PrintMode mode = Config::globalConfig ().printModeSTDERR;
@@ -112,11 +97,6 @@ void printLogs (std::ostream & ostream, text::PrintMode mode) {
 	for (const Message & msg : messages) {
 		if (mode == text::COLOUR) ostream << getPrintMode (msg.severity);
 		ostream << msg.severity << ": " << msg.file << ":" << msg.pos.line << ":" << msg.pos.col << ": " << msg.message << "\n";
-		if (mode == text::COLOUR) ostream << text::reset;
-	}
-	for (const EstrangedMessage & msg : estrangedMessages) {
-		if (mode == text::COLOUR) ostream << getPrintMode (msg.severity);
-		ostream << msg.severity << ": " << msg.message << "\n";
 		if (mode == text::COLOUR) ostream << text::reset;
 	}
 	ostream << std::flush;

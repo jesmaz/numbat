@@ -29,7 +29,6 @@ void dumpLogs (std::ostream & ostream, text::PrintMode mode=text::PLAIN);
 
 // Logs a new message. Messages are ordered by file, line, and position.
 void logMessage (Severity severity, const numbat::File * file, numbat::lexer::position pos, const std::string & message);
-void logMessage (Severity severity, const std::string & message);
 
 // Prints all logs to the stream.
 // If no stream is specified std::cerr is used.
