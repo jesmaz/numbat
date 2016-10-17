@@ -32,9 +32,5 @@ void ParseTreeNode::declare (nir::Scope *) {
 	report::logMessage (report::ERROR, string ("virtual 'declare' not implemented for: ") + typeid (*this).name ());
 }
 
-void ParseTreeNode::push_back (ParseTreeNode * e) {
-	report::logMessage (report::ERROR, string ("virtual 'push_back' not implemented for: ") + typeid (*this).name ());
-}
-
 
 }

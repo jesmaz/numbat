@@ -43,7 +43,6 @@ class ParseTreeNode {
 		virtual const nir::Type * resolveType (nir::Scope * scope);
 		
 		virtual void declare (nir::Scope * scope);
-		virtual void push_back (PTNode e);
 		
 		ParseTreeNode (numbat::lexer::position pos) : type (NodeType::EXPRESSION), pos (pos) {}
 		ParseTreeNode (NodeType nodeType, numbat::lexer::position pos) : type (nodeType), pos (pos) {}
