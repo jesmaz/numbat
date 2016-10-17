@@ -49,7 +49,7 @@ void ParseTreeImport::declare (nir::Scope * scope) {
 	}
 	
 	if (not sourceFile) {
-		report::logMessage (report::ERROR, "Failed to import '" + relPath + "'");
+		report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Failed to import '" + relPath + "'");
 	}
 	
 }

@@ -70,7 +70,7 @@ Scope * Scope::declareFunction (const BasicArray <const Parameter *> params, con
 	
 }
 
-const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
+const Type * promoteArithmatic (const Type * lhs, const Type * rhs, const numbat::File * source, numbat::lexer::position pos) {
 	//TODO: Deal with edge cases
 	switch (lhs->getArithmaticType ()) {
 		case Type::DECINT:
@@ -84,7 +84,7 @@ const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
 				case Type::UINT:
 					return lhs;
 				default:
-					report::logMessage (report::ERROR, "'" + rhs->toString (text::PLAIN) + "' is not a numeric type");
+					report::logMessage (report::ERROR, source, pos, "'" + rhs->toString (text::PLAIN) + "' is not a numeric type");
 			}
 		case Type::INT:
 			switch (rhs->getArithmaticType ()) {
@@ -95,12 +95,12 @@ const Type * promoteArithmatic (const Type * lhs, const Type * rhs) {
 				case Type::UINT:
 					return lhs;
 				default:
-					report::logMessage (report::ERROR, "'" + rhs->toString (text::PLAIN) + "' is not a numeric type");
+					report::logMessage (report::ERROR, source, pos, "'" + rhs->toString (text::PLAIN) + "' is not a numeric type");
 			}
 		case Type::UINT:
 			return rhs;
 		default:
-			report::logMessage (report::ERROR, "'" + lhs->toString (text::PLAIN) + "' is not a numeric type");
+			report::logMessage (report::ERROR, source, pos, "'" + lhs->toString (text::PLAIN) + "' is not a numeric type");
 	}
 	return lhs;
 }
@@ -153,7 +153,7 @@ const Type * Scope::resolveType (Argument parent, const string & iden, numbat::l
 
 Argument Scope::loadReference (Argument arg) {
 	if (not arg.type->getDereferenceType ()) {
-		report::logMessage (report::ERROR, "Reference required");
+		report::logMessage (report::ERROR, sourceFile, arg.sym->pos, "Reference required");
 		return nullptr;
 	}
 	if (arg.type->getDereferenceType ()->getDereferenceType ()) {
@@ -207,7 +207,7 @@ template <typename T>
 const Instruction * Scope::createBinary (Argument lhs, Argument rhs, const string & iden) {
 	Argument tlhs = loadValue (lhs), trhs = loadValue (rhs);
 	
-	auto * t = promoteArithmatic (tlhs.type, trhs.type);
+	auto * t = promoteArithmatic (tlhs.type, trhs.type, sourceFile, rhs.sym->pos);
 	Instruction * inst = new T (t, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
 	return insertionPoint->give (inst);
 }
@@ -219,7 +219,7 @@ const Instruction * Scope::createAdd (Argument lhs, Argument rhs) {
 const Instruction * Scope::createAssign (Argument lhs, Argument rhs) {
 	const Type * dref = lhs.type->getDereferenceType ();
 	if (not dref) {
-		report::logMessage (report::ERROR, "Can't assign to a constant");
+		report::logMessage (report::ERROR, sourceFile, rhs.sym->pos, "Can't assign to a constant");
 		return nullptr;
 	}
 	lhs = loadReference (lhs);
@@ -275,7 +275,7 @@ template <typename T>
 const Instruction * Scope::createCmp (Argument lhs, Argument rhs, const string & iden) {
 	Argument tlhs = loadValue (lhs), trhs = loadValue (rhs);
 	
-	auto * t = promoteArithmatic (tlhs.type, trhs.type);
+	auto * t = promoteArithmatic (tlhs.type, trhs.type, sourceFile, rhs.sym->pos);
 	auto * b = resolveType ("bool", {1,1});
 	Instruction * inst = new T (b, staticCast (tlhs, t), staticCast (trhs, t), module->newSymbol (iden));
 	return insertionPoint->give (inst);
@@ -541,7 +541,7 @@ const Instruction * Scope::staticCast (const Type * src, const Type * const targ
 	} else {
 		
 		//TODO: complex casting
-		report::logMessage (report::ERROR, "Non trivial casting is not yet supported");
+		report::logMessage (report::ERROR, sourceFile, {0,0}, "Non trivial casting is not yet supported");
 		return nullptr;
 		
 	}
