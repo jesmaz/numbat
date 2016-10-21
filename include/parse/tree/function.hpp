@@ -26,14 +26,14 @@ struct Function : ParseTreeNode {
 		Function (PTNode iden, PTNode params, PTNode type, PTNode body);
 		Function (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & params, const BasicArray <PTNode> & type, PTNode body, nir::LINKAGE linkage);
 		
-		virtual ~Function () {delAll (tplate); delAll (tags); delAll (params); delAll (type); delete body;}
+		virtual ~Function () {delAll (tplate); delAll (params); delAll (type); delete body;}
 		
 	protected:
 	private:
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		BasicArray <PTNode> tplate, tags, params, type;
+		BasicArray <PTNode> tplate, params, type;
 		string iden;
 		PTNode body;
 		nir::LINKAGE linkage;
