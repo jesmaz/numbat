@@ -552,10 +552,16 @@ PTNode parseFunction (CodeQueue * queue) {
 	// drop def
 	auto pos = queue->popToken ().pos;
 	
-	if (queue->peak () != Symbol::IDENTIFIER) {
-		return errorUnexpectedToken (queue, "identifier");
+	string iden = "";
+	
+	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
+		
+		if (queue->peak () != Symbol::IDENTIFIER and queue->peak () != Symbol::LITERAL) {
+			return errorUnexpectedToken (queue, "identifier");
+		}
+		iden = queue->popToken ().iden;
+		
 	}
-	numbat::lexer::token token = queue->popToken ();
 	
 	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
 		return errorUnexpectedToken (queue, "'('");
@@ -594,7 +600,7 @@ PTNode parseFunction (CodeQueue * queue) {
 	if (linkage != nir::LINKAGE::EXTERNAL and not (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT)) {
 		body = parseStatement (queue);
 	}
-	return new Function (pos, token.iden, params, type, body, linkage);
+	return new Function (pos, iden, params, type, body, linkage);
 	
 }
 
@@ -892,7 +898,6 @@ PTNode parseVariable (CodeQueue * queue) {
 		type = new ParseTreeKeyword (token.pos, token.iden);
 		
 	} else if (queue->peak (1) == Symbol::SEMICOLON) {
-		delete type;
 		return errorUnexpectedToken (queue, "an identifier");
 		
 	} else {
