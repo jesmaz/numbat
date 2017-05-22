@@ -366,7 +366,11 @@ const Instruction * Scope::createGet (Argument src) {
 	
 }
 
-const Instruction * Scope::createJump (symbol block) {return createJump (Argument (), block);}
+const Instruction * Scope::createJump (symbol block) {
+	const Block * b = blocks [block];
+	auto * instr = new Jump ({}, b);
+	return insertionPoint->give (instr);
+}
 
 const Instruction * Scope::createJump (Argument cond, symbol block) {
 	cond = loadValue (cond);
@@ -544,6 +548,25 @@ const Instruction * Scope::staticCast (const Type * src, const Type * const targ
 		report::logMessage (report::ERROR, sourceFile, {0,0}, "Non trivial casting is not yet supported");
 		return nullptr;
 		
+	}
+	
+}
+
+const Function * Scope::resolve (const string & iden, numbat::lexer::position pos, const BasicArray <Argument> & args) {
+	
+	auto itt = variables.find (iden);
+	if (itt != variables.end ()) {
+		BasicArray <Argument> oppArgs (args.size () + 1);
+		oppArgs [0] = itt->second;
+		std::copy (args.begin (), args.end (), oppArgs.begin () + 1);
+		return resolve (" ( )", pos, oppArgs);
+	}
+	
+	auto fitt = functions.find (iden);
+	if (fitt != functions.end ()) {
+		for (auto * func : *fitt->second) {
+			func->getArgs ();
+		}
 	}
 	
 }
