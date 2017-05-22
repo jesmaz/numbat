@@ -42,9 +42,23 @@ struct BasicArray {
 		}
 		
 		template <typename Y>
+		BasicArray <Y> map (const std::function <Y (const T&, size_t)> & f) const {
+			BasicArray <Y> res (len);
+			for (size_t i=0; i<len; ++i) {res [i] = f (data [i], i);}
+			return res;
+		}
+		
+		template <typename Y>
 		BasicArray <Y> map (const std::function <Y (T&)> & f) {
 			BasicArray <Y> res (len);
 			for (size_t i=0; i<len; ++i) {res [i] = f (data [i]);}
+			return res;
+		}
+		
+		template <typename Y>
+		BasicArray <Y> map (const std::function <Y (T&, size_t)> & f) {
+			BasicArray <Y> res (len);
+			for (size_t i=0; i<len; ++i) {res [i] = f (data [i], i);}
 			return res;
 		}
 		
