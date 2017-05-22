@@ -1,6 +1,7 @@
-#ifndef TOKEN_HPP
-#define TOKEN_HPP
+#pragma once
 
+
+#include <forward.hpp>
 #include <string>
 #include <utility/array.hpp>
 
@@ -51,10 +52,6 @@ enum class TOKEN {
 	whitespace,
 };
 
-struct position {
-	uint32_t line, col;
-};
-
 struct token {
 	TOKEN type;
 	position pos;
@@ -102,8 +99,5 @@ inline const tkstring operator + (const tkstring & lhs, const tkstring & rhs) {
 }
 
 
-};
-};
-
-
-#endif
+}
+}

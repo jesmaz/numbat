@@ -1,15 +1,46 @@
 #pragma once
 
 
+#include <memory>
 #include <string>
 
 using std::string;
+
+
+namespace AST {
+
+
+class Type;
+class Node;
+class Variable;
+
+struct Context;
+struct Function;
+
+typedef std::shared_ptr <Function> FuncPtr;
+typedef std::shared_ptr <Node> NodePtr;
+typedef std::shared_ptr <Type> TypePtr;
+typedef std::shared_ptr <Variable> VarPtr;
+
+
+}
 
 
 namespace numbat {
 
 
 struct File;
+
+
+namespace lexer {
+
+
+struct position {
+	uint32_t line, col;
+};
+
+
+}
 
 
 }
@@ -31,7 +62,7 @@ namespace parser {
 using std::string;
 
 
-enum class OPERATION {ADD, AND, AS, ASSIGN, BAND, BNOT, BOR, BXOR, CMPEQ, CMPGT, CMPGTE, CMPLT, CMPLTE, CMPNE, CONCAT, DECREMENT, DIV, IN, INCREMENT, LNOT, MUL, NEG, NONE, OR, REM, SUB};
+enum class OPERATION {ADD, AND, AS, ASSIGN, BAND, BNOT, BOR, BXOR, CMPEQ, CMPGT, CMPGTE, CMPLT, CMPLTE, CMPNE, CONCAT, DECREMENT, DIV, IN, INCREMENT, INDEX, LNOT, MUL, NEG, NONE, OR, REM, SUB, __COUNT__};
 
 
 class ParseTreeNode;
