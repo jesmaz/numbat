@@ -66,6 +66,14 @@
  - [ ] OS module
    - [ ] Numbat friendly wrapper (no pointers passed by the user)
    - [ ] Open, read, write, close system calls
+ - [ ] Flow control
+   - [ ] if-else statements return a value when blocks match
+   - [ ] while loops produce an array
+ - [ ] Reintroduce AST
+   - Needed for optimisation passes
+   - [ ] NIR translation pass
+   - [ ] Nodes for the tree
+   - [ ] Resove symbols pass
  - [ ] Smart pointers (reference counting)
  - [ ] Templates (required for smart pointers)
    - [ ] Parse variables/parameters with a template
