@@ -48,7 +48,12 @@ int numbatMain (const Config & cfg) {
 			continue;
 		}
 		
-		std::cout << interpreter (val) << '\n';
+		if (val) {
+			std::cout << val->toString () << std::endl;
+			std::cout << interpreter (val) << '\n';
+		} else {
+			std::cout << '\n';
+		}
 		
 	}
 	return 0;
