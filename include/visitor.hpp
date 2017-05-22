@@ -1,9 +1,8 @@
-#ifndef VISITOR_HPP
-#define VISITOR_HPP
+#pragma once
 
 
-#define VISITABLE public: virtual void accept (numbat::	visitor::BaseVisitor & vis) {acceptVisitor (*this, vis);}
-#define CONST_VISITABLE public: virtual void accept (numbat::	visitor::BaseVisitor & vis) const {acceptVisitor (*this, vis);}
+#define VISITABLE public: virtual void accept (numbat::visitor::BaseVisitor & vis) {acceptVisitor (*this, vis);}
+#define CONST_VISITABLE public: virtual void accept (numbat::visitor::BaseVisitor & vis) const {acceptVisitor (*this, vis);}
 
 namespace numbat {
 namespace visitor {
@@ -30,7 +29,7 @@ class Visitor : public virtual BaseVisitor {
 
 class BaseConstVisitable {
 	public:
-		virtual void accept (BaseVisitor & vis) const=0;;
+		virtual void accept (BaseVisitor & vis) const=0;
 		virtual ~BaseConstVisitable () {}
 	protected:
 		template <typename T>
@@ -51,8 +50,5 @@ class BaseVisitable {
 };
 
 
-};
-};
-
-
-#endif
+}
+}
