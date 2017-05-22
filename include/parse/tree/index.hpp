@@ -11,6 +11,9 @@ class ParseTreeIndex : public ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
+		AST::TypePtr createASTtype (AST::Context & ctx);
+		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
 		virtual const nir::Type * resolveType (nir::Scope * scope);

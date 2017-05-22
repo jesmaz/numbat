@@ -11,6 +11,7 @@ class ParseTreeCall : public ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
 		
 		virtual bool isAggregate () {return true;}
 		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return args;}

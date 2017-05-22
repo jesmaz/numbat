@@ -11,6 +11,9 @@ struct Function : ParseTreeNode {
 	
 	public:
 		
+		AST::FuncPtr createFunc (AST::Context & ctx);
+		AST::NodePtr createAST (AST::Context & ctx);
+		
 		const BasicArray <PTNode> & getParams () const {return params;}
 		const BasicArray <PTNode> & getType () const {return type;}
 		
@@ -39,6 +42,8 @@ struct Function : ParseTreeNode {
 		nir::LINKAGE linkage;
 		
 		nir::Scope * fScope=nullptr;
+		AST::FuncPtr fPtr=nullptr;
+		std::unique_ptr <AST::Context> context=nullptr;
 		
 };
 

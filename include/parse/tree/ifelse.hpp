@@ -11,6 +11,8 @@ struct ParseTreeIfElse : ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
+		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		ParseTreeIfElse (numbat::lexer::position pos) : ParseTreeNode (ParseTreeNode::NodeType::EXPRESSION, pos), body (nullptr) {}

@@ -1,7 +1,11 @@
 #pragma once
 
 
+#include <ast/operation.hpp>
+#include <ast/type.hpp>
+#include <forward.hpp>
 #include <parse/tree/base.hpp>
+#include <utility/report.hpp>
 
 
 namespace parser {
@@ -36,6 +40,20 @@ template <OPERATION opp>
 class SpecificOperator : public GenericOperator {
 	
 	public:
+		
+		AST::NodePtr createAST (AST::Context & ctx) {
+			
+			if (args.empty ()) {
+				report::logMessage (report::ERROR, ctx.getSourceFile (), getPos (), "Operator '" + iden + "' has no arguments");
+				return nullptr;
+				
+			} else {
+				auto params = args.map <AST::NodePtr> ([&](auto & a){return a->createAST (ctx);});
+				return std::make_shared <AST::Unresolved_Operation> (getPos (), iden, params, opp);
+				
+			}
+			
+		}
 		
 		SpecificOperator (numbat::lexer::position pos) : GenericOperator (pos) {}
 		SpecificOperator (const string & iden, std::initializer_list <PTNode> args) : GenericOperator (iden, args) {}

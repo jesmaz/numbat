@@ -11,6 +11,9 @@ struct Struct : ParseTreeNode {
 	
 	public:
 		
+		AST::TypePtr createType (AST::Context & ctx);
+		AST::NodePtr createAST (AST::Context & ctx);
+		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		void declare (nir::Scope * scope);
@@ -28,6 +31,7 @@ struct Struct : ParseTreeNode {
 		string iden;
 		BasicArray <PTNode> tplate, tags, members;
 		nir::Struct * type=nullptr;
+		std::shared_ptr <AST::Struct> stype=nullptr;
 		
 };
 

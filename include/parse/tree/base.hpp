@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <ast/context.hpp>
 #include <cassert>
 #include <iostream>
 #include <forward.hpp>
@@ -26,6 +27,10 @@ class ParseTreeNode {
 		string toString (text::PrintMode mode=text::PLAIN) {if (this) return strDump (mode); else return "nullptr";}
 		
 		numbat::lexer::position getPos () {return pos;}
+		
+		virtual AST::NodePtr createAST (AST::Context &) {return nullptr;}
+		virtual AST::NodePtr createASTparam (AST::Context & ctx) {return createASTtype (ctx);}
+		virtual AST::TypePtr createASTtype (AST::Context &) {return nullptr;}
 		
 		virtual bool isAggregate () {return false;}
 		virtual bool isList () {return false;}

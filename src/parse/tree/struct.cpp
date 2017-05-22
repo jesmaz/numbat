@@ -1,3 +1,4 @@
+#include <ast/type.hpp>
 #include <nir/module.hpp>
 #include <nir/parameter.hpp>
 #include <nir/scope.hpp>
@@ -8,6 +9,18 @@
 
 namespace parser {
 
+
+AST::TypePtr Struct::createType (AST::Context & ctx) {
+	return stype = std::make_shared <AST::Struct> (getPos (), iden);
+}
+
+AST::NodePtr Struct::createAST (AST::Context & ctx) {
+	if (not stype) {
+		stype = std::make_shared <AST::Struct> (getPos (), iden);
+	}
+	stype->members = members.map <AST::NodePtr> ([&](auto & m){return m->createASTparam (ctx);});
+	return stype;
+}
 
 const nir::Instruction * Struct::build (nir::Scope * scope) {
 	

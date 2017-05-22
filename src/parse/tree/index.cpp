@@ -1,3 +1,5 @@
+#include <ast/operation.hpp>
+#include <ast/type.hpp>
 #include <parse/tree/index.hpp>
 #include <nir/parameter.hpp>
 #include <nir/scope.hpp>
@@ -7,6 +9,21 @@
 
 namespace parser {
 
+
+AST::NodePtr ParseTreeIndex::createAST (AST::Context & ctx) {
+	
+	BasicArray <AST::NodePtr> oppArgs (args.size () + 1);
+	oppArgs [0] = index->createAST (ctx);
+	for (size_t i=1; i<oppArgs.size (); ++i)  {
+		oppArgs [i] = args [i-1]->createAST (ctx);
+	}
+	return std::make_shared <AST::Unresolved_Operation> (getPos (), " [ ]", oppArgs, OPERATION::INDEX);
+	
+}
+
+AST::TypePtr ParseTreeIndex::createASTtype (AST::Context & ctx) {
+	return std::make_shared <AST::ArrayInit> (getPos (), index->createASTtype (ctx), args [0]->createAST (ctx), nullptr);
+}
 
 const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {
 	

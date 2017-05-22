@@ -12,6 +12,8 @@ class ParseTreeLiteral : public ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
+		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		
 		ParseTreeLiteral (numbat::lexer::position pos) : ParseTreeNode (pos) {}

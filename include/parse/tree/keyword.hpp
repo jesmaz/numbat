@@ -11,6 +11,8 @@ class ParseTreeKeyword : public ParseTreeNode {
 	
 	public:
 		
+		AST::TypePtr createASTtype (AST::Context &);
+		
 		const string & getIden () const {return sym;}
 		
 		ParseTreeKeyword (numbat::lexer::position pos, string sym) : ParseTreeNode (ParseTreeNode::NodeType::KEYWORD, pos), sym (sym) {}

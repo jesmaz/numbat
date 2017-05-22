@@ -12,6 +12,8 @@ class ParseTreeImport : public ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
+		
 		virtual const string & getIden () const {return iden->getIden ();}
 		
 		const nir::Instruction * build (nir::Scope * scope);

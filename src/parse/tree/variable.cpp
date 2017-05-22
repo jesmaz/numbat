@@ -1,3 +1,5 @@
+#include <ast/call.hpp>
+#include <ast/variable.hpp>
 #include <nir/instruction.hpp>
 #include <nir/parameter.hpp>
 #include <nir/scope.hpp>
@@ -6,6 +8,34 @@
 
 
 namespace parser {
+
+
+AST::NodePtr ParseTreeVariable::createAST (AST::Context & ctx) {
+	
+	AST::TypePtr type = vType->createASTtype (ctx);
+	AST::VarPtr var = std::make_shared <AST::Variable> (getPos (), iden->getIden (), type);
+	ctx.var (iden->getIden (), var);
+	if (inst) {
+		AST::NodePtr init = inst->createAST (ctx);
+		return std::make_shared <AST::Unresolved_Constructor> (getPos (), var, BasicArray <AST::NodePtr> ({init}));
+	} else {
+		return std::make_shared <AST::Unresolved_Constructor> (getPos (), var, BasicArray <AST::NodePtr> ());
+	}
+	
+}
+
+AST::NodePtr ParseTreeVariable::createASTparam (AST::Context & ctx) {
+	
+	AST::TypePtr type = vType->createASTtype (ctx);
+	AST::VarPtr var = std::make_shared <AST::Variable> (getPos (), iden->getIden (), type);
+	if (inst) {
+		AST::NodePtr init = inst->createAST (ctx);
+		return std::make_shared <AST::Unresolved_Constructor> (getPos (), var, BasicArray <AST::NodePtr> ({init}));
+	} else {
+		return var;
+	}
+	
+}
 
 
 const nir::Instruction * ParseTreeVariable::build (nir::Scope * scope) {

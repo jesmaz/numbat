@@ -20,6 +20,33 @@ auto buildParams = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
 	return conv;
 };
 
+
+AST::FuncPtr Function::createFunc (AST::Context & ctx) {
+	
+	if (fPtr) return fPtr;
+	context = std::make_unique <AST::Context> (ctx);
+	
+	auto typeConv = [&](auto & a) {
+		return a->createASTtype (*context);
+	};
+	
+	fPtr = std::make_shared <AST::Function> ();
+	fPtr->iden = iden;
+	fPtr->params = params.map <AST::TypePtr> (typeConv);
+	fPtr->retVals = type.map <AST::TypePtr> (typeConv);
+	
+	return fPtr;
+}
+
+AST::NodePtr Function::createAST (AST::Context & ctx) {
+	
+	auto func = createFunc (ctx);
+	fPtr->body = body->createAST (*context);
+	return std::make_shared <AST::Function_Ptr> (getPos (), std::move (func));
+	
+}
+
+
 const nir::Instruction * Function::build (nir::Scope * scope) {
 	
 	if (not fScope) {

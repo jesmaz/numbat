@@ -1,3 +1,4 @@
+#include <ast/call.hpp>
 #include <nir/inst/functionPointer.hpp>
 #include <nir/scope.hpp>
 #include <parse/tree/call.hpp>
@@ -21,6 +22,16 @@ auto buildArgs = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
 	}
 	return conv;
 };
+
+
+AST::NodePtr ParseTreeCall::createAST (AST::Context & ctx) {
+	
+	auto callee = iden->createAST (ctx);
+	auto params = args.map <AST::NodePtr> ([&](auto & a){return a->createAST (ctx);});
+	return std::make_shared <AST::Unresolved_Call> (getPos (), callee, params);
+	
+}
+
 
 const nir::Instruction * ParseTreeCall::build (nir::Scope * scope) {
 	

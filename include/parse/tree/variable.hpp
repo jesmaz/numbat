@@ -11,6 +11,9 @@ class ParseTreeVariable : public ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
+		AST::NodePtr createASTparam (AST::Context & ctx);
+		
 		virtual const nir::Instruction * build (nir::Scope * scope);
 		virtual const nir::Parameter * buildParameter (nir::Scope * scope);
 		

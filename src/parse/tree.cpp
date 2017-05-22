@@ -1,9 +1,37 @@
+#include <ast/sequence.hpp>
 #include <parse/tree/function.hpp>
+#include <parse/tree/struct.hpp>
 #include <parse/tree.hpp>
 
 
 namespace parser {
 
+
+AST::Context * ParseTree::createContext (const AST::Context & ctx) {
+	
+	if (context) return context.get ();
+	
+	context = std::make_unique <AST::Context> (ctx);
+	
+	for (auto & str : structs) {
+		context->type (str->getIden (), str->createType (*context));
+	}
+	
+	for (auto & func : functions) {
+		context->func (func->getIden (), func->createFunc (*context));
+	}
+	
+	return context.get ();
+	
+}
+
+AST::NodePtr ParseTree::createAST (AST::Context & ctx) {
+	
+	auto * context = createContext (ctx);
+	auto arr = body.map <AST::NodePtr> ([&](auto & a){return a->createAST (*context);});
+	return std::make_shared <AST::Sequence> (getPos (), arr);
+	
+}
 
 const nir::Instruction * ParseTree::build (nir::Scope * scope) {
 	if (nirTreeScope) {

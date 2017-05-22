@@ -11,6 +11,9 @@ class ParseTree : public ParseTreeNode {
 	
 	public:
 		
+		AST::Context * createContext (const AST::Context &);
+		AST::NodePtr createAST (AST::Context & ctx);
+		
 		const BasicArray <Function *> & getFunctions () const {return functions;}
 		const BasicArray <PTNode> & getBody () const {return body;}
 		const BasicArray <Struct *> & getStructs () const {return structs;}
@@ -54,6 +57,7 @@ class ParseTree : public ParseTreeNode {
 		DynArray <Struct *> structs;
 		
 		nir::Scope * nirTreeScope=nullptr;
+		std::unique_ptr <AST::Context> context=nullptr;
 		
 };
 

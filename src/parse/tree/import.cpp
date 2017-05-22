@@ -8,6 +8,7 @@ namespace parser {
 
 #define PATH_JOIN "/"
 
+
 const nir::Instruction * ParseTreeImport::build (nir::Scope * scope) {
 	
 	if (not sourceFile) declare (scope);
@@ -27,6 +28,29 @@ string joinPath (const BasicArray <PTNode> & path) {
 	}
 	return relPath;
 }
+
+
+AST::NodePtr ParseTreeImport::createAST (AST::Context & ctx) {
+	
+	auto & args = path->getArgs ();
+	string relPath = joinPath (args);
+	
+	const numbat::File * parent = ctx.getSourceFile ();
+	if (parent) {
+		//sourceFile = numbat::File::import (parent->getDirectory (), relPath, scope->getModule ());
+	} else {
+		//sourceFile = numbat::File::import (relPath, scope->getModule ());
+	}
+	
+	if (not sourceFile) {
+		//report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Failed to import '" + relPath + "'");
+	}
+	
+	//TODO: return an import handle
+	return nullptr;
+	
+}
+
 
 string ParseTreeImport::strDump (text::PrintMode mode) {
 	return "import " + path->toString (mode) + (iden ? " as " + iden->toString (mode) : "");
