@@ -1,5 +1,6 @@
 #include <ast/context.hpp>
 #include <ast/function.hpp>
+#include <ast/type.hpp>
 #include <iostream>
 #include <utility/report.hpp>
 
@@ -128,6 +129,39 @@ void Context::var (const string & str, NodePtr v) {
 		std::cerr << ("Duplicate variable '" + str + "'. First defined here: ") << std::endl;
 		
 	}
+	
+}
+
+Context::Context (const numbat::File * sourceFile) : imports (new std::map <string, Context *> ()),
+functions (new std::map <string, std::shared_ptr <function_t>> ()),
+types (new std::map <string, std::shared_ptr <type_t>> ()),
+variables (new std::map <string, std::shared_ptr <variable_t>> ()),
+sourceFile (sourceFile),
+ownImp (true),
+ownFunc (true),
+ownType (true),
+ownVar (true),
+rootContex (this) {
+	
+	type ("bool", Numeric::get (Numeric::ArithmaticType::UINT, 1));
+	
+	type ("int8", Numeric::get (Numeric::ArithmaticType::INT, 8));
+	type ("int16", Numeric::get (Numeric::ArithmaticType::INT, 16));
+	type ("int32", Numeric::get (Numeric::ArithmaticType::INT, 32));
+	type ("int64", Numeric::get (Numeric::ArithmaticType::INT, 64));
+	
+	type ("uint8", Numeric::get (Numeric::ArithmaticType::UINT, 8));
+	type ("uint16", Numeric::get (Numeric::ArithmaticType::UINT, 16));
+	type ("uint32", Numeric::get (Numeric::ArithmaticType::UINT, 32));
+	type ("uint64", Numeric::get (Numeric::ArithmaticType::UINT, 64));
+	
+	type ("half", Numeric::get (Numeric::ArithmaticType::FPINT, 16));
+	type ("float", Numeric::get (Numeric::ArithmaticType::FPINT, 32));
+	type ("double", Numeric::get (Numeric::ArithmaticType::FPINT, 64));
+	type ("quad", Numeric::get (Numeric::ArithmaticType::FPINT, 128));
+	
+	type ("intptr", Numeric::get (Numeric::ArithmaticType::INT, 0));
+	type ("uintptr", Numeric::get (Numeric::ArithmaticType::UINT, 0));
 	
 }
 

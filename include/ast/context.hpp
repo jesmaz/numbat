@@ -52,16 +52,7 @@ struct Context {
 		std::shared_ptr <function_t> reserveFunc (const string & str);
 		std::shared_ptr <type_t> reserveType (const string & str);
 		
-		Context (const numbat::File * sourceFile) : imports (new std::map <string, Context *> ()),
-		             functions (new std::map <string, std::shared_ptr <function_t>> ()),
-		             types (new std::map <string, std::shared_ptr <type_t>> ()),
-		             variables (new std::map <string, std::shared_ptr <variable_t>> ()),
-		             sourceFile (sourceFile),
-		             ownImp (true),
-		             ownFunc (true),
-		             ownType (true),
-		             ownVar (true),
-		             rootContex (this) {}
+		Context (const numbat::File * sourceFile);
 		             
 		Context (const Context & other) : imports (other.imports),
 		             functions (other.functions),
