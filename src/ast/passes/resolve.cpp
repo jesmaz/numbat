@@ -178,6 +178,10 @@ void ConstructorSelectionPass::visit (const Interface & node) {
 	abort ();
 }
 
+void ConstructorSelectionPass::visit (const Numeric & node) {
+	//TODO: Check arguments for compatibility
+}
+
 void ConstructorSelectionPass::visit (const Ref & node) {
 	node.getRegType ()->accept (*this);
 	if (replacementType) {
@@ -191,7 +195,7 @@ void ConstructorSelectionPass::visit (const Struct & node) {
 }
 
 NodePtr ConstructorSelectionPass::operator () (const NodePtr & node) {
-	nPtr = node;
+	nPtr = var;
 	node->accept (*this);
 	if (replacementType) {
 		*var = Variable (var->getPos (), var->getIden (), replacementType);

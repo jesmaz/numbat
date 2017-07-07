@@ -85,6 +85,7 @@ class ConstructorSelectionPass : public ShallNotPass {
 		virtual void visit (const Const & node);
 		virtual void visit (const Inferred & node);
 		virtual void visit (const Interface & node);
+		virtual void visit (const Numeric & node);
 		virtual void visit (const Ref & node);
 		virtual void visit (const Struct & node);
 		
