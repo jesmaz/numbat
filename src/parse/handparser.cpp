@@ -247,6 +247,8 @@ namespace SymbolFlags {
 		{Symbol::NOT,                      EXPRESSION_START},
 		{Symbol::SEMICOLON,                TERMINATE_STATEMENT},
 		{Symbol::WHILE,                    EXPRESSION_START},
+		{Symbol::REF,                      EXPRESSION_START},
+		{Symbol::VREF,                     EXPRESSION_START},
 		{Symbol::SYMBOL_BANG,              EXPRESSION_START},
 		{Symbol::SYMBOL_BRACE_LEFT,        EXPRESSION_START | SEGMENT_BEGIN},
 		{Symbol::SYMBOL_BRACE_RIGHT,       TERMINATE_STATEMENT | SEGMENT_END},
@@ -415,6 +417,12 @@ PTNode parseAtom (CodeQueue * queue) {
 		case Symbol::SYMBOL_SQUARE_LEFT:
 			atom = parseSlice (queue);
 			break;
+		case Symbol::REF:
+		case Symbol::VREF: {
+			auto token = queue->popToken ();
+			return new ParseTreeTypeModifier (parseAtom (queue), token.pos, token.iden);
+			break;
+		}
 		default:
 			break;
 	}
