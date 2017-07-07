@@ -11,6 +11,8 @@ class ParseTreeTypeModifier : public ParseTreeNode {
 	
 	public:
 		
+		virtual AST::TypePtr createASTtype (AST::Context & ctx);
+		
 		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
 		virtual const nir::Type * resolveType (nir::Scope * scope);
 		

@@ -58,6 +58,24 @@ string GenericOperator::strDump (text::PrintMode mode) {
 
 
 template <>
+AST::NodePtr SpecificOperator <OPERATION::AS>::createAST (AST::Context & ctx) {
+	if (args.size () != 2) {
+		report::logMessage (report::ERROR, ctx.getSourceFile (), getPos (), "Operator '" + iden + "' must have 2 arguments");
+		return nullptr;
+		
+	} else {
+		BasicArray <AST::NodePtr> params = {args [0]->createAST (ctx), args [1]->createASTtype (ctx)};
+		return std::make_shared <AST::Unresolved_Operation> (
+			getPos (), 
+			iden, 
+			params,
+			OPERATION::AS
+		);
+		
+	}
+}
+
+template <>
 const nir::Instruction * SpecificOperator <OPERATION::ADD>::defBuild (nir::Scope * scope) {
 	auto nodes = resolveNodes (scope, args);
 	if (nodes.empty ()) return nullptr;
