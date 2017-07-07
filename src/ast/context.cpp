@@ -25,6 +25,7 @@ TypePtr Context::resolveType (const string & str) const {
 	if (itt != types->end ()) {
 		return itt->second->type;
 	}
+	std::cerr << "'" << str << "' is not a recognised type " << std::hex << (void*)this << std::endl;
 	return nullptr;
 	
 }
@@ -103,6 +104,19 @@ void Context::type (const string & str, TypePtr t) {
 	if (not ownType) {
 		types = std::make_shared <std::map <string, std::shared_ptr <type_t>>> (*types);
 		ownType = true;
+	}
+	
+	auto itt = types->find (str);
+	if (itt == types->end ()) {
+		(*types) [str] = std::make_shared <type_t> (type_t {t, this});
+	} else {
+		report::logMessage (
+			report::ERROR,
+			sourceFile,
+			t->getPos (),
+			"Duplicate type '" + str + "'. First defined here: "//TODO: print old position
+		);
+		std::cerr << ("Duplicate type '" + str + "'. First defined here: ") << std::endl;
 	}
 	
 }
