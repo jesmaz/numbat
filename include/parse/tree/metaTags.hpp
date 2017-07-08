@@ -31,7 +31,7 @@ class MetaTags : public ParseTreeNode {
 	protected:
 	private:
 		
-		virtual string strDump (text::PrintMode mode) {return componant->toString (mode);}
+		virtual string strDump (text::PrintMode mode);
 		
 		BasicArray <PTNode> tags;
 		PTNode componant;

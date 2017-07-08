@@ -22,5 +22,14 @@ void MetaTags::declare (nir::Scope * scope) {
 	componant->declare (scope);
 }
 
+string MetaTags::strDump (text::PrintMode mode) {
+	string s = "(";
+	for (auto & tag : tags) {
+		s += "@" + tag->toString (mode);
+		s += " ";
+	}
+	return s + componant->toString (mode) + ")";
+}
+
 
 }
