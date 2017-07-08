@@ -57,6 +57,8 @@
    - [ ] Must contain accurate file/line/pos
    - [x] Should be in colour
  - [ ] LLVM upgrade to a more recent version
+ - [ ] Meta tags (type modifying)
+   - [ ] 'pointer' meta tag (modifies arrays)
  - [ ] Operator overloading
  - [ ] Optimisation
    - [ ] Activate the static evaluator with a flag
@@ -74,9 +76,6 @@
    - [ ] NIR translation pass
    - [ ] Nodes for the tree
    - [ ] Resove symbols pass
- - [ ] Smart pointers (reference counting)
- - [ ] Templates (required for smart pointers)
-   - [ ] Parse variables/parameters with a template
 
 ##Version 0.3.2##
  - [ ] Enum parser
@@ -111,6 +110,7 @@
      - Requires flagged enums, Interfaces and templates
  - [ ] Full I/O library
      - Requires file I/O, socket I/O, flagged enums, Interfaces and templates
+ - [ ] Smart pointers
  - [ ] Socket I/O (TCP and UDP only) basic
    - [ ] Document a specification
    - [ ] Reference implementation
