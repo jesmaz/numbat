@@ -719,7 +719,13 @@ PTNode parseProgram (CodeQueue * queue) {
 	PROFILE ("parseProgram");
 	DynArray <PTNode> body;
 	while (queue->more ()) {
-		body.push_back (parseStatement (queue));
+		if (queue->peak () == Symbol::SYMBOL_AT) {
+			auto tags = parseMetaTags (queue);
+			auto stmt = parseStatement (queue);
+			body.push_back (decorateNodeWithTags (tags, stmt));
+		} else {
+			body.push_back (parseStatement (queue));
+		}
 		while (SymbolFlags::map [size_t (queue->peak ())] & SymbolFlags::TERMINATE_STATEMENT) queue->popToken ();
 	}
 	if (body.empty ()) {
@@ -733,7 +739,6 @@ PTNode parseProgram (CodeQueue * queue) {
 PTNode parseStatement (CodeQueue * queue) {
 	PROFILE ("parseStatement");
 	PTNode lhs=nullptr;
-	BasicArray <PTNode> metaTags = parseMetaTags (queue);
 	
 	switch (queue->peak ()) {
 		case Symbol::DEF:
