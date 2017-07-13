@@ -1,5 +1,6 @@
 #include <ast/context.hpp>
 #include <ast/function.hpp>
+#include <ast/meta.hpp>
 #include <ast/type.hpp>
 #include <iostream>
 #include <utility/report.hpp>
@@ -176,6 +177,8 @@ rootContex (this) {
 	
 	type ("intptr", Numeric::get (Numeric::ArithmaticType::INT, 0));
 	type ("uintptr", Numeric::get (Numeric::ArithmaticType::UINT, 0));
+	
+	func ("@pointer", Reflect::api ("AST.Pointer"));
 	
 }
 

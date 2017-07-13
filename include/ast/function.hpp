@@ -3,6 +3,7 @@
 
 #include <ast/node.hpp>
 #include <ast/type.hpp>
+#include <functional>
 #include <map>
 #include <set>
 #include <utility/array.hpp>
@@ -22,7 +23,9 @@ struct Function {
 	protected:
 	private:
 		
+		friend AST::Context;
 		friend parser::Function;
+		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <void(void*, void*)> &func);
 		
 		BasicArray <TypePtr> params, retVals;
 		std::map <std::string, size_t> positions;
@@ -30,6 +33,7 @@ struct Function {
 		string iden;
 		NodePtr body;
 		numbat::lexer::position pos;
+		std::function <void(void*, void*)> nativeFunction;
 		
 };
 
