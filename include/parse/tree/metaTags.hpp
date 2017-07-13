@@ -11,6 +11,9 @@ class MetaTags : public ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
+		AST::NodePtr createASTparam (AST::Context & ctx);
+		
 		virtual bool isAggregate () {return componant->isAggregate ();}
 		virtual bool isList () {return componant->isList ();}
 		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return componant->getArgs ();}
