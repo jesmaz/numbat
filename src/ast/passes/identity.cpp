@@ -1,5 +1,6 @@
 #include <ast/call.hpp>
 #include <ast/function.hpp>
+#include <ast/meta.hpp>
 #include <ast/node.hpp>
 #include <ast/operation.hpp>
 #include <ast/passes/identity.hpp>
@@ -81,6 +82,12 @@ void IdentityPass::visit (const Number & node) {}
 void IdentityPass::visit (const Numeric & node) {}
 
 void IdentityPass::visit (const Ref & node) {}
+
+void IdentityPass::visit (const Reflect & node) {
+	auto meta = this->visit (node.getMetaTag ());
+	auto target = this->visit (node.getTarget ());
+	nPtr = std::make_shared <Reflect> (node.getPos (), meta, target);
+}
 
 void IdentityPass::visit (const Sequence & seq) {
 	bool changed = false;
