@@ -16,6 +16,16 @@ AST::NodePtr ParseTreeIdentifier::createAST (AST::Context & ctx) {
 	
 }
 
+AST::NodePtr ParseTreeIdentifier::createASTmeta (AST::Context & ctx) {
+	
+	auto var = ctx.resolve ("@" + iden);
+	if (var) return var;
+	//TODO: perform a spell check to offer suggested fixes
+	report::logMessage (report::ERROR, ctx.getSourceFile (), getPos (), "Failed to resolve '@" + iden + "'");
+	return nullptr;
+	
+}
+
 AST::TypePtr ParseTreeIdentifier::createASTtype (AST::Context & ctx) {
 	
 	auto type = ctx.resolveType (iden);

@@ -12,6 +12,7 @@ class ParseTreeIdentifier : public ParseTreeNode {
 	public:
 		
 		AST::NodePtr createAST (AST::Context & ctx);
+		AST::NodePtr createASTmeta (AST::Context & ctx);
 		AST::TypePtr createASTtype (AST::Context & ctx);
 		
 		virtual const nir::Instruction * build (nir::Scope * scope);

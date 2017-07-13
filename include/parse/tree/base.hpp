@@ -29,6 +29,7 @@ class ParseTreeNode {
 		numbat::lexer::position getPos () {return pos;}
 		
 		virtual AST::NodePtr createAST (AST::Context &) {return nullptr;}
+		virtual AST::NodePtr createASTmeta (AST::Context &) {return nullptr;}
 		virtual AST::NodePtr createASTparam (AST::Context & ctx) {return createASTtype (ctx);}
 		virtual AST::TypePtr createASTtype (AST::Context &) {return nullptr;}
 		
