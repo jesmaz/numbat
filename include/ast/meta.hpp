@@ -30,4 +30,27 @@ class Reflect : public Node {
 		
 };
 
+class ReflectType : public Type {
+	
+	public:
+		
+		NodePtr getMetaTag () const {return metaTag;}
+		TypePtr getTarget () const {return target;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		static TypePtr get (const NodePtr & metaTag, const TypePtr & target);
+		
+	protected:
+	private:
+		
+		ReflectType (const NodePtr & metaTag, const TypePtr & target) : Type (metaTag->getPos ()), metaTag (metaTag), target (target) {}
+		
+		NodePtr metaTag;
+		TypePtr target;
+		static std::map <std::pair <Node*, Type*>, TypePtr> typeMap;
+		
+};
+
 }

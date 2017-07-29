@@ -31,6 +31,7 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const Numeric & node);
 		virtual void visit (const Ref & node);
 		virtual void visit (const Reflect & node);
+		virtual void visit (const ReflectType & node);
 		virtual void visit (const Sequence & node);
 		virtual void visit (const Struct & node);
 		virtual void visit (const Unresolved_Call & node);

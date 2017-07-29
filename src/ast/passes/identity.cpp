@@ -89,6 +89,8 @@ void IdentityPass::visit (const Reflect & node) {
 	nPtr = std::make_shared <Reflect> (node.getPos (), meta, target);
 }
 
+void IdentityPass::visit (const ReflectType & node) {}
+
 void IdentityPass::visit (const Sequence & seq) {
 	bool changed = false;
 	

@@ -24,6 +24,7 @@ class Number;
 class Numeric;
 class Ref;
 class Reflect;
+class ReflectType;
 class Sequence;
 class Struct;
 class Unresolved_Call;
@@ -55,6 +56,7 @@ class AbstractPass {
 		virtual void visit (const Numeric & node)=0;
 		virtual void visit (const Ref & node)=0;
 		virtual void visit (const Reflect & node)=0;
+		virtual void visit (const ReflectType & node)=0;
 		virtual void visit (const Sequence & node)=0;
 		virtual void visit (const Struct & node)=0;
 		virtual void visit (const Unresolved_Call & node)=0;

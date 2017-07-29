@@ -56,4 +56,24 @@ string Reflect::toString (text::PrintMode mode) const {
 	
 }
 
+
+std::map <std::pair <Node*, Type*>, TypePtr> ReflectType::typeMap;
+
+TypePtr ReflectType::get (const NodePtr & metaTag, const TypePtr & target) {
+	auto key = std::make_pair (metaTag.get (), target.get ());
+	auto itt = typeMap.find (key);
+	auto end = typeMap.end ();
+	if (itt == end) {
+		return typeMap [key] = std::shared_ptr <ReflectType> (new ReflectType (metaTag, target));
+	} else {
+		return itt->second;
+	}
+}
+
+string ReflectType::toString (text::PrintMode mode) const {
+	
+	return metaTag->toString (mode) + " " + target->toString (mode);
+	
+}
+
 }
