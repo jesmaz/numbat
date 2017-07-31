@@ -21,8 +21,22 @@ std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <Type
 }
 
 
-std::map <string, FuncPtr> Reflect::apiFuncs = {
-	{APIfunc (
+std::map <string, FuncPtr> Reflect::apiFuncs;
+
+
+FuncPtr Reflect::api (const string & iden) {
+	if (apiFuncs.empty ()) initAPI ();
+	auto itt = apiFuncs.find (iden);
+	auto end = apiFuncs.end ();
+	if (itt != end) {
+		return itt->second;
+	}
+	return nullptr;
+}
+
+
+void Reflect::initAPI () {
+	apiFuncs.insert (APIfunc (
 		"AST.Pointer",
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
@@ -36,17 +50,7 @@ std::map <string, FuncPtr> Reflect::apiFuncs = {
 			revrseTypeIDmap.push_back (refType);
 			*out = typeID;
 		}
-	)}
-};
-
-
-FuncPtr Reflect::api (const string & iden) {
-	auto itt = apiFuncs.find (iden);
-	auto end = apiFuncs.end ();
-	if (itt != end) {
-		return itt->second;
-	}
-	return nullptr;
+	));
 }
 
 

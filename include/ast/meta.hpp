@@ -13,6 +13,7 @@ class Reflect : public Node {
 	public:
 		
 		static FuncPtr api (const string & iden);
+		static void initAPI ();
 		
 		NodePtr getMetaTag () const {return metaTag;}
 		NodePtr getTarget () const {return target;}
