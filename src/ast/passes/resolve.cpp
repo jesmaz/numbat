@@ -189,6 +189,10 @@ void ConstructorSelectionPass::visit (const Ref & node) {
 	}
 }
 
+void ConstructorSelectionPass::visit (const ReflectType & node) {
+	//TODO: Search type for constructors
+}
+
 void ConstructorSelectionPass::visit (const Struct & node) {
 	//TODO: Search struct for constructors
 	abort ();

@@ -87,6 +87,7 @@ class ConstructorSelectionPass : public ShallNotPass {
 		virtual void visit (const Interface & node);
 		virtual void visit (const Numeric & node);
 		virtual void visit (const Ref & node);
+		virtual void visit (const ReflectType & node);
 		virtual void visit (const Struct & node);
 		
 		ConstructorSelectionPass (numbat::lexer::position pos, const VarPtr & var, const BasicArray <NodePtr> & args) : pos (pos), var (var), args (args) {}
