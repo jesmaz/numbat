@@ -40,7 +40,7 @@ string Struct::toString (text::PrintMode mode) const {
 }
 
 
-std::map <TypePtr, TypePtr> arrayMap;
+std::map <TypePtr, TypePtr> arrayMap, constMap, refMap;
 std::map <uint64_t, TypePtr> numericMap;
 
 TypePtr Array::get (const TypePtr & base) {
@@ -49,6 +49,22 @@ TypePtr Array::get (const TypePtr & base) {
 		return itt->second;
 	}
 	return arrayMap [base] = TypePtr (new Array (base->getPos (), base));
+}
+
+TypePtr Const::get (const TypePtr & base) {
+	auto itt = constMap.find (base);
+	if (itt != constMap.end ()) {
+		return itt->second;
+	}
+	return constMap [base] = TypePtr (new Const (base->getPos (), base));
+}
+
+TypePtr Ref::get (const TypePtr & base) {
+	auto itt = refMap.find (base);
+	if (itt != refMap.end ()) {
+		return itt->second;
+	}
+	return refMap [base] = TypePtr (new Ref (base->getPos (), base));
 }
 
 TypePtr Numeric::get (ArithmaticType arith, uint32_t minPrecision) {

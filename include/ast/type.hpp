@@ -95,10 +95,12 @@ class Const : public Type {
 		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func); Type::overloadFunc (str, func);}
 		
-		Const (numbat::lexer::position pos, TypePtr type) : Type (pos), type (type) {}
+		static TypePtr get (const TypePtr & base);
 		
 	protected:
 	private:
+		
+		Const (numbat::lexer::position pos, TypePtr type) : Type (pos), type (type) {}
 		
 		TypePtr type;
 		
@@ -114,10 +116,12 @@ class Ref : public Type {
 		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func);}
 		
-		Ref (numbat::lexer::position pos, TypePtr type) : Type (pos), type (type) {}
+		static TypePtr get (const TypePtr & base);
 		
 	protected:
 	private:
+		
+		Ref (numbat::lexer::position pos, TypePtr type) : Type (pos), type (type) {}
 		
 		TypePtr type;
 		

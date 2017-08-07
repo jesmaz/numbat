@@ -9,15 +9,15 @@ AST::TypePtr ParseTreeKeyword::createASTtype (AST::Context &) {
 	
 	AST::TypePtr type = std::make_shared <AST::Inferred> (getPos ());
 	if (sym == "ref") {
-		type = std::make_shared <AST::Const> (getPos (), type);
-		type = std::make_shared <AST::Ref> (getPos (), type);
+		type = AST::Const::get (type);
+		type = AST::Ref::get (type);
 		
 	} else if (sym == "val") {
-		type = std::make_shared <AST::Const> (getPos (), type);
+		type = AST::Const::get (type);
 		
 	} else if (sym == "var") {
 	} else if (sym == "vref") {
-		type = std::make_shared <AST::Ref> (getPos (), type);
+		type = AST::Ref::get (type);
 		
 	}
 	

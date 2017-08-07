@@ -8,15 +8,15 @@ namespace parser {
 AST::TypePtr ParseTreeTypeModifier::createASTtype (AST::Context & ctx) {
 	auto t = type->createASTtype (ctx);
 	if (sym == "ref") {
-		t = std::make_shared <AST::Const> (getPos (), t);
-		t = std::make_shared <AST::Ref> (getPos (), t);
+		t = AST::Const::get (t);;
+		t = AST::Ref::get (t);;
 		
 	} else if (sym == "val") {
-		t = std::make_shared <AST::Const> (getPos (), t);
+		t = AST::Const::get (t);;
 		
 	} else if (sym == "var") {
 	} else if (sym == "vref") {
-		t = std::make_shared <AST::Ref> (getPos (), t);
+		t = AST::Ref::get (t);;
 		
 	}
 	

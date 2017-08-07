@@ -44,7 +44,7 @@ void Reflect::initAPI () {
 			auto * in = reinterpret_cast <size_t *> (voidIn);
 			auto * out = reinterpret_cast <size_t *> (voidOut);
 			auto baseType = revrseTypeIDmap [*in];
-			auto refType = std::make_shared <Ref> (baseType->getPos (), baseType);
+			auto refType = Ref::get (baseType);
 			size_t typeID = revrseTypeIDmap.size ();
 			typeIDmap [refType] = typeID;
 			revrseTypeIDmap.push_back (refType);
