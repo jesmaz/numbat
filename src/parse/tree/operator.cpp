@@ -1,3 +1,5 @@
+#include <ast/flowcontrol.hpp>
+#include <ast/variable.hpp>
 #include <nir/scope.hpp>
 #include <nir/type/array.hpp>
 #include <parse/tree/operator.hpp>
@@ -56,6 +58,17 @@ string GenericOperator::strDump (text::PrintMode mode) {
 	}
 }
 
+template <>
+AST::NodePtr SpecificOperator <OPERATION::AND>::createAST (AST::Context & ctx) {
+	if (args.size () != 2) {
+		report::logMessage (report::ERROR, ctx.getSourceFile (), getPos (), "Operator '" + iden + "' must have 2 arguments");
+		return nullptr;
+		
+	} else {
+		auto params = args.map <AST::NodePtr> ([&](auto & a) {return a->createAST (ctx);});
+		return std::make_shared <AST::And> (getPos (), params [0], params [1]);
+	}
+}
 
 template <>
 AST::NodePtr SpecificOperator <OPERATION::AS>::createAST (AST::Context & ctx) {
@@ -72,6 +85,18 @@ AST::NodePtr SpecificOperator <OPERATION::AS>::createAST (AST::Context & ctx) {
 			OPERATION::AS
 		);
 		
+	}
+}
+
+template <>
+AST::NodePtr SpecificOperator <OPERATION::OR>::createAST (AST::Context & ctx) {
+	if (args.size () != 2) {
+		report::logMessage (report::ERROR, ctx.getSourceFile (), getPos (), "Operator '" + iden + "' must have 2 arguments");
+		return nullptr;
+		
+	} else {
+		auto params = args.map <AST::NodePtr> ([&](auto & a) {return a->createAST (ctx);});
+		return std::make_shared <AST::Or> (getPos (), params [0], params [1]);
 	}
 }
 

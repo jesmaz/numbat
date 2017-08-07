@@ -7,6 +7,25 @@
 namespace AST {
 
 
+class And : public Node {
+	
+	public:
+		
+		const NodePtr & getFirst () const {return first;}
+		const NodePtr & getSecond () const {return second;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		And (numbat::lexer::position pos, const NodePtr & first, const NodePtr & second) : Node (pos), first (first), second (second) {}
+		
+	protected:
+	private:
+		
+		NodePtr first, second;
+		
+};
+
 class IfElse : public Node {
 	
 	public:
@@ -19,9 +38,9 @@ class IfElse : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		  IfElse (numbat::lexer::position pos, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos), cond (cond), body (body), alt (alt) {}
-		  IfElse (numbat::lexer::position pos, const TypePtr & type, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, type), cond (cond), body (body), alt (alt) {}
-		  IfElse (numbat::lexer::position pos, const VarPtr & var, const NodePtr & cond, const NodePtr & body, const NodePtr & alt);
+		IfElse (numbat::lexer::position pos, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos), cond (cond), body (body), alt (alt) {}
+		IfElse (numbat::lexer::position pos, const TypePtr & type, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, type), cond (cond), body (body), alt (alt) {}
+		IfElse (numbat::lexer::position pos, const VarPtr & var, const NodePtr & cond, const NodePtr & body, const NodePtr & alt);
 		
 	protected:
 	private:
@@ -45,6 +64,25 @@ class Loop : public Node {
 		
 		NodePtr init, cond, step, body;
 		VarPtr array;
+		
+};
+
+class Or : public Node {
+	
+	public:
+		
+		const NodePtr & getFirst () const {return first;}
+		const NodePtr & getSecond () const {return second;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		Or (numbat::lexer::position pos, const NodePtr & first, const NodePtr & second) : Node (pos), first (first), second (second) {}
+		
+	protected:
+	private:
+		
+		NodePtr first, second;
 		
 };
 

@@ -1,4 +1,5 @@
 #include <ast/call.hpp>
+#include <ast/flowcontrol.hpp>
 #include <ast/function.hpp>
 #include <ast/meta.hpp>
 #include <ast/node.hpp>
@@ -10,6 +11,10 @@
 
 namespace AST {
 
+
+void IdentityPass::visit (const And & node) {
+	nPtr = std::make_shared <And> (node.getPos (), this->visit (node.getFirst ()), this->visit (node.getSecond ()));
+}
 
 void IdentityPass::visit (const Array & node) {
 }
@@ -80,6 +85,10 @@ void IdentityPass::visit (const Interface & node) {}
 void IdentityPass::visit (const Number & node) {}
 
 void IdentityPass::visit (const Numeric & node) {}
+
+void IdentityPass::visit (const Or & node) {
+	nPtr = std::make_shared <Or> (node.getPos (), this->visit (node.getFirst ()), this->visit (node.getSecond ()));
+}
 
 void IdentityPass::visit (const Ref & node) {}
 

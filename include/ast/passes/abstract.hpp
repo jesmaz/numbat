@@ -7,6 +7,7 @@
 namespace AST {
 
 
+class And;
 class Array;
 class ArrayInit;
 class Basic_Operation;
@@ -22,6 +23,7 @@ class Inferred;
 class Interface;
 class Number;
 class Numeric;
+class Or;
 class Ref;
 class Reflect;
 class ReflectType;
@@ -39,6 +41,7 @@ class AbstractPass {
 		
 		virtual NodePtr visit (const NodePtr & node)=0;
 		
+		virtual void visit (const And & node)=0;
 		virtual void visit (const Array & node)=0;
 		virtual void visit (const ArrayInit & node)=0;
 		virtual void visit (const Basic_Operation & node)=0;
@@ -54,6 +57,7 @@ class AbstractPass {
 		virtual void visit (const Interface & node)=0;
 		virtual void visit (const Number & node)=0;
 		virtual void visit (const Numeric & node)=0;
+		virtual void visit (const Or & node)=0;
 		virtual void visit (const Ref & node)=0;
 		virtual void visit (const Reflect & node)=0;
 		virtual void visit (const ReflectType & node)=0;
