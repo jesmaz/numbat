@@ -38,10 +38,33 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 		return this->visit (arg);
 	});
 	
+	auto types = args.map <TypePtr> ([](auto & arg) {
+		auto type = arg->getType ();
+		while (type->getRegType ()) {
+			type = type->getRegType ();
+		}
+		return type;
+	});
+	
 	if (/*TODO: Check for complex types*/ false) {
+		
+	} else if (args.size () == 1 or types [0] == types [1]) {
+		nPtr = std::make_shared <Basic_Operation> (node.getPos (), types [0], node.getIden (), args, node.getOpp ());
+		
+	} else if (args.size () == 2) {
+		auto arbNum = Numeric::get (Numeric::ArithmaticType::ARBITRARY, 0);
+		if (types [0] == arbNum and typeid (*types [1]) == typeid (Numeric)) {
+			nPtr = std::make_shared <Basic_Operation> (node.getPos (), types [1], node.getIden (), args, node.getOpp ());
+		} else if (types [1] == arbNum and typeid (*types [0]) == typeid (Numeric)) {
+			nPtr = std::make_shared <Basic_Operation> (node.getPos (), types [0], node.getIden (), args, node.getOpp ());
+		} else {
+			//TODO: raise an error
+			abort ();
+		}
 		
 	} else {
 		nPtr = std::make_shared <Basic_Operation> (node.getPos (), args [0]->getType (), node.getIden (), args, node.getOpp ());
+		
 	}
 	
 }
