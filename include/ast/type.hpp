@@ -16,6 +16,7 @@ class Type : public Node {
 	public:
 		
 		string getName () const {return name;}
+		virtual TypePtr getRegType () const {return nullptr;}
 		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {methods.insert (std::make_pair (str, func));}
 		
