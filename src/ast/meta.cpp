@@ -90,6 +90,11 @@ TypePtr ReflectType::get (const NodePtr & metaTag, const TypePtr & target) {
 	}
 }
 
+TypePtr ReflectType::getType (size_t id) {
+	assert (id < reverseTypeIDmap.size ());
+	return reverseTypeIDmap [id];
+}
+
 string ReflectType::toString (text::PrintMode mode) const {
 	
 	return metaTag->toString (mode) + " " + target->toString (mode);
