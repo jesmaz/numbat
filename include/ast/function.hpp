@@ -18,6 +18,8 @@ struct Function {
 		const BasicArray <TypePtr> getParams () const {return params;}
 		const BasicArray <TypePtr> getRetVals () const {return retVals;}
 		const numbat::lexer::position getPos () const {return pos;}
+		const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>)> & getNative () const {return nativeFunction;}
+		const std::map <std::string, std::string> & getMetaData () const {return metaData;}
 		const string & getIden () const {return iden;}
 		
 	protected:
@@ -25,15 +27,16 @@ struct Function {
 		
 		friend AST::Context;
 		friend parser::Function;
-		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <void(void*, void*)> &func);
+		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>)> &func);
 		
 		BasicArray <TypePtr> params, retVals;
+		std::map <std::string, std::string> metaData;
 		std::map <std::string, size_t> positions;
 		
 		string iden;
 		NodePtr body;
 		numbat::lexer::position pos;
-		std::function <void(void*, void*)> nativeFunction;
+		std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>)> nativeFunction;
 		
 };
 

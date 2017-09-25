@@ -32,6 +32,7 @@ class Number : public Value {
 		virtual string toString (text::PrintMode mode) const;
 		
 		Number (numbat::lexer::position pos, const string & value);
+		Number (numbat::lexer::position pos, const string & value, const TypePtr & type) : Value (pos, type), value (value) {}
 		
 	protected:
 	private:

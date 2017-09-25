@@ -1,3 +1,4 @@
+#include <ast/literal.hpp>
 #include <ast/meta.hpp>
 #include <map>
 #include <utility/report.hpp>
@@ -8,15 +9,16 @@ namespace AST {
 
 
 std::map <TypePtr, size_t> typeIDmap;
-DynArray <TypePtr> revrseTypeIDmap;
+DynArray <TypePtr> reverseTypeIDmap;
 
 
-std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <void(void*, void*)> &func) {
+std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>)> & func) {
 	auto fPtr = std::make_shared <Function> ();
 	fPtr->iden = iden;
 	fPtr->nativeFunction = func;
 	fPtr->params = params;
 	fPtr->retVals = retVals;
+	fPtr->metaData ["functional"] = "true";
 	return std::make_pair (iden, fPtr);
 }
 
@@ -40,15 +42,18 @@ void Reflect::initAPI () {
 		"AST.Pointer",
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
-		[](void * voidIn, void * voidOut) {
-			auto * in = reinterpret_cast <size_t *> (voidIn);
-			auto * out = reinterpret_cast <size_t *> (voidOut);
-			auto baseType = revrseTypeIDmap [*in];
+		[](const BasicArray <NodePtr> args) -> const BasicArray <NodePtr> {
+			assert (args.size () == 1);
+			assert (typeid (*(args [0].get ())) == typeid (AST::Number));
+			auto number = reinterpret_cast <const AST::Number*> (args [0].get ());
+			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::INT, 0));
+			auto in = std::stol (number->getValue ());
+			auto baseType = reverseTypeIDmap [in];
 			auto refType = Ref::get (baseType);
-			size_t typeID = revrseTypeIDmap.size ();
+			size_t typeID = reverseTypeIDmap.size ();
 			typeIDmap [refType] = typeID;
-			revrseTypeIDmap.push_back (refType);
-			*out = typeID;
+			reverseTypeIDmap.push_back (refType);
+			return {std::make_shared <AST::Number> (number->getPos (), std::to_string (typeID), number->getType ())};
 		}
 	));
 }
@@ -62,6 +67,17 @@ string Reflect::toString (text::PrintMode mode) const {
 
 
 std::map <std::pair <Node*, Type*>, TypePtr> ReflectType::typeMap;
+
+size_t ReflectType::getTypeId (const TypePtr & type) {
+	auto itt = typeIDmap.find (type);
+	if (itt != typeIDmap.end ()) {
+		return itt->second;
+	} else {
+		auto id = typeIDmap [type] = reverseTypeIDmap.size ();
+		reverseTypeIDmap.push_back (type);
+		return id;
+	}
+}
 
 TypePtr ReflectType::get (const NodePtr & metaTag, const TypePtr & target) {
 	auto key = std::make_pair (metaTag.get (), target.get ());
