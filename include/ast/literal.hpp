@@ -8,7 +8,21 @@
 namespace AST {
 
 
-class Number : public Node {
+class Value : public Node {
+	
+	public:
+		
+		virtual bool isValue () const {return true;}
+		
+		
+		Value (numbat::lexer::position pos, const TypePtr & type) : Node (pos, type) {}
+		
+	protected:
+	private:
+		
+};
+
+class Number : public Value {
 	
 	public:
 		
