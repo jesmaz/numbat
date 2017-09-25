@@ -14,8 +14,9 @@ class ResolvePass : public IdentityPass {
 		
 		virtual NodePtr visit (const NodePtr & node) {return ResolvePass () (node);}
 		
-		virtual void visit (const Unresolved_IfElse & node);
 		virtual void visit (const Sequence & node);
+		virtual void visit (const Variable & node);
+		virtual void visit (const Unresolved_IfElse & node);
 		virtual void visit (const Unresolved_Call & node);
 		virtual void visit (const Unresolved_Constructor & node);
 		virtual void visit (const Unresolved_Operation & node);
@@ -24,6 +25,23 @@ class ResolvePass : public IdentityPass {
 	private:
 		
 		
+		
+};
+
+class ResolveTypePass : public IdentityPass {
+	
+	public:
+		
+		virtual NodePtr visit (const NodePtr & node) {return ResolvePass () (node);}
+		
+		virtual void visit (const ReflectType & node);
+		
+		TypePtr operator () (const TypePtr & node);
+		
+	protected:
+	private:
+		
+		TypePtr nType;
 		
 };
 

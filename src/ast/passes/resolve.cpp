@@ -18,6 +18,11 @@ void ResolvePass::visit (const Sequence & node) {
 	nPtr = std::make_shared <Sequence> (node.getPos (), nodes.back ()->getType (), nodes);
 }
 
+void ResolvePass::visit (const Variable & node) {
+	auto type = ResolveTypePass () (node.getType ());
+	nPtr = std::make_shared <Variable> (node.getPos (), node.getIden (), type);
+}
+
 void ResolvePass::visit (const Unresolved_Call & node) {
 	auto args = node.getArgs ().map <NodePtr> ([&](auto & arg) {
 		return this->visit (arg);
@@ -30,6 +35,7 @@ void ResolvePass::visit (const Unresolved_Constructor & node) {
 	auto args = node.getArgs ().map <NodePtr> ([&](auto & arg) {
 		return this->visit (arg);
 	});
+	auto var = this->visit (node.getVar ());
 	nPtr = ConstructorSelectionPass (node.getPos (), node.getVar (), args) (node.getVar ()->getType ());
 }
 
@@ -83,6 +89,17 @@ void ResolvePass::visit (const Unresolved_IfElse & node) {
 	}
 	
 	nPtr = std::make_shared <IfElse> (node.getPos (), var, cond, body, alt);
+}
+
+void ResolveTypePass::visit (const ReflectType & node) {
+	//TODO: resolve meta tag to specific function
+}
+
+TypePtr ResolveTypePass::operator () (const TypePtr & node) {
+	assert (nType = node);
+	node->accept (*this);
+	assert (nType);
+	return nType;
 }
 
 void MakeCallPass::visit (const Function_Ptr & node) {
