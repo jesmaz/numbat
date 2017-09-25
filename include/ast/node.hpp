@@ -13,6 +13,7 @@ class Node {
 	
 	public:
 		
+		virtual bool isValue () const {return false;}
 		virtual void accept (AbstractPass & pass) const=0;
 		
 		virtual string toString (text::PrintMode mode) const=0;
