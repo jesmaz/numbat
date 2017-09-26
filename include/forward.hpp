@@ -12,6 +12,7 @@ namespace AST {
 
 class Type;
 class Node;
+class Value;
 class Variable;
 
 struct Context;
@@ -20,6 +21,7 @@ struct Function;
 typedef std::shared_ptr <Function> FuncPtr;
 typedef std::shared_ptr <Node> NodePtr;
 typedef std::shared_ptr <Type> TypePtr;
+typedef std::shared_ptr <Value> ValPtr;
 typedef std::shared_ptr <Variable> VarPtr;
 
 
