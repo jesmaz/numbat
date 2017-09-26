@@ -13,6 +13,7 @@ class ParseTree : public ParseTreeNode {
 		
 		AST::Context * createContext (const AST::Context &);
 		AST::NodePtr createAST (AST::Context & ctx);
+		AST::NodePtr extendAST (AST::Context & ctx);
 		
 		const BasicArray <Function *> & getFunctions () const {return functions;}
 		const BasicArray <PTNode> & getBody () const {return body;}

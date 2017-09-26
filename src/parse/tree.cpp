@@ -33,6 +33,21 @@ AST::NodePtr ParseTree::createAST (AST::Context & ctx) {
 	
 }
 
+AST::NodePtr ParseTree::extendAST (AST::Context & ctx) {
+	
+	for (auto & str : structs) {
+		ctx.type (str->getIden (), str->createType (ctx));
+	}
+	
+	for (auto & func : functions) {
+		ctx.func (func->getIden (), func->createFunc (ctx));
+	}
+	
+	auto arr = body.map <AST::NodePtr> ([&](auto & a){return a->createAST (ctx);});
+	return std::make_shared <AST::Sequence> (getPos (), arr);
+	
+}
+
 const nir::Instruction * ParseTree::build (nir::Scope * scope) {
 	if (nirTreeScope) {
 		scope = nirTreeScope;

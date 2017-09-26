@@ -32,6 +32,7 @@ class ParseTreeNode {
 		virtual AST::NodePtr createASTmeta (AST::Context &) {return nullptr;}
 		virtual AST::NodePtr createASTparam (AST::Context & ctx) {return createASTtype (ctx);}
 		virtual AST::TypePtr createASTtype (AST::Context &) {return nullptr;}
+		virtual AST::NodePtr extendAST (AST::Context & ctx) {return createAST (ctx);}
 		
 		virtual bool isAggregate () {return false;}
 		virtual bool isList () {return false;}
