@@ -1,4 +1,4 @@
-#include <codegen/interpreter.hpp>
+#include <ast/passes/execute.hpp>
 #include <iostream>
 #include <nir/module.hpp>
 #include <parse/handparser.hpp>
@@ -11,8 +11,8 @@ int numbatMain (const Config & cfg) {
 	
 	nir::Module nirmodule;
 	auto globalScope = nirmodule.getGlobalScope ();
-	codegen::Interpreter interpreter (nirmodule.getEntry ());
 	numbat::File dummyFile;
+	AST::Context context (&dummyFile);
 	
 	string line;
 	for (;;) {
@@ -40,7 +40,9 @@ int numbatMain (const Config & cfg) {
 			continue;
 		}
 		
-		const nir::Instruction * val = parseTree->build (globalScope);
+		auto ast = parseTree->createAST (context);
+		std::cerr << ast->toString (text::PrintMode::PLAIN) << std::endl;
+		delete parseTree;
 		
 		if (report::compilationFailed ()) {
 			report::printLogs ();
@@ -48,9 +50,19 @@ int numbatMain (const Config & cfg) {
 			continue;
 		}
 		
+		ast = AST::transform (ast);
+		std::cerr << ast->toString (text::PrintMode::PLAIN) << std::endl;
+		
+		if (report::compilationFailed ()) {
+			report::printLogs ();
+			report::reset ();
+			continue;
+		}
+		
+		auto val = AST::ExecutePass () (ast);
+		
 		if (val) {
-			std::cout << val->toString () << std::endl;
-			std::cout << interpreter (val) << '\n';
+			std::cout << val->toString (text::PrintMode::PLAIN) << std::endl;
 		} else {
 			std::cout << '\n';
 		}
