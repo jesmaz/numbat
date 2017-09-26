@@ -46,12 +46,14 @@ NodePtr OperatePass <OPP>::operator () (const NodePtr & node) {
 template <>
 NodePtr OperatePass <parser::OPERATION::ASSIGN>::operator () (const NodePtr & node) {
 	auto n = args [0].get ();
-	if (typeid (args [0].get ()) == typeid (Variable*)) {
-		Variable * var = static_cast <Variable *> (args [0].get ());
+	Variable * var = static_cast <Variable *> (args [0].get ());
+	if (var) {
+		assert (var->getType () == args [1]->getType ());
 		if (args [1]->isValue ()) {
-			//Direct copy
+			var->getCurrentValue () = std::dynamic_pointer_cast <Value> (args [1]);
 		} else if (typeid (args [1].get ()) == typeid (Variable*)) {
-			//Load value first
+			Variable * rhs = static_cast <Variable *> (args [1].get ());
+			var->getCurrentValue () = rhs->getCurrentValue ();
 		} else {
 			abort ();
 		}
