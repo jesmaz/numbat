@@ -22,6 +22,11 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const Call_1 &)  {abort ();}
 		virtual void visit (const Call_2 &)  {abort ();}
 		virtual void visit (const Call_n &)  {abort ();}
+		virtual void visit (const CastToArbPrec &) {abort ();}
+		virtual void visit (const CastToInt &) {abort ();}
+		virtual void visit (const CastToDecimal &) {abort ();}
+		virtual void visit (const CastToFloat &) {abort ();}
+		virtual void visit (const CastToUint &) {abort ();}
 		virtual void visit (const Const &)  {abort ();}
 		virtual void visit (const Function_Ptr &)  {abort ();}
 		virtual void visit (const Function_Set &)  {abort ();}

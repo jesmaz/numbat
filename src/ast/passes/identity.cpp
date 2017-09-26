@@ -70,6 +70,16 @@ void IdentityPass::visit (const Call_n & node) {
 	}
 }
 
+void IdentityPass::visit (const CastToArbPrec & node) {}
+
+void IdentityPass::visit (const CastToDecimal & node) {}
+
+void IdentityPass::visit (const CastToFloat & node) {}
+
+void IdentityPass::visit (const CastToInt & node) {}
+
+void IdentityPass::visit (const CastToUint & node) {}
+
 void IdentityPass::visit (const Const & node) {}
 
 void IdentityPass::visit (const Function_Ptr & node) {}

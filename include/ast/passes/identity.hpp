@@ -22,6 +22,11 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const Call_1 & node);
 		virtual void visit (const Call_2 & node);
 		virtual void visit (const Call_n & node);
+		virtual void visit (const CastToArbPrec & node);
+		virtual void visit (const CastToInt & node);
+		virtual void visit (const CastToDecimal & node);
+		virtual void visit (const CastToFloat & node);
+		virtual void visit (const CastToUint & node);
 		virtual void visit (const Const & node);
 		virtual void visit (const Function_Ptr & node);
 		virtual void visit (const Function_Set & node);
