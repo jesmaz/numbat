@@ -11,7 +11,7 @@ class FoldConstPass : public ShallNotPass {
 	
 	public:
 		
-		virtual NodePtr visit (const NodePtr & node) {return FoldConstPass () (node);}
+		virtual NodePtr visit (const NodePtr & node) {return FoldConstPass (*this) (node);}
 		
 		virtual void visit (const Basic_Operation & node);
 		virtual void visit (const Call_0 & node);
@@ -25,12 +25,14 @@ class FoldConstPass : public ShallNotPass {
 		virtual void visit (const CastToUint & node);
 		virtual void visit (const Number &) {}
 		virtual void visit (const Sequence & node);
-		virtual void visit (const Variable &) {}
+		virtual void visit (const Variable &);
+		
+		FoldConstPass (bool readVar=false) : readVar (readVar) {}
 		
 	protected:
 	private:
 		
-		
+		bool readVar=false;
 		
 };
 
@@ -39,7 +41,9 @@ class ExecutePass : public FoldConstPass {
 	
 	public:
 		
-		virtual NodePtr visit (const NodePtr & node) {return ExecutePass () (node);}
+		virtual NodePtr visit (const NodePtr & node) {return ExecutePass (*this) (node);}
+		
+		ExecutePass (bool readVar=false) : FoldConstPass (readVar) {}
 		
 	protected:
 	private:

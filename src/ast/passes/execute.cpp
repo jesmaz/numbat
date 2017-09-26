@@ -30,6 +30,7 @@ NodePtr group (const BasicArray <NodePtr> & arr) {
 
 void FoldConstPass::visit (const Basic_Operation & node) {
 	bool allValues = true;
+	readVar = false;
 	auto args = node.getArgs ().map <NodePtr> ([&](const NodePtr & n) -> NodePtr {
 		auto arg = visit (n);
 		allValues &= arg->isValue ();
@@ -263,11 +264,26 @@ void FoldConstPass::visit (const CastToUint & node) {
 }
 
 void FoldConstPass::visit (const Sequence & node) {
-	nPtr = std::make_shared <Sequence> (
-		node.getPos (), 
-		node.getNodes ().map <NodePtr> ([&](const NodePtr & n) -> NodePtr {return visit (n);})
-	);
+	bool allValues=true;
+	auto args = node.getNodes ().map <NodePtr> ([&](const NodePtr & n) -> NodePtr {
+		auto arg = visit (n);
+		allValues &= arg->isValue ();
+		return arg;
+	});
+	if (args.size () == 1) {
+		nPtr = args [0];
+	} else if (args.size () > 1 and allValues) {
+		nPtr = args.back ();
+	} else {
+		nPtr = std::make_shared <Sequence> (node.getPos (), args);
+	}
 	//TODO: chain onto a pruning pass (might as well do it here)
+}
+
+void FoldConstPass::visit (const Variable & node) {
+	if (readVar and node.getCurrentValue ()) {
+		nPtr = node.getCurrentValue ();
+	}
 }
 
 
