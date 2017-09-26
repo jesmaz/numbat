@@ -40,7 +40,7 @@ int numbatMain (const Config & cfg) {
 			continue;
 		}
 		
-		auto ast = parseTree->createAST (context);
+		auto ast = parseTree->extendAST (context);
 		std::cerr << ast->toString (text::PrintMode::PLAIN) << std::endl;
 		delete parseTree;
 		

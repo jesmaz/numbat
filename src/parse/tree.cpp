@@ -43,7 +43,7 @@ AST::NodePtr ParseTree::extendAST (AST::Context & ctx) {
 		ctx.func (func->getIden (), func->createFunc (ctx));
 	}
 	
-	auto arr = body.map <AST::NodePtr> ([&](auto & a){return a->createAST (ctx);});
+	auto arr = body.map <AST::NodePtr> ([&](auto & a){return a->extendAST (ctx);});
 	return std::make_shared <AST::Sequence> (getPos (), arr);
 	
 }
