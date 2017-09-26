@@ -3,6 +3,7 @@
 #include <ast/flowcontrol.hpp>
 #include <ast/operation.hpp>
 #include <ast/passes/resolve.hpp>
+#include <ast/passes/typecastpass.hpp>
 #include <ast/sequence.hpp>
 #include <ast/variable.hpp>
 #include <iostream>
@@ -20,7 +21,7 @@ void ResolvePass::visit (const Sequence & node) {
 
 void ResolvePass::visit (const Variable & node) {
 	auto type = ResolveTypePass () (node.getType ());
-	nPtr = std::make_shared <Variable> (node.getPos (), node.getIden (), type);
+	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getIden (), type);
 }
 
 void ResolvePass::visit (const Unresolved_Call & node) {
@@ -220,6 +221,10 @@ void ConstructorSelectionPass::visit (const Interface & node) {
 
 void ConstructorSelectionPass::visit (const Numeric & node) {
 	//TODO: Check arguments for compatibility
+	if (args.size () == 1) {
+		auto arg = CastToNumberPass (node) (args [0]);
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), " = ", BasicArray <NodePtr> {var, arg}, parser::OPERATION::ASSIGN);
+	}
 }
 
 void ConstructorSelectionPass::visit (const Ref & node) {
