@@ -37,7 +37,7 @@ void ReflectPass::visit (const ReflectType & node) {
 void ReflectPass::visit (const Variable & node) {
 	
 	auto type = std::dynamic_pointer_cast <Type> (ReflectPass () (node.getType ()));
-	nPtr = std::make_shared <Variable> (node.getPos (), node.getIden (), type);
+	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getIden (), type, node.getCurrentValue ());
 	
 }
 

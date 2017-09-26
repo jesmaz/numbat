@@ -21,7 +21,7 @@ void ResolvePass::visit (const Sequence & node) {
 
 void ResolvePass::visit (const Variable & node) {
 	auto type = ResolveTypePass () (node.getType ());
-	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getIden (), type);
+	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getIden (), type, node.getCurrentValue ());
 }
 
 void ResolvePass::visit (const Unresolved_Call & node) {
@@ -247,7 +247,7 @@ NodePtr ConstructorSelectionPass::operator () (const NodePtr & node) {
 	nPtr = var;
 	node->accept (*this);
 	if (replacementType) {
-		*var = Variable (var->getPos (), var->getIden (), replacementType);
+		*var = Variable (var->getPos (), var->getIden (), replacementType, var->getCurrentValue ());
 	}
 	return nPtr;
 }

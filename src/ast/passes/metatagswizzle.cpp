@@ -22,7 +22,7 @@ void SwizzleSubjectPass::visit (const Unresolved_Constructor & node) {
 void SwizzleSubjectPass::visit (const Variable & node) {
 	auto type = node.getType ();
 	type = ReflectType::get (metaTag, type);
-	nPtr = std::make_shared <Variable> (node.getPos (), node.getIden (), type);
+	nPtr = std::make_shared <Variable> (node.getPos (), node.getIden (), type, node.getCurrentValue ());
 }
 
 
