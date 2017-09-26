@@ -5,6 +5,7 @@
 #include <ast/passes/execute.hpp>
 #include <ast/passes/operate.hpp>
 #include <ast/sequence.hpp>
+#include <ast/typecast.hpp>
 
 
 namespace AST {
@@ -177,6 +178,88 @@ void FoldConstPass::visit (const Call_n & node) {
 			abort ();
 		}
 	}
+}
+
+void FoldConstPass::visit (const CastToArbPrec & node) {
+	auto nodeType = std::static_pointer_cast <Numeric> (node.getNode ()->getType ());
+	assert (nodeType);
+	abort ();
+}
+
+void FoldConstPass::visit (const CastToDecimal & node) {
+	auto nodeType = std::static_pointer_cast <Numeric> (node.getNode ()->getType ());
+	assert (nodeType);
+	abort ();
+}
+
+void FoldConstPass::visit (const CastToFloat & node) {
+	auto nodeType = std::static_pointer_cast <Numeric> (node.getNode ()->getType ());
+	assert (nodeType);
+	abort ();
+}
+
+void FoldConstPass::visit (const CastToInt & node) {
+	auto arg = std::static_pointer_cast <Number> (node.getNode ());
+	auto argType = std::static_pointer_cast <Numeric> (node.getNode ()->getType ());
+	auto targetType = std::static_pointer_cast <Numeric> (node.getType ());
+	if (arg and argType) {
+		std::string result;
+		auto & str = arg->getValue ();
+		switch (argType->getArith ()) {
+			case Numeric::ArithmaticType::ARBITRARY: {
+				mpq_class num;
+				string::size_type pos;
+				if ((pos = str.find ('.')) != string::npos) {
+					num = str.substr (0, pos) + str.substr (pos + 1) + "/1" + string (str.length () - (pos+1), '0');
+				} else {
+					num = str;
+				}
+				if (targetType->getMinPrec () <= 8) {
+					result = std::to_string (int8_t (num.get_num ().get_si () / num.get_den ().get_si ()));
+				} else if (targetType->getMinPrec () <= 16) {
+					result = std::to_string (int16_t (num.get_num ().get_si () / num.get_den ().get_si ()));
+				} else if (targetType->getMinPrec () <= 32) {
+					result = std::to_string (int32_t (num.get_num ().get_si () / num.get_den ().get_si ()));
+				} else {
+					result = std::to_string (int64_t (num.get_num ().get_si () / num.get_den ().get_si ()));
+				}
+				break;
+			}
+			case Numeric::ArithmaticType::DECINT:
+				abort ();
+				break;
+			case Numeric::ArithmaticType::FPINT:
+				if (targetType->getMinPrec () <= 8) {
+					result = std::to_string (int8_t (std::stod (str)));
+				} else if (targetType->getMinPrec () <= 16) {
+					result = std::to_string (int16_t (std::stod (str)));
+				} else if (targetType->getMinPrec () <= 32) {
+					result = std::to_string (int32_t (std::stod (str)));
+				} else {
+					result = std::to_string (int64_t (std::stod (str)));
+				}
+				break;
+			case Numeric::ArithmaticType::INT:
+			case Numeric::ArithmaticType::UINT:
+				if (targetType->getMinPrec () <= 8) {
+					result = std::to_string (int8_t (std::stoll (str)));
+				} else if (targetType->getMinPrec () <= 16) {
+					result = std::to_string (int16_t (std::stoll (str)));
+				} else if (targetType->getMinPrec () <= 32) {
+					result = std::to_string (int32_t (std::stoll (str)));
+				} else {
+					result = std::to_string (int64_t (std::stoll (str)));
+				}
+				break;
+		}
+		nPtr = std::make_shared <Number> (nPtr->getPos (), result, targetType);
+	}
+}
+
+void FoldConstPass::visit (const CastToUint & node) {
+	auto nodeType = std::static_pointer_cast <Numeric> (node.getNode ()->getType ());
+	assert (nodeType);
+	abort ();
 }
 
 void FoldConstPass::visit (const Sequence & node) {
