@@ -17,7 +17,7 @@ class And : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		And (numbat::lexer::position pos, const NodePtr & first, const NodePtr & second) : Node (pos), first (first), second (second) {}
+		And (numbat::lexer::position pos, const numbat::File * file, const NodePtr & first, const NodePtr & second) : Node (pos, file), first (first), second (second) {}
 		
 	protected:
 	private:
@@ -38,9 +38,9 @@ class IfElse : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		IfElse (numbat::lexer::position pos, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos), cond (cond), body (body), alt (alt) {}
-		IfElse (numbat::lexer::position pos, const TypePtr & type, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, type), cond (cond), body (body), alt (alt) {}
-		IfElse (numbat::lexer::position pos, const VarPtr & var, const NodePtr & cond, const NodePtr & body, const NodePtr & alt);
+		IfElse (numbat::lexer::position pos, const numbat::File * file, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, file), cond (cond), body (body), alt (alt) {}
+		IfElse (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, file, type), cond (cond), body (body), alt (alt) {}
+		IfElse (numbat::lexer::position pos, const numbat::File * file, const VarPtr & var, const NodePtr & cond, const NodePtr & body, const NodePtr & alt);
 		
 	protected:
 	private:
@@ -57,7 +57,7 @@ class Loop : public Node {
 		//void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Loop (numbat::lexer::position pos, const NodePtr & init, const NodePtr & cond, const NodePtr & step, const NodePtr & body, const VarPtr & array) : Node (pos), init (init), cond (cond), step (step), body (body), array (array) {}
+		Loop (numbat::lexer::position pos, const numbat::File * file, const NodePtr & init, const NodePtr & cond, const NodePtr & step, const NodePtr & body, const VarPtr & array) : Node (pos, file), init (init), cond (cond), step (step), body (body), array (array) {}
 		
 	protected:
 	private:
@@ -77,7 +77,7 @@ class Or : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Or (numbat::lexer::position pos, const NodePtr & first, const NodePtr & second) : Node (pos), first (first), second (second) {}
+		Or (numbat::lexer::position pos, const numbat::File * file, const NodePtr & first, const NodePtr & second) : Node (pos, file), first (first), second (second) {}
 		
 	protected:
 	private:
@@ -97,8 +97,8 @@ class Unresolved_IfElse : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Unresolved_IfElse (numbat::lexer::position pos, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos), cond (cond), body (body), alt (alt) {}
-		Unresolved_IfElse (numbat::lexer::position pos, const TypePtr & type, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, type), cond (cond), body (body), alt (alt) {}
+		Unresolved_IfElse (numbat::lexer::position pos, const numbat::File * file, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, file), cond (cond), body (body), alt (alt) {}
+		Unresolved_IfElse (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, file, type), cond (cond), body (body), alt (alt) {}
 		
 	protected:
 	private:
@@ -114,7 +114,7 @@ class Unresolved_Loop : public Node {
 		//void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Unresolved_Loop (numbat::lexer::position pos, const NodePtr & init, const NodePtr & cond, const NodePtr & step, const NodePtr & body) : Node (pos), init (init), cond (cond), step (step), body (body) {}
+		Unresolved_Loop (numbat::lexer::position pos, const numbat::File * file, const NodePtr & init, const NodePtr & cond, const NodePtr & step, const NodePtr & body) : Node (pos, file), init (init), cond (cond), step (step), body (body) {}
 		
 	protected:
 	private:

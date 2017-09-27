@@ -16,7 +16,7 @@ AST::NodePtr ParseTreeLiteral::createAST (AST::Context & ctx) {
 		}
 		
 		case numbat::lexer::TOKEN::numericliteral: {
-			return std::make_shared <AST::Number> (getPos (), literal);
+			return std::make_shared <AST::Number> (getPos (), ctx.getSourceFile (), literal);
 		}
 		
 		case numbat::lexer::TOKEN::stringliteral: {

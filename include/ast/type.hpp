@@ -20,9 +20,9 @@ class Type : public Node {
 		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {methods.insert (std::make_pair (str, func));}
 		
-		Type (numbat::lexer::position pos) : Node (pos) {}
-		Type (numbat::lexer::position pos, const string & name) : Node (pos), name (name) {}
-		Type (numbat::lexer::position pos, const TypePtr & type) : Node (pos, type) {}
+		Type (numbat::lexer::position pos, const numbat::File * file) : Node (pos, file) {}
+		Type (numbat::lexer::position pos, const numbat::File * file, const string & name) : Node (pos, file), name (name) {}
+		Type (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type) : Node (pos, file, type) {}
 		
 	protected:
 	private:
@@ -40,7 +40,7 @@ class Inferred : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Inferred (numbat::lexer::position pos) : Type (pos) {}
+		Inferred (numbat::lexer::position pos, const numbat::File * file) : Type (pos, file) {}
 		
 	protected:
 	private:
@@ -61,7 +61,7 @@ class Array : public Type {
 	protected:
 	private:
 		
-		Array (numbat::lexer::position pos, const TypePtr & base) : Type (pos), base (base) {}
+		Array (numbat::lexer::position pos, const numbat::File * file, const TypePtr & base) : Type (pos, file), base (base) {}
 		
 		TypePtr base;
 		
@@ -76,7 +76,7 @@ class ArrayInit : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		ArrayInit (numbat::lexer::position pos, const TypePtr & base, const NodePtr & length, const NodePtr & val) : Type (pos, Array::get (base)), base (base), length (length), val (val) {}
+		ArrayInit (numbat::lexer::position pos, const numbat::File * file, const TypePtr & base, const NodePtr & length, const NodePtr & val) : Type (pos, file, Array::get (base)), base (base), length (length), val (val) {}
 		
 	protected:
 	private:
@@ -101,7 +101,7 @@ class Const : public Type {
 	protected:
 	private:
 		
-		Const (numbat::lexer::position pos, TypePtr type) : Type (pos), type (type) {}
+		Const (numbat::lexer::position pos, const numbat::File * file, TypePtr type) : Type (pos, file), type (type) {}
 		
 		TypePtr type;
 		
@@ -122,7 +122,7 @@ class Ref : public Type {
 	protected:
 	private:
 		
-		Ref (numbat::lexer::position pos, TypePtr type) : Type (pos), type (type) {}
+		Ref (numbat::lexer::position pos, const numbat::File * file, TypePtr type) : Type (pos, file), type (type) {}
 		
 		TypePtr type;
 		
@@ -133,7 +133,7 @@ class Interface : public Type {
 	public:
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
-		Interface (numbat::lexer::position pos) : Type (pos) {}
+		Interface (numbat::lexer::position pos, const numbat::File * file) : Type (pos, file) {}
 		
 	protected:
 	private:
@@ -158,7 +158,7 @@ class Numeric : public Type {
 	protected:
 	private:
 		
-		Numeric (numbat::lexer::position pos, ArithmaticType arith, uint32_t minPrecision) : Type (pos), arith (arith), minPrecision (minPrecision) {}
+		Numeric (numbat::lexer::position pos, const numbat::File * file, ArithmaticType arith, uint32_t minPrecision) : Type (pos, file), arith (arith), minPrecision (minPrecision) {}
 		
 		ArithmaticType arith;
 		uint32_t minPrecision;
@@ -176,7 +176,7 @@ class Struct : public Type {
 		
 		static TypePtr tuple (const BasicArray <TypePtr> & vals);
 		
-		Struct (numbat::lexer::position pos, const string & name) : Type (pos, name) {}
+		Struct (numbat::lexer::position pos, const numbat::File * file, const string & name) : Type (pos, file, name) {}
 		
 	protected:
 	private:

@@ -9,9 +9,9 @@ namespace parser {
 
 AST::NodePtr ParseTreeIfElse::createAST (AST::Context & ctx) {
 	if (alternate) {
-		return std::make_shared <AST::Unresolved_IfElse> (getPos (), cond->createAST (ctx), body->createAST (ctx), alternate->createAST (ctx));
+		return std::make_shared <AST::Unresolved_IfElse> (getPos (), ctx.getSourceFile (), cond->createAST (ctx), body->createAST (ctx), alternate->createAST (ctx));
 	} else {
-		return std::make_shared <AST::Unresolved_IfElse> (getPos (), cond->createAST (ctx), body->createAST (ctx), nullptr);
+		return std::make_shared <AST::Unresolved_IfElse> (getPos (), ctx.getSourceFile (), cond->createAST (ctx), body->createAST (ctx), nullptr);
 	}
 }
 

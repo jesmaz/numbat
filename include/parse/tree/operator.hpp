@@ -49,7 +49,7 @@ class SpecificOperator : public GenericOperator {
 				
 			} else {
 				auto params = args.map <AST::NodePtr> ([&](auto & a){return a->createAST (ctx);});
-				return std::make_shared <AST::Unresolved_Operation> (getPos (), iden, params, opp);
+				return std::make_shared <AST::Unresolved_Operation> (getPos (), ctx.getSourceFile (), iden, params, opp);
 				
 			}
 			

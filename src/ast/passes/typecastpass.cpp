@@ -31,19 +31,19 @@ void CastToNumberPass::visit (const Numeric & node) {
 		
 		switch (numeric.getArith ()) {
 			case Numeric::ArithmaticType::ARBITRARY:
-				nPtr = std::make_shared <CastToArbPrec> (nPtr->getPos (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
+				nPtr = std::make_shared <CastToArbPrec> (nPtr->getPos (), nPtr->getFile (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
 				break;
 			case Numeric::ArithmaticType::DECINT:
-				nPtr = std::make_shared <CastToDecimal> (nPtr->getPos (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
+				nPtr = std::make_shared <CastToDecimal> (nPtr->getPos (), nPtr->getFile (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
 				break;
 			case Numeric::ArithmaticType::INT:
-				nPtr = std::make_shared <CastToInt> (nPtr->getPos (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
+				nPtr = std::make_shared <CastToInt> (nPtr->getPos (), nPtr->getFile (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
 				break;
 			case Numeric::ArithmaticType::FPINT:
-				nPtr = std::make_shared <CastToFloat> (nPtr->getPos (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
+				nPtr = std::make_shared <CastToFloat> (nPtr->getPos (), nPtr->getFile (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
 				break;
 			case Numeric::ArithmaticType::UINT:
-				nPtr = std::make_shared <CastToUint> (nPtr->getPos (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
+				nPtr = std::make_shared <CastToUint> (nPtr->getPos (), nPtr->getFile (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
 				break;
 		}
 		

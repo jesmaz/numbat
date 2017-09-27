@@ -9,7 +9,7 @@ string Number::toString (text::PrintMode mode) const {
 	return value;
 }
 
-Number::Number (numbat::lexer::position pos, const string & value) : Value (pos, [&](){
+Number::Number (numbat::lexer::position pos, const numbat::File * file, const string & value) : Value (pos, file, [&](){
 	if (value.back () == 'd') {
 		return Numeric::get (Numeric::ArithmaticType::FPINT, 64);
 	} else if (value.back () == 'f') {

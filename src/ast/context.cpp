@@ -58,10 +58,10 @@ void Context::func (const string & str, FuncPtr func) {
 	auto var = variables->find (str);
 	if (var == variables->end () or var->second->owner != this) {
 		auto f = std::make_shared <variable_t> (variable_t {
-			std::make_shared <AST::Function_Set> (func->getPos (), ptr),
+			std::make_shared <AST::Function_Set> (func->getPos (), sourceFile, ptr),
 			this
 		});
-		this->var (str, std::make_shared <AST::Function_Set> (func->getPos (), ptr));
+		this->var (str, std::make_shared <AST::Function_Set> (func->getPos (), sourceFile, ptr));
 		std::cerr << "RRRRRRRRRRRRRR " << str << " " << std::hex << (void*)this << std::endl;
 		
 	}

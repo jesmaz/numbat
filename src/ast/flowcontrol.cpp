@@ -26,7 +26,7 @@ string IfElse::toString (text::PrintMode mode) const {
 	}
 }
 
-IfElse::IfElse (numbat::lexer::position pos, const VarPtr & var, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, var->getType ()), cond (cond), body (body), alt (alt), retVar (var) {
+IfElse::IfElse (numbat::lexer::position pos, const numbat::File * file, const VarPtr & var, const NodePtr & cond, const NodePtr & body, const NodePtr & alt) : Node (pos, file, var->getType ()), cond (cond), body (body), alt (alt), retVar (var) {
 	
 }
 

@@ -1,3 +1,4 @@
+#include <ast/context.hpp>
 #include <ast/type.hpp>
 #include <parse/tree/keyword.hpp>
 
@@ -5,9 +6,9 @@
 namespace parser {
 
 
-AST::TypePtr ParseTreeKeyword::createASTtype (AST::Context &) {
+AST::TypePtr ParseTreeKeyword::createASTtype (AST::Context & ctx) {
 	
-	AST::TypePtr type = std::make_shared <AST::Inferred> (getPos ());
+	AST::TypePtr type = std::make_shared <AST::Inferred> (getPos (), ctx.getSourceFile ());
 	if (sym == "ref") {
 		type = AST::Const::get (type);
 		type = AST::Ref::get (type);

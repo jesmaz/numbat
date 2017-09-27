@@ -55,7 +55,7 @@ class MakeCallPass : public ResolvePass {
 		virtual void visit (const Struct & node);
 		virtual void visit (const Variable & node);
 		
-		MakeCallPass (numbat::lexer::position pos, const BasicArray <NodePtr> & args) : pos (pos), args (args) {}
+		MakeCallPass (numbat::lexer::position pos, const numbat::File * file, const BasicArray <NodePtr> & args) : pos (pos), file (file), args (args) {}
 		
 		NodePtr operator () (const NodePtr & node);
 		
@@ -63,6 +63,7 @@ class MakeCallPass : public ResolvePass {
 	private:
 		
 		numbat::lexer::position pos;
+		const numbat::File * file;
 		const BasicArray <NodePtr> & args;
 		
 };
@@ -78,8 +79,8 @@ class CallMethodPass : public ShallNotPass {
 		virtual void visit (const Ref & node);
 		virtual void visit (const Struct & node);
 		
-		CallMethodPass (numbat::lexer::position pos, const BasicArray <NodePtr> & args) : defaultAction (parser::OPERATION::NONE), pos (pos), args (args) {}
-		CallMethodPass (numbat::lexer::position pos, parser::OPERATION defaultAction, const BasicArray <NodePtr> & args) : defaultAction (defaultAction), pos (pos), args (args) {}
+		CallMethodPass (numbat::lexer::position pos, const numbat::File * file, const BasicArray <NodePtr> & args) : defaultAction (parser::OPERATION::NONE), pos (pos), file (file), args (args) {}
+		CallMethodPass (numbat::lexer::position pos, const numbat::File * file, parser::OPERATION defaultAction, const BasicArray <NodePtr> & args) : defaultAction (defaultAction), pos (pos), file (file), args (args) {}
 		
 		//NodePtr operator () (const NodePtr & node);
 		
@@ -88,6 +89,7 @@ class CallMethodPass : public ShallNotPass {
 		
 		parser::OPERATION defaultAction;
 		numbat::lexer::position pos;
+		const numbat::File * file;
 		const BasicArray <NodePtr> & args;
 		
 };
@@ -108,7 +110,7 @@ class ConstructorSelectionPass : public ShallNotPass {
 		virtual void visit (const ReflectType & node);
 		virtual void visit (const Struct & node);
 		
-		ConstructorSelectionPass (numbat::lexer::position pos, const VarPtr & var, const BasicArray <NodePtr> & args) : pos (pos), var (var), args (args) {}
+		ConstructorSelectionPass (numbat::lexer::position pos, const numbat::File * file, const VarPtr & var, const BasicArray <NodePtr> & args) : pos (pos), file (file), var (var), args (args) {}
 		
 		NodePtr operator () (const NodePtr & node);
 		
@@ -116,6 +118,7 @@ class ConstructorSelectionPass : public ShallNotPass {
 	private:
 		
 		numbat::lexer::position pos;
+		const numbat::File * file;
 		const VarPtr & var;
 		const BasicArray <NodePtr> & args;
 		TypePtr replacementType = nullptr;

@@ -13,9 +13,9 @@ string Variable::toString (text::PrintMode mode) const {
 	}
 }
 
-Variable::Variable (numbat::lexer::position pos, const string & iden, const TypePtr & type) : Node (pos, type), identifier (iden), currentValue (std::make_shared <Number> (pos, "0")) {}
+Variable::Variable (numbat::lexer::position pos, const numbat::File * file, const string & iden, const TypePtr & type) : Node (pos, file, type), identifier (iden), currentValue (std::make_shared <Number> (pos, file, "0")) {}
 
-Variable::Variable (numbat::lexer::position pos, const string & iden, const TypePtr & type, const ValPtr & val) : Node (pos, type), identifier (iden), currentValue (val) {}
+Variable::Variable (numbat::lexer::position pos, const numbat::File * file, const string & iden, const TypePtr & type, const ValPtr & val) : Node (pos, file, type), identifier (iden), currentValue (val) {}
 
 
 }

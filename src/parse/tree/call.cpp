@@ -28,7 +28,7 @@ AST::NodePtr ParseTreeCall::createAST (AST::Context & ctx) {
 	
 	auto callee = iden->createAST (ctx);
 	auto params = args.map <AST::NodePtr> ([&](auto & a){return a->createAST (ctx);});
-	return std::make_shared <AST::Unresolved_Call> (getPos (), callee, params);
+	return std::make_shared <AST::Unresolved_Call> (getPos (), ctx.getSourceFile (), callee, params);
 	
 }
 

@@ -1,4 +1,5 @@
 #include <ast/type.hpp>
+#include <file.hpp>
 
 
 namespace AST {
@@ -48,7 +49,7 @@ TypePtr Array::get (const TypePtr & base) {
 	if (itt != arrayMap.end ()) {
 		return itt->second;
 	}
-	return arrayMap [base] = TypePtr (new Array (base->getPos (), base));
+	return arrayMap [base] = TypePtr (new Array (base->getPos (), base->getFile (), base));
 }
 
 TypePtr Const::get (const TypePtr & base) {
@@ -56,7 +57,7 @@ TypePtr Const::get (const TypePtr & base) {
 	if (itt != constMap.end ()) {
 		return itt->second;
 	}
-	return constMap [base] = TypePtr (new Const (base->getPos (), base));
+	return constMap [base] = TypePtr (new Const (base->getPos (), base->getFile (), base));
 }
 
 TypePtr Ref::get (const TypePtr & base) {
@@ -64,7 +65,7 @@ TypePtr Ref::get (const TypePtr & base) {
 	if (itt != refMap.end ()) {
 		return itt->second;
 	}
-	return refMap [base] = TypePtr (new Ref (base->getPos (), base));
+	return refMap [base] = TypePtr (new Ref (base->getPos (), base->getFile (), base));
 }
 
 TypePtr Numeric::get (ArithmaticType arith, uint32_t minPrecision) {
@@ -82,7 +83,7 @@ TypePtr Numeric::get (ArithmaticType arith, uint32_t minPrecision) {
 	if (itt != numericMap.end ()) {
 		return itt->second;
 	} else {
-		return numericMap [converter.key] = TypePtr (new Numeric ({0, 0}, arith, minPrecision));
+		return numericMap [converter.key] = TypePtr (new Numeric ({0, 0}, numbat::File::builtIn (), arith, minPrecision));
 	}
 }
 

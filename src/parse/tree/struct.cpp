@@ -11,12 +11,12 @@ namespace parser {
 
 
 AST::TypePtr Struct::createType (AST::Context & ctx) {
-	return stype = std::make_shared <AST::Struct> (getPos (), iden);
+	return stype = std::make_shared <AST::Struct> (getPos (), ctx.getSourceFile (), iden);
 }
 
 AST::NodePtr Struct::createAST (AST::Context & ctx) {
 	if (not stype) {
-		stype = std::make_shared <AST::Struct> (getPos (), iden);
+		stype = std::make_shared <AST::Struct> (getPos (), ctx.getSourceFile (), iden);
 	}
 	stype->members = members.map <AST::NodePtr> ([&](auto & m){return m->createASTparam (ctx);});
 	return stype;

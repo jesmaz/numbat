@@ -21,14 +21,16 @@ class Node {
 		TypePtr getType () const {return type;}
 		
 		numbat::lexer::position getPos () const {return pos;}
+		const numbat::File * getFile () const {return file;}
 		
-		Node (numbat::lexer::position pos) : pos (pos) {}
-		Node (numbat::lexer::position pos, const TypePtr & type) : pos (pos), type (type) {}
+		Node (numbat::lexer::position pos, const numbat::File * file) : pos (pos), file (file) {}
+		Node (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type) : pos (pos), file (file), type (type) {}
 		
 	protected:
 	private:
 		
 		numbat::lexer::position pos;
+		const numbat::File * file;
 		TypePtr type;
 		
 };

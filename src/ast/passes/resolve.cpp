@@ -16,19 +16,19 @@ void ResolvePass::visit (const Sequence & node) {
 	auto nodes = node.getNodes ().map <NodePtr> ([&](auto & n) {
 		return this->visit (n);
 	});
-	nPtr = std::make_shared <Sequence> (node.getPos (), nodes.back ()->getType (), nodes);
+	nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), nodes.back ()->getType (), nodes);
 }
 
 void ResolvePass::visit (const Variable & node) {
 	auto type = ResolveTypePass () (node.getType ());
-	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getIden (), type, node.getCurrentValue ());
+	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getFile (), node.getIden (), type, node.getCurrentValue ());
 }
 
 void ResolvePass::visit (const Unresolved_Call & node) {
 	auto args = node.getArgs ().map <NodePtr> ([&](auto & arg) {
 		return this->visit (arg);
 	});
-	nPtr = MakeCallPass (node.getPos (), args) (node.getCallee ());
+	nPtr = MakeCallPass (node.getPos (), node.getFile (), args) (node.getCallee ());
 	assert (nPtr);
 }
 
@@ -37,7 +37,7 @@ void ResolvePass::visit (const Unresolved_Constructor & node) {
 		return this->visit (arg);
 	});
 	auto var = this->visit (node.getVar ());
-	nPtr = ConstructorSelectionPass (node.getPos (), node.getVar (), args) (node.getVar ()->getType ());
+	nPtr = ConstructorSelectionPass (node.getPos (), node.getFile (), node.getVar (), args) (node.getVar ()->getType ());
 }
 
 void ResolvePass::visit (const Unresolved_Operation & node) {
@@ -56,21 +56,21 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 	if (/*TODO: Check for complex types*/ false) {
 		
 	} else if (args.size () == 1 or types [0] == types [1]) {
-		nPtr = std::make_shared <Basic_Operation> (node.getPos (), types [0], node.getIden (), args, node.getOpp ());
+		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), types [0], node.getIden (), args, node.getOpp ());
 		
 	} else if (args.size () == 2) {
 		auto arbNum = Numeric::get (Numeric::ArithmaticType::ARBITRARY, 0);
 		if (types [0] == arbNum and typeid (*types [1]) == typeid (Numeric)) {
-			nPtr = std::make_shared <Basic_Operation> (node.getPos (), types [1], node.getIden (), args, node.getOpp ());
+			nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), types [1], node.getIden (), args, node.getOpp ());
 		} else if (types [1] == arbNum and typeid (*types [0]) == typeid (Numeric)) {
-			nPtr = std::make_shared <Basic_Operation> (node.getPos (), types [0], node.getIden (), args, node.getOpp ());
+			nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), types [0], node.getIden (), args, node.getOpp ());
 		} else {
 			//TODO: raise an error
 			abort ();
 		}
 		
 	} else {
-		nPtr = std::make_shared <Basic_Operation> (node.getPos (), args [0]->getType (), node.getIden (), args, node.getOpp ());
+		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), args [0]->getType (), node.getIden (), args, node.getOpp ());
 		
 	}
 	
@@ -83,13 +83,13 @@ void ResolvePass::visit (const Unresolved_IfElse & node) {
 	
 	//TODO: Make sure body & alt types are compatible with the return type
 	
-	VarPtr var = std::make_shared <Variable> (node.getPos (), "tmp", body->getType ());
-	body = std::make_shared <Basic_Operation> (node.getPos (), " = ", BasicArray <NodePtr> {var, body}, parser::OPERATION::ASSIGN);
+	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), "tmp", body->getType ());
+	body = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, body}, parser::OPERATION::ASSIGN);
 	if (alt) {
-		alt = std::make_shared <Basic_Operation> (node.getPos (), " = ", BasicArray <NodePtr> {var, alt}, parser::OPERATION::ASSIGN);
+		alt = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, alt}, parser::OPERATION::ASSIGN);
 	}
 	
-	nPtr = std::make_shared <IfElse> (node.getPos (), var, cond, body, alt);
+	nPtr = std::make_shared <IfElse> (node.getPos (), node.getFile (), var, cond, body, alt);
 }
 
 void ResolveTypePass::visit (const ReflectType & node) {
@@ -134,16 +134,16 @@ void MakeCallPass::visit (const Function_Set & node) {
 		
 		switch (params.size ()) {
 			case 0:
-				nPtr = std::make_shared <Call_0> (pos, f);
+				nPtr = std::make_shared <Call_0> (pos, file, f);
 				break;
 			case 1:
-				nPtr = std::make_shared <Call_1> (pos, f, params [0]);
+				nPtr = std::make_shared <Call_1> (pos, file, f, params [0]);
 				break;
 			case 2:
-				nPtr = std::make_shared <Call_2> (pos, f, params [0], params [1]);
+				nPtr = std::make_shared <Call_2> (pos, file, f, params [0], params [1]);
 				break;
 			default:
-				nPtr = std::make_shared <Call_n> (pos, f, params);
+				nPtr = std::make_shared <Call_n> (pos, file, f, params);
 				break;
 		}
 	}
@@ -207,7 +207,7 @@ void ConstructorSelectionPass::visit (const Inferred & node) {
 	} if (args.size () == 1) {
 		std::cerr << args.front ()->toString (text::PrintMode::COLOUR) << std::endl;
 		assert (replacementType = args.front ()->getType ());
-		nPtr = std::make_shared <Basic_Operation> (node.getPos (), " = ", BasicArray <NodePtr> {var, args.front ()}, parser::OPERATION::ASSIGN);
+		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, args.front ()}, parser::OPERATION::ASSIGN);
 	} else {
 		//TODO: Set to tuple
 		abort ();
@@ -223,7 +223,7 @@ void ConstructorSelectionPass::visit (const Numeric & node) {
 	//TODO: Check arguments for compatibility
 	if (args.size () == 1) {
 		auto arg = CastToNumberPass (node) (args [0]);
-		nPtr = std::make_shared <Basic_Operation> (var->getPos (), " = ", BasicArray <NodePtr> {var, arg}, parser::OPERATION::ASSIGN);
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), " = ", BasicArray <NodePtr> {var, arg}, parser::OPERATION::ASSIGN);
 	}
 }
 
@@ -247,7 +247,7 @@ NodePtr ConstructorSelectionPass::operator () (const NodePtr & node) {
 	nPtr = var;
 	node->accept (*this);
 	if (replacementType) {
-		*var = Variable (var->getPos (), var->getIden (), replacementType, var->getCurrentValue ());
+		*var = Variable (var->getPos (), var->getFile (), var->getIden (), replacementType, var->getCurrentValue ());
 	}
 	return nPtr;
 }

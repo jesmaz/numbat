@@ -124,6 +124,7 @@ void FoldConstPass::visit (const Basic_Operation & node) {
 	} else {
 		nPtr = std::make_shared <Basic_Operation> (
 			node.getPos (),
+			node.getFile (),
 			node.getType (),
 			node.getIden (),
 			args,
@@ -136,7 +137,7 @@ void FoldConstPass::visit (const Call_0 & node) {
 	if (foldable (node.getFunc ())) {
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({}));
+			nPtr = group (native ({}, {node.getPos ()}));
 		} else {
 			abort ();
 		}
@@ -149,7 +150,7 @@ void FoldConstPass::visit (const Call_1 & node) {
 		if (!arg->isValue ()) return;
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({arg}));
+			nPtr = group (native ({arg}, {node.getPos ()}));
 		} else {
 			abort ();
 		}
@@ -163,7 +164,7 @@ void FoldConstPass::visit (const Call_2 & node) {
 		if (!lhs->isValue () or !rhs->isValue ()) return;
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({lhs, rhs}));
+			nPtr = group (native ({lhs, rhs}, {node.getPos ()}));
 		} else {
 			abort ();
 		}
@@ -253,7 +254,7 @@ void FoldConstPass::visit (const CastToInt & node) {
 				}
 				break;
 		}
-		nPtr = std::make_shared <Number> (nPtr->getPos (), result, targetType);
+		nPtr = std::make_shared <Number> (nPtr->getPos (), nPtr->getFile (), result, targetType);
 	}
 }
 
@@ -275,7 +276,7 @@ void FoldConstPass::visit (const Sequence & node) {
 	} else if (args.size () > 1 and allValues) {
 		nPtr = args.back ();
 	} else {
-		nPtr = std::make_shared <Sequence> (node.getPos (), args);
+		nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), args);
 	}
 	//TODO: chain onto a pruning pass (might as well do it here)
 }

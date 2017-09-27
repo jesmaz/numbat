@@ -17,7 +17,7 @@ class Call_n : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_n (numbat::lexer::position pos, const FuncPtr & func, const BasicArray <NodePtr> & args) : Node (pos), func (func), args (args) {}
+		Call_n (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func, const BasicArray <NodePtr> & args) : Node (pos, file), func (func), args (args) {}
 		
 	protected:
 	private:
@@ -36,7 +36,7 @@ class Call_0 : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_0 (numbat::lexer::position pos, const FuncPtr & func) : Node (pos), func (func) {}
+		Call_0 (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func) : Node (pos, file), func (func) {}
 		
 	protected:
 	private:
@@ -55,7 +55,7 @@ class Call_1 : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_1 (numbat::lexer::position pos, const FuncPtr & func, const NodePtr & arg) : Node (pos), func (func), arg (arg) {}
+		Call_1 (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func, const NodePtr & arg) : Node (pos, file), func (func), arg (arg) {}
 		
 	protected:
 	private:
@@ -76,7 +76,7 @@ class Call_2 : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_2 (numbat::lexer::position pos, const FuncPtr & func, const NodePtr & lhs, const NodePtr & rhs) : Node (pos), func (func), lhs (lhs), rhs (rhs) {}
+		Call_2 (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func, const NodePtr & lhs, const NodePtr & rhs) : Node (pos, file), func (func), lhs (lhs), rhs (rhs) {}
 		
 	protected:
 	private:
@@ -96,7 +96,7 @@ class Unresolved_Call : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Unresolved_Call (numbat::lexer::position pos, NodePtr callee, const BasicArray <NodePtr> & args) : Node (pos), callee (callee), args (args) {}
+		Unresolved_Call (numbat::lexer::position pos, const numbat::File * file, NodePtr callee, const BasicArray <NodePtr> & args) : Node (pos, file), callee (callee), args (args) {}
 		
 	protected:
 	private:
@@ -116,7 +116,7 @@ class Unresolved_Constructor : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Unresolved_Constructor (numbat::lexer::position pos, VarPtr var, const BasicArray <NodePtr> & args) : Node (pos), var (var), args (args) {}
+		Unresolved_Constructor (numbat::lexer::position pos, const numbat::File * file, VarPtr var, const BasicArray <NodePtr> & args) : Node (pos, file), var (var), args (args) {}
 		
 	protected:
 	private:

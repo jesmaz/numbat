@@ -53,7 +53,7 @@ void Reflect::initAPI () {
 			size_t typeID = reverseTypeIDmap.size ();
 			typeIDmap [refType] = typeID;
 			reverseTypeIDmap.push_back (refType);
-			return {std::make_shared <AST::Number> (number->getPos (), std::to_string (typeID), number->getType ())};
+			return {std::make_shared <AST::Number> (number->getPos (), number->getFile (), std::to_string (typeID), number->getType ())};
 		}
 	));
 }

@@ -47,7 +47,7 @@ class Function_Ptr : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Function_Ptr (numbat::lexer::position pos, const FuncPtr & func) : Node (pos), func (func) {}
+		Function_Ptr (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func) : Node (pos, file), func (func) {}
 		
 	protected:
 	private:

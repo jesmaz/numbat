@@ -15,7 +15,7 @@ class Value : public Node {
 		virtual bool isValue () const {return true;}
 		
 		
-		Value (numbat::lexer::position pos, const TypePtr & type) : Node (pos, type) {}
+		Value (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type) : Node (pos, file, type) {}
 		
 	protected:
 	private:
@@ -31,8 +31,8 @@ class Number : public Value {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Number (numbat::lexer::position pos, const string & value);
-		Number (numbat::lexer::position pos, const string & value, const TypePtr & type) : Value (pos, type), value (value) {}
+		Number (numbat::lexer::position pos, const numbat::File * file, const string & value);
+		Number (numbat::lexer::position pos, const numbat::File * file, const string & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
 		
 	protected:
 	private:

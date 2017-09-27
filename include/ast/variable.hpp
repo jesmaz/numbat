@@ -18,8 +18,8 @@ class Variable : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Variable (numbat::lexer::position pos, const string & iden, const TypePtr & type);
-		Variable (numbat::lexer::position pos, const string & iden, const TypePtr & type, const ValPtr & currentVal);
+		Variable (numbat::lexer::position pos, const numbat::File * file, const string & iden, const TypePtr & type);
+		Variable (numbat::lexer::position pos, const numbat::File * file, const string & iden, const TypePtr & type, const ValPtr & currentVal);
 		
 	protected:
 	private:

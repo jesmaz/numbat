@@ -11,8 +11,8 @@ class Operation : public Node {
 	
 	public:
 		
-		Operation (numbat::lexer::position pos) : Node (pos) {}
-		Operation (numbat::lexer::position pos, const TypePtr & type) : Node (pos, type) {}
+		Operation (numbat::lexer::position pos, const numbat::File * file) : Node (pos, file) {}
+		Operation (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type) : Node (pos, file, type) {}
 		
 	protected:
 	private:
@@ -42,8 +42,8 @@ class Unresolved_Operation : public Operation {
 			return s + ")";
 		}
 		
-		Unresolved_Operation (numbat::lexer::position pos, const string & iden, const BasicArray <NodePtr> & args, parser::OPERATION opp) : 
-		                      Operation (pos),
+		Unresolved_Operation (numbat::lexer::position pos, const numbat::File * file, const string & iden, const BasicArray <NodePtr> & args, parser::OPERATION opp) : 
+		                      Operation (pos, file),
 		                      iden (iden),
 		                      args (args),
 		                      opp (opp) {}
@@ -78,14 +78,14 @@ class Basic_Operation : public Operation {
 			return s + ")";
 		}
 		
-		Basic_Operation (numbat::lexer::position pos, const string & iden, const BasicArray <NodePtr> & args, parser::OPERATION opp) : 
-		                 Operation (pos),
+		Basic_Operation (numbat::lexer::position pos, const numbat::File * file, const string & iden, const BasicArray <NodePtr> & args, parser::OPERATION opp) : 
+		                 Operation (pos, file),
 		                 iden (iden),
 		                 args (args),
 		                 opp (opp)  {}
 		
-		Basic_Operation (numbat::lexer::position pos, const TypePtr & type, const string & iden, const BasicArray <NodePtr> & args, parser::OPERATION opp) : 
-		                 Operation (pos, type),
+		Basic_Operation (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const string & iden, const BasicArray <NodePtr> & args, parser::OPERATION opp) : 
+		                 Operation (pos, file, type),
 		                 iden (iden),
 		                 args (args),
 		                 opp (opp)  {}

@@ -15,9 +15,9 @@ class Sequence : public Node {
 		const BasicArray <NodePtr> & getNodes () const {return nodes;}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Sequence (numbat::lexer::position pos) : Node (pos) {}
-		Sequence (numbat::lexer::position pos, const BasicArray <NodePtr> & nodes) : Node (pos), nodes (nodes) {}
-		Sequence (numbat::lexer::position pos, const TypePtr & type, const BasicArray <NodePtr> & nodes) : Node (pos, type), nodes (nodes) {}
+		Sequence (numbat::lexer::position pos, const numbat::File * file) : Node (pos, file) {}
+		Sequence (numbat::lexer::position pos, const numbat::File * file, const BasicArray <NodePtr> & nodes) : Node (pos, file), nodes (nodes) {}
+		Sequence (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const BasicArray <NodePtr> & nodes) : Node (pos, file, type), nodes (nodes) {}
 		
 	protected:
 	private:

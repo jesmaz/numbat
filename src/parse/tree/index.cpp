@@ -17,12 +17,12 @@ AST::NodePtr ParseTreeIndex::createAST (AST::Context & ctx) {
 	for (size_t i=1; i<oppArgs.size (); ++i)  {
 		oppArgs [i] = args [i-1]->createAST (ctx);
 	}
-	return std::make_shared <AST::Unresolved_Operation> (getPos (), " [ ]", oppArgs, OPERATION::INDEX);
+	return std::make_shared <AST::Unresolved_Operation> (getPos (), ctx.getSourceFile (), " [ ]", oppArgs, OPERATION::INDEX);
 	
 }
 
 AST::TypePtr ParseTreeIndex::createASTtype (AST::Context & ctx) {
-	return std::make_shared <AST::ArrayInit> (getPos (), index->createASTtype (ctx), args [0]->createAST (ctx), nullptr);
+	return std::make_shared <AST::ArrayInit> (getPos (), ctx.getSourceFile (), index->createASTtype (ctx), args [0]->createAST (ctx), nullptr);
 }
 
 const nir::Instruction * ParseTreeIndex::build (nir::Scope * scope) {

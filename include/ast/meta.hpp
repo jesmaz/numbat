@@ -21,7 +21,7 @@ class Reflect : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Reflect (numbat::lexer::position pos, const NodePtr & metaTag, const NodePtr & target) : Node (pos), metaTag (metaTag), target (target) {}
+		Reflect (numbat::lexer::position pos, const numbat::File * file, const NodePtr & metaTag, const NodePtr & target) : Node (pos, file), metaTag (metaTag), target (target) {}
 		
 	protected:
 	private:
@@ -48,7 +48,7 @@ class ReflectType : public Type {
 	protected:
 	private:
 		
-		ReflectType (const NodePtr & metaTag, const TypePtr & target) : Type (metaTag->getPos ()), metaTag (metaTag), target (target) {}
+		ReflectType (const NodePtr & metaTag, const TypePtr & target) : Type (metaTag->getPos (), metaTag->getFile ()), metaTag (metaTag), target (target) {}
 		
 		NodePtr metaTag;
 		TypePtr target;

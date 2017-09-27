@@ -66,7 +66,7 @@ AST::NodePtr SpecificOperator <OPERATION::AND>::createAST (AST::Context & ctx) {
 		
 	} else {
 		auto params = args.map <AST::NodePtr> ([&](auto & a) {return a->createAST (ctx);});
-		return std::make_shared <AST::And> (getPos (), params [0], params [1]);
+		return std::make_shared <AST::And> (getPos (), ctx.getSourceFile (), params [0], params [1]);
 	}
 }
 
@@ -79,7 +79,8 @@ AST::NodePtr SpecificOperator <OPERATION::AS>::createAST (AST::Context & ctx) {
 	} else {
 		BasicArray <AST::NodePtr> params = {args [0]->createAST (ctx), args [1]->createASTtype (ctx)};
 		return std::make_shared <AST::Unresolved_Operation> (
-			getPos (), 
+			getPos (),
+			ctx.getSourceFile (), 
 			iden, 
 			params,
 			OPERATION::AS
@@ -96,7 +97,7 @@ AST::NodePtr SpecificOperator <OPERATION::OR>::createAST (AST::Context & ctx) {
 		
 	} else {
 		auto params = args.map <AST::NodePtr> ([&](auto & a) {return a->createAST (ctx);});
-		return std::make_shared <AST::Or> (getPos (), params [0], params [1]);
+		return std::make_shared <AST::Or> (getPos (), ctx.getSourceFile (), params [0], params [1]);
 	}
 }
 

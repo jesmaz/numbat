@@ -19,10 +19,11 @@ void ReflectPass::visit (const ReflectType & node) {
 	auto target = node.getTarget ();
 	auto arg = std::make_shared <Number> (
 		node.getPos (),
+		node.getFile (),
 		std::to_string (ReflectType::getTypeId (target)),
 		Numeric::get (Numeric::ArithmaticType::INT, 0)
 	);
-	auto call = MakeCallPass (node.getPos (), {arg}) (metaTag);
+	auto call = MakeCallPass (node.getPos (), node.getFile (), {arg}) (metaTag);
 	auto res = FoldConstPass () (call);
 	auto typeID = std::dynamic_pointer_cast <Number> (res);
 	if (typeID) {
@@ -37,7 +38,7 @@ void ReflectPass::visit (const ReflectType & node) {
 void ReflectPass::visit (const Variable & node) {
 	
 	auto type = std::dynamic_pointer_cast <Type> (ReflectPass () (node.getType ()));
-	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getIden (), type, node.getCurrentValue ());
+	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getFile (), node.getIden (), type, node.getCurrentValue ());
 	
 }
 

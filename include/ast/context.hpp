@@ -92,7 +92,7 @@ class Function_Set : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Function_Set (numbat::lexer::position pos, const std::shared_ptr <Context::function_t> & set) : Node (pos), set (set) {}
+		Function_Set (numbat::lexer::position pos, const numbat::File * file, const std::shared_ptr <Context::function_t> & set) : Node (pos, file), set (set) {}
 		
 	protected:
 	private:

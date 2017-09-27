@@ -15,7 +15,7 @@ class CastToNumber : public Node {
 		
 		virtual string toString (text::PrintMode mode) const;
 		
-		CastToNumber (numbat::lexer::position pos, const TypePtr & type, const NodePtr & node) : Node (pos, type), node (node) {}
+		CastToNumber (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & node) : Node (pos, file, type), node (node) {}
 		
 	protected:
 	private:
@@ -30,7 +30,7 @@ class CastToArbPrec : public CastToNumber {
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		
-		CastToArbPrec (numbat::lexer::position pos, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, type, node) {}
+		CastToArbPrec (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, file, type, node) {}
 		
 	protected:
 	private:
@@ -43,7 +43,7 @@ class CastToInt : public CastToNumber {
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		
-		CastToInt (numbat::lexer::position pos, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, type, node) {}
+		CastToInt (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, file, type, node) {}
 		
 	protected:
 	private:
@@ -56,7 +56,7 @@ class CastToDecimal : public CastToNumber {
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		
-		CastToDecimal (numbat::lexer::position pos, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, type, node) {}
+		CastToDecimal (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, file, type, node) {}
 		
 	protected:
 	private:
@@ -69,7 +69,7 @@ class CastToFloat : public CastToNumber {
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		
-		CastToFloat (numbat::lexer::position pos, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, type, node) {}
+		CastToFloat (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, file, type, node) {}
 		
 	protected:
 	private:
@@ -82,7 +82,7 @@ class CastToUint : public CastToNumber {
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		
-		CastToUint (numbat::lexer::position pos, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, type, node) {}
+		CastToUint (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const NodePtr & node) : CastToNumber (pos, file, type, node) {}
 		
 	protected:
 	private:

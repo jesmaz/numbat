@@ -42,7 +42,7 @@ AST::NodePtr Function::createAST (AST::Context & ctx) {
 	
 	auto func = createFunc (ctx);
 	fPtr->body = body->createAST (*context);
-	return std::make_shared <AST::Function_Ptr> (getPos (), std::move (func));
+	return std::make_shared <AST::Function_Ptr> (getPos (), ctx.getSourceFile (), std::move (func));
 	
 }
 
