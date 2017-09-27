@@ -55,6 +55,9 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 	
 	if (/*TODO: Check for complex types*/ false) {
 		
+	} else if (isPredicate (node.getOpp ())) {
+		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), node.getIden (), args, node.getOpp ());
+		
 	} else if (args.size () == 1 or types [0] == types [1]) {
 		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), types [0], node.getIden (), args, node.getOpp ());
 		
