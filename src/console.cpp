@@ -9,8 +9,6 @@
 
 int numbatMain (const Config & cfg) {
 	
-	nir::Module nirmodule;
-	auto globalScope = nirmodule.getGlobalScope ();
 	numbat::File dummyFile;
 	AST::Context context (&dummyFile);
 	
@@ -25,14 +23,6 @@ int numbatMain (const Config & cfg) {
 		}
 		auto parseTree = parser::parse (line, &dummyFile);
 		std::cerr << parseTree->toString () << std::endl;
-		
-		if (report::compilationFailed ()) {
-			report::printLogs ();
-			report::reset ();
-			continue;
-		}
-		
-		parseTree->declare (globalScope);
 		
 		if (report::compilationFailed ()) {
 			report::printLogs ();
@@ -60,6 +50,12 @@ int numbatMain (const Config & cfg) {
 		}
 		
 		auto val = AST::ExecutePass () (ast);
+		
+		if (report::compilationFailed ()) {
+			report::printLogs ();
+			report::reset ();
+			continue;
+		}
 		
 		if (val) {
 			std::cout << val->toString (text::PrintMode::PLAIN) << std::endl;
