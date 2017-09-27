@@ -137,7 +137,7 @@ void FoldConstPass::visit (const Call_0 & node) {
 	if (foldable (node.getFunc ())) {
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({}, {node.getPos ()}));
+			nPtr = group (native ({}, {node.getPos (), node.getFile ()}));
 		} else {
 			abort ();
 		}
@@ -150,7 +150,7 @@ void FoldConstPass::visit (const Call_1 & node) {
 		if (!arg->isValue ()) return;
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({arg}, {node.getPos ()}));
+			nPtr = group (native ({arg}, {node.getPos (), node.getFile ()}));
 		} else {
 			abort ();
 		}
@@ -164,7 +164,7 @@ void FoldConstPass::visit (const Call_2 & node) {
 		if (!lhs->isValue () or !rhs->isValue ()) return;
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({lhs, rhs}, {node.getPos ()}));
+			nPtr = group (native ({lhs, rhs}, {node.getPos (), node.getFile ()}));
 		} else {
 			abort ();
 		}

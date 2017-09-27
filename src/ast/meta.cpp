@@ -12,7 +12,7 @@ std::map <TypePtr, size_t> typeIDmap;
 DynArray <TypePtr> reverseTypeIDmap;
 
 
-std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>)> & func) {
+std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>, const CallingData &)> & func) {
 	auto fPtr = std::make_shared <Function> ();
 	fPtr->iden = iden;
 	fPtr->nativeFunction = func;
@@ -42,7 +42,7 @@ void Reflect::initAPI () {
 		"AST.Pointer",
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
-		[](const BasicArray <NodePtr> args) -> const BasicArray <NodePtr> {
+		[](const BasicArray <NodePtr> args, const CallingData &) -> const BasicArray <NodePtr> {
 			assert (args.size () == 1);
 			assert (typeid (*(args [0].get ())) == typeid (AST::Number));
 			auto number = reinterpret_cast <const AST::Number*> (args [0].get ());
@@ -54,6 +54,22 @@ void Reflect::initAPI () {
 			typeIDmap [refType] = typeID;
 			reverseTypeIDmap.push_back (refType);
 			return {std::make_shared <AST::Number> (number->getPos (), number->getFile (), std::to_string (typeID), number->getType ())};
+		}
+	));
+	apiFuncs.insert (APIfunc (
+		"static_assert",
+		{Numeric::get (Numeric::ArithmaticType::UINT, 1)},
+		{Numeric::get (Numeric::ArithmaticType::UINT, 1)},
+		[](const BasicArray <NodePtr> args, const CallingData & callingData) -> const BasicArray <NodePtr> {
+			assert (args.size () == 1);
+			auto number = static_cast <const AST::Number*> (args [0].get ());
+			assert (number);
+			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::UINT, 1));
+			bool assertion = std::stoi (number->getValue ());
+			if (not assertion) {
+				report::logMessage (report::Severity::ERROR, callingData.file, callingData.position, "Static assertion failed");
+			}
+			return args;
 		}
 	));
 }

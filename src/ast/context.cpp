@@ -180,6 +180,8 @@ rootContex (this) {
 	
 	func ("@pointer", Reflect::api ("AST.Pointer"));
 	
+	func ("static_assert", Reflect::api ("static_assert"));
+	
 }
 
 string Function_Set::toString (text::PrintMode mode) const {
