@@ -27,12 +27,12 @@ class FoldConstPass : public ShallNotPass {
 		virtual void visit (const Sequence & node);
 		virtual void visit (const Variable &);
 		
-		FoldConstPass (bool readVar=false) : readVar (readVar) {}
+		FoldConstPass (bool readVar=true) : readVar (readVar) {}
 		
 	protected:
 	private:
 		
-		bool readVar=false;
+		bool readVar=true;
 		
 };
 
@@ -43,7 +43,7 @@ class ExecutePass : public FoldConstPass {
 		
 		virtual NodePtr visit (const NodePtr & node) {return ExecutePass (*this) (node);}
 		
-		ExecutePass (bool readVar=false) : FoldConstPass (readVar) {}
+		ExecutePass (bool readVar=true) : FoldConstPass (readVar) {}
 		
 	protected:
 	private:
