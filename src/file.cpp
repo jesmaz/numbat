@@ -1,5 +1,7 @@
 #include <file.hpp>
 #include <fstream>
+#include <ast/context.hpp>
+#include <ast/passes/nir.hpp>
 #include <nir/module.hpp>
 #include <nir/scope.hpp>
 #include <mutex>
@@ -90,8 +92,11 @@ File * File::compile (const string & path, nir::Module * module) {
 	}
 	
 	nir::Scope * root = module->createRootScope (f);
-	parseTree->declare (root);
-	parseTree->build (root);
+	AST::Context context (f);
+	auto ast = parseTree->createAST (context);
+	ast = AST::transform (ast);
+	AST::NirPass nirPass (root);
+	nirPass (ast);
 	f->scope = root;
 	return f;
 	
