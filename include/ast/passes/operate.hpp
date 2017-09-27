@@ -102,7 +102,7 @@ NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, 
 			}
 			break;
 	}
-	return std::make_shared <Number> (args [0]->getPos (), args [0]->getFile (), result);
+	return std::make_shared <Number> (args [0]->getPos (), args [0]->getFile (), result, Numeric::get (type.getArith (), type.getMinPrec ()));
 }
 
 template <typename FUNCTOR>
@@ -162,7 +162,7 @@ NodePtr standardBinary (const Numeric & type, const BasicArray <NodePtr> & args,
 			}
 			break;
 	}
-	return std::make_shared <Number> (args [0]->getPos (), args [1]->getFile (), result);
+	return std::make_shared <Number> (args [0]->getPos (), args [1]->getFile (), result, Numeric::get (type.getArith (), type.getMinPrec ()));
 }
 
 template <parser::OPERATION OPP>
