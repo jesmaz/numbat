@@ -116,3 +116,16 @@ set_target_properties(interpreter PROPERTIES COMPILE_FLAGS "-DN_PROMPT")
 install(FILES numbat.xml DESTINATION /usr/share/katepart5/syntax/)
 install(DIRECTORY "libnbt/" DESTINATION /usr/include/numbat)
 install(TARGETS numbat numbat-static numbat-static RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib/static)
+
+
+
+add_test(test-regression numbat test/regression.nbt)
+add_test(test-regression2 console test/regression2.nbt)
+
+add_custom_command(
+	OUTPUT regression.passed
+	COMMAND numbat -o regression.passed ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
+	DEPENDS numbat test/regression.nbt
+)
+
+add_custom_target(regression.run ALL DEPENDS regression.passed)
