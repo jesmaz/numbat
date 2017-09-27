@@ -66,6 +66,8 @@ using std::string;
 
 enum class OPERATION {ADD, AND, AS, ASSIGN, BAND, BNOT, BOR, BXOR, CMPEQ, CMPGT, CMPGTE, CMPLT, CMPLTE, CMPNE, CONCAT, DECREMENT, DIV, IN, INCREMENT, INDEX, LNOT, MUL, NEG, NONE, OR, REM, SUB, __COUNT__};
 
+bool isPredicate (OPERATION opp);
+
 
 class ParseTreeNode;
 struct Function;

@@ -365,4 +365,43 @@ const nir::Instruction * SpecificOperator <OPERATION::SUB>::defBuild (nir::Scope
 }
 
 
+bool isPredicate (OPERATION opp) {
+	switch (opp) {
+		case OPERATION::ADD:
+		case OPERATION::AND:
+		case OPERATION::AS:
+		case OPERATION::ASSIGN:
+		case OPERATION::BAND:
+		case OPERATION::BNOT:
+		case OPERATION::BOR:
+		case OPERATION::BXOR:
+			return false;
+		case OPERATION::CMPEQ:
+		case OPERATION::CMPGT:
+		case OPERATION::CMPGTE:
+		case OPERATION::CMPLT:
+		case OPERATION::CMPLTE:
+		case OPERATION::CMPNE:
+			return true;
+		case OPERATION::CONCAT:
+		case OPERATION::DECREMENT:
+		case OPERATION::DIV:
+		case OPERATION::IN:
+		case OPERATION::INCREMENT:
+		case OPERATION::INDEX:
+			return false;
+		case OPERATION::LNOT:
+			return true;
+		case OPERATION::MUL:
+		case OPERATION::NEG:
+		case OPERATION::NONE:
+		case OPERATION::OR:
+		case OPERATION::REM:
+		case OPERATION::SUB:
+		case OPERATION::__COUNT__:
+			return false;
+	}
+}
+
+
 }
