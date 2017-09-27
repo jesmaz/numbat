@@ -3,6 +3,7 @@
 #include <file.hpp>
 #include <nir/module.hpp>
 #include <utility/config.hpp>
+#include <utility/report.hpp>
 
 
 int numbatMain (const Config & cfg) {
@@ -14,12 +15,20 @@ int numbatMain (const Config & cfg) {
 		numbat::File::compile (file, &nirModule);
 	}
 	
+	if (report::compilationFailed ()) {
+		report::printLogs ();
+		return 1;
+	}
+	
 	if (not nirModule.validate ()) {
+		report::printLogs ();
 		return 1;
 	}
 	
 	nirModule.build (target);
 	target->finalise ();
-	return 0;
+	
+	report::printLogs ();
+	return report::compilationFailed ();
 	
 }
