@@ -5,18 +5,16 @@ project(numbat)
 #option(debug "debug" ON)
 
 
-execute_process(COMMAND llvm-config-3.5 --includedir OUTPUT_VARIABLE LLVM_INCLUDE_DIRS OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND llvm-config-3.5 --libdir OUTPUT_VARIABLE LLVM_LIBRARY_DIRS OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND llvm-config-3.5 --libs all-targets core jit native analysis ipo systemz OUTPUT_VARIABLE REQ_LLVM_LIBRARIES OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND llvm-config-3.5 --ldflags OUTPUT_VARIABLE LLVM_LINKER_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-#We only care about preprocessor flags
-execute_process(COMMAND llvm-config --cppflags OUTPUT_VARIABLE LLVM_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config-5.0 --includedir OUTPUT_VARIABLE LLVM_INCLUDE_DIRS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config-5.0 --libdir OUTPUT_VARIABLE LLVM_LIBRARY_DIRS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config-5.0 --libs all OUTPUT_VARIABLE REQ_LLVM_LIBRARIES OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config-5.0 --ldflags OUTPUT_VARIABLE LLVM_LINKER_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND llvm-config-5.0 --cppflags OUTPUT_VARIABLE LLVM_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 include_directories(${LLVM_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/include")
 link_directories(${LLVM_LIBRARY_DIRS})
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++14 -g -pthread -march=native ${LLVM_FLAGS}")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++14 -DUSE_LLVM=1 -g -pthread -march=native ${LLVM_FLAGS}")
 
 set(sources ${sources} "src/file.cpp")
 set(sources ${sources} "src/lexer.cpp")

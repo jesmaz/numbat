@@ -3,9 +3,9 @@
 
 #include <codegen/llvm.hpp>
 #include <iostream>
+#include <llvm/ADT/Optional.h>
 #include <llvm/Analysis/Passes.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/ExecutionEngine/JIT.h>
 #include <llvm/IR/Attributes.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/DataLayout.h>
@@ -40,15 +40,91 @@ Target::RegTarget LLVM::target ("llvm", []()->Target*{
 	llvm::InitializeAllAsmPrinters ();
 	llvm::InitializeAllAsmParsers ();
 	llvm::InitializeNativeTarget ();
-	return new LLVM;
+	
+	std::string error;
+	
+	auto targetTriple = llvm::sys::getDefaultTargetTriple ();
+	auto target = llvm::TargetRegistry::lookupTarget (targetTriple, error);
+	
+	if (not target) {
+		std::cerr << error << std::endl;
+		std::cerr << targetTriple << std::endl;
+		return nullptr;
+	}
+	
+	llvm::TargetOptions options;
+	auto rm = llvm::Optional <llvm::Reloc::Model> ();
+	auto * machine = target->createTargetMachine (targetTriple, "generic", "", options, rm);
+	
+	if (not machine) {
+		std::cerr << "could not allocate target machine" << std::endl;
+		return nullptr;
+	}
+	
+	auto * ll = new LLVM (machine);
+	ll->module->setTargetTriple (targetTriple);
+	return ll;
 });
+
+
+class LLVMConstantBuilder : public ConstVisitor <nir::FunctionPointer>, public ConstVisitor <nir::Number>, public ConstVisitor <nir::PointerType>, public ConstVisitor <nir::Struct> {
+	
+	public:
+		
+		void visit (const nir::FunctionPointer & func) {
+			
+		}
+		
+		void visit (const nir::Number & number) {
+			auto intWidth = number.calculateSize (ll->dataLayout.getPointerSize ());
+			switch (number.getArithmaticType ()) {
+				case nir::Number::ArithmaticType::DEFAULT:
+				case nir::Number::ArithmaticType::DECINT:
+					abort ();
+				case nir::Number::ArithmaticType::INT:
+				case nir::Number::ArithmaticType::UINT:
+					c = llvm::ConstantInt::get (llvm::IntegerType::getIntNTy (ll->theContext, intWidth*8), *val);
+					break;
+				case nir::Number::ArithmaticType::FPINT:
+					if (intWidth <= 2) {
+						c = llvm::ConstantFP::get (llvm::IntegerType::getHalfTy (ll->theContext), *val);
+					} else if (intWidth <= 4) {
+						c = llvm::ConstantFP::get (llvm::IntegerType::getFloatTy (ll->theContext), *val);
+					} else if (intWidth <= 8) {
+						c = llvm::ConstantFP::get (llvm::IntegerType::getDoubleTy (ll->theContext), *val);
+					} else {
+						c = llvm::ConstantFP::get (llvm::IntegerType::getFP128Ty (ll->theContext), *val);
+					}
+					break;
+			}
+		}
+		
+		void visit (const nir::PointerType & pointer) {
+			
+		}
+		
+		void visit (const nir::Struct & struc) {
+			
+		}
+		
+		llvm::Constant * operator () (const nir::Type * t) {t->accept (*this); return c;}
+		
+		LLVMConstantBuilder (LLVM * ll, const nir::AbstractValue * val) : ll (ll), val (val) {}
+		
+	private:
+		
+		LLVM * ll;
+		llvm::Constant * c;
+		const nir::AbstractValue * val;
+		
+};
 
 
 llvm::Value * LLVM::resolve (const nir::AbstractValue * val) {
 	
 	auto & v = valueDict [val];
 	if (not v) {
-		val->accept (*this);
+		v = LLVMConstantBuilder (this, val) (val->getType ());
 	}
 	assert (v);
 	return v;
@@ -91,7 +167,7 @@ llvm::Function * LLVM::resolve (const nir::Function * func) {
 	}
 	
 	llvm::FunctionType * ft = llvm::FunctionType::get (retType, params, false);
-	return f = llvm::Function::Create (ft, llvm::Function::ExternalLinkage, func->getLabel ()->iden, module);
+	return f = llvm::Function::Create (ft, llvm::Function::ExternalLinkage, func->getLabel ()->iden, module.get ());
 	
 }
 
@@ -105,49 +181,17 @@ void LLVM::finalise () {
 	
 	const Config & config = Config::globalConfig ();
 	
-	std::string error;
-	
-	llvm::Triple theTriple (module->getTargetTriple ());
-	const llvm::Target * target = llvm::TargetRegistry::lookupTarget ("x86-64", theTriple, error);
-	llvm::TargetRegistry::printRegisteredTargetsForVersion ();
-	
-	if (not target) {
-		std::cerr << error << std::endl;
-		std::cerr << theTriple.getTriple () << std::endl;
-		return;
-	}
-	
-	llvm::TargetOptions options;
-	llvm::TargetMachine * machine = target->createTargetMachine (theTriple.getTriple (), "generic", "", options);
-	
-	if (not machine) {
-		std::cerr << "could not allocate target machine" << std::endl;
-		return;
-	}
-	
-	
-	llvm::tool_output_file fout ((config.outfile + ".o").c_str (), error, llvm::sys::fs::F_None);
-	if (!error.empty ()) {
-		std::cerr << error << std::endl;
-		return;
-	}
-	
-	
-	llvm::PassManager pm;
-	pm.add (new llvm::TargetLibraryInfo (theTriple));
-	machine->addAnalysisPasses (pm);
-	pm.add (new llvm::DataLayoutPass (*machine->getDataLayout ()));
-	llvm::formatted_raw_ostream frouts (fout.os ());
-	machine->addPassesToEmitFile (pm, frouts, llvm::TargetMachine::CGFT_ObjectFile);
-	
+	std::error_code ec;
+	llvm::raw_fd_ostream fout ((config.outfile + ".o").c_str (), ec, llvm::sys::fs::F_None);
+	llvm::legacy::PassManager pm;
+	targetMachine->addPassesToEmitFile (pm, fout, llvm::TargetMachine::CGFT_ObjectFile);
 	pm.run (*module);
-	fout.keep ();
+	fout.flush ();
 	
 }
 
 void LLVM::reset () {
-	delete module;
-	new (this) LLVM;
+	abort ();
 }
 
 
@@ -251,7 +295,7 @@ void LLVM::visit (const nir::Function * func) {
 	auto argEnd = llFunc->arg_end ();
 	for (const Parameter * param : func->getArgs ()) {
 		assert (argItt != argEnd);
-		instrDict [param->getIden ()] = argItt;
+		//instrDict [param->getIden ()] = argItt;
 		++argItt;
 	}
 	
@@ -360,7 +404,9 @@ void LLVM::visit (const Type * type) {
 
 }
 
-LLVM::LLVM () : module (new llvm::Module ("numbat", llvm::getGlobalContext ())), diBuilder (*module), irBuilder (llvm::getGlobalContext ()) {
+LLVM::LLVM (llvm::TargetMachine * targetMachine) : module (new llvm::Module ("numbat", theContext)), diBuilder (*module), irBuilder (theContext), targetMachine (targetMachine), dataLayout (targetMachine->createDataLayout ()) {
+	
+	module->setDataLayout (dataLayout);
 	
 }
 

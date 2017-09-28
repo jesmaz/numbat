@@ -5,14 +5,18 @@
 #include <codegen/targetVisitor.hpp>
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
-
 #include <map>
+#include <memory>
 
 
 namespace codegen {
 
 using namespace nir;
 using numbat::visitor::ConstVisitor;
+
+
+class LLVMConstantBuilder;
+
 
 class LLVM : public TargetVisitor {
 	
@@ -53,7 +57,7 @@ class LLVM : public TargetVisitor {
 		virtual void visit (const Sub & sub);
 		virtual void visit (const Type * type);
 		
-		LLVM ();
+		LLVM (llvm::TargetMachine * targetMachine);
 		
 	protected:
 	private:
@@ -65,9 +69,13 @@ class LLVM : public TargetVisitor {
 		
 		virtual void generate (const Function * func, BasicArray <uint8_t> & output) {}
 		
-		llvm::Module * module;
+		llvm::LLVMContext theContext;
+		std::unique_ptr <llvm::Module> module;
 		llvm::DIBuilder diBuilder;
 		llvm::IRBuilder<> irBuilder;
+		
+		llvm::DataLayout dataLayout;
+		llvm::TargetMachine * targetMachine;
 		
 		std::map <const nir::AbstractValue *, llvm::Value *> valueDict;
 		std::map <const Function *, llvm::Function *> funcDict;
@@ -75,6 +83,8 @@ class LLVM : public TargetVisitor {
 		std::map <const nir::Type *, llvm::Type *> typeDict;
 		
 		static Target::RegTarget target;
+		
+		friend LLVMConstantBuilder;
 		
 };
 
