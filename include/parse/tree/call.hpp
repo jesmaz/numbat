@@ -16,8 +16,6 @@ class ParseTreeCall : public ParseTreeNode {
 		virtual bool isAggregate () {return true;}
 		virtual const BasicArray <ParseTreeNode *> & getArgs () const {return args;}
 		
-		virtual const nir::Instruction * build (nir::Scope * scope);
-		
 		ParseTreeCall (numbat::lexer::position pos) : ParseTreeNode (pos) {}
 		ParseTreeCall (const PTNode & iden, const BasicArray <PTNode> & args) : ParseTreeNode (iden->getPos ()), iden (iden), args (args) {}
 		virtual ~ParseTreeCall () {delAll (args); delete iden;}

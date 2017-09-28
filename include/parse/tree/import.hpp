@@ -16,10 +16,6 @@ class ParseTreeImport : public ParseTreeNode {
 		
 		virtual const string & getIden () const {return iden->getIden ();}
 		
-		const nir::Instruction * build (nir::Scope * scope);
-		
-		void declare (nir::Scope * scope);
-		
 		ParseTreeImport (numbat::lexer::position pos) : ParseTreeNode (pos), path (nullptr), iden (nullptr) {}
 		ParseTreeImport (PTNode path, PTNode iden=nullptr) : ParseTreeNode (ParseTreeNode::NodeType::IMPORT, path->getPos ()), path (path), iden (iden) {}
 		virtual ~ParseTreeImport () {delete path; delete iden;}

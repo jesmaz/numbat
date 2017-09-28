@@ -44,13 +44,6 @@ class ParseTreeNode {
 		virtual Function * asFunction () {return nullptr;}
 		virtual Struct * asStruct () {return nullptr;}
 		
-		virtual const nir::Instruction * build (nir::Scope * scope);
-		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
-		virtual const nir::Parameter * buildParameter (nir::Scope * scope);
-		virtual const nir::Type * resolveType (nir::Scope * scope);
-		
-		virtual void declare (nir::Scope * scope);
-		
 		ParseTreeNode (numbat::lexer::position pos) : type (NodeType::EXPRESSION), pos (pos) {}
 		ParseTreeNode (NodeType nodeType, numbat::lexer::position pos) : type (nodeType), pos (pos) {}
 		virtual ~ParseTreeNode () {}

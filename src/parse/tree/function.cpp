@@ -6,21 +6,6 @@
 namespace parser {
 
 
-auto buildParams = [](const BasicArray <PTNode> & args, nir::Scope * scope) {
-	DynArray <const nir::Parameter *> conv;
-	for (auto & arg : args) {
-		auto * p = arg->buildParameter (scope);
-		if (p) {
-			assert (typeid (*p) == typeid (nir::Parameter));
-			conv.push_back (static_cast <const nir::Parameter *> (p));
-		} else {
-			return DynArray <const nir::Parameter *> ();
-		}
-	}
-	return conv;
-};
-
-
 AST::FuncPtr Function::createFunc (AST::Context & ctx) {
 	
 	if (fPtr) return fPtr;
@@ -43,34 +28,6 @@ AST::NodePtr Function::createAST (AST::Context & ctx) {
 	auto func = createFunc (ctx);
 	fPtr->body = body->createAST (*context);
 	return std::make_shared <AST::Function_Ptr> (getPos (), ctx.getSourceFile (), std::move (func));
-	
-}
-
-
-const nir::Instruction * Function::build (nir::Scope * scope) {
-	
-	if (not fScope) {
-		//Must be anon
-		auto nirParams = buildParams (params, scope);
-		auto nirTypes = buildParams (type, scope);
-		fScope = scope->declareFunction ({nirParams.begin (), nirParams.end ()}, {nirTypes.begin (), nirTypes.end ()}, "", linkage);
-	}
-	
-	if (body) {
-		auto b = body->build (fScope);
-		if (b) {
-			fScope->createAutoReturn (b);
-		}
-	}
-	return fScope->getFunctionPointer ();
-	
-}
-
-void Function::declare (nir::Scope * scope) {
-	
-	auto nirParams = buildParams (params, scope);
-	auto nirTypes = buildParams (type, scope);
-	fScope = scope->declareFunction ({nirParams.begin (), nirParams.end ()}, {nirTypes.begin (), nirTypes.end ()}, iden, linkage);
 	
 }
 

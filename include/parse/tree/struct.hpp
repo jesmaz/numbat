@@ -14,10 +14,6 @@ struct Struct : ParseTreeNode {
 		AST::TypePtr createType (AST::Context & ctx);
 		AST::NodePtr createAST (AST::Context & ctx);
 		
-		virtual const nir::Instruction * build (nir::Scope * scope);
-		
-		void declare (nir::Scope * scope);
-		
 		Struct (numbat::lexer::position pos) : ParseTreeNode (pos) {}
 		Struct (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & members) : ParseTreeNode (pos), iden (iden), members (members) {}
 		

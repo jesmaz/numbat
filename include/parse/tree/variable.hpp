@@ -14,9 +14,6 @@ class ParseTreeVariable : public ParseTreeNode {
 		AST::NodePtr createAST (AST::Context & ctx);
 		AST::NodePtr createASTparam (AST::Context & ctx);
 		
-		virtual const nir::Instruction * build (nir::Scope * scope);
-		virtual const nir::Parameter * buildParameter (nir::Scope * scope);
-		
 		PTNode releaseIden () {auto e = iden; iden = 0; return e;}
 		PTNode releaseInst () {auto e = inst; inst = 0; return e;}
 		PTNode releaseVType () {auto e = vType; vType = 0; return e;}

@@ -13,9 +13,6 @@ class ParseTreeTypeModifier : public ParseTreeNode {
 		
 		virtual AST::TypePtr createASTtype (AST::Context & ctx);
 		
-		virtual const nir::Instruction * buildAllocate (nir::Scope * scope, const string & iden);
-		virtual const nir::Type * resolveType (nir::Scope * scope);
-		
 		const string & getIden () const {return sym;}
 		
 		ParseTreeTypeModifier (PTNode type, numbat::lexer::position pos, string sym) : ParseTreeNode (pos), type (type), sym (sym) {}

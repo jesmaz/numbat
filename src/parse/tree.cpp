@@ -48,20 +48,6 @@ AST::NodePtr ParseTree::extendAST (AST::Context & ctx) {
 	
 }
 
-const nir::Instruction * ParseTree::build (nir::Scope * scope) {
-	if (nirTreeScope) {
-		scope = nirTreeScope;
-	} else {
-		declare (scope);
-	}
-	const nir::Instruction * last=nullptr;
-	for (auto * b : body) {
-		last = b->build (scope);
-	}
-	
-	return last;
-}
-
 string ParseTree::strDump (text::PrintMode mode) {
 	if (not body.empty ()) {
 		string s = "{"; 
@@ -72,11 +58,6 @@ string ParseTree::strDump (text::PrintMode mode) {
 	} else {
 		return "{}";
 	}
-}
-
-void ParseTree::declare (nir::Scope * scope) {
-	nirTreeScope = scope;
-	declareInline ();
 }
 
 void ParseTree::declareInline () {
