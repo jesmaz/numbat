@@ -251,6 +251,38 @@ void OperatePass <parser::OPERATION::DIV>::visit (const Numeric & node) {
 }
 
 template <>
+void OperatePass <parser::OPERATION::LNOT>::visit (const Numeric & node) {
+	bool val;
+	auto * arg = static_cast <Number *> (args [0].get ());
+	switch (node.getArith ()) {
+		case Numeric::ArithmaticType::ARBITRARY: {
+			mpq_class mpq;
+			string::size_type pos;
+			if ((pos = arg->getValue ().find ('.')) != string::npos) {
+				mpq = arg->getValue ().substr (0, pos) + arg->getValue ().substr (pos + 1) + "/1" + string (arg->getValue ().length () - (pos+1), '0');
+			} else {
+				mpq = arg->getValue ();
+			}
+			val = not mpq;
+			break;
+		}
+		case Numeric::ArithmaticType::DECINT:
+			abort ();
+			break;
+		case Numeric::ArithmaticType::FPINT:
+			val = not std::stold (arg->getValue ());
+			break;
+		case Numeric::ArithmaticType::INT:
+			val = not std::stoll (arg->getValue ());
+			break;
+		case Numeric::ArithmaticType::UINT:
+			val = not std::stoull (arg->getValue ());
+			break;
+	}
+	nPtr = std::make_shared <Number> (arg->getPos (), arg->getFile (), std::to_string (val), Numeric::get (Numeric::ArithmaticType::UINT, 1));
+}
+
+template <>
 void OperatePass <parser::OPERATION::MUL>::visit (const Numeric & node) {
 	nPtr = standardBinary (node, args, std::multiplies <> ());
 }
