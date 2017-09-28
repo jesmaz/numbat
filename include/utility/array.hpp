@@ -31,6 +31,20 @@ struct BasicArray {
 			return *this;
 		}
 		
+		const bool operator < (BasicArray <T> & other) {
+			auto i1 = begin ();
+			auto i2 = other.begin ();
+			auto e1 = end ();
+			auto e2 = other.end ();
+			while (i1 != e1 and i2 != e2 and *i1 == *i2) {
+				++i1;
+				++i2;
+			}
+			if (i2 == e2) return false;
+			if (i1 == e1) return true;
+			return *i1 < *i2;
+		}
+		
 		T & operator [] (size_t index) {assert (index < len); return data [index];}
 		const T & operator [] (size_t index) const {assert (index < len); return data [index];}
 		
