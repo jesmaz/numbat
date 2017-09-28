@@ -92,13 +92,13 @@ NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, 
 			break;
 		case Numeric::ArithmaticType::UINT:
 			if (type.getMinPrec () <= 8) {
-				result = std::to_string (functr (int8_t (std::stoll (lhs)), int8_t (std::stoll (rhs))));
+				result = std::to_string (functr (int8_t (std::stoull (lhs)), int8_t (std::stoull (rhs))));
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int16_t (std::stoll (lhs)), int16_t (std::stoll (rhs))));
+				result = std::to_string (functr (int16_t (std::stoull (lhs)), int16_t (std::stoull (rhs))));
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int32_t (std::stoll (lhs)), int32_t (std::stoll (rhs))));
+				result = std::to_string (functr (int32_t (std::stoull (lhs)), int32_t (std::stoull (rhs))));
 			} else {
-				result = std::to_string (functr (int64_t (std::stoll (lhs)), int64_t (std::stoll (rhs))));
+				result = std::to_string (functr (int64_t (std::stoull (lhs)), int64_t (std::stoull (rhs))));
 			}
 			break;
 	}
@@ -152,13 +152,13 @@ NodePtr standardBinary (const Numeric & type, const BasicArray <NodePtr> & args,
 			break;
 		case Numeric::ArithmaticType::UINT:
 			if (type.getMinPrec () <= 8) {
-				result = std::to_string (functr (int8_t (std::stoll (lhs)), int8_t (std::stoll (rhs))));
+				result = std::to_string (functr (int8_t (std::stoull (lhs)), int8_t (std::stoull (rhs))));
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int16_t (std::stoll (lhs)), int16_t (std::stoll (rhs))));
+				result = std::to_string (functr (int16_t (std::stoull (lhs)), int16_t (std::stoull (rhs))));
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int32_t (std::stoll (lhs)), int32_t (std::stoll (rhs))));
+				result = std::to_string (functr (int32_t (std::stoull (lhs)), int32_t (std::stoull (rhs))));
 			} else {
-				result = std::to_string (functr (int64_t (std::stoll (lhs)), int64_t (std::stoll (rhs))));
+				result = std::to_string (functr (int64_t (std::stoull (lhs)), int64_t (std::stoull (rhs))));
 			}
 			break;
 	}
