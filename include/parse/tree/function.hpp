@@ -17,7 +17,6 @@ struct Function : ParseTreeNode {
 		const BasicArray <PTNode> & getParams () const {return params;}
 		const BasicArray <PTNode> & getType () const {return type;}
 		
-		void declare (nir::Scope * scope);
 		void setBody (PTNode b) {body = b;}
 		
 		virtual Function * asFunction () {return this;}

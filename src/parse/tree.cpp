@@ -60,12 +60,6 @@ string ParseTree::strDump (text::PrintMode mode) {
 	}
 }
 
-void ParseTree::declareInline () {
-	for (Function * f : functions) {
-		f->declare (nirTreeScope);
-	}
-}
-
 void ParseTree::push_back (PTNode node) {
 	switch (node->getType ()) {
 			case ParseTreeNode::NodeType::FUNCTION:
