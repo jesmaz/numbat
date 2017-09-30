@@ -146,7 +146,7 @@ class Numeric : public Type {
 	
 	public:
 		
-		enum ArithmaticType : char {ARBITRARY='a', DECINT='d', INT='i', FPINT='f', UINT='u'};
+		enum ArithmaticType : char {ARBITRARY='a', DECINT='d', INT='i', FPINT='f', UINT='u', UNDETERMINED='n'};
 		
 		ArithmaticType getArith () const {return arith;}
 		uint32_t getMinPrec () const {return minPrecision;}

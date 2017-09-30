@@ -69,6 +69,7 @@ NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, 
 	const string & rhs = static_cast <Number*> (args [1].get ())->getValue ();
 	string result;
 	switch (type.getArith ()) {
+		case Numeric::ArithmaticType::UNDETERMINED:
 		case Numeric::ArithmaticType::ARBITRARY: {
 			abort ();
 			break;
@@ -111,6 +112,7 @@ NodePtr standardBinary (const Numeric & type, const BasicArray <NodePtr> & args,
 	const string & rhs = static_cast <Number*> (args [1].get ())->getValue ();
 	string result;
 	switch (type.getArith ()) {
+		case Numeric::ArithmaticType::UNDETERMINED:
 		case Numeric::ArithmaticType::ARBITRARY: {
 			mpq_class l, r;
 			string::size_type pos;
@@ -255,6 +257,7 @@ void OperatePass <parser::OPERATION::LNOT>::visit (const Numeric & node) {
 	bool val;
 	auto * arg = static_cast <Number *> (args [0].get ());
 	switch (node.getArith ()) {
+		case Numeric::ArithmaticType::UNDETERMINED:
 		case Numeric::ArithmaticType::ARBITRARY: {
 			mpq_class mpq;
 			string::size_type pos;

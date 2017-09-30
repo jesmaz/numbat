@@ -370,6 +370,7 @@ void NirTypePass::visit (const Interface & node) {
 
 void NirTypePass::visit (const Numeric & node) {
 	switch (node.getArith ()) {
+		case Numeric::ArithmaticType::UNDETERMINED:
 		case Numeric::ArithmaticType::ARBITRARY:
 		case Numeric::ArithmaticType::DECINT:
 			//TODO: Replace with decimal int

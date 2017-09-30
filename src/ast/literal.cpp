@@ -20,8 +20,10 @@ Number::Number (numbat::lexer::position pos, const numbat::File * file, const st
 		return Numeric::get (Numeric::ArithmaticType::FPINT, 128);
 	} else if (value.back () == 'u') {
 		return Numeric::get (Numeric::ArithmaticType::UINT, 64);
-	} else {
+	} else if (value.back () == 'a') {
 		return Numeric::get (Numeric::ArithmaticType::ARBITRARY, 0);
+	} else {
+		return Numeric::get (Numeric::ArithmaticType::UNDETERMINED, 0);
 	}
 } ()), value (value) {}
 

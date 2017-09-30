@@ -208,6 +208,7 @@ void FoldConstPass::visit (const CastToInt & node) {
 		std::string result;
 		auto & str = arg->getValue ();
 		switch (argType->getArith ()) {
+			case Numeric::ArithmaticType::UNDETERMINED:
 			case Numeric::ArithmaticType::ARBITRARY: {
 				mpq_class num;
 				string::size_type pos;
