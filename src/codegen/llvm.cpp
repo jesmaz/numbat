@@ -385,11 +385,11 @@ void LLVM::visit (const nir::Ret & ret) {
 void LLVM::visit (const nir::Tuple & tuple) {
 	
 	std::vector <llvm::Type *> members;
-	members.reserve (stru.getMemberArr ().size ());
-	for (const nir::Type * t : stru.getMemberArr ()) {
+	members.reserve (tuple.getMemberArr ().size ());
+	for (const nir::Type * t : tuple.getMemberArr ()) {
 		members.push_back (resolve (t));
 	}
-	typeDict [&stru] = llvm::StructType::get (irBuilder.getContext (), members);
+	typeDict [&tuple] = llvm::StructType::get (irBuilder.getContext (), members);
 	
 }
 
