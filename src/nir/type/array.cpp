@@ -6,6 +6,7 @@
 namespace nir {
 
 
+const size_t Array::DATA_INDEX=0, Array::LENGTH_INDEX=1;
 std::map <const Type *, std::unique_ptr <Array>> Array::arrayTypes;
 
 
