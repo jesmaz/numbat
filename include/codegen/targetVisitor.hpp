@@ -25,7 +25,7 @@
 #include <nir/inst/sub.hpp>
 #include <nir/parameter.hpp>
 #include <nir/type/number.hpp>
-#include <nir/type/struct.hpp>
+#include <nir/type/tuple.hpp>
 #include <visitor.hpp>
 
 
@@ -60,7 +60,7 @@ class TargetVisitor :
 	public ConstVisitor <Put>,
 	public ConstVisitor <Reinterpret>,
 	public ConstVisitor <Ret>,
-	public ConstVisitor <Struct>,
+	public ConstVisitor <Tuple>,
 	public ConstVisitor <Sub> {};
 
 }

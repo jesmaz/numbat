@@ -31,7 +31,7 @@ struct BasicArray {
 			return *this;
 		}
 		
-		const bool operator < (BasicArray <T> & other) {
+		const bool operator < (const BasicArray <T> & other) const {
 			auto i1 = begin ();
 			auto i2 = other.begin ();
 			auto e1 = end ();

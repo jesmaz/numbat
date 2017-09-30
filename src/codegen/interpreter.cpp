@@ -4,7 +4,7 @@
 #include <nir/block.hpp>
 #include <nir/type/array.hpp>
 #include <nir/type/pointer.hpp>
-#include <nir/type/struct.hpp>
+#include <nir/type/tuple.hpp>
 
 namespace codegen {
 
@@ -127,10 +127,10 @@ void Interpreter::visit (const Composite & comp) {
 	for (auto i=0ul; i<l; ++i) {
 		vals [i] = evaluate (comp.getArguments () [i]);
 	}
-	const Struct * str = reinterpret_cast <const Struct *> (comp.getType ());
-	if (typeid (*str) == typeid (Array)) str = &reinterpret_cast <const Array *> (str)->getUnderlyingType ();
-	assert (typeid (*str) == typeid (Struct));
-	lookupTable [comp.getIden ()] = Value (vals, str);
+	const Tuple * tup = reinterpret_cast <const Tuple *> (comp.getType ());
+	if (typeid (*tup) == typeid (Array)) tup = &reinterpret_cast <const Array *> (tup)->getUnderlyingType ();
+	assert (typeid (*tup) == typeid (Tuple));
+	lookupTable [comp.getIden ()] = Value (vals, tup);
 	
 }
 
@@ -306,7 +306,7 @@ void Interpreter::visit (const Reinterpret & reinterpret) {
 	
 }
 
-void Interpreter::visit (const Struct & stru) {
+void Interpreter::visit (const Tuple & tuple) {
 	
 }
 

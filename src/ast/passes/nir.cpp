@@ -392,11 +392,9 @@ void NirTypePass::visit (const Ref & node) {
 }
 
 void NirTypePass::visit (const Struct & node) {
-	nir::Struct * str = scope->registerStruct (node.getName (), node.getPos ());
-	str->populate (node.getMembers ().map <const nir::Parameter *> ([&](auto & n) {
-		return new nir::Parameter (resolve (scope, n->getType ().get ()), *(scope->getModule ()->newSymbol ("")));
+	type = nir::Tuple::getTuple (node.getMembers ().map <const nir::Type *> ([&](auto & n) {
+		return resolve (scope, n->getType ().get ());
 	}));
-	type = str;
 }
 
 

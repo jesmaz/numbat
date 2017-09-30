@@ -66,7 +66,7 @@ Target::RegTarget LLVM::target ("llvm", []()->Target*{
 });
 
 
-class LLVMConstantBuilder : public ConstVisitor <nir::FunctionPointer>, public ConstVisitor <nir::Number>, public ConstVisitor <nir::PointerType>, public ConstVisitor <nir::Struct> {
+class LLVMConstantBuilder : public ConstVisitor <nir::FunctionPointer>, public ConstVisitor <nir::Number>, public ConstVisitor <nir::PointerType>, public ConstVisitor <nir::Tuple> {
 	
 	public:
 		
@@ -102,7 +102,7 @@ class LLVMConstantBuilder : public ConstVisitor <nir::FunctionPointer>, public C
 			
 		}
 		
-		void visit (const nir::Struct & struc) {
+		void visit (const nir::Tuple & tuple) {
 			
 		}
 		
@@ -382,7 +382,7 @@ void LLVM::visit (const nir::Ret & ret) {
 	}
 }
 
-void LLVM::visit (const nir::Struct & stru) {
+void LLVM::visit (const nir::Tuple & tuple) {
 	
 	std::vector <llvm::Type *> members;
 	members.reserve (stru.getMemberArr ().size ());

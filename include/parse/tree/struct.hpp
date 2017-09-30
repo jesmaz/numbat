@@ -26,7 +26,6 @@ struct Struct : ParseTreeNode {
 		
 		string iden;
 		BasicArray <PTNode> tplate, tags, members;
-		nir::Struct * type=nullptr;
 		std::shared_ptr <AST::Struct> stype=nullptr;
 		
 };

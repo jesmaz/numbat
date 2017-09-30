@@ -2,7 +2,7 @@
 #include <nir/module.hpp>
 #include <nir/parameter.hpp>
 #include <nir/scope.hpp>
-#include <nir/type/struct.hpp>
+#include <nir/type/tuple.hpp>
 #include <parse/tree/struct.hpp>
 #include <utility/report.hpp>
 

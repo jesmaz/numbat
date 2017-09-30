@@ -13,7 +13,7 @@ class Instruction;
 class Number;
 struct Parameter;
 class PointerType;
-class Struct;
+class Tuple;
 class Type;
 
 struct Block;

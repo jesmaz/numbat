@@ -4,7 +4,7 @@
 #include <forward.hpp>
 #include <map>
 #include <nir/instruction.hpp>
-#include <nir/type/struct.hpp>
+#include <nir/type/tuple.hpp>
 #include <set>
 #include <token.hpp>
  
@@ -75,6 +75,7 @@ struct Scope {
 		const Instruction * createStructValue (const Type * const type, BasicArray <Argument> vals, const string & iden="");
 		const Instruction * createSub (Argument lhs, Argument rhs);
 		const Instruction * getFunctionPointer ();
+		const Instruction * resolve (Argument parent, const size_t index, numbat::lexer::position pos);
 		const Instruction * resolve (Argument parent, const string & iden, numbat::lexer::position pos);
 		const Instruction * resolve (const string & iden, numbat::lexer::position pos);
 		const Instruction * resolve (const string & iden, Block * insertionPoint, numbat::lexer::position pos) const;
@@ -82,7 +83,7 @@ struct Scope {
 		
 		const Function * resolve (const string & iden, numbat::lexer::position pos, const BasicArray <Argument> & args);
 		
-		Struct * registerStruct (const std::string & iden, numbat::lexer::position pos);
+		Tuple * registerStruct (const std::string & iden, numbat::lexer::position pos);
 		
 		void declareFunction ();
 		

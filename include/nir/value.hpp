@@ -47,7 +47,7 @@ struct Value {
 		Value ();
 		Value (AbstractValue * absVal);
 		Value (const Function * func);
-		Value (const DynArray <Value> & members, const Struct * layout);
+		Value (const DynArray <Value> & members, const Tuple * layout);
 		Value (const Value & val) : val (val.val) {}
 		Value (double);
 		Value (float);

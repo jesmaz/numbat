@@ -132,7 +132,7 @@ const Type * Scope::resolveType (const string & iden, numbat::lexer::position po
 const Type * Scope::resolveType (Argument parent, const string & iden, numbat::lexer::position pos) const {
 	
 	const Type * type = parent.type;
-	if (typeid (*type) == typeid (Struct)) {
+	if (typeid (*type) == typeid (Tuple)) {
 		
 		report::logMessage (report::ERROR, sourceFile, pos, "Nested structs are not yet supported");
 		return nullptr;
@@ -465,22 +465,31 @@ const Instruction * Scope::getFunctionPointer () {
 	
 }
 
+const Instruction * Scope::resolve (Argument parent, size_t index, numbat::lexer::position pos) {
+	
+	const Type * type = parent.type;
+	if (typeid (*type) == typeid (Tuple)) {
+		const Tuple * tup = static_cast <const Tuple *> (type);
+		const auto & memberArr = tup->getMemberArr ();
+		
+		if (index < memberArr.size ()) {
+			return insertionPoint->give (new PickStructMember (memberArr [index], parent, index, "_" + std::to_string (index), module->newSymbol ("_" + std::to_string (index))));
+		}
+		
+		report::logMessage (report::ERROR, sourceFile, pos, std::to_string (index) + " is not in the range of parent type");
+		return nullptr;
+		
+	}
+	
+	report::logMessage (report::ERROR, sourceFile, pos, "Can't resolve '" + std::to_string (index) + "'");
+	return nullptr;
+	
+}
+
 const Instruction * Scope::resolve (Argument parent, const string & iden, numbat::lexer::position pos) {
 	
 	const Type * type = parent.type;
-	if (typeid (*type) == typeid (Struct)) {
-		
-		const Struct * str = static_cast <const Struct *> (type);
-		const auto & memberArr = str->getMemberArr ();
-		
-		for (size_t i=0; i<memberArr.size (); ++i) {
-			const Parameter * param = memberArr [i];
-			if (param->getIden ()->iden == iden) {
-				return insertionPoint->give (new PickStructMember (param->getType (), parent, i, iden, module->newSymbol (iden)));
-			}
-		}
-		
-	} else if (typeid (*type) == typeid (ImportHandle)) {
+	if (typeid (*type) == typeid (ImportHandle)) {
 		
 		const ImportHandle * imp = static_cast <const ImportHandle *> (type);
 		const Scope * scope = imp->getScope ();
@@ -580,14 +589,14 @@ Argument Scope::staticCast (Argument src, const Type * const target, const strin
 }
 
 
-Struct * Scope::registerStruct (const string & iden, numbat::lexer::position pos) {
+Tuple * Scope::registerStruct (const string & iden, numbat::lexer::position pos) {
 	
-	Struct * s = nullptr;
+	Tuple * s = nullptr;
 	if (iden != "") {
 		if (module->data->types.find (module->findSymbol (iden)) == module->data->types.end ()) {
 			Type *& t = types [iden];
 			if (!t) {
-				t = s = new Struct;
+				t = s = Tuple::newTuple ();
 			} else {
 				report::logMessage (report::ERROR, sourceFile, pos, "Unable to override '" + iden + "'");
 			}

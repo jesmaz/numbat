@@ -4,7 +4,7 @@
 #include <nir/type/array.hpp>
 #include <nir/type/number.hpp>
 #include <nir/type/pointer.hpp>
-#include <nir/type/struct.hpp>
+#include <nir/type/tuple.hpp>
 #include <nir/value.hpp>
 
 
@@ -207,8 +207,7 @@ class TupleValue : public AbstractValue {
 			assert (layout == other.layout);
 			auto itt_src = other.bytes;
 			auto itt_dest = bytes;
-			for (const Parameter * param : layout->getMemberArr ()) {
-				const Type * type = param->getType ();
+			for (const Type * type : layout->getMemberArr ()) {
 				*fromData (itt_dest, type) = *fromData (itt_src, type);
 				ssize_t size = type->calculateSize (sizeof (Value));
 				assert (size >= 0);
@@ -222,8 +221,7 @@ class TupleValue : public AbstractValue {
 		virtual string toString (text::PrintMode mode) const {
 			string s = "(";
 			auto itt = bytes;
-			for (const Parameter * param : layout->getMemberArr ()) {
-				const Type * type = param->getType ();
+			for (const Type * type : layout->getMemberArr ()) {
 				s += fromData (itt, type)->toString (mode) + ", ";
 				itt = itt + type->calculateSize (sizeof (Value));
 			}
@@ -249,15 +247,15 @@ class TupleValue : public AbstractValue {
 		virtual operator int64_t () const {abort ();}
 		virtual operator uint64_t () const {abort ();}
 		
-		TupleValue (const Struct * layout) : bytes (layout->calculateSize (sizeof (Value)), 0), layout (layout) {}
-		TupleValue (size_t amount, const Struct * layout) : bytes (amount * layout->calculateSize (sizeof (Value)), 0), layout (layout) {}
-		TupleValue (const adv_ptr <uint8_t> & bytes, const Struct * layout) : bytes (bytes), layout (layout) {}
+		TupleValue (const Tuple * layout) : bytes (layout->calculateSize (sizeof (Value)), 0), layout (layout) {}
+		TupleValue (size_t amount, const Tuple * layout) : bytes (amount * layout->calculateSize (sizeof (Value)), 0), layout (layout) {}
+		TupleValue (const adv_ptr <uint8_t> & bytes, const Tuple * layout) : bytes (bytes), layout (layout) {}
 		
 	protected:
 	private:
 		
 		adv_ptr <uint8_t> bytes;
-		const Struct * layout;
+		const Tuple * layout;
 		
 };
 
@@ -323,19 +321,20 @@ class PointerValue : public AbstractValue {
 
 
 Value TupleValue::operator [] (const Parameter * param) const {
-	ssize_t offset = layout->calculateOffset (sizeof (Value), param->getIden ()->iden);
+	abort ();
+	/*ssize_t offset = layout->calculateOffset (sizeof (Value), param->getIden ()->iden);
 	assert (offset >= 0);
 	adv_ptr <uint8_t> ptr = bytes + offset;
 	const Type * type = param->getType ();
-	return fromData (ptr, type);
+	return fromData (ptr, type);*/
 }
 
 
 Value fromData (const adv_ptr <uint8_t> & ptr, const Type * type) {
 	if (typeid (*type) == typeid (PointerType)) {
 		return Value (new PointerValue <> (ptr.reinterpret <Value> (), reinterpret_cast <const PointerType *> (type)));
-	} else if (typeid (*type) == typeid (Struct)) {
-		return Value (new TupleValue (ptr, reinterpret_cast <const Struct *> (type)));
+	} else if (typeid (*type) == typeid (Tuple)) {
+		return Value (new TupleValue (ptr, reinterpret_cast <const Tuple *> (type)));
 	} else if (typeid (*type) == typeid (Array)) {
 		return Value (new TupleValue (ptr, &reinterpret_cast <const Array *> (type)->getUnderlyingType ()));
 	} else if (typeid (*type) == typeid (Number)) {
@@ -367,14 +366,13 @@ Value fromData (const adv_ptr <uint8_t> & ptr, const Type * type) {
 Value::Value () {}
 Value::Value (AbstractValue * absVal) : val (absVal) {}
 Value::Value (const Function * func) {abort ();}
-Value::Value (const DynArray <Value> & members, const Struct * layout) {
+Value::Value (const DynArray <Value> & members, const Tuple * layout) {
 	auto & mem = layout->getMemberArr ();
 	assert (mem.size () == members.size ());
 	adv_ptr <uint8_t> bytes (layout->calculateSize (sizeof (Value)), 0);
 	auto itt_dest = bytes;
 	for (size_t i=0, l=mem.size (); i<l; ++i) {
-		const Parameter * param = mem [i];
-		const Type * type = param->getType ();
+		const Type * type = mem [i];
 		if (members [i]->getType () == type) {
 			*fromData (itt_dest, type) = *members [i];
 		} else if (members [i]->getType ()->getDereferenceType () == type) {
@@ -409,8 +407,8 @@ Value Value::allocate (const Type * type, int64_t amount) {
 	if (typeid (*type) == typeid (PointerType)) {
 		adv_ptr <Value> ptr (amount);
 		return Value (new PointerValue <> (ptr, reinterpret_cast <const PointerType *> (type)));
-	} else if (typeid (*type) == typeid (Struct)) {
-		return Value (new TupleValue (amount, reinterpret_cast <const Struct *> (type)));
+	} else if (typeid (*type) == typeid (Tuple)) {
+		return Value (new TupleValue (amount, reinterpret_cast <const Tuple *> (type)));
 	} else if (typeid (*type) == typeid (Array)) {
 		return Value (new TupleValue (amount, &reinterpret_cast <const Array *> (type)->getUnderlyingType ()));
 	} else if (typeid (*type) == typeid (Number)) {
