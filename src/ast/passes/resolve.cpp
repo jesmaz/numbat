@@ -4,6 +4,7 @@
 #include <ast/operation.hpp>
 #include <ast/passes/resolve.hpp>
 #include <ast/passes/typecastpass.hpp>
+#include <ast/passes/typeutil.hpp>
 #include <ast/sequence.hpp>
 #include <ast/variable.hpp>
 #include <iostream>
@@ -56,17 +57,45 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 	if (/*TODO: Check for complex types*/ false) {
 		
 	} else if (isPredicate (node.getOpp ())) {
-		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), node.getIden (), args, node.getOpp ());
+		if (args.size () == 2) {
+			if (typeid (*types [0]) == typeid (Numeric) and typeid (*types [1]) == typeid (Numeric)) {
+				auto dom = DominantType (types [0], types [1]) ();
+				nPtr = std::make_shared <Basic_Operation> (
+					node.getPos (),
+					node.getFile (),
+					Numeric::get (Numeric::ArithmaticType::UINT, 1),
+					node.getIden (),
+					BasicArray <NodePtr> ({
+						StaticCastPass (dom) (args [0]),
+						StaticCastPass (dom) (args [1])
+					}),
+					node.getOpp ()
+				);
+			} else {
+				abort ();
+			}
+		} else {
+			nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), node.getIden (), args, node.getOpp ());
+		}
 		
 	} else if (args.size () == 1 or types [0] == types [1]) {
 		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), types [0], node.getIden (), args, node.getOpp ());
 		
 	} else if (args.size () == 2) {
-		auto arbNum = Numeric::get (Numeric::ArithmaticType::ARBITRARY, 0);
-		if (types [0] == arbNum and typeid (*types [1]) == typeid (Numeric)) {
-			nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), types [1], node.getIden (), args, node.getOpp ());
-		} else if (types [1] == arbNum and typeid (*types [0]) == typeid (Numeric)) {
-			nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), types [0], node.getIden (), args, node.getOpp ());
+		if (typeid (*types [0]) == typeid (Numeric) and typeid (*types [1]) == typeid (Numeric)) {
+			auto dom = DominantType (types [0], types [1]) ();
+			nPtr = std::make_shared <Basic_Operation> (
+				node.getPos (),
+				node.getFile (),
+				types [1],
+				node.getIden (),
+				BasicArray <NodePtr> ({
+					StaticCastPass (dom) (args [0]),
+					StaticCastPass (dom) (args [1])
+				}),
+				node.getOpp ()
+			);
+			
 		} else {
 			//TODO: raise an error
 			abort ();
