@@ -189,6 +189,18 @@ void OperatePass <OPP>::visit (const Struct & node) {
 	abort ();
 }
 
+
+template <>
+void OperatePass <parser::OPERATION::CONCAT>::visit (const Array & node) {
+	auto lhs = static_cast <const ArrayVal *> (args [0].get ())->getValue ();
+	auto rhs = static_cast <const ArrayVal *> (args [1].get ())->getValue ();
+	BasicArray <Literal> result (lhs->getData().size () + rhs->getData().size ());
+	auto itt = std::copy (lhs->getData ().begin (), lhs->getData ().end (), result.begin ());
+	std::copy (rhs->getData ().begin (), rhs->getData ().end (), itt);
+	nPtr = std::make_shared <ArrayVal> (args [0]->getPos (), args [1]->getFile (), std::make_shared <ArrayLiteral> (result), args [0]->getType ());
+}
+
+
 template <>
 void OperatePass <parser::OPERATION::ADD>::visit (const Numeric & node) {
 	nPtr = standardBinary (node, args, std::plus <> ());
