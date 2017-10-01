@@ -35,6 +35,23 @@ class CastToNumberPass : public ShallNotPass {
 		
 };
 
+class StaticCastPass : public ShallNotPass {
+	
+	public:
+		
+		virtual NodePtr visit (const NodePtr & node) {return StaticCastPass (*this) (node);}
+		
+		StaticCastPass (const TypePtr & target) : target (target) {}
+		
+		NodePtr operator () (const NodePtr & node);
+		
+	protected:
+	private:
+		
+		const TypePtr & target;
+		
+};
+
 
 }
 

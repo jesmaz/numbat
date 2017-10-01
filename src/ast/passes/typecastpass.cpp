@@ -30,6 +30,7 @@ void CastToNumberPass::visit (const Numeric & node) {
 	if (node.getArith () != numeric.getArith () or node.getMinPrec () != numeric.getMinPrec ()) {
 		
 		switch (numeric.getArith ()) {
+			case Numeric::ArithmaticType::UNDETERMINED:
 			case Numeric::ArithmaticType::ARBITRARY:
 				nPtr = std::make_shared <CastToArbPrec> (nPtr->getPos (), nPtr->getFile (), Numeric::get (numeric.getArith (), numeric.getMinPrec ()), nPtr);
 				break;
@@ -70,6 +71,14 @@ NodePtr CastToNumberPass::operator () (const NodePtr & node) {
 	node->getType ()->accept (*this);
 	assert (nPtr);
 	return nPtr;
+}
+
+
+NodePtr StaticCastPass::operator () (const NodePtr & node) {
+	
+	if (node->getType () == target) return node;
+	abort ();
+	
 }
 
 
