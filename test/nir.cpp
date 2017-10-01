@@ -3,6 +3,7 @@
 #include <nir/block.hpp>
 #include <nir/instruction.hpp>
 #include <nir/module.hpp>
+#include <ast/passes/nir.hpp>
 #include <nir/scope.hpp>
 #include <parse/handparser.hpp>
 #include <set>
@@ -16,6 +17,7 @@ void printHelp (char * cmd) {
 int numbatMain (const Config & cfg) {
 	
 	numbat::File dummyFile;
+	AST::Context context (&dummyFile);
 	
 	if (cfg.files.empty ()) {
 		
@@ -29,7 +31,10 @@ int numbatMain (const Config & cfg) {
 				prog += line + "\n";
 			} else if (not prog.empty ()) {
 				auto node = parser::parse (prog, &dummyFile);
-				node->build (globalScope);
+				auto ast = node->extendAST (context);
+				ast = AST::transform (ast);
+				AST::NirPass nirPass (globalScope);
+				nirPass (ast);
 				while (printItt) {
 					std::cout << printItt << '\n';
 					++printItt;
@@ -42,7 +47,10 @@ int numbatMain (const Config & cfg) {
 		}
 		if (not prog.empty()) {
 			auto node = parser::parse (prog, &dummyFile);
-			node->build (globalScope);
+			auto ast = node->extendAST (context);
+			ast = AST::transform (ast);
+			AST::NirPass nirPass (globalScope);
+			nirPass (ast);
 			while (printItt) {
 				std::cout << printItt << '\n';
 				++printItt;
@@ -61,7 +69,10 @@ int numbatMain (const Config & cfg) {
 			while (std::getline (fin, buff)) prog += buff + "\n";
 			std::cout << "########" << f << "########" << std::endl;
 			auto node = parser::parse (prog, &dummyFile);
-			node->build (globalScope);
+			auto ast = node->createAST (context);
+			ast = AST::transform (ast);
+			AST::NirPass nirPass (globalScope);
+			nirPass (ast);
 			while (printItt) {
 				std::cout << printItt << std::endl;
 				++printItt;
