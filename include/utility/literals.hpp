@@ -12,6 +12,13 @@ class AbstractLiteral {
 		
 		virtual string toString (text::PrintMode mode) const {return "";}
 		
+		virtual bool operator == (const AbstractLiteral & literal) const=0;
+		bool operator != (const AbstractLiteral & literal) const {return not (*this == literal);}
+		virtual bool operator < (const AbstractLiteral & literal) const=0;
+		virtual bool operator <= (const AbstractLiteral & literal) const=0;
+		bool operator > (const AbstractLiteral & literal) const {return not (*this <= literal);}
+		bool operator >= (const AbstractLiteral & literal) const {return not (*this < literal);}
+		
 	protected:
 	private:
 		
@@ -19,7 +26,31 @@ class AbstractLiteral {
 		
 };
 
-typedef std::shared_ptr <AbstractLiteral> Literal;
+struct Literal {
+	
+	AbstractLiteral & operator * () {return *lit;}
+	const AbstractLiteral & operator * () const {return *lit;}
+	
+	AbstractLiteral * operator -> () {return lit.get ();}
+	const AbstractLiteral * operator -> () const {return lit.get ();}
+	
+	virtual bool operator == (const Literal & literal) const {return *lit == *literal;}
+	bool operator != (const Literal & literal) const {return *lit != *literal;}
+	virtual bool operator < (const Literal & literal) const {return *lit < *literal;}
+	virtual bool operator <= (const Literal & literal) const {return *lit <= *literal;}
+	bool operator > (const Literal & literal) const {return *lit > *literal;}
+	bool operator >= (const Literal & literal) const {return *lit >= *literal;}
+	
+	operator std::shared_ptr <AbstractLiteral> & () {return lit;}
+	operator const std::shared_ptr <AbstractLiteral> & () const {return lit;}
+	
+	std::shared_ptr <AbstractLiteral> lit;
+	
+	Literal () {}
+	Literal (const std::shared_ptr <AbstractLiteral> & lit) : lit (lit) {}
+	template <typename T>
+	Literal (const std::shared_ptr <T> & lit) : lit (lit) {}
+};
 
 class NumericLiteral : public AbstractLiteral {
 	
@@ -36,12 +67,6 @@ class NumericLiteral : public AbstractLiteral {
 		virtual string toString (text::PrintMode mode) const=0;
 		
 		virtual bool operator not () const=0;
-		virtual bool operator == (const NumericLiteral & literal) const=0;
-		bool operator != (const NumericLiteral & literal) const {return not (*this == literal);}
-		virtual bool operator < (const NumericLiteral & literal) const=0;
-		virtual bool operator <= (const NumericLiteral & literal) const=0;
-		bool operator > (const NumericLiteral & literal) const {return not (*this <= literal);}
-		bool operator >= (const NumericLiteral & literal) const {return not (*this < literal);}
 		
 		virtual double toDouble () const=0;
 		virtual float toFloat () const=0;
@@ -112,21 +137,21 @@ class NumericLiteralTemplate : public NumericLiteral {
 		virtual string toString (text::PrintMode mode) const {return std::to_string (number);}
 		
 		virtual bool operator not () const {return not number;}
-		virtual bool operator == (const NumericLiteral & literal) const {
+		virtual bool operator == (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
 				return number == rhs.number;
 			}
 			return false;
 		}
-		virtual bool operator < (const NumericLiteral & literal) const {
+		virtual bool operator < (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
 				return number < rhs.number;
 			}
 			return false;
 		}
-		virtual bool operator <= (const NumericLiteral & literal) const {
+		virtual bool operator <= (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
 				return number <= rhs.number;
@@ -196,21 +221,21 @@ class NumericLiteralTemplate <T, typename std::enable_if <std::is_floating_point
 		virtual string toString (text::PrintMode mode) const {return std::to_string (number);}
 		
 		virtual bool operator not () const {return not number;}
-		virtual bool operator == (const NumericLiteral & literal) const {
+		virtual bool operator == (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
 				return number == rhs.number;
 			}
 			return false;
 		}
-		virtual bool operator < (const NumericLiteral & literal) const {
+		virtual bool operator < (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
 				return number < rhs.number;
 			}
 			return false;
 		}
-		virtual bool operator <= (const NumericLiteral & literal) const {
+		virtual bool operator <= (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
 				return number <= rhs.number;
@@ -274,21 +299,21 @@ class NumericLiteralTemplate <mpq_class> : public NumericLiteral {
 		virtual string toString (text::PrintMode mode) const {return number.get_str ();}
 		
 		virtual bool operator not () const {return not number;}
-		virtual bool operator == (const NumericLiteral & literal) const {
+		virtual bool operator == (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
 				return number == rhs.number;
 			}
 			return false;
 		}
-		virtual bool operator < (const NumericLiteral & literal) const {
+		virtual bool operator < (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
 				return number < rhs.number;
 			}
 			return false;
 		}
-		virtual bool operator <= (const NumericLiteral & literal) const {
+		virtual bool operator <= (const AbstractLiteral & literal) const {
 			if (typeid (literal) == typeid (*this)) {
 				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
 				return number <= rhs.number;
@@ -337,6 +362,30 @@ class ArrayLiteral : public AbstractLiteral {
 	public:
 		
 		const BasicArray <Literal> & getData () const {return data;}
+		
+		virtual bool operator == (const AbstractLiteral & literal) const {
+			if (typeid (literal) == typeid (*this)) {
+				auto & rhs = static_cast <const ArrayLiteral &> (literal);
+				return data == rhs.data;
+			}
+			return false;
+		}
+		virtual bool operator < (const AbstractLiteral & literal) const {
+			if (typeid (literal) == typeid (*this)) {
+				auto & rhs = static_cast <const ArrayLiteral &> (literal);
+				return data < rhs.data;
+			}
+			return false;
+			
+		}
+		virtual bool operator <= (const AbstractLiteral & literal) const {
+			if (typeid (literal) == typeid (*this)) {
+				auto & rhs = static_cast <const ArrayLiteral &> (literal);
+				return data <= rhs.data;
+			}
+			return false;
+			
+		}
 		
 		ArrayLiteral (const BasicArray <Literal> & data) : data (data) {}
 		

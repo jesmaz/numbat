@@ -152,9 +152,9 @@ NodePtr standardBinary (const Numeric & type, const BasicArray <NodePtr> & args,
 }
 
 template <typename FUNCTOR>
-NodePtr predicateBinary (const Numeric & type, const BasicArray <NodePtr> & args, FUNCTOR functr) {
-	const auto & lhs = static_cast <Number*> (args [0].get ())->getValue ();
-	const auto & rhs = static_cast <Number*> (args [1].get ())->getValue ();
+NodePtr predicateBinary (const BasicArray <NodePtr> & args, FUNCTOR functr) {
+	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral ();
+	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral ();
 	auto result = std::make_shared <NumericLiteralTemplate <bool>> (functr (*lhs, *rhs));
 	return std::make_shared <Number> (args [0]->getPos (), args [1]->getFile (), result, Numeric::get (Numeric::ArithmaticType::UINT, 1));
 }
@@ -200,6 +200,11 @@ void OperatePass <parser::OPERATION::CONCAT>::visit (const Array & node) {
 	nPtr = std::make_shared <ArrayVal> (args [0]->getPos (), args [1]->getFile (), std::make_shared <ArrayLiteral> (result), args [0]->getType ());
 }
 
+template <>
+void OperatePass <parser::OPERATION::CMPEQ>::visit (const Array & node) {
+	nPtr = predicateBinary (args, std::equal_to <> ());
+}
+
 
 template <>
 void OperatePass <parser::OPERATION::ADD>::visit (const Numeric & node) {
@@ -223,32 +228,32 @@ void OperatePass <parser::OPERATION::BXOR>::visit (const Numeric & node) {
 
 template <>
 void OperatePass <parser::OPERATION::CMPEQ>::visit (const Numeric & node) {
-	nPtr = predicateBinary (node, args, std::equal_to <> ());
+	nPtr = predicateBinary (args, std::equal_to <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPGT>::visit (const Numeric & node) {
-	nPtr = predicateBinary (node, args, std::greater <> ());
+	nPtr = predicateBinary (args, std::greater <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPGTE>::visit (const Numeric & node) {
-	nPtr = predicateBinary (node, args, std::greater_equal <> ());
+	nPtr = predicateBinary (args, std::greater_equal <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPLT>::visit (const Numeric & node) {
-	nPtr = predicateBinary (node, args, std::less <> ());
+	nPtr = predicateBinary (args, std::less <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPLTE>::visit (const Numeric & node) {
-	nPtr = predicateBinary (node, args, std::less_equal <> ());
+	nPtr = predicateBinary (args, std::less_equal <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPNE>::visit (const Numeric & node) {
-	nPtr = predicateBinary (node, args, std::not_equal_to <> ());
+	nPtr = predicateBinary (args, std::not_equal_to <> ());
 }
 
 template <>

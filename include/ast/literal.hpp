@@ -13,6 +13,8 @@ class Value : public Node {
 	
 	public:
 		
+		virtual Literal getLiteral () const=0;
+		
 		virtual bool isValue () const {return true;}
 		
 		
@@ -27,6 +29,7 @@ class ArrayVal : public Value {
 	
 	public:
 		
+		Literal getLiteral () const {return value;}
 		const std::shared_ptr <ArrayLiteral> & getValue () const {return value;}
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
@@ -45,6 +48,7 @@ class Number : public Value {
 	
 	public:
 		
+		Literal getLiteral () const {return value;}
 		const std::shared_ptr <NumericLiteral> & getValue () const {return value;}
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}

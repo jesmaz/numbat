@@ -10,3 +10,7 @@ static_assert (1 * 5 == 5)
 static_assert (5 * 5 == 25)
 static_assert (5 / 5 == 1)
 static_assert (5 / 50 == 0.1)
+
+static_assert ('hello' == 'hello')
+static_assert ('hello' != 'world')
+static_assert ('hello' ~ 'world' == 'helloworld')
