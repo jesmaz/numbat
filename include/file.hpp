@@ -16,6 +16,9 @@ namespace numbat {
 using std::string;
 
 
+string joinPaths (const string & lhs, const string & rhs);
+
+
 struct File {
 	
 	public:

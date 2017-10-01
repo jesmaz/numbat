@@ -67,7 +67,8 @@ void Reflect::initAPI () {
 			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::UINT, 1));
 			bool assertion = number->getValue ()->toUint64 ();
 			if (not assertion) {
-				report::logMessage (report::Severity::ERROR, callingData.file, callingData.position, "Static assertion failed");
+				auto msg = "Static assertion failed: " + report::retrieveLine (callingData.file, callingData.position.line);
+				report::logMessage (report::Severity::ERROR, callingData.file, callingData.position, msg);
 			}
 			return args;
 		}

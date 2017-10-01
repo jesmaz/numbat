@@ -76,8 +76,8 @@ File * File::compile (const string & path, nir::Module * module) {
 		f->directory = path;
 		f->fileName = "";
 	} else {
-		f->directory = path.substr (pos+1);
-		f->fileName = path.substr (0, pos);
+		f->directory = path.substr (0, pos);
+		f->fileName = path.substr (pos+1);
 	}
 	
 	parser::PTNode parseTree;

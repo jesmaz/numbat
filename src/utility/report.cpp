@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <utility/array.hpp>
 #include <utility/config.hpp>
@@ -50,6 +51,25 @@ bool compilationFailed () {
 
 bool empty () {
 	return messages.empty ();
+}
+
+
+string retrieveLine (const numbat::File * file, uint32_t line) {
+	
+	string buffer;
+	uint32_t l=0;
+	std::ifstream fin (numbat::joinPaths (file->getDirectory (), file->getFileName ()));
+	if (fin) {
+		while (std::getline (fin, buffer)) {
+			if (++l == line) {
+				return buffer;
+			}
+		}
+	} else {
+		abort ();
+	}
+	return "";
+	
 }
 
 

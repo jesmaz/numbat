@@ -19,6 +19,9 @@ bool compilationFailed ();
 // true if nothing has been logged.
 bool empty ();
 
+// Gets the relevant line from the source file. Warning, this function is expensive, only use it if an error needs to be reported.
+string retrieveLine (const numbat::File * file, uint32_t line);
+
 // Clears all logged messages. Compilation status is preserved.
 void clearLogs ();
 
