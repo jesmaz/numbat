@@ -17,6 +17,7 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const And & node);
 		virtual void visit (const Array & node);
 		virtual void visit (const ArrayInit & node);
+		virtual void visit (const ArrayVal & node) {}
 		virtual void visit (const Basic_Operation & node);
 		virtual void visit (const Call_0 & node);
 		virtual void visit (const Call_1 & node);

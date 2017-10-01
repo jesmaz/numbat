@@ -13,6 +13,7 @@ class FoldConstPass : public ShallNotPass {
 		
 		virtual NodePtr visit (const NodePtr & node) {return FoldConstPass (*this) (node);}
 		
+		virtual void visit (const ArrayVal &) {}
 		virtual void visit (const Basic_Operation & node);
 		virtual void visit (const Call_0 & node);
 		virtual void visit (const Call_1 & node);

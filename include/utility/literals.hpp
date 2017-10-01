@@ -9,6 +9,9 @@
 class AbstractLiteral {
 	
 	public:
+		
+		virtual string toString (text::PrintMode mode) const {return "";}
+		
 	protected:
 	private:
 		
@@ -137,6 +140,7 @@ class NumericLiteralTemplate : public NumericLiteral {
 		virtual mpq_class toMPQ () const {return mpq_class (number);}
 		virtual uint64_t toUint64 () const {return uint64_t (number);}
 		
+		NumericLiteralTemplate () : number (0) {}
 		NumericLiteralTemplate (const T & t) : number (t) {}
 		
 	protected:
@@ -220,6 +224,7 @@ class NumericLiteralTemplate <T, typename std::enable_if <std::is_floating_point
 		virtual mpq_class toMPQ () const {return mpq_class (number);}
 		virtual uint64_t toUint64 () const {return uint64_t (number);}
 		
+		NumericLiteralTemplate () : number (0) {}
 		NumericLiteralTemplate (const T & t) : number (t) {}
 		
 	protected:
@@ -297,6 +302,7 @@ class NumericLiteralTemplate <mpq_class> : public NumericLiteral {
 		virtual mpq_class toMPQ () const {return number;}
 		virtual uint64_t toUint64 () const {return number.get_num ().get_si () / number.get_den ().get_si ();}
 		
+		NumericLiteralTemplate () : number (0) {}
 		NumericLiteralTemplate (const mpq_class & t) : number (t) {}
 		
 	protected:
@@ -329,9 +335,14 @@ class ReferenceLiteral : public AbstractLiteral {
 class ArrayLiteral : public AbstractLiteral {
 	
 	public:
+		
+		const BasicArray <Literal> & getData () const {return data;}
+		
+		ArrayLiteral (const BasicArray <Literal> & data) : data (data) {}
+		
 	protected:
 	private:
 		
-		std::shared_ptr <AbstractLiteral []> data;
+		BasicArray <Literal> data;
 		
 };

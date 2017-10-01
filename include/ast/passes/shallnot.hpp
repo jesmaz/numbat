@@ -17,6 +17,7 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const And &) {abort ();}
 		virtual void visit (const Array &) {abort ();}
 		virtual void visit (const ArrayInit &) {abort ();}
+		virtual void visit (const ArrayVal &) {abort ();}
 		virtual void visit (const Basic_Operation &) {abort ();}
 		virtual void visit (const Call_0 &) {abort ();}
 		virtual void visit (const Call_1 &)  {abort ();}

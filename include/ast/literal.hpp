@@ -23,6 +23,24 @@ class Value : public Node {
 		
 };
 
+class ArrayVal : public Value {
+	
+	public:
+		
+		const std::shared_ptr <ArrayLiteral> & getValue () const {return value;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		ArrayVal (numbat::lexer::position pos, const numbat::File * file, const std::shared_ptr <ArrayLiteral> & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
+		
+	protected:
+	private:
+		
+		std::shared_ptr <ArrayLiteral> value;
+		
+};
+
 class Number : public Value {
 	
 	public:

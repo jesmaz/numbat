@@ -6,6 +6,19 @@
 namespace AST {
 
 
+string ArrayVal::toString (text::PrintMode mode) const {
+	string s = "[";
+	for (auto & v : value->getData ()) {
+		s += v->toString (mode) + ", ";
+	}
+	if (s.back () == ' ') {
+		s.pop_back ();
+		s.back () = ']';
+		return s;
+	}
+	return s + "]";
+}
+
 string Number::toString (text::PrintMode mode) const {
 	return value->toString (mode);
 }

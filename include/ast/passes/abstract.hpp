@@ -10,6 +10,7 @@ namespace AST {
 class And;
 class Array;
 class ArrayInit;
+class ArrayVal;
 class Basic_Operation;
 class Call_0;
 class Call_1;
@@ -49,6 +50,7 @@ class AbstractPass {
 		virtual void visit (const And & node)=0;
 		virtual void visit (const Array & node)=0;
 		virtual void visit (const ArrayInit & node)=0;
+		virtual void visit (const ArrayVal & node)=0;
 		virtual void visit (const Basic_Operation & node)=0;
 		virtual void visit (const Call_0 & node)=0;
 		virtual void visit (const Call_1 & node)=0;

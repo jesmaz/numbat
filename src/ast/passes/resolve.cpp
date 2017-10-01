@@ -58,22 +58,18 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 		
 	} else if (isPredicate (node.getOpp ())) {
 		if (args.size () == 2) {
-			if (typeid (*types [0]) == typeid (Numeric) and typeid (*types [1]) == typeid (Numeric)) {
-				auto dom = DominantType (types [0], types [1]) ();
-				nPtr = std::make_shared <Basic_Operation> (
-					node.getPos (),
-					node.getFile (),
-					Numeric::get (Numeric::ArithmaticType::UINT, 1),
-					node.getIden (),
-					BasicArray <NodePtr> ({
-						StaticCastPass (dom) (args [0]),
-						StaticCastPass (dom) (args [1])
-					}),
-					node.getOpp ()
-				);
-			} else {
-				abort ();
-			}
+			auto dom = DominantType (types [0], types [1]) ();
+			nPtr = std::make_shared <Basic_Operation> (
+				node.getPos (),
+				node.getFile (),
+				Numeric::get (Numeric::ArithmaticType::UINT, 1),
+				node.getIden (),
+				BasicArray <NodePtr> ({
+					StaticCastPass (dom) (args [0]),
+					StaticCastPass (dom) (args [1])
+				}),
+				node.getOpp ()
+			);
 		} else {
 			nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), node.getIden (), args, node.getOpp ());
 		}
