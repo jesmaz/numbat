@@ -118,13 +118,10 @@ install(TARGETS numbat numbat-static numbat-static RUNTIME DESTINATION bin LIBRA
 
 
 
-add_test(test-regression numbat test/regression.nbt)
-add_test(test-regression2 console test/regression2.nbt)
-
 add_custom_command(
 	OUTPUT regression.passed
 	COMMAND numbat -o regression.passed ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
-	DEPENDS numbat test/regression.nbt
+	DEPENDS numbat ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
 )
 
 add_custom_target(regression.run ALL DEPENDS regression.passed)
