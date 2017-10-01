@@ -3,6 +3,7 @@
 
 #include <ast/node.hpp>
 #include <cinttypes>
+#include <utility/literals.hpp>
 
 
 namespace AST {
@@ -26,18 +27,18 @@ class Number : public Value {
 	
 	public:
 		
-		const string & getValue () const {return value;}
+		const std::shared_ptr <NumericLiteral> & getValue () const {return value;}
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
 		Number (numbat::lexer::position pos, const numbat::File * file, const string & value);
-		Number (numbat::lexer::position pos, const numbat::File * file, const string & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
+		Number (numbat::lexer::position pos, const numbat::File * file, const std::shared_ptr <NumericLiteral> & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
 		
 	protected:
 	private:
 		
-		string value;
+		std::shared_ptr <NumericLiteral> value;
 		
 };
 

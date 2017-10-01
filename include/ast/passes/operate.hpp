@@ -65,9 +65,10 @@ NodePtr OperatePass <parser::OPERATION::ASSIGN>::operator () (const NodePtr & no
 
 template <typename FUNCTOR>
 NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, FUNCTOR functr) {
-	const string & lhs = static_cast <Number*> (args [0].get ())->getValue ();
-	const string & rhs = static_cast <Number*> (args [1].get ())->getValue ();
-	string result;
+	const auto & lhs = static_cast <Number*> (args [0].get ())->getValue ();
+	const auto & rhs = static_cast <Number*> (args [1].get ())->getValue ();
+	auto val = functr (*lhs, *rhs);
+	std::shared_ptr <NumericLiteral> result;
 	switch (type.getArith ()) {
 		case Numeric::ArithmaticType::UNDETERMINED:
 		case Numeric::ArithmaticType::ARBITRARY: {
@@ -82,24 +83,24 @@ NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, 
 			break;
 		case Numeric::ArithmaticType::INT:
 			if (type.getMinPrec () <= 8) {
-				result = std::to_string (functr (int8_t (std::stoll (lhs)), int8_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int8_t>> (val->toInt64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int16_t (std::stoll (lhs)), int16_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int16_t>> (val->toInt64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int32_t (std::stoll (lhs)), int32_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int32_t>> (val->toInt64 ());
 			} else {
-				result = std::to_string (functr (int64_t (std::stoll (lhs)), int64_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int64_t>> (val->toInt64 ());
 			}
 			break;
 		case Numeric::ArithmaticType::UINT:
 			if (type.getMinPrec () <= 8) {
-				result = std::to_string (functr (int8_t (std::stoull (lhs)), int8_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint8_t>> (val->toUint64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int16_t (std::stoull (lhs)), int16_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint16_t>> (val->toUint64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int32_t (std::stoull (lhs)), int32_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint32_t>> (val->toUint64 ());
 			} else {
-				result = std::to_string (functr (int64_t (std::stoull (lhs)), int64_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint64_t>> (val->toUint64 ());
 			}
 			break;
 	}
@@ -108,63 +109,54 @@ NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, 
 
 template <typename FUNCTOR>
 NodePtr standardBinary (const Numeric & type, const BasicArray <NodePtr> & args, FUNCTOR functr) {
-	const string & lhs = static_cast <Number*> (args [0].get ())->getValue ();
-	const string & rhs = static_cast <Number*> (args [1].get ())->getValue ();
-	string result;
+	const auto & lhs = static_cast <Number*> (args [0].get ())->getValue ();
+	const auto & rhs = static_cast <Number*> (args [1].get ())->getValue ();
+	auto val = functr (*lhs, *rhs);
+	std::shared_ptr <NumericLiteral> result;
 	switch (type.getArith ()) {
 		case Numeric::ArithmaticType::UNDETERMINED:
 		case Numeric::ArithmaticType::ARBITRARY: {
-			mpq_class l, r;
-			string::size_type pos;
-			if ((pos = lhs.find ('.')) != string::npos) {
-				l = lhs.substr (0, pos) + lhs.substr (pos + 1) + "/1" + string (lhs.length () - (pos+1), '0');
-			} else {
-				l = lhs;
-			}
-			if ((pos = rhs.find ('.')) != string::npos) {
-				r = rhs.substr (0, pos) + rhs.substr (pos + 1) + "/1" + string (rhs.length () - (pos+1), '0');
-			} else {
-				r = rhs;
-			}
-			result = mpq_class (functr (l, r)).get_str ();
+			result = std::make_shared <NumericLiteralTemplate <mpq_class>> (val->toMPQ ());
 			break;
 		}
 		case Numeric::ArithmaticType::DECINT:
 			abort ();
 			break;
 		case Numeric::ArithmaticType::FPINT:
-			if (type.getMinPrec () <= 32) {
-				result = std::to_string (functr (std::stof (lhs), std::stof (rhs)));
-			} else if (type.getMinPrec () <= 64) {
-				result = std::to_string (functr (std::stod (lhs), std::stod (rhs)));
-			} else {
-				result = std::to_string (functr (std::stold (lhs), std::stold (rhs)));
-			}
+			result = std::make_shared <NumericLiteralTemplate <mpq_class>> (val->toMPQ ());
 			break;
 		case Numeric::ArithmaticType::INT:
 			if (type.getMinPrec () <= 8) {
-				result = std::to_string (functr (int8_t (std::stoll (lhs)), int8_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int8_t>> (val->toInt64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int16_t (std::stoll (lhs)), int16_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int16_t>> (val->toInt64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int32_t (std::stoll (lhs)), int32_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int32_t>> (val->toInt64 ());
 			} else {
-				result = std::to_string (functr (int64_t (std::stoll (lhs)), int64_t (std::stoll (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <int64_t>> (val->toInt64 ());
 			}
 			break;
 		case Numeric::ArithmaticType::UINT:
 			if (type.getMinPrec () <= 8) {
-				result = std::to_string (functr (int8_t (std::stoull (lhs)), int8_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint8_t>> (val->toUint64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int16_t (std::stoull (lhs)), int16_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint16_t>> (val->toUint64 ());
 			} else if (type.getMinPrec () <= 16) {
-				result = std::to_string (functr (int32_t (std::stoull (lhs)), int32_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint32_t>> (val->toUint64 ());
 			} else {
-				result = std::to_string (functr (int64_t (std::stoull (lhs)), int64_t (std::stoull (rhs))));
+				result = std::make_shared <NumericLiteralTemplate <uint64_t>> (val->toUint64 ());
 			}
 			break;
 	}
 	return std::make_shared <Number> (args [0]->getPos (), args [1]->getFile (), result, Numeric::get (type.getArith (), type.getMinPrec ()));
+}
+
+template <typename FUNCTOR>
+NodePtr predicateBinary (const Numeric & type, const BasicArray <NodePtr> & args, FUNCTOR functr) {
+	const auto & lhs = static_cast <Number*> (args [0].get ())->getValue ();
+	const auto & rhs = static_cast <Number*> (args [1].get ())->getValue ();
+	auto result = std::make_shared <NumericLiteralTemplate <bool>> (functr (*lhs, *rhs));
+	return std::make_shared <Number> (args [0]->getPos (), args [1]->getFile (), result, Numeric::get (Numeric::ArithmaticType::UINT, 1));
 }
 
 template <parser::OPERATION OPP>
@@ -219,32 +211,32 @@ void OperatePass <parser::OPERATION::BXOR>::visit (const Numeric & node) {
 
 template <>
 void OperatePass <parser::OPERATION::CMPEQ>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::equal_to <> ());
+	nPtr = predicateBinary (node, args, std::equal_to <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPGT>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::greater <> ());
+	nPtr = predicateBinary (node, args, std::greater <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPGTE>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::greater_equal <> ());
+	nPtr = predicateBinary (node, args, std::greater_equal <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPLT>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::less <> ());
+	nPtr = predicateBinary (node, args, std::less <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPLTE>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::less_equal <> ());
+	nPtr = predicateBinary (node, args, std::less_equal <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPNE>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::not_equal_to <> ());
+	nPtr = predicateBinary (node, args, std::not_equal_to <> ());
 }
 
 template <>
@@ -256,33 +248,8 @@ template <>
 void OperatePass <parser::OPERATION::LNOT>::visit (const Numeric & node) {
 	bool val;
 	auto * arg = static_cast <Number *> (args [0].get ());
-	switch (node.getArith ()) {
-		case Numeric::ArithmaticType::UNDETERMINED:
-		case Numeric::ArithmaticType::ARBITRARY: {
-			mpq_class mpq;
-			string::size_type pos;
-			if ((pos = arg->getValue ().find ('.')) != string::npos) {
-				mpq = arg->getValue ().substr (0, pos) + arg->getValue ().substr (pos + 1) + "/1" + string (arg->getValue ().length () - (pos+1), '0');
-			} else {
-				mpq = arg->getValue ();
-			}
-			val = not mpq;
-			break;
-		}
-		case Numeric::ArithmaticType::DECINT:
-			abort ();
-			break;
-		case Numeric::ArithmaticType::FPINT:
-			val = not std::stold (arg->getValue ());
-			break;
-		case Numeric::ArithmaticType::INT:
-			val = not std::stoll (arg->getValue ());
-			break;
-		case Numeric::ArithmaticType::UINT:
-			val = not std::stoull (arg->getValue ());
-			break;
-	}
-	nPtr = std::make_shared <Number> (arg->getPos (), arg->getFile (), std::to_string (val), Numeric::get (Numeric::ArithmaticType::UINT, 1));
+	val = not *arg->getValue ();
+	nPtr = std::make_shared <Number> (arg->getPos (), arg->getFile (), std::make_shared <NumericLiteralTemplate <bool>> (val), Numeric::get (Numeric::ArithmaticType::UINT, 1));
 }
 
 template <>

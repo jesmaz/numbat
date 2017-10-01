@@ -202,56 +202,45 @@ void FoldConstPass::visit (const CastToFloat & node) {
 
 void FoldConstPass::visit (const CastToInt & node) {
 	auto arg = std::static_pointer_cast <Number> (node.getNode ());
-	auto argType = std::static_pointer_cast <Numeric> (node.getNode ()->getType ());
 	auto targetType = std::static_pointer_cast <Numeric> (node.getType ());
-	if (arg and argType) {
-		std::string result;
-		auto & str = arg->getValue ();
-		switch (argType->getArith ()) {
+	if (arg and targetType) {
+		std::shared_ptr <NumericLiteral> result;
+		switch (targetType->getArith ()) {
 			case Numeric::ArithmaticType::UNDETERMINED:
 			case Numeric::ArithmaticType::ARBITRARY: {
-				mpq_class num;
-				string::size_type pos;
-				if ((pos = str.find ('.')) != string::npos) {
-					num = str.substr (0, pos) + str.substr (pos + 1) + "/1" + string (str.length () - (pos+1), '0');
-				} else {
-					num = str;
-				}
-				if (targetType->getMinPrec () <= 8) {
-					result = std::to_string (int8_t (num.get_num ().get_si () / num.get_den ().get_si ()));
-				} else if (targetType->getMinPrec () <= 16) {
-					result = std::to_string (int16_t (num.get_num ().get_si () / num.get_den ().get_si ()));
-				} else if (targetType->getMinPrec () <= 32) {
-					result = std::to_string (int32_t (num.get_num ().get_si () / num.get_den ().get_si ()));
-				} else {
-					result = std::to_string (int64_t (num.get_num ().get_si () / num.get_den ().get_si ()));
-				}
+				result = std::make_shared <NumericLiteralTemplate <mpq_class>> (arg->getValue ()->toMPQ ());
 				break;
 			}
 			case Numeric::ArithmaticType::DECINT:
 				abort ();
 				break;
 			case Numeric::ArithmaticType::FPINT:
-				if (targetType->getMinPrec () <= 8) {
-					result = std::to_string (int8_t (std::stod (str)));
-				} else if (targetType->getMinPrec () <= 16) {
-					result = std::to_string (int16_t (std::stod (str)));
-				} else if (targetType->getMinPrec () <= 32) {
-					result = std::to_string (int32_t (std::stod (str)));
+				if (targetType->getMinPrec () <= 32) {
+					result = std::make_shared <NumericLiteralTemplate <float>> (arg->getValue ()->toFloat ());
 				} else {
-					result = std::to_string (int64_t (std::stod (str)));
+					result = std::make_shared <NumericLiteralTemplate <double>> (arg->getValue ()->toDouble ());
 				}
 				break;
 			case Numeric::ArithmaticType::INT:
+				if (targetType->getMinPrec () <= 8) {
+					result = std::make_shared <NumericLiteralTemplate <int8_t>> (arg->getValue ()->toInt64 ());
+				} else if (targetType->getMinPrec () <= 16) {
+					result = std::make_shared <NumericLiteralTemplate <int16_t>> (arg->getValue ()->toInt64 ());
+				} else if (targetType->getMinPrec () <= 32) {
+					result = std::make_shared <NumericLiteralTemplate <int32_t>> (arg->getValue ()->toInt64 ());
+				} else {
+					result = std::make_shared <NumericLiteralTemplate <int64_t>> (arg->getValue ()->toInt64 ());
+				}
+				break;
 			case Numeric::ArithmaticType::UINT:
 				if (targetType->getMinPrec () <= 8) {
-					result = std::to_string (int8_t (std::stoll (str)));
+					result = std::make_shared <NumericLiteralTemplate <int8_t>> (arg->getValue ()->toUint64 ());
 				} else if (targetType->getMinPrec () <= 16) {
-					result = std::to_string (int16_t (std::stoll (str)));
+					result = std::make_shared <NumericLiteralTemplate <int16_t>> (arg->getValue ()->toUint64 ());
 				} else if (targetType->getMinPrec () <= 32) {
-					result = std::to_string (int32_t (std::stoll (str)));
+					result = std::make_shared <NumericLiteralTemplate <int32_t>> (arg->getValue ()->toUint64 ());
 				} else {
-					result = std::to_string (int64_t (std::stoll (str)));
+					result = std::make_shared <NumericLiteralTemplate <int64_t>> (arg->getValue ()->toUint64 ());
 				}
 				break;
 		}

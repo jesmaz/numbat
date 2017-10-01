@@ -317,18 +317,22 @@ void NirPass::visit (const IfElse & node) {
 
 void NirPass::visit (const Number & node) {
 	auto pos = node.getPos ();
-	auto & literal = node.getValue ();
+	auto literal = node.getValue ()->toString (text::PrintMode::PLAIN);
 	const nir::Type * t;
-	if (literal.back () == 'f') {
-		t = scope->resolveType ("float", pos);
-	} else if (literal.back () == 'h') {
-		t = scope->resolveType ("half", pos);
-	} else if (literal.back () == 'q') {
-		t = scope->resolveType ("quad", pos);
-	} else if (literal.find ('.') != string::npos) {
-		t = scope->resolveType ("double", pos);
-	} else {
-		t = scope->resolveType ("int64", pos);
+	switch (static_cast <const Numeric *> (node.getType ().get ())->getArith ()) {
+		case Numeric::ArithmaticType::UNDETERMINED:
+		case Numeric::ArithmaticType::ARBITRARY:
+		case Numeric::ArithmaticType::DECINT:
+			abort ();
+		case Numeric::ArithmaticType::FPINT:
+			t = scope->resolveType ("double", pos);
+			break;
+		case Numeric::ArithmaticType::INT:
+			t = scope->resolveType ("int64", pos);
+			break;
+		case Numeric::ArithmaticType::UINT:
+			t = scope->resolveType ("uint64", pos);
+			break;
 	}
 	inst = scope->createConstant (t, literal, pos);
 }

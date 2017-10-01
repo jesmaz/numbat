@@ -47,13 +47,13 @@ void Reflect::initAPI () {
 			assert (typeid (*(args [0].get ())) == typeid (AST::Number));
 			auto number = reinterpret_cast <const AST::Number*> (args [0].get ());
 			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::INT, 0));
-			auto in = std::stol (number->getValue ());
+			auto in = number->getValue ()->toUint64 ();
 			auto baseType = reverseTypeIDmap [in];
 			auto refType = Ref::get (baseType);
 			size_t typeID = reverseTypeIDmap.size ();
 			typeIDmap [refType] = typeID;
 			reverseTypeIDmap.push_back (refType);
-			return {std::make_shared <AST::Number> (number->getPos (), number->getFile (), std::to_string (typeID), number->getType ())};
+			return {std::make_shared <AST::Number> (number->getPos (), number->getFile (), std::make_shared <NumericLiteralTemplate <uint64_t>> (typeID), number->getType ())};
 		}
 	));
 	apiFuncs.insert (APIfunc (
@@ -65,7 +65,7 @@ void Reflect::initAPI () {
 			auto number = static_cast <const AST::Number*> (args [0].get ());
 			assert (number);
 			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::UINT, 1));
-			bool assertion = std::stoi (number->getValue ());
+			bool assertion = number->getValue ()->toUint64 ();
 			if (not assertion) {
 				report::logMessage (report::Severity::ERROR, callingData.file, callingData.position, "Static assertion failed");
 			}

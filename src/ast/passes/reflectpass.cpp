@@ -20,14 +20,14 @@ void ReflectPass::visit (const ReflectType & node) {
 	auto arg = std::make_shared <Number> (
 		node.getPos (),
 		node.getFile (),
-		std::to_string (ReflectType::getTypeId (target)),
+		std::make_shared <NumericLiteralTemplate <uint64_t>> (ReflectType::getTypeId (target)),
 		Numeric::get (Numeric::ArithmaticType::INT, 0)
 	);
 	auto call = MakeCallPass (node.getPos (), node.getFile (), {arg}) (metaTag);
 	auto res = FoldConstPass () (call);
 	auto typeID = std::dynamic_pointer_cast <Number> (res);
 	if (typeID) {
-		size_t id = std::stoull (typeID->getValue ());
+		size_t id = typeID->getValue ()->toUint64 ();
 		auto type = ReflectType::getType (id);
 		nPtr = type;
 	} else {
