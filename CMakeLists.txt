@@ -75,6 +75,7 @@ set(sources ${sources} "src/parse/tree/literal.cpp")
 set(sources ${sources} "src/parse/tree/metaTags.cpp")
 set(sources ${sources} "src/parse/tree/operator.cpp")
 set(sources ${sources} "src/parse/tree/resolvescope.cpp")
+set(sources ${sources} "src/parse/tree/return.cpp")
 set(sources ${sources} "src/parse/tree/slice.cpp")
 set(sources ${sources} "src/parse/tree/struct.cpp")
 set(sources ${sources} "src/parse/tree/symbol.cpp")
@@ -120,7 +121,7 @@ install(TARGETS numbat numbat-static numbat-static RUNTIME DESTINATION bin LIBRA
 
 add_custom_command(
 	OUTPUT regression.passed
-	COMMAND numbat -o regression.passed ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
+	COMMAND numbat -core-lib-dir=${CMAKE_CURRENT_SOURCE_DIR}/libnbt/core -o regression.passed ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
 	DEPENDS numbat ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
 )
 

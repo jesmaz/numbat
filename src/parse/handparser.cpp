@@ -15,6 +15,7 @@
 #include <parse/tree/metaTags.hpp>
 #include <parse/tree/operator.hpp>
 #include <parse/tree/resolvescope.hpp>
+#include <parse/tree/return.hpp>
 #include <parse/tree/slice.hpp>
 #include <parse/tree/struct.hpp>
 #include <parse/tree/typemodifier.hpp>
@@ -50,6 +51,7 @@ enum class Symbol : char {
 	OR,
 	PROGRAM,
 	REF,
+	RET,
 	SEMICOLON,
 	STATEMENT,
 	STRUCT,
@@ -110,6 +112,7 @@ std::map <string, Symbol> symbolMap {
 	{"or", Symbol::OR},
 	{";", Symbol::SEMICOLON},
 	{"ref", Symbol::REF},
+	{"return", Symbol::RET},
 	{"struct", Symbol::STRUCT},
 	{"union", Symbol::UNION},
 	{"val", Symbol::VAL},
@@ -754,6 +757,11 @@ PTNode parseStatement (CodeQueue * queue) {
 		case Symbol::UNION:
 			//return parseUnion (queue);
 			break;
+		case Symbol::RET: {
+			auto pos = queue->popToken ().pos;
+			return new ParseTreeReturn (pos, parseStatement (queue));
+			break;
+		}
 		case Symbol::REF:
 		case Symbol::VAL:
 		case Symbol::VAR:
