@@ -36,6 +36,9 @@ void Config::initalise (int argl, char ** args) {
 				} else if (std::strcmp (str, "-debug-compiler") == 0) {
 					std::cerr << str << " is currently ignored" << std::endl;
 					continue;
+				} else if (std::strncmp (str, "-core-lib-dir=", 13) == 0) {
+					config.coreLibDir = str+13;
+					continue;
 				}
 				for (int j=1; str [j]; ++j) {
 					switch (str[j]) {

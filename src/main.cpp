@@ -1,3 +1,4 @@
+#include <ast/passes/nir.hpp>
 #include <codegen/target.hpp>
 #include <codegen/llvm.hpp>
 #include <file.hpp>
@@ -11,8 +12,10 @@ int numbatMain (const Config & cfg) {
 	codegen::Target * target = codegen::Target::find ("llvm");
 	
 	nir::Module nirModule;
+	AST::NirPass nirPass (nirModule.getGlobalScope ());
 	for (const string & file : cfg.files) {
-		numbat::File::compile (file, &nirModule);
+		auto * f = numbat::File::compile (file);
+		nirPass (f->getAST ());
 	}
 	
 	if (report::compilationFailed ()) {

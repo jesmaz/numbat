@@ -10,7 +10,7 @@ struct Config {
 	static const Config & globalConfig ();
 	static void initalise (int argl, char ** args);
 	
-	std::string outfile = "a.out";
+	std::string outfile = "a.out", coreLibDir = "";
 	bool emitAssembly = false;
 	bool link = true;
 	bool emitLLVM = false;
