@@ -13,7 +13,7 @@ struct ParseTreeReturn : ParseTreeNode {
 		
 		AST::NodePtr createAST (AST::Context & ctx);
 		
-		ParseTreeReturn (numbat::lexer::position pos, PTNode cond) : ParseTreeNode (ParseTreeNode::NodeType::EXPRESSION, pos), arg (arg) {}
+		ParseTreeReturn (numbat::lexer::position pos, PTNode arg) : ParseTreeNode (ParseTreeNode::NodeType::EXPRESSION, pos), arg (arg) {}
 		
 		virtual ~ParseTreeReturn () {delete arg;}
 		
