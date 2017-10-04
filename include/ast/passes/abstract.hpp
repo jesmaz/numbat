@@ -33,6 +33,7 @@ class Or;
 class Ref;
 class Reflect;
 class ReflectType;
+class Return;
 class Sequence;
 class Struct;
 class Unresolved_Call;
@@ -74,6 +75,7 @@ class AbstractPass {
 		virtual void visit (const Ref & node)=0;
 		virtual void visit (const Reflect & node)=0;
 		virtual void visit (const ReflectType & node)=0;
+		virtual void visit (const Return & node)=0;
 		virtual void visit (const Sequence & node)=0;
 		virtual void visit (const Struct & node)=0;
 		virtual void visit (const Unresolved_Call & node)=0;

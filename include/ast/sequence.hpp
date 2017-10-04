@@ -7,6 +7,23 @@
 
 namespace AST {
 
+class Return : public Node {
+	
+	public:
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		Return (numbat::lexer::position pos, const numbat::File * file) : Node (pos, file), retVal (nullptr) {}
+		Return (numbat::lexer::position pos, const numbat::File * file, const NodePtr & retVal) : Node (pos, file, retVal->getType ()), retVal (retVal) {}
+		
+	protected:
+	private:
+		
+		NodePtr retVal;
+		
+};
+
 class Sequence : public Node {
 	
 	public:

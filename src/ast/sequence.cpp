@@ -3,6 +3,9 @@
 
 namespace AST {
 
+string Return::toString (text::PrintMode mode) const {
+	return "(return " + retVal->toString (mode) + ")";
+}
 
 string Sequence::toString (text::PrintMode mode) const {
 	
