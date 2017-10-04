@@ -114,6 +114,7 @@ void printLogs () {
 
 void printLogs (std::ostream & ostream, text::PrintMode mode) {
 	
+	ostream << std::dec;
 	for (const Message & msg : messages) {
 		if (mode == text::COLOUR) ostream << getPrintMode (msg.severity);
 		ostream << msg.severity << ": " << msg.file << ":" << msg.pos.line << ":" << msg.pos.col << ": " << msg.message << "\n";
