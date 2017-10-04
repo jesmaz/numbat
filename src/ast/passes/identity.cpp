@@ -136,6 +136,8 @@ void IdentityPass::visit (const Unresolved_Constructor & node) {
 	
 }
 
+void IdentityPass::visit (const Unresolved_Get_Member & node) {}
+
 void IdentityPass::visit (const Unresolved_IfElse & node) {}
 
 void IdentityPass::visit (const Unresolved_Operation & node) {

@@ -47,5 +47,11 @@ string Unresolved_Constructor::toString (text::PrintMode mode) const {
 	
 }
 
+string Unresolved_Get_Member::toString (text::PrintMode mode) const {
+	
+	return "([unresolved] . " + parent->toString (mode) + " " + memberName + ")";
+	
+}
+
 
 }

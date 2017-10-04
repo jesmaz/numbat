@@ -37,6 +37,7 @@ class Sequence;
 class Struct;
 class Unresolved_Call;
 class Unresolved_Constructor;
+class Unresolved_Get_Member;
 class Unresolved_IfElse;
 class Unresolved_Operation;
 class Variable;
@@ -77,6 +78,7 @@ class AbstractPass {
 		virtual void visit (const Struct & node)=0;
 		virtual void visit (const Unresolved_Call & node)=0;
 		virtual void visit (const Unresolved_Constructor & node)=0;
+		virtual void visit (const Unresolved_Get_Member & node)=0;
 		virtual void visit (const Unresolved_IfElse & node)=0;
 		virtual void visit (const Unresolved_Operation & node)=0;
 		virtual void visit (const Variable & node)=0;

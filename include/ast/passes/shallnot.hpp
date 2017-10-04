@@ -43,7 +43,8 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const Sequence &)  {abort ();}
 		virtual void visit (const Struct &)  {abort ();}
 		virtual void visit (const Unresolved_Call &)  {abort ();}
-		virtual void visit (const Unresolved_Constructor &)  {abort ();}
+		virtual void visit (const Unresolved_Constructor &) {abort ();}
+		virtual void visit (const Unresolved_Get_Member &) {abort ();}
 		virtual void visit (const Unresolved_IfElse &)  {abort ();}
 		virtual void visit (const Unresolved_Operation &)  {abort ();}
 		virtual void visit (const Variable &)  {abort ();}

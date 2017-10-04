@@ -126,4 +126,21 @@ class Unresolved_Constructor : public Node {
 		
 };
 
+class Unresolved_Get_Member : public Node {
+	
+	public:
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		Unresolved_Get_Member (numbat::lexer::position pos, const numbat::File * file, const NodePtr & parent, const string & iden) : Node (pos, file), parent (parent), memberName (iden) {}
+		
+	protected:
+	private:
+		
+		NodePtr parent;
+		string memberName;
+		
+};
+
 }

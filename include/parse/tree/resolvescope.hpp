@@ -11,6 +11,8 @@ struct ResolveScope : ParseTreeNode {
 	
 	public:
 		
+		AST::NodePtr createAST (AST::Context & ctx);
+		
 		const string & getIden () const {return iden;}
 		
 		ResolveScope (PTNode parent, const string & iden) : ParseTreeNode (ParseTreeNode::NodeType::EXPRESSION, parent->getPos ()), parent (parent), iden (iden) {}
