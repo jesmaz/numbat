@@ -103,7 +103,7 @@ void dumpLogs (std::ostream & ostream, text::PrintMode mode) {
 void logMessage (Severity severity, const numbat::File * file, numbat::lexer::position pos, const std::string & message) {
 	messages.push_back (Message (severity, file->getFileName (), pos, message));
 	std::sort (messages.begin (), messages.end ());
-	if (not errorReported or severity == ERROR) errorReported = true;
+	if (severity == ERROR) errorReported = true;
 }
 
 
