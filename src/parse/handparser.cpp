@@ -1025,12 +1025,6 @@ BasicArray <PTNode> parseParameterList (CodeQueue * queue) {
 			case Symbol::SYMBOL_AT:
 				metaTags = parseMetaTags (queue);
 				continue;
-			case Symbol::VAL:
-			case Symbol::VAR: {
-				numbat::lexer::token token = queue->popToken ();
-				atom = new ParseTreeKeyword (token.pos, token.iden);
-				break;
-			}
 			default:
 				atom = parseAtom (queue);
 				break;
