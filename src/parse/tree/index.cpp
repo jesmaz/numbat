@@ -22,7 +22,11 @@ AST::NodePtr ParseTreeIndex::createAST (AST::Context & ctx) {
 }
 
 AST::TypePtr ParseTreeIndex::createASTtype (AST::Context & ctx) {
-	return std::make_shared <AST::ArrayInit> (getPos (), ctx.getSourceFile (), index->createASTtype (ctx), args [0]->createAST (ctx), nullptr);
+	if (args.empty ()) {
+		return AST::Array::get (index->createASTtype (ctx));
+	} else {
+		return std::make_shared <AST::ArrayInit> (getPos (), ctx.getSourceFile (), index->createASTtype (ctx), args [0]->createAST (ctx), nullptr);
+	}
 }
 
 string ParseTreeIndex::strDump (text::PrintMode mode) {
