@@ -24,8 +24,10 @@ class FoldConstPass : public ShallNotPass {
 		virtual void visit (const CastToFloat & node);
 		virtual void visit (const CastToInt & node);
 		virtual void visit (const CastToUint & node);
+		virtual void visit (const Function_Ptr &) {}
 		virtual void visit (const Number &) {}
 		virtual void visit (const Sequence & node);
+		virtual void visit (const Struct &) {}
 		virtual void visit (const Variable &);
 		
 		FoldConstPass (bool readVar=true) : readVar (readVar) {}
