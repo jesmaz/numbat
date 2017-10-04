@@ -1,6 +1,7 @@
 #include <ast/node.hpp>
 #include <ast/passes/execute.hpp>
 #include <ast/passes/metatagswizzle.hpp>
+#include <ast/passes/prunedead.hpp>
 #include <ast/passes/reflectpass.hpp>
 #include <ast/passes/resolve.hpp>
 
@@ -13,6 +14,7 @@ NodePtr transform (const NodePtr & node) {
 	n = ResolvePass () (n);
 	n = ReflectPass () (n);
 	n = FoldConstPass () (n);
+	n = PruneDeadCodePass () (n);
 	return n;
 	
 }
