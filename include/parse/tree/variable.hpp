@@ -13,6 +13,7 @@ class ParseTreeVariable : public ParseTreeNode {
 		
 		AST::NodePtr createAST (AST::Context & ctx);
 		AST::NodePtr createASTparam (AST::Context & ctx);
+		AST::TypePtr createASTtype (AST::Context & ctx);
 		
 		PTNode releaseIden () {auto e = iden; iden = 0; return e;}
 		PTNode releaseInst () {auto e = inst; inst = 0; return e;}

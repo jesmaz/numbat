@@ -12,7 +12,7 @@ namespace parser {
 
 AST::NodePtr ParseTreeVariable::createAST (AST::Context & ctx) {
 	
-	AST::TypePtr type = vType->createASTtype (ctx);
+	AST::TypePtr type = createASTtype (ctx);
 	AST::VarPtr var = std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), iden->getIden (), type);
 	ctx.var (iden->getIden (), var);
 	if (inst) {
@@ -26,7 +26,7 @@ AST::NodePtr ParseTreeVariable::createAST (AST::Context & ctx) {
 
 AST::NodePtr ParseTreeVariable::createASTparam (AST::Context & ctx) {
 	
-	AST::TypePtr type = vType->createASTtype (ctx);
+	AST::TypePtr type = createASTtype (ctx);
 	AST::VarPtr var = std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), iden->getIden (), type);
 	if (inst) {
 		AST::NodePtr init = inst->createAST (ctx);
@@ -35,6 +35,10 @@ AST::NodePtr ParseTreeVariable::createASTparam (AST::Context & ctx) {
 		return var;
 	}
 	
+}
+
+AST::TypePtr ParseTreeVariable::createASTtype (AST::Context & ctx) {
+	return vType->createASTtype (ctx);
 }
 
 string ParseTreeVariable::strDump (text::PrintMode mode) {
