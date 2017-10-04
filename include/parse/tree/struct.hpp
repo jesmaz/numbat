@@ -7,15 +7,19 @@
 namespace parser {
 
 
-struct Struct : ParseTreeNode {
+struct Struct : public ParseTreeNode {
 	
 	public:
 		
 		AST::TypePtr createType (AST::Context & ctx);
 		AST::NodePtr createAST (AST::Context & ctx);
 		
-		Struct (numbat::lexer::position pos) : ParseTreeNode (pos) {}
-		Struct (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & members) : ParseTreeNode (pos), iden (iden), members (members) {}
+		const string & getIden () const {return iden;}
+		
+		Struct * asStruct () {return this;}
+		
+		Struct (numbat::lexer::position pos) : ParseTreeNode (ParseTreeNode::NodeType::STRUCT, pos) {}
+		Struct (numbat::lexer::position pos, const string & iden, const BasicArray <PTNode> & members) : ParseTreeNode (ParseTreeNode::NodeType::STRUCT, pos), iden (iden), members (members) {}
 		
 		virtual ~Struct () {delAll (tplate); delAll (tags); delAll (members);}
 		
