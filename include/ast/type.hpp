@@ -18,6 +18,7 @@ class Type : public Node {
 		string getName () const {return name;}
 		virtual TypePtr getRegType () const {return nullptr;}
 		
+		const std::multimap <string, FuncPtr> & getMethods () const {return methods;}
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {methods.insert (std::make_pair (str, func));}
 		
 		Type (numbat::lexer::position pos, const numbat::File * file) : Node (pos, file) {}
