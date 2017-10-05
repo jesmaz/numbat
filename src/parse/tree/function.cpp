@@ -1,9 +1,48 @@
-#include <nir/parameter.hpp>
-#include <nir/scope.hpp>
+#include <ast/call.hpp>
+#include <ast/passes/shallnot.hpp>
+#include <ast/variable.hpp>
 #include <parse/tree/function.hpp>
 
 
 namespace parser {
+
+
+class SeedParameterPass : public AST::ShallNotPass {
+	
+	public:
+		
+		virtual AST::NodePtr visit (const AST::NodePtr & node) {return SeedParameterPass (*this) (node);}
+		
+		virtual void visit(const AST::Variable & node) {
+			positions [node.getIden ()] = pos;
+			tPtr = node.getType ();
+			ctx.var (node.getIden (), nPtr);
+		}
+		virtual void visit (const AST::Unresolved_Constructor & node) {
+			visit (*node.getVar ());
+			defaults [pos] = nPtr;
+		}
+		
+		SeedParameterPass (BasicArray <AST::NodePtr> & defaults, std::map <std::string, size_t> & positions, size_t pos, AST::Context & ctx) : defaults (defaults), positions (positions), pos (pos), ctx (ctx) {}
+		
+		AST::TypePtr getType (const AST::NodePtr & node) {
+			nPtr = node;
+			if (not (tPtr = std::dynamic_pointer_cast <AST::Type> (node))) {
+				node->accept (*this);
+			}
+			return tPtr;
+		}
+		
+	protected:
+	private:
+		
+		BasicArray <AST::NodePtr> & defaults;
+		std::map <std::string, size_t> & positions;
+		size_t pos;
+		AST::Context & ctx;
+		AST::TypePtr tPtr;
+		
+};
 
 
 AST::FuncPtr Function::createFunc (AST::Context & ctx) {
@@ -11,14 +50,18 @@ AST::FuncPtr Function::createFunc (AST::Context & ctx) {
 	if (fPtr) return fPtr;
 	context = std::make_unique <AST::Context> (ctx);
 	
-	auto typeConv = [&](auto & a) {
-		return a->createASTtype (*context);
-	};
-	
 	fPtr = std::make_shared <AST::Function> ();
 	fPtr->iden = iden;
-	fPtr->params = params.map <AST::TypePtr> (typeConv);
-	fPtr->retVals = type.map <AST::TypePtr> (typeConv);
+	fPtr->defParams = BasicArray <AST::NodePtr> (params.size ());
+	fPtr->params = params.map <AST::TypePtr> ([&](auto & a) {
+		static size_t index=0;
+		return SeedParameterPass (fPtr->defParams, fPtr->positions, index++, *context).getType (a->createASTparam (*context));
+	});
+	fPtr->defRets = BasicArray <AST::NodePtr> (type.size ());
+	fPtr->retVals = type.map <AST::TypePtr> ([&](auto & a) {
+		static size_t index=0;
+		return SeedParameterPass (fPtr->defRets, fPtr->positions, index++, *context).getType (a->createASTparam (*context));
+	});
 	
 	return fPtr;
 }

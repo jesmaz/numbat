@@ -35,6 +35,7 @@ struct Function {
 		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>, const CallingData &)> &func);
 		
 		BasicArray <TypePtr> params, retVals;
+		BasicArray <NodePtr> defParams, defRets;
 		std::map <std::string, std::string> metaData;
 		std::map <std::string, size_t> positions;
 		
