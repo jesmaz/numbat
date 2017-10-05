@@ -327,6 +327,12 @@ struct DynArray : public BasicArray <T> {
 			capacity = 0;
 		}
 		
+		void reserve (size_t n) {
+			if (capacity < n) {
+				resize (n);
+			}
+		}
+		
 		DynArray () : BasicArray <T> (), capacity (this->size ()) {}
 		DynArray (size_t len) : DynArray <T, GROWTH> (len, T ()) {}
 		DynArray (size_t len, const T & d) : BasicArray <T> (len, d), capacity (this->size ()) {}
