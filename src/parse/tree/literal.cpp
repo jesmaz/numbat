@@ -1,5 +1,7 @@
+#include <ast/call.hpp>
 #include <ast/literal.hpp>
 #include <ast/type.hpp>
+#include <ast/variable.hpp>
 #include <nir/scope.hpp>
 #include <parse/tree/literal.hpp>
 #include <string>
@@ -28,8 +30,17 @@ AST::NodePtr ParseTreeLiteral::createAST (AST::Context & ctx) {
 		}
 		
 		case numbat::lexer::TOKEN::stringliteral: {
-			//TODO: String literals
-			return nullptr;
+			auto data = BasicArray <uint8_t> (literal.begin (), literal.end ()).map <Literal> ([](auto & n){
+				return std::make_shared <NumericLiteralTemplate <uint8_t>> (n);
+			});
+			auto arg = std::make_shared <AST::ArrayVal> (
+				getPos (),
+				ctx.getSourceFile (),
+				std::make_shared <ArrayLiteral> (data),
+				AST::Array::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8))
+			);
+			auto var = std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), literal, AST::Const::get (ctx.resolveType ("string")));
+			return std::make_shared <AST::Unresolved_Constructor> (getPos (), ctx.getSourceFile (), var, BasicArray <AST::NodePtr> {arg});
 		}
 		
 		default: {
