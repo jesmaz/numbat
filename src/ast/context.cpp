@@ -89,6 +89,11 @@ void Context::func (const string & str, FuncPtr func) {
 		func->getParams () [0]->overloadFunc (str, func);
 	}
 	
+	auto type = types->find (str);
+	if (type != types->end ()) {
+		type->second->type->overloadFunc ("", func);
+	}
+	
 }
 
 void Context::import (const string & str, Context * ctx) {
