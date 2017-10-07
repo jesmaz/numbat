@@ -2,6 +2,7 @@
 #include <ast/context.hpp>
 #include <ast/flowcontrol.hpp>
 #include <ast/operation.hpp>
+#include <ast/passes/funcutil.hpp>
 #include <ast/passes/resolve.hpp>
 #include <ast/passes/typecastpass.hpp>
 #include <ast/passes/typeutil.hpp>
@@ -58,18 +59,33 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 		
 	} else if (isPredicate (node.getOpp ())) {
 		if (args.size () == 2) {
-			auto dom = DominantType (types [0], types [1]) ();
-			nPtr = std::make_shared <Basic_Operation> (
-				node.getPos (),
-				node.getFile (),
-				Numeric::get (Numeric::ArithmaticType::UINT, 1),
-				node.getIden (),
-				BasicArray <NodePtr> ({
-					StaticCastPass (dom) (args [0]),
-					StaticCastPass (dom) (args [1])
-				}),
-				node.getOpp ()
-			);
+			if (types [0] == types [1]) {
+				nPtr = std::make_shared <Basic_Operation> (
+					node.getPos (),
+					node.getFile (),
+					Numeric::get (Numeric::ArithmaticType::UINT, 1),
+					node.getIden (),
+					BasicArray <NodePtr> ({
+						args [0],
+						args [1]
+					}),
+					node.getOpp ()
+				);
+			} else {
+				auto dom = DominantType (types [0], types [1]) ();
+				nPtr = std::make_shared <Basic_Operation> (
+					node.getPos (),
+					node.getFile (),
+					Numeric::get (Numeric::ArithmaticType::UINT, 1),
+					node.getIden (),
+					BasicArray <NodePtr> ({
+						StaticCastPass (dom) (args [0]),
+						StaticCastPass (dom) (args [1])
+					}),
+					node.getOpp ()
+				);
+				
+			}
 		} else {
 			nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), node.getIden (), args, node.getOpp ());
 		}
@@ -267,8 +283,28 @@ void ConstructorSelectionPass::visit (const ReflectType & node) {
 }
 
 void ConstructorSelectionPass::visit (const Struct & node) {
-	//TODO: Search struct for constructors
-	abort ();
+	auto itt = node.getMethods ().lower_bound ("");
+	auto end = node.getMethods ().upper_bound ("");
+	size_t winningScore = __UINT64_MAX__;
+	NodePtr winner;
+	while (itt != end) {
+		size_t score;
+		auto c = createCall (var->getPos (), var->getFile (), itt->second, args, score);
+		if (c) {
+			if (score < winningScore) {
+				winner = c;
+			} else if (score == winningScore) {
+				winner = nullptr;
+			}
+		}
+		++itt;
+	}
+	
+	if (winner) {
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " = ", BasicArray <NodePtr> {var, winner}, parser::OPERATION::ASSIGN);
+	} else {
+		abort ();
+	}
 }
 
 NodePtr ConstructorSelectionPass::operator () (const NodePtr & node) {
