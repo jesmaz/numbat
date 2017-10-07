@@ -63,6 +63,8 @@ AST::FuncPtr Function::createFunc (AST::Context & ctx) {
 		return SeedParameterPass (fPtr->defRets, fPtr->positions, index++, *context).getType (a->createASTparam (*context));
 	});
 	
+	ctx.func (iden, fPtr);
+	
 	return fPtr;
 }
 
