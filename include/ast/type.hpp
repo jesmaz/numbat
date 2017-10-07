@@ -18,6 +18,9 @@ class Type : public Node {
 		string getName () const {return name;}
 		virtual TypePtr getRegType () const {return nullptr;}
 		
+		virtual bool isConst () const {return false;}
+		virtual bool isRef () const {return false;}
+		
 		const std::multimap <string, FuncPtr> & getMethods () const {return methods;}
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {methods.insert (std::make_pair (str, func));}
 		
@@ -94,6 +97,8 @@ class Const : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		TypePtr getRegType () const {return type;}
 		virtual string toString (text::PrintMode mode) const;
+		virtual bool isConst () const {return true;}
+		virtual bool isRef () const {return type->isRef ();}
 		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func); Type::overloadFunc (str, func);}
 		
@@ -115,6 +120,8 @@ class Ref : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		TypePtr getRegType () const {return type;}
 		virtual string toString (text::PrintMode mode) const;
+		virtual bool isConst () const {return type->isConst ();}
+		virtual bool isRef () const {return true;}
 		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func);}
 		
