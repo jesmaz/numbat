@@ -73,6 +73,60 @@ NodePtr CastToNumberPass::operator () (const NodePtr & node) {
 	return nPtr;
 }
 
+void ImplicitCastPass::visit (const Array & node) {}
+
+void ImplicitCastPass::visit (const ArrayInit & node) {}
+
+void ImplicitCastPass::visit (const Const & node) {}
+
+void ImplicitCastPass::visit (const Inferred & node) {}
+
+void ImplicitCastPass::visit (const Interface & node) {}
+
+void ImplicitCastPass::visit (const Numeric & node) {}
+
+void ImplicitCastPass::visit (const Ref & node) {}
+
+void ImplicitCastPass::visit (const ReflectType & node) {}
+
+void ImplicitCastPass::visit (const Struct & node) {}
+
+NodePtr ImplicitCastPass::operator () (const NodePtr & node) {
+	
+	auto t = node->getType ();
+	if (t == target) return node;
+	
+	if (t->isRef ()) {
+		t = t->getRegType ();
+	}
+	
+	if (t->isConst ()) {
+		
+		if (target->isConst ()) {
+			ImplicitCastPass imp (target->getRegType ());
+			auto n = imp (node);
+			score = imp.score;
+			return n;
+			
+		} else if (target->isRef ()) {
+			//Requires writable memory
+			return nullptr;
+			
+		} else {
+			
+			while (t->getRegType ()) t = t->getRegType ();
+			if (t == target) return node;
+			
+		}
+		
+	}
+	
+	nPtr = node;
+	t->accept (*this);
+	return nPtr;
+	
+}
+
 
 NodePtr StaticCastPass::operator () (const NodePtr & node) {
 	
