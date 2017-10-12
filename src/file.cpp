@@ -2,6 +2,7 @@
 #include <fstream>
 #include <ast/context.hpp>
 #include <ast/passes/nir.hpp>
+#include <ast/sequence.hpp>
 #include <nir/module.hpp>
 #include <nir/scope.hpp>
 #include <mutex>
@@ -65,6 +66,7 @@ File * File::builtIn () {
 		f->directory = "";
 		f->fileName = "numbat";
 		f->context = std::make_unique <AST::Context> (f);
+		DynArray <AST::NodePtr> seq;
 		auto & cfg = Config::globalConfig ();
 		for (auto & s : {"string.nbt"}) {
 			auto path = joinPaths (cfg.coreLibDir, s);
@@ -75,10 +77,11 @@ File * File::builtIn () {
 			} else {
 				parser::PTNode parseTree = parseFile (fin, lib);
 				lib->ast = parseTree->extendAST (*f->context);
-				lib->ast = AST::transform (lib->ast);
+				seq.push_back (lib->ast);
 				delete parseTree;
 			}
 		}
+		f->ast = std::make_shared <AST::Sequence> (numbat::lexer::position {0, 0}, f, seq);
 	}
 	return builtInPtr.get ();
 }
@@ -100,7 +103,6 @@ File * File::compile (const string & path) {
 	
 	f->context = std::make_unique <AST::Context> (*builtIn ()->context, f);
 	f->ast = parseTree->createAST (*f->context);
-	f->ast = AST::transform (f->ast);
 	delete parseTree;
 	return f;
 	
