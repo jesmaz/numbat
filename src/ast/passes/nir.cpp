@@ -361,7 +361,7 @@ const nir::Type * NirTypePass::transform (const Type * t) {
 }
 
 void NirTypePass::visit (const Const & node) {
-	type = resolve (scope, node.getType ().get ());
+	type = resolve (scope, node.getRegType ().get ());
 }
 
 void NirTypePass::visit (const Inferred & node) {
@@ -393,7 +393,7 @@ void NirTypePass::visit (const Numeric & node) {
 }
 
 void NirTypePass::visit (const Ref & node) {
-	type = resolve (scope, node.getType ().get ())->getPointerTo ();
+	type = resolve (scope, node.getRegType ().get ())->getPointerTo ();
 }
 
 void NirTypePass::visit (const Struct & node) {
