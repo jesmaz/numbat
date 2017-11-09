@@ -178,6 +178,7 @@ class Struct : public Type {
 	
 	public:
 		
+		const std::map <string, size_t> & getPositionMap () const {return positionMap;}
 		const BasicArray <NodePtr> & getMembers () const {return members;}
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}

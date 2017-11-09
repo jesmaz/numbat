@@ -10,9 +10,49 @@
 #include <ast/type.hpp>
 #include <ast/variable.hpp>
 #include <iostream>
+#include <utility/report.hpp>
 
 
 namespace AST {
+
+
+void ResolveMemberPass::visit (const Array & node) {
+	abort ();
+}
+
+void ResolveMemberPass::visit (const Const & node) {
+	abort ();
+}
+
+void ResolveMemberPass::visit (const Interface & node) {
+	abort ();
+}
+
+void ResolveMemberPass::visit (const Numeric & node) {
+	abort ();
+}
+
+void ResolveMemberPass::visit (const Ref & node) {
+	abort ();
+}
+
+void ResolveMemberPass::visit (const Struct & node) {
+	auto itt = node.getPositionMap ().find (iden);
+	if (itt != node.getPositionMap ().end ()) {
+		index = itt->second;
+		type = node.getMembers () [index]->getType ();
+	}
+}
+
+NodePtr ResolveMemberPass::operator ()(numbat::lexer::position pos, const numbat::File * file, const NodePtr & node) {
+	node->getType ()->accept (*this);
+	if (index >= 0) {
+		return std::make_shared <StaticIndex> (pos, file, type, node, index);
+	} else {
+		report::logMessage (report::Severity::ERROR, file, pos, "'" + iden + "' is not a member of " + node->toString (text::PrintMode::PLAIN));
+		return node;
+	}
+}
 
 
 void ResolvePass::visit (const Sequence & node) {
@@ -50,6 +90,13 @@ void ResolvePass::visit (const Unresolved_Constructor & node) {
 	});
 	auto var = this->visit (node.getVar ());
 	nPtr = ConstructorSelectionPass (node.getPos (), node.getFile (), node.getVar (), args) (node.getVar ()->getType ());
+}
+
+void ResolvePass::visit (const Unresolved_Get_Member & node) {
+	
+	auto parent = this->visit (node.getParent ());
+	nPtr = ResolveMemberPass (node.getmember ()) (node.getPos (), node.getFile (), parent);
+	
 }
 
 void ResolvePass::visit (const Unresolved_Operation & node) {

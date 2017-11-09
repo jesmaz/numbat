@@ -130,6 +130,9 @@ class Unresolved_Get_Member : public Node {
 	
 	public:
 		
+		const NodePtr & getParent () const {return parent;}
+		const string & getmember () const {return memberName;}
+		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		

@@ -8,6 +8,32 @@
 namespace AST {
 
 
+class ResolveMemberPass : public ShallNotPass {
+	
+	public:
+		
+		virtual NodePtr visit (const NodePtr & node) {abort ();}
+		
+		virtual void visit (const Array & node);
+		virtual void visit (const Const & node);
+		virtual void visit (const Interface & node);
+		virtual void visit (const Numeric & node);
+		virtual void visit (const Ref & node);
+		virtual void visit (const Struct & node);
+		
+		NodePtr operator () (numbat::lexer::position pos, const numbat::File * file, const NodePtr & node);
+		
+		ResolveMemberPass (const string & iden) : index (-1), iden (iden) {}
+		
+	protected:
+	private:
+		
+		ssize_t index;
+		string iden;
+		TypePtr type;
+		
+};
+
 class ResolvePass : public IdentityPass {
 	
 	public:
@@ -19,6 +45,7 @@ class ResolvePass : public IdentityPass {
 		virtual void visit (const Unresolved_IfElse & node);
 		virtual void visit (const Unresolved_Call & node);
 		virtual void visit (const Unresolved_Constructor & node);
+		virtual void visit (const Unresolved_Get_Member & node);
 		virtual void visit (const Unresolved_Operation & node);
 		
 	protected:
