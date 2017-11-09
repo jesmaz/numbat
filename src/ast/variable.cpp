@@ -5,6 +5,11 @@
 namespace AST {
 
 
+string StaticIndex::toString (text::PrintMode mode) const {
+	return parent->toString (mode) + "." + std::to_string (index);
+}
+
+
 string Variable::toString (text::PrintMode mode) const {
 	if (currentValue) {
 		return "var (" + getType ()->toString (mode) + ") " + identifier + " (" + currentValue->toString (mode) + ")";

@@ -35,6 +35,7 @@ class Reflect;
 class ReflectType;
 class Return;
 class Sequence;
+class StaticIndex;
 class Struct;
 class Unresolved_Call;
 class Unresolved_Constructor;
@@ -77,6 +78,7 @@ class AbstractPass {
 		virtual void visit (const ReflectType & node)=0;
 		virtual void visit (const Return & node)=0;
 		virtual void visit (const Sequence & node)=0;
+		virtual void visit (const StaticIndex & node)=0;
 		virtual void visit (const Struct & node)=0;
 		virtual void visit (const Unresolved_Call & node)=0;
 		virtual void visit (const Unresolved_Constructor & node)=0;

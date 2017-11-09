@@ -7,6 +7,7 @@
 #include <ast/passes/identity.hpp>
 #include <ast/sequence.hpp>
 #include <ast/type.hpp>
+#include <ast/variable.hpp>
 
 
 namespace AST {
@@ -122,6 +123,10 @@ void IdentityPass::visit (const Sequence & seq) {
 	if (changed) {
 		nPtr = std::make_shared <Sequence> (seq.getPos (), seq.getFile (), nodes);
 	}
+}
+
+void IdentityPass::visit (const StaticIndex & node) {
+	nPtr = std::make_shared <StaticIndex> (node.getPos (), node.getFile (), node.getType (), this->visit (node.getParent ()), node.getIndex ());
 }
 
 void IdentityPass::visit (const Struct & node) {}
