@@ -9,6 +9,9 @@
 namespace AST {
 
 
+std::set <FuncPtr> Context::allFunctions;
+
+
 NodePtr Context::resolve (const string & str) const {
 	
 	auto itt = variables->find (str);
@@ -34,6 +37,7 @@ TypePtr Context::resolveType (const string & str) const {
 
 void Context::func (const string & str, FuncPtr func) {
 	
+	allFunctions.insert (func);
 	std::cerr << "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ " << str << std::endl;
 	
 	if (not ownFunc) {

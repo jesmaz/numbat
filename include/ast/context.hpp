@@ -37,6 +37,8 @@ struct Context {
 			const Context * owner;
 		};
 		
+		static const std::set <FuncPtr> & getAllFunctions () {return allFunctions;}
+		
 		const numbat::File * getSourceFile () const {return sourceFile;}
 		
 		Context * getRootContext () const {return rootContex;}
@@ -72,6 +74,7 @@ struct Context {
 		
 		const Context & operator = (const Context &)=delete;
 		
+		static std::set <FuncPtr> allFunctions;
 		std::shared_ptr <std::map <string, Context *>> imports;
 		std::shared_ptr <std::map <string, std::shared_ptr <function_t>>> functions;
 		std::shared_ptr <std::map <string, std::shared_ptr <type_t>>> types;
