@@ -42,6 +42,7 @@ class NirTypePass : public ShallNotPass {
 		
 		virtual NodePtr visit (const NodePtr & node) {return NirTypePass (scope) (node);}
 		
+		virtual void visit (const Array & node);
 		virtual void visit (const Const & node);
 		virtual void visit (const Inferred & node);
 		virtual void visit (const Interface & node);

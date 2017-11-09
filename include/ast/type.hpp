@@ -61,6 +61,7 @@ class Array : public Type {
 		virtual string toString (text::PrintMode mode) const;
 		
 		static TypePtr get (const TypePtr & base);
+		TypePtr getBaseType () const {return base;}
 		
 	protected:
 	private:

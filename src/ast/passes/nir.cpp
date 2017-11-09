@@ -360,6 +360,10 @@ const nir::Type * NirTypePass::transform (const Type * t) {
 	return type;
 }
 
+void NirTypePass::visit (const Array & node) {
+	type = nir::Array::arrayOf (resolve (scope, node.getBaseType ().get ()));
+}
+
 void NirTypePass::visit (const Const & node) {
 	type = resolve (scope, node.getRegType ().get ());
 }
