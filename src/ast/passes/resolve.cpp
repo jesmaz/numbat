@@ -7,6 +7,7 @@
 #include <ast/passes/typecastpass.hpp>
 #include <ast/passes/typeutil.hpp>
 #include <ast/sequence.hpp>
+#include <ast/type.hpp>
 #include <ast/variable.hpp>
 #include <iostream>
 
@@ -18,7 +19,16 @@ void ResolvePass::visit (const Sequence & node) {
 	auto nodes = node.getNodes ().map <NodePtr> ([&](auto & n) {
 		return this->visit (n);
 	});
-	nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), nodes.back ()->getType (), nodes);
+	if (nodes.empty ()) {
+		nPtr = std::make_shared <Sequence> (
+			node.getPos (),
+			node.getFile (),
+			std::make_shared <Struct> (node.getPos (), node.getFile (), ""),
+			nodes
+		);
+	} else {
+		nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), nodes.back ()->getType (), nodes);
+	}
 }
 
 void ResolvePass::visit (const Variable & node) {
