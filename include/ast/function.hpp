@@ -30,6 +30,7 @@ struct Function {
 		std::map <std::string, std::string> & getMetaData () {return metaData;}
 		const std::map <std::string, std::string> & getMetaData () const {return metaData;}
 		const string & getIden () const {return iden;}
+		void replaceBody (NodePtr b) {body = b;}
 		
 	protected:
 	private:
