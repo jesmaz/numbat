@@ -341,6 +341,9 @@ void NirPass::visit (const Sequence & seq) {
 	for (auto & node : seq.getNodes ()) {
 		inst = this->transform (node);
 	}
+	if (not inst) {
+		inst = scope->createConstant (scope->resolveType ("bool", seq.getPos ()), "0", seq.getPos ());
+	}
 }
 
 void NirPass::visit (const Variable & node) {
