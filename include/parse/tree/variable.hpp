@@ -11,6 +11,8 @@ class ParseTreeVariable : public ParseTreeNode {
 	
 	public:
 		
+		const string & getIden () const {return iden->getIden ();}
+		
 		AST::NodePtr createAST (AST::Context & ctx);
 		AST::NodePtr createASTparam (AST::Context & ctx);
 		AST::TypePtr createASTtype (AST::Context & ctx);

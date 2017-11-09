@@ -18,7 +18,13 @@ AST::NodePtr Struct::createAST (AST::Context & ctx) {
 	if (not stype) {
 		stype = std::make_shared <AST::Struct> (getPos (), ctx.getSourceFile (), iden);
 	}
-	stype->members = members.map <AST::NodePtr> ([&](auto & m){return m->createASTparam (ctx);});
+	size_t position=0;
+	stype->members = members.map <AST::NodePtr> ([&](auto & m){
+		auto param = m->createASTparam (ctx);
+		stype->positionMap [m->getIden ()] = position;
+		position++;
+		return param;
+	});
 	return stype;
 }
 
