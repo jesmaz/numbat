@@ -340,10 +340,37 @@ class NumericLiteralTemplate <mpq_class> : public NumericLiteral {
 class TupleLiteral : public AbstractLiteral {
 	
 	public:
+		
+		virtual bool operator == (const AbstractLiteral & literal) const {
+			if (typeid (literal) == typeid (*this)) {
+				auto & rhs = static_cast <const TupleLiteral &> (literal);
+				return data == rhs.data;
+			}
+			return false;
+		}
+		virtual bool operator < (const AbstractLiteral & literal) const {
+			if (typeid (literal) == typeid (*this)) {
+				auto & rhs = static_cast <const TupleLiteral &> (literal);
+				return data < rhs.data;
+			}
+			return false;
+			
+		}
+		virtual bool operator <= (const AbstractLiteral & literal) const {
+			if (typeid (literal) == typeid (*this)) {
+				auto & rhs = static_cast <const TupleLiteral &> (literal);
+				return data <= rhs.data;
+			}
+			return false;
+			
+		}
+		
+		TupleLiteral (const BasicArray <Literal> & data) : data (data) {}
+		
 	protected:
 	private:
 		
-		BasicArray <std::shared_ptr <AbstractLiteral>> data;
+		BasicArray <Literal> data;
 		
 };
 
@@ -387,6 +414,7 @@ class ArrayLiteral : public AbstractLiteral {
 			
 		}
 		
+		ArrayLiteral () : data ({}) {}
 		ArrayLiteral (const BasicArray <Literal> & data) : data (data) {}
 		
 	protected:
