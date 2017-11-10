@@ -64,5 +64,24 @@ class Number : public Value {
 		
 };
 
+class Record : public Value {
+	
+	public:
+		
+		Literal getLiteral () const {return value;}
+		const std::shared_ptr <TupleLiteral> & getValue () const {return value;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		Record (numbat::lexer::position pos, const numbat::File * file, const std::shared_ptr <TupleLiteral> & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
+		
+	protected:
+	private:
+		
+		std::shared_ptr <TupleLiteral> value;
+		
+};
+
 
 }

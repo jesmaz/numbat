@@ -30,6 +30,7 @@ class Interface;
 class Number;
 class Numeric;
 class Or;
+class Record;
 class Ref;
 class Reflect;
 class ReflectType;
@@ -73,6 +74,7 @@ class AbstractPass {
 		virtual void visit (const Number & node)=0;
 		virtual void visit (const Numeric & node)=0;
 		virtual void visit (const Or & node)=0;
+		virtual void visit (const Record & node)=0;
 		virtual void visit (const Ref & node)=0;
 		virtual void visit (const Reflect & node)=0;
 		virtual void visit (const ReflectType & node)=0;

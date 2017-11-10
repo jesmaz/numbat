@@ -73,4 +73,9 @@ Number::Number (numbat::lexer::position pos, const numbat::File * file, const st
 } ()) {}
 
 
+string Record::toString (text::PrintMode mode) const {
+	return value->toString (mode);
+}
+
+
 }

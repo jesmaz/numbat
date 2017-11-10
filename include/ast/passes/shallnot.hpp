@@ -37,6 +37,7 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const Number &)  {abort ();}
 		virtual void visit (const Numeric &)  {abort ();}
 		virtual void visit (const Or &) {abort ();}
+		virtual void visit (const Record &) {abort ();}
 		virtual void visit (const Ref &)  {abort ();}
 		virtual void visit (const Reflect &) {abort ();}
 		virtual void visit (const ReflectType &) {abort ();}
