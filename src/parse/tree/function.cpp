@@ -1,5 +1,6 @@
 #include <ast/call.hpp>
 #include <ast/passes/shallnot.hpp>
+#include <ast/passes/typeutil.hpp>
 #include <ast/variable.hpp>
 #include <parse/tree/function.hpp>
 
@@ -71,6 +72,11 @@ AST::FuncPtr Function::createFunc (AST::Context & ctx) {
 AST::NodePtr Function::createAST (AST::Context & ctx) {
 	
 	auto func = createFunc (ctx);
+	auto type = ctx.resolveType (iden);
+	if (type) {
+		context->var ("this", std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), "this", type, AST::DefaultValue ()(type)));
+		type->overloadFunc ("", func);
+	}
 	fPtr->body = body->createAST (*context);
 	return std::make_shared <AST::Function_Ptr> (getPos (), ctx.getSourceFile (), std::move (func));
 	

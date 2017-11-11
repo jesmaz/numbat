@@ -271,6 +271,19 @@ void FoldConstPass::visit (const Sequence & node) {
 	//TODO: chain onto a pruning pass (might as well do it here)
 }
 
+void FoldConstPass::visit (const StaticIndex & node) {
+	
+	auto parent = visit (node.getParent ());
+	if (parent->isValue ()) {
+		abort ();
+		
+	} else {
+		nPtr = std::make_shared <StaticIndex> (node.getPos (), node.getFile (), node.getType (), parent, node.getIndex ());
+		
+	}
+	
+}
+
 void FoldConstPass::visit (const Variable & node) {
 	if (readVar and node.getCurrentValue ()) {
 		nPtr = node.getCurrentValue ();
