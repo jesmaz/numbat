@@ -27,6 +27,7 @@ class FoldConstPass : public ShallNotPass {
 		virtual void visit (const Function_Ptr &) {}
 		virtual void visit (const Number &) {}
 		virtual void visit (const Sequence & node);
+		virtual void visit (const StaticIndex &);
 		virtual void visit (const Struct &) {}
 		virtual void visit (const Variable &);
 		
