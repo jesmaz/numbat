@@ -1,3 +1,4 @@
+#include <ast/literal.hpp>
 #include <ast/meta.hpp>
 #include <ast/passes/typeutil.hpp>
 #include <ast/type.hpp>
@@ -55,6 +56,45 @@ TypePtr DominantType::operator () () {
 	a->accept (*this);
 	return a;
 	
+}
+
+
+void DefaultValue::visit (const Array & node) {
+	value = std::make_shared <ArrayVal> (
+		node.getPos (),
+		node.getFile (),
+		std::make_shared <ArrayLiteral> (),
+		type
+	);
+}
+
+void DefaultValue::visit (const Numeric & node) {
+	abort ();
+}
+
+void DefaultValue::visit (const ReflectType & node) {
+	abort ();
+}
+
+void DefaultValue::visit (const Struct & node) {
+	value = std::make_shared <Record> (
+		node.getPos (),
+		node.getFile (),
+		std::make_shared <TupleLiteral> (node.getMembers ().map <Literal> (
+			[&](auto & m){
+				return DefaultValue ()(m->getType ())->getLiteral ();
+			}
+		)),
+		type
+	);
+}
+
+
+ValPtr DefaultValue::operator () (const TypePtr & type) {
+	this->type = type;
+	type->accept (*this);
+	assert (value);
+	return value;
 }
 
 

@@ -32,5 +32,29 @@ class DominantType : public ShallNotPass {
 		
 };
 
+class DefaultValue : public ShallNotPass {
+	
+	public:
+		
+		virtual NodePtr visit (const NodePtr & node) {abort ();}
+		
+		virtual void visit (const Array & node);
+		virtual void visit (const Numeric & node);
+		virtual void visit (const ReflectType & node);
+		virtual void visit (const Struct & node);
+		
+		
+		ValPtr operator () (const TypePtr & type);
+		
+	protected:
+	private:
+		
+		NodePtr operator () (const NodePtr & node) {abort ();}
+		
+		TypePtr type;
+		ValPtr value;
+		
+};
+
 
 }
