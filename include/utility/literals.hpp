@@ -25,13 +25,14 @@ struct literal_virtual_table {
 	Literal (*op_bxor) (const Literal &, const Literal &);
 	Literal (*op_concat) (const Literal &, const Literal &);
 	Literal (*op_div) (const Literal &, const Literal &);
+	Literal (*op_index) (const Literal &, size_t);
 	Literal (*op_mul) (const Literal &, const Literal &);
 	Literal (*op_sub) (const Literal &, const Literal &);
 	
 	void (*copy_ctr) (Literal &, const Literal &);
 	void (*destroy) (Literal &);
 	
-	static literal_virtual_table type_nil, type_array, type_fint64, type_fint32, type_int64, type_aint0, type_uint64;
+	static literal_virtual_table type_nil, type_array, type_array_index, type_fint64, type_fint32, type_int64, type_aint0, type_uint64;
 };
 
 struct Literal {
@@ -54,6 +55,7 @@ struct Literal {
 		Literal operator & (const Literal & other) const {return vTable->op_band (*this, other);}
 		Literal operator ^ (const Literal & other) const {return vTable->op_bxor (*this, other);}
 		Literal operator / (const Literal & other) const {return vTable->op_div (*this, other);}
+		Literal operator [] (size_t i) const {return vTable->op_index (*this, i);}
 		Literal operator * (const Literal & other) const {return vTable->op_mul (*this, other);}
 		Literal operator - (const Literal & other) const {return vTable->op_sub (*this, other);}
 		
@@ -77,7 +79,7 @@ struct Literal {
 		Literal (uint32_t val) : vTable (&literal_virtual_table::type_uint64), uint64 (val) {}
 		Literal (uint64_t val) : vTable (&literal_virtual_table::type_uint64), uint64 (val) {}
 		Literal (const mpq_class & val) : vTable (&literal_virtual_table::type_aint0), aint0 (new mpq_class (val)) {}
-		Literal (const BasicArray <Literal> & val) : vTable (&literal_virtual_table::type_array), array (new BasicArray <Literal> (val)) {}
+		Literal (const BasicArray <Literal> & val) : vTable (&literal_virtual_table::type_array), array (new ArrayRef {val, 1}) {}
 		
 		const Literal & operator = (const Literal & rhs) {vTable->destroy (*this); rhs.vTable->copy_ctr (*this, rhs); return *this;}
 		~Literal () {vTable->destroy (*this);}
@@ -87,9 +89,19 @@ struct Literal {
 		
 		friend literal_virtual_table;
 		
+		struct ArrayRef {
+			BasicArray <Literal> data;
+			size_t owners;
+		};
+		struct ArrayIndex {
+			ArrayRef * array;
+			size_t index;
+		};
+		
 		literal_virtual_table * vTable;
 		union {
-			BasicArray <Literal> * array;
+			ArrayIndex * arr_index;
+			ArrayRef * array;
 			double fint64;
 			float fint32;
 			int64_t int64;

@@ -32,6 +32,8 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_div
 	[](const Literal &, const Literal &) {return Literal ();},
+	// op_index
+	[](const Literal &, size_t) {return Literal ();},
 	// op_mul
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_sub
@@ -47,21 +49,21 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// op_eq
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_array == rhs.vTable) {
-			return *lhs.array == *rhs.array;
+			return lhs.array->data == rhs.array->data;
 		}
 		return false;
 	},
 	// op_lt
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_array == rhs.vTable) {
-			return *lhs.array < *rhs.array;
+			return lhs.array->data < rhs.array->data;
 		}
 		return false;
 	},
 	// op_lte
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_array == rhs.vTable) {
-			return *lhs.array <= *rhs.array;
+			return lhs.array->data <= rhs.array->data;
 		}
 		return false;
 	},
@@ -90,9 +92,12 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		if (&type_array == rhs.vTable) {
 			Literal l;
 			l.vTable = &type_array;
-			l.array = new BasicArray <Literal> (lhs.array->size () + rhs.array->size ());
-			auto itt = std::copy (lhs.array->begin (), lhs.array->end (), l.array->begin ());
-			std::copy (rhs.array->begin (), rhs.array->end (), itt);
+			l.array = new Literal::ArrayRef {
+				BasicArray <Literal> (lhs.array->data.size () + rhs.array->data.size ()),
+				1
+			};
+			auto itt = std::copy (lhs.array->data.begin (), lhs.array->data.end (), l.array->data.begin ());
+			std::copy (rhs.array->data.begin (), rhs.array->data.end (), itt);
 			return l;
 			
 		}
@@ -100,6 +105,14 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	},
 	// op_div
 	[](const Literal &, const Literal &) {return Literal ();},
+	// op_index
+	[](const Literal & self, size_t i) {
+		Literal l;
+		l.vTable = &type_array_index;
+		l.arr_index = new Literal::ArrayIndex {self.array, i};
+		self.array->owners += 1;
+		return l;
+	},
 	// op_mul
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_sub
@@ -108,11 +121,117 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {
 		lhs.vTable = rhs.vTable;
-		lhs.array = new BasicArray <Literal> (*rhs.array);
+		lhs.array = new Literal::ArrayRef (*rhs.array);
 	},
 	// destroy
-	[](Literal & lit) {
-		delete lit.array;
+	[](Literal & self) {
+		if (--(self.array->owners) == 0) {
+			delete self.array;
+		}
+	}
+	
+}, literal_virtual_table::type_array_index = {
+	
+	// op_eq
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_eq (arg, rhs);
+	},
+	// op_lt
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_lt (arg, rhs);
+	},
+	// op_lte
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_lte (arg, rhs);
+	},
+	// op_not
+	[](const Literal & self) {
+		auto & arg = self.arr_index->array->data [self.arr_index->index];
+		return arg.vTable->op_not (arg);
+	},
+	
+	// conv_double
+	[](const Literal & self) {
+		auto & arg = self.arr_index->array->data [self.arr_index->index];
+		return arg.vTable->conv_double (arg);
+	},
+	// conv_int64
+	[](const Literal & self) {
+		auto & arg = self.arr_index->array->data [self.arr_index->index];
+		return arg.vTable->conv_int64 (arg);
+	},
+	// conv_uint64
+	[](const Literal & self) {
+		auto & arg = self.arr_index->array->data [self.arr_index->index];
+		return arg.vTable->conv_uint64 (arg);
+	},
+	// conv_aint
+	[](const Literal & self) {
+		auto & arg = self.arr_index->array->data [self.arr_index->index];
+		return arg.vTable->conv_aint (arg);
+	},
+	
+	// op_add
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_add (arg, rhs);
+	},
+	// op_band
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_band (arg, rhs);
+	},
+	// op_bor
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_bor (arg, rhs);
+	},
+	// op_bxor
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_bxor (arg, rhs);
+	},
+	// op_concat
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_concat (arg, rhs);
+	},
+	// op_div
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_div (arg, rhs);
+	},
+	// op_index
+	[](const Literal & self, size_t i) {
+		auto & arg = self.arr_index->array->data [self.arr_index->index];
+		return arg.vTable->op_index (arg, i);
+	},
+	// op_mul
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_mul (arg, rhs);
+	},
+	// op_sub
+	[](const Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		return arg.vTable->op_sub (arg, rhs);
+	},
+	
+	// copy_ctr
+	[](Literal & lhs, const Literal & rhs) {
+		lhs.vTable = rhs.vTable;
+		lhs.arr_index = new Literal::ArrayIndex (*rhs.arr_index );
+		++(lhs.arr_index->array->owners);
+	},
+	// destroy
+	[](Literal & self) {
+		if (--(self.arr_index->array->owners) == 0) {
+			delete self.arr_index->array;
+		}
+		delete self.arr_index;
 	}
 	
 }, literal_virtual_table::type_fint64 = {
@@ -202,6 +321,8 @@ literal_virtual_table literal_virtual_table::type_nil = {
 			}
 		}
 	},
+	// op_index
+	[](const Literal &, size_t) {return Literal ();},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_fint64 == rhs.vTable) {
@@ -321,6 +442,8 @@ literal_virtual_table literal_virtual_table::type_nil = {
 			}
 		}
 	},
+	// op_index
+	[](const Literal &, size_t) {return Literal ();},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_fint32 == rhs.vTable) {
@@ -473,6 +596,8 @@ literal_virtual_table literal_virtual_table::type_nil = {
 			}
 		}
 	},
+	// op_index
+	[](const Literal &, size_t) {return Literal ();},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_int64 == rhs.vTable) {
@@ -592,6 +717,8 @@ literal_virtual_table literal_virtual_table::type_nil = {
 			}
 		}
 	},
+	// op_index
+	[](const Literal &, size_t) {return Literal ();},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_aint0 == rhs.vTable) {
@@ -747,6 +874,8 @@ literal_virtual_table literal_virtual_table::type_nil = {
 			}
 		}
 	},
+	// op_index
+	[](const Literal &, size_t) {return Literal ();},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_uint64 == rhs.vTable) {
