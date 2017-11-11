@@ -315,9 +315,18 @@ void NirPass::visit (const IfElse & node) {
 	inst = v;
 }
 
-void NirPass::visit (const Number & node) {
+void NirPass::visit (const Sequence & seq) {
+	for (auto & node : seq.getNodes ()) {
+		inst = this->transform (node);
+	}
+	if (not inst) {
+		inst = scope->createConstant (scope->resolveType ("bool", seq.getPos ()), "0", seq.getPos ());
+	}
+}
+
+void NirPass::visit (const Value & node) {
 	auto pos = node.getPos ();
-	auto literal = node.getValue ()->toString (text::PrintMode::PLAIN);
+	auto literal = node.getLiteral ().toString (text::PrintMode::PLAIN);
 	const nir::Type * t;
 	switch (static_cast <const Numeric *> (node.getType ().get ())->getArith ()) {
 		case Numeric::ArithmaticType::UNDETERMINED:
@@ -335,15 +344,6 @@ void NirPass::visit (const Number & node) {
 			break;
 	}
 	inst = scope->createConstant (t, literal, pos);
-}
-
-void NirPass::visit (const Sequence & seq) {
-	for (auto & node : seq.getNodes ()) {
-		inst = this->transform (node);
-	}
-	if (not inst) {
-		inst = scope->createConstant (scope->resolveType ("bool", seq.getPos ()), "0", seq.getPos ());
-	}
 }
 
 void NirPass::visit (const Variable & node) {

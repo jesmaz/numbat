@@ -17,17 +17,17 @@ void ReflectPass::visit (const Reflect & node) {
 void ReflectPass::visit (const ReflectType & node) {
 	auto metaTag = node.getMetaTag ();
 	auto target = node.getTarget ();
-	auto arg = std::make_shared <Number> (
+	auto arg = std::make_shared <Value> (
 		node.getPos (),
 		node.getFile (),
-		std::make_shared <NumericLiteralTemplate <uint64_t>> (ReflectType::getTypeId (target)),
-		Numeric::get (Numeric::ArithmaticType::INT, 0)
+		Numeric::get (Numeric::ArithmaticType::INT, 0),
+		ReflectType::getTypeId (target)
 	);
 	auto call = MakeCallPass (node.getPos (), node.getFile (), {arg}) (metaTag);
 	auto res = FoldConstPass () (call);
-	auto typeID = std::dynamic_pointer_cast <Number> (res);
+	auto typeID = std::dynamic_pointer_cast <Value> (res);
 	if (typeID) {
-		size_t id = typeID->getValue ()->toUint64 ();
+		size_t id = typeID->getLiteral ().to_uint64 ();
 		auto type = ReflectType::getType (id);
 		nPtr = type;
 	} else {

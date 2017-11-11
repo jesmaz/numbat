@@ -201,14 +201,14 @@ void FoldConstPass::visit (const CastToFloat & node) {
 }
 
 void FoldConstPass::visit (const CastToInt & node) {
-	auto arg = std::static_pointer_cast <Number> (node.getNode ());
+	auto arg = std::static_pointer_cast <Value> (node.getNode ());
 	auto targetType = std::static_pointer_cast <Numeric> (node.getType ());
 	if (arg and targetType) {
-		std::shared_ptr <NumericLiteral> result;
+		Literal result;
 		switch (targetType->getArith ()) {
 			case Numeric::ArithmaticType::UNDETERMINED:
 			case Numeric::ArithmaticType::ARBITRARY: {
-				result = std::make_shared <NumericLiteralTemplate <mpq_class>> (arg->getValue ()->toMPQ ());
+				result = arg->getLiteral ().to_aint0 ();
 				break;
 			}
 			case Numeric::ArithmaticType::DECINT:
@@ -216,35 +216,35 @@ void FoldConstPass::visit (const CastToInt & node) {
 				break;
 			case Numeric::ArithmaticType::FPINT:
 				if (targetType->getMinPrec () <= 32) {
-					result = std::make_shared <NumericLiteralTemplate <float>> (arg->getValue ()->toFloat ());
+					result = float (arg->getLiteral ().to_double ());
 				} else {
-					result = std::make_shared <NumericLiteralTemplate <double>> (arg->getValue ()->toDouble ());
+					result = arg->getLiteral ().to_double ();
 				}
 				break;
 			case Numeric::ArithmaticType::INT:
 				if (targetType->getMinPrec () <= 8) {
-					result = std::make_shared <NumericLiteralTemplate <int8_t>> (arg->getValue ()->toInt64 ());
+					result = int8_t (arg->getLiteral ().to_int64 ());
 				} else if (targetType->getMinPrec () <= 16) {
-					result = std::make_shared <NumericLiteralTemplate <int16_t>> (arg->getValue ()->toInt64 ());
+					result = int16_t (arg->getLiteral ().to_int64 ());
 				} else if (targetType->getMinPrec () <= 32) {
-					result = std::make_shared <NumericLiteralTemplate <int32_t>> (arg->getValue ()->toInt64 ());
+					result = int32_t (arg->getLiteral ().to_int64 ());
 				} else {
-					result = std::make_shared <NumericLiteralTemplate <int64_t>> (arg->getValue ()->toInt64 ());
+					result = arg->getLiteral ().to_int64 ();
 				}
 				break;
 			case Numeric::ArithmaticType::UINT:
 				if (targetType->getMinPrec () <= 8) {
-					result = std::make_shared <NumericLiteralTemplate <int8_t>> (arg->getValue ()->toUint64 ());
+					result = uint8_t (arg->getLiteral ().to_uint64 ());
 				} else if (targetType->getMinPrec () <= 16) {
-					result = std::make_shared <NumericLiteralTemplate <int16_t>> (arg->getValue ()->toUint64 ());
+					result = uint16_t (arg->getLiteral ().to_uint64 ());
 				} else if (targetType->getMinPrec () <= 32) {
-					result = std::make_shared <NumericLiteralTemplate <int32_t>> (arg->getValue ()->toUint64 ());
+					result = uint32_t (arg->getLiteral ().to_uint64 ());
 				} else {
-					result = std::make_shared <NumericLiteralTemplate <int64_t>> (arg->getValue ()->toUint64 ());
+					result = arg->getLiteral ().to_uint64 ();
 				}
 				break;
 		}
-		nPtr = std::make_shared <Number> (nPtr->getPos (), nPtr->getFile (), result, targetType);
+		nPtr = std::make_shared <Value> (nPtr->getPos (), nPtr->getFile (), targetType, result);
 	}
 }
 
@@ -285,8 +285,8 @@ void FoldConstPass::visit (const StaticIndex & node) {
 }
 
 void FoldConstPass::visit (const Variable & node) {
-	if (readVar and node.getCurrentValue ()) {
-		nPtr = node.getCurrentValue ();
+	if (readVar) {
+		nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), node.getCurrentValue ());
 	}
 }
 

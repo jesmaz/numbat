@@ -17,7 +17,6 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const And & node);
 		virtual void visit (const Array & node);
 		virtual void visit (const ArrayInit & node);
-		virtual void visit (const ArrayVal & node) {}
 		virtual void visit (const Basic_Operation & node);
 		virtual void visit (const Call_0 & node);
 		virtual void visit (const Call_1 & node);
@@ -34,10 +33,8 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const IfElse & node);
 		virtual void visit (const Inferred & node);
 		virtual void visit (const Interface & node);
-		virtual void visit (const Number & node);
 		virtual void visit (const Numeric & node);
 		virtual void visit (const Or & node);
-		virtual void visit (const Record & node) {}
 		virtual void visit (const Ref & node);
 		virtual void visit (const Reflect & node);
 		virtual void visit (const ReflectType & node);
@@ -50,6 +47,7 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const Unresolved_Get_Member & node);
 		virtual void visit (const Unresolved_IfElse & node);
 		virtual void visit (const Unresolved_Operation & node);
+		virtual void visit (const Value & node) {}
 		virtual void visit (const Variable & node);
 		
 	protected:

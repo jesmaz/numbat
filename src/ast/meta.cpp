@@ -44,16 +44,16 @@ void Reflect::initAPI () {
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
 		[](const BasicArray <NodePtr> args, const CallingData &) -> const BasicArray <NodePtr> {
 			assert (args.size () == 1);
-			assert (typeid (*(args [0].get ())) == typeid (AST::Number));
-			auto number = reinterpret_cast <const AST::Number*> (args [0].get ());
+			assert (typeid (*(args [0].get ())) == typeid (AST::Value));
+			auto number = reinterpret_cast <const AST::Value*> (args [0].get ());
 			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::INT, 0));
-			auto in = number->getValue ()->toUint64 ();
+			auto in = number->getLiteral ().to_uint64 ();
 			auto baseType = reverseTypeIDmap [in];
 			auto refType = Ref::get (baseType);
 			size_t typeID = reverseTypeIDmap.size ();
 			typeIDmap [refType] = typeID;
 			reverseTypeIDmap.push_back (refType);
-			return {std::make_shared <AST::Number> (number->getPos (), number->getFile (), std::make_shared <NumericLiteralTemplate <uint64_t>> (typeID), number->getType ())};
+			return {std::make_shared <AST::Value> (number->getPos (), number->getFile (), number->getType (), typeID)};
 		}
 	));
 	apiFuncs.insert (APIfunc (
@@ -62,10 +62,10 @@ void Reflect::initAPI () {
 		{Numeric::get (Numeric::ArithmaticType::UINT, 1)},
 		[](const BasicArray <NodePtr> args, const CallingData & callingData) -> const BasicArray <NodePtr> {
 			assert (args.size () == 1);
-			auto number = static_cast <const AST::Number*> (args [0].get ());
+			auto number = static_cast <const AST::Value*> (args [0].get ());
 			assert (number);
 			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::UINT, 1));
-			bool assertion = number->getValue ()->toUint64 ();
+			bool assertion = number->getLiteral ().to_uint64 ();
 			if (not assertion) {
 				auto msg = "Static assertion failed: " + report::retrieveLine (callingData.file, callingData.position.line);
 				report::logMessage (report::Severity::ERROR, callingData.file, callingData.position, msg);

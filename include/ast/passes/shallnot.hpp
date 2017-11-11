@@ -17,7 +17,6 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const And &) {abort ();}
 		virtual void visit (const Array &) {abort ();}
 		virtual void visit (const ArrayInit &) {abort ();}
-		virtual void visit (const ArrayVal &) {abort ();}
 		virtual void visit (const Basic_Operation &) {abort ();}
 		virtual void visit (const Call_0 &) {abort ();}
 		virtual void visit (const Call_1 &)  {abort ();}
@@ -34,10 +33,8 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const IfElse &)  {abort ();}
 		virtual void visit (const Inferred &)  {abort ();}
 		virtual void visit (const Interface &)  {abort ();}
-		virtual void visit (const Number &)  {abort ();}
 		virtual void visit (const Numeric &)  {abort ();}
 		virtual void visit (const Or &) {abort ();}
-		virtual void visit (const Record &) {abort ();}
 		virtual void visit (const Ref &)  {abort ();}
 		virtual void visit (const Reflect &) {abort ();}
 		virtual void visit (const ReflectType &) {abort ();}
@@ -50,6 +47,7 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const Unresolved_Get_Member &) {abort ();}
 		virtual void visit (const Unresolved_IfElse &)  {abort ();}
 		virtual void visit (const Unresolved_Operation &)  {abort ();}
+		virtual void visit (const Value &) {abort ();}
 		virtual void visit (const Variable &)  {abort ();}
 		
 	protected:

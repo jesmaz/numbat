@@ -93,8 +93,6 @@ void IdentityPass::visit (const Inferred & node) {}
 
 void IdentityPass::visit (const Interface & node) {}
 
-void IdentityPass::visit (const Number & node) {}
-
 void IdentityPass::visit (const Numeric & node) {}
 
 void IdentityPass::visit (const Or & node) {

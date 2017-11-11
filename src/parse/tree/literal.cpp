@@ -14,30 +14,30 @@ AST::NodePtr ParseTreeLiteral::createAST (AST::Context & ctx) {
 	
 	switch (tokenType) {
 		case numbat::lexer::TOKEN::chararrayliteral: {
-			auto data = BasicArray <uint8_t> (literal.begin (), literal.end ()).map <Literal> ([](auto & n){
-				return std::make_shared <NumericLiteralTemplate <uint8_t>> (n);
+			auto data = BasicArray <Literal> (literal.begin (), literal.end ()).map <Literal> ([](auto & n){
+				return Literal (n);
 			});
-			return std::make_shared <AST::ArrayVal> (
+			return std::make_shared <AST::Value> (
 				getPos (),
 				ctx.getSourceFile (),
-				std::make_shared <ArrayLiteral> (data),
-				AST::Array::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8))
+				AST::Array::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)),
+				data
 			);
 		}
 		
 		case numbat::lexer::TOKEN::numericliteral: {
-			return std::make_shared <AST::Number> (getPos (), ctx.getSourceFile (), literal);
+			return AST::Value::parseNumber (getPos (), ctx.getSourceFile (), literal);
 		}
 		
 		case numbat::lexer::TOKEN::stringliteral: {
-			auto data = BasicArray <uint8_t> (literal.begin (), literal.end ()).map <Literal> ([](auto & n){
-				return std::make_shared <NumericLiteralTemplate <uint8_t>> (n);
+			auto data = BasicArray <Literal> (literal.begin (), literal.end ()).map <Literal> ([](auto & n){
+				return Literal (n);
 			});
-			auto arg = std::make_shared <AST::ArrayVal> (
+			auto arg = std::make_shared <AST::Value> (
 				getPos (),
 				ctx.getSourceFile (),
-				std::make_shared <ArrayLiteral> (data),
-				AST::Array::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8))
+				AST::Array::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)),
+				data
 			);
 			auto var = std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), literal, AST::Const::get (ctx.resolveType ("string")));
 			return std::make_shared <AST::Unresolved_Constructor> (getPos (), ctx.getSourceFile (), var, BasicArray <AST::NodePtr> {arg});

@@ -20,8 +20,8 @@ class NirPass : public ShallNotPass {
 		virtual void visit (const Call_2 & node);
 		virtual void visit (const Call_n & node);
 		virtual void visit (const IfElse & node);
-		virtual void visit (const Number & node);
 		virtual void visit (const Sequence & node);
+		virtual void visit (const Value & node);
 		virtual void visit (const Variable & node);
 		
 		NirPass (nir::Scope * scope) : scope (scope) {}

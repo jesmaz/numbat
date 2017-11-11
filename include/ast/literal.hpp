@@ -13,73 +13,20 @@ class Value : public Node {
 	
 	public:
 		
-		virtual Literal getLiteral () const=0;
+		const Literal & getLiteral () const {return literal;}
 		
 		virtual bool isValue () const {return true;}
-		
-		
-		Value (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type) : Node (pos, file, type) {}
-		
-	protected:
-	private:
-		
-};
-
-class ArrayVal : public Value {
-	
-	public:
-		
-		Literal getLiteral () const {return value;}
-		const std::shared_ptr <ArrayLiteral> & getValue () const {return value;}
-		
-		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
+		virtual void accept (AbstractPass & pass) const {pass.visit (*this);}
 		
-		ArrayVal (numbat::lexer::position pos, const numbat::File * file, const std::shared_ptr <ArrayLiteral> & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
+		static ValPtr parseNumber (numbat::lexer::position pos, const numbat::File * file, const string & num);
 		
-	protected:
-	private:
-		
-		std::shared_ptr <ArrayLiteral> value;
-		
-};
-
-class Number : public Value {
-	
-	public:
-		
-		Literal getLiteral () const {return value;}
-		const std::shared_ptr <NumericLiteral> & getValue () const {return value;}
-		
-		void accept (AbstractPass & pass) const {pass.visit (*this);}
-		virtual string toString (text::PrintMode mode) const;
-		
-		Number (numbat::lexer::position pos, const numbat::File * file, const string & value);
-		Number (numbat::lexer::position pos, const numbat::File * file, const std::shared_ptr <NumericLiteral> & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
+		Value (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const Literal & lit) : Node (pos, file, type), literal (lit) {}
 		
 	protected:
 	private:
 		
-		std::shared_ptr <NumericLiteral> value;
-		
-};
-
-class Record : public Value {
-	
-	public:
-		
-		Literal getLiteral () const {return value;}
-		const std::shared_ptr <TupleLiteral> & getValue () const {return value;}
-		
-		void accept (AbstractPass & pass) const {pass.visit (*this);}
-		virtual string toString (text::PrintMode mode) const;
-		
-		Record (numbat::lexer::position pos, const numbat::File * file, const std::shared_ptr <TupleLiteral> & value, const TypePtr & type) : Value (pos, file, type), value (value) {}
-		
-	protected:
-	private:
-		
-		std::shared_ptr <TupleLiteral> value;
+		Literal literal;
 		
 };
 

@@ -10,7 +10,6 @@ namespace AST {
 class And;
 class Array;
 class ArrayInit;
-class ArrayVal;
 class Basic_Operation;
 class Call_0;
 class Call_1;
@@ -27,10 +26,8 @@ class Function_Set;
 class IfElse;
 class Inferred;
 class Interface;
-class Number;
 class Numeric;
 class Or;
-class Record;
 class Ref;
 class Reflect;
 class ReflectType;
@@ -43,6 +40,7 @@ class Unresolved_Constructor;
 class Unresolved_Get_Member;
 class Unresolved_IfElse;
 class Unresolved_Operation;
+class Value;
 class Variable;
 
 class AbstractPass {
@@ -54,7 +52,6 @@ class AbstractPass {
 		virtual void visit (const And & node)=0;
 		virtual void visit (const Array & node)=0;
 		virtual void visit (const ArrayInit & node)=0;
-		virtual void visit (const ArrayVal & node)=0;
 		virtual void visit (const Basic_Operation & node)=0;
 		virtual void visit (const Call_0 & node)=0;
 		virtual void visit (const Call_1 & node)=0;
@@ -71,10 +68,8 @@ class AbstractPass {
 		virtual void visit (const IfElse & node)=0;
 		virtual void visit (const Inferred & node)=0;
 		virtual void visit (const Interface & node)=0;
-		virtual void visit (const Number & node)=0;
 		virtual void visit (const Numeric & node)=0;
 		virtual void visit (const Or & node)=0;
-		virtual void visit (const Record & node)=0;
 		virtual void visit (const Ref & node)=0;
 		virtual void visit (const Reflect & node)=0;
 		virtual void visit (const ReflectType & node)=0;
@@ -87,6 +82,7 @@ class AbstractPass {
 		virtual void visit (const Unresolved_Get_Member & node)=0;
 		virtual void visit (const Unresolved_IfElse & node)=0;
 		virtual void visit (const Unresolved_Operation & node)=0;
+		virtual void visit (const Value & node)=0;
 		virtual void visit (const Variable & node)=0;
 		
 		NodePtr operator () (const NodePtr & node);

@@ -2,426 +2,99 @@
 
 
 #include <gmpxx.h>
-#include <memory>
 #include <utility/array.hpp>
+#include <utility/text.hpp>
 
 
-class AbstractLiteral {
+struct Literal;
+
+struct literal_virtual_table {
+	bool (*op_eq) (const Literal &, const Literal &);
+	bool (*op_lt) (const Literal &, const Literal &);
+	bool (*op_lte) (const Literal &, const Literal &);
+	bool (*op_not) (const Literal &);
 	
-	public:
-		
-		virtual string toString (text::PrintMode mode) const {return "";}
-		
-		virtual bool operator == (const AbstractLiteral & literal) const=0;
-		bool operator != (const AbstractLiteral & literal) const {return not (*this == literal);}
-		virtual bool operator < (const AbstractLiteral & literal) const=0;
-		virtual bool operator <= (const AbstractLiteral & literal) const=0;
-		bool operator > (const AbstractLiteral & literal) const {return not (*this <= literal);}
-		bool operator >= (const AbstractLiteral & literal) const {return not (*this < literal);}
-		
-	protected:
-	private:
-		
-		
-		
+	Literal (*conv_double) (const Literal &);
+	Literal (*conv_int64) (const Literal &);
+	Literal (*conv_uint64) (const Literal &);
+	Literal (*conv_aint) (const Literal &);
+	
+	Literal (*op_add) (const Literal &, const Literal &);
+	Literal (*op_band) (const Literal &, const Literal &);
+	Literal (*op_bor) (const Literal &, const Literal &);
+	Literal (*op_bxor) (const Literal &, const Literal &);
+	Literal (*op_concat) (const Literal &, const Literal &);
+	Literal (*op_div) (const Literal &, const Literal &);
+	Literal (*op_mul) (const Literal &, const Literal &);
+	Literal (*op_sub) (const Literal &, const Literal &);
+	
+	void (*copy_ctr) (Literal &, const Literal &);
+	void (*destroy) (Literal &);
+	
+	static literal_virtual_table type_nil, type_array, type_fint64, type_fint32, type_int64, type_aint0, type_uint64;
 };
 
 struct Literal {
 	
-	AbstractLiteral & operator * () {return *lit;}
-	const AbstractLiteral & operator * () const {return *lit;}
-	
-	AbstractLiteral * operator -> () {return lit.get ();}
-	const AbstractLiteral * operator -> () const {return lit.get ();}
-	
-	bool isNil () const {return lit == nullptr;}
-	
-	virtual bool operator == (const Literal & literal) const {return *lit == *literal;}
-	bool operator != (const Literal & literal) const {return *lit != *literal;}
-	virtual bool operator < (const Literal & literal) const {return *lit < *literal;}
-	virtual bool operator <= (const Literal & literal) const {return *lit <= *literal;}
-	bool operator > (const Literal & literal) const {return *lit > *literal;}
-	bool operator >= (const Literal & literal) const {return *lit >= *literal;}
-	
-	operator std::shared_ptr <AbstractLiteral> & () {return lit;}
-	operator const std::shared_ptr <AbstractLiteral> & () const {return lit;}
-	
-	std::shared_ptr <AbstractLiteral> lit;
-	
-	Literal () {}
-	Literal (const std::shared_ptr <AbstractLiteral> & lit) : lit (lit) {}
-	template <typename T>
-	Literal (const std::shared_ptr <T> & lit) : lit (lit) {}
-};
-
-class NumericLiteral : public AbstractLiteral {
-	
 	public:
 		
-		virtual std::shared_ptr <NumericLiteral> operator + (const NumericLiteral & literal) const=0;
-		virtual std::shared_ptr <NumericLiteral> operator - (const NumericLiteral & literal) const=0;
-		virtual std::shared_ptr <NumericLiteral> operator * (const NumericLiteral & literal) const=0;
-		virtual std::shared_ptr <NumericLiteral> operator / (const NumericLiteral & literal) const=0;
-		virtual std::shared_ptr <NumericLiteral> operator | (const NumericLiteral & literal) const=0;
-		virtual std::shared_ptr <NumericLiteral> operator & (const NumericLiteral & literal) const=0;
-		virtual std::shared_ptr <NumericLiteral> operator ^ (const NumericLiteral & literal) const=0;
+		bool isNil () const {return vTable == &literal_virtual_table::type_nil;}
 		
-		virtual string toString (text::PrintMode mode) const=0;
+		bool operator == (const Literal & rhs) const {return vTable->op_eq (*this, rhs);}
+		bool operator != (const Literal & rhs) const {return not vTable->op_eq (*this, rhs);}
+		bool operator < (const Literal & rhs) const {return vTable->op_lt (*this, rhs);}
+		bool operator <= (const Literal & rhs) const {return vTable->op_lte (*this, rhs);}
+		bool operator > (const Literal & rhs) const {return not vTable->op_lte (*this, rhs);}
+		bool operator >= (const Literal & rhs) const {return not vTable->op_lt (*this, rhs);}
+		bool operator not () const {return vTable->op_not (*this);}
 		
-		virtual bool operator not () const=0;
+		Literal concat (const Literal & other) const {return vTable->op_concat (*this, other);}
+		Literal operator + (const Literal & other) const {return vTable->op_add (*this, other);}
+		Literal operator | (const Literal & other) const {return vTable->op_bor (*this, other);}
+		Literal operator & (const Literal & other) const {return vTable->op_band (*this, other);}
+		Literal operator ^ (const Literal & other) const {return vTable->op_bxor (*this, other);}
+		Literal operator / (const Literal & other) const {return vTable->op_div (*this, other);}
+		Literal operator * (const Literal & other) const {return vTable->op_mul (*this, other);}
+		Literal operator - (const Literal & other) const {return vTable->op_sub (*this, other);}
 		
-		virtual double toDouble () const=0;
-		virtual float toFloat () const=0;
-		virtual int64_t toInt64 () const=0;
-		virtual mpq_class toMPQ () const=0;
-		virtual uint64_t toUint64 () const=0;
+		std::string toString (text::PrintMode mode) const;
+		
+		mpq_class to_aint0 (bool * success=nullptr) const;
+		double to_double (bool * success=nullptr) const;
+		int64_t to_int64 (bool * success=nullptr) const;
+		uint64_t to_uint64 (bool * success=nullptr) const;
+		
+		Literal () : vTable (&literal_virtual_table::type_nil), uint64 (0) {}
+		Literal (const Literal & rhs) {rhs.vTable->copy_ctr (*this, rhs);}
+		Literal (double val) : vTable (&literal_virtual_table::type_fint64), fint64 (val) {}
+		Literal (float val) : vTable (&literal_virtual_table::type_fint32), fint32 (val) {}
+		Literal (int8_t val) : vTable (&literal_virtual_table::type_int64), int64 (val) {}
+		Literal (int16_t val) : vTable (&literal_virtual_table::type_int64), int64 (val) {}
+		Literal (int32_t val) : vTable (&literal_virtual_table::type_int64), int64 (val) {}
+		Literal (int64_t val) : vTable (&literal_virtual_table::type_int64), int64 (val) {}
+		Literal (uint8_t val) : vTable (&literal_virtual_table::type_uint64), uint64 (val) {}
+		Literal (uint16_t val) : vTable (&literal_virtual_table::type_uint64), uint64 (val) {}
+		Literal (uint32_t val) : vTable (&literal_virtual_table::type_uint64), uint64 (val) {}
+		Literal (uint64_t val) : vTable (&literal_virtual_table::type_uint64), uint64 (val) {}
+		Literal (const mpq_class & val) : vTable (&literal_virtual_table::type_aint0), aint0 (new mpq_class (val)) {}
+		Literal (const BasicArray <Literal> & val) : vTable (&literal_virtual_table::type_array), array (new BasicArray <Literal> (val)) {}
+		
+		const Literal & operator = (const Literal & rhs) {vTable->destroy (*this); rhs.vTable->copy_ctr (*this, rhs); return *this;}
+		~Literal () {vTable->destroy (*this);}
 		
 	protected:
 	private:
 		
-};
-
-template <typename T, typename T_SFINAE = void>
-class NumericLiteralTemplate : public NumericLiteral {
-	
-	public:
+		friend literal_virtual_table;
 		
-		virtual std::shared_ptr <NumericLiteral> operator + (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number + rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator - (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number - rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator * (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number * rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator / (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number / rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator | (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number | rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator & (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number & rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator ^ (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number ^ rhs.number);
-			}
-			abort ();
-		}
-		
-		virtual string toString (text::PrintMode mode) const {return std::to_string (number);}
-		
-		virtual bool operator not () const {return not number;}
-		virtual bool operator == (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return number == rhs.number;
-			}
-			return false;
-		}
-		virtual bool operator < (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return number < rhs.number;
-			}
-			return false;
-		}
-		virtual bool operator <= (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return number <= rhs.number;
-			}
-			return false;
-		}
-		
-		virtual double toDouble () const {return double (number);}
-		virtual float toFloat () const {return float (number);}
-		virtual int64_t toInt64 () const {return int64_t (number);}
-		virtual mpq_class toMPQ () const {return mpq_class (number);}
-		virtual uint64_t toUint64 () const {return uint64_t (number);}
-		
-		NumericLiteralTemplate () : number (0) {}
-		NumericLiteralTemplate (const T & t) : number (t) {}
-		
-	protected:
-	private:
-		
-		T number;
-		
-};
-
-template <typename T>
-class NumericLiteralTemplate <T, typename std::enable_if <std::is_floating_point <T>::value>::type> : public NumericLiteral {
-	
-	public:
-		
-		virtual std::shared_ptr <NumericLiteral> operator + (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number + rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator - (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number - rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator * (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number * rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator / (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <T>> (number / rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator | (const NumericLiteral & literal) const {
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator & (const NumericLiteral & literal) const {
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator ^ (const NumericLiteral & literal) const {
-			abort ();
-		}
-		
-		virtual string toString (text::PrintMode mode) const {return std::to_string (number);}
-		
-		virtual bool operator not () const {return not number;}
-		virtual bool operator == (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return number == rhs.number;
-			}
-			return false;
-		}
-		virtual bool operator < (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return number < rhs.number;
-			}
-			return false;
-		}
-		virtual bool operator <= (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <T>&> (literal);
-				return number <= rhs.number;
-			}
-			return false;
-		}
-		
-		virtual double toDouble () const {return double (number);}
-		virtual float toFloat () const {return float (number);}
-		virtual int64_t toInt64 () const {return int64_t (number);}
-		virtual mpq_class toMPQ () const {return mpq_class (number);}
-		virtual uint64_t toUint64 () const {return uint64_t (number);}
-		
-		NumericLiteralTemplate () : number (0) {}
-		NumericLiteralTemplate (const T & t) : number (t) {}
-		
-	protected:
-	private:
-		
-		T number;
-		
-};
-
-template <>
-class NumericLiteralTemplate <mpq_class> : public NumericLiteral {
-	
-	public:
-		
-		virtual std::shared_ptr <NumericLiteral> operator + (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <mpq_class>> (number + rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator - (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <mpq_class>> (number - rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator * (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <mpq_class>> (number * rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator / (const NumericLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
-				return std::make_shared <NumericLiteralTemplate <mpq_class>> (number / rhs.number);
-			}
-			abort ();
-		}
-		virtual std::shared_ptr <NumericLiteral> operator | (const NumericLiteral & literal) const {abort ();}
-		virtual std::shared_ptr <NumericLiteral> operator & (const NumericLiteral & literal) const {abort ();}
-		virtual std::shared_ptr <NumericLiteral> operator ^ (const NumericLiteral & literal) const {abort ();}
-		
-		virtual string toString (text::PrintMode mode) const {return number.get_str ();}
-		
-		virtual bool operator not () const {return not number;}
-		virtual bool operator == (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
-				return number == rhs.number;
-			}
-			return false;
-		}
-		virtual bool operator < (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
-				return number < rhs.number;
-			}
-			return false;
-		}
-		virtual bool operator <= (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const NumericLiteralTemplate <mpq_class>&> (literal);
-				return number <= rhs.number;
-			}
-			return false;
-		}
-		
-		virtual double toDouble () const {return number.get_d ();}
-		virtual float toFloat () const {return number.get_d ();}
-		virtual int64_t toInt64 () const {return number.get_num ().get_si () / number.get_den ().get_si ();}
-		virtual mpq_class toMPQ () const {return number;}
-		virtual uint64_t toUint64 () const {return number.get_num ().get_si () / number.get_den ().get_si ();}
-		
-		NumericLiteralTemplate () : number (0) {}
-		NumericLiteralTemplate (const mpq_class & t) : number (t) {}
-		
-	protected:
-	private:
-		
-		mpq_class number;
-		
-};
-
-class TupleLiteral : public AbstractLiteral {
-	
-	public:
-		
-		virtual bool operator == (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const TupleLiteral &> (literal);
-				return data == rhs.data;
-			}
-			return false;
-		}
-		virtual bool operator < (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const TupleLiteral &> (literal);
-				return data < rhs.data;
-			}
-			return false;
-			
-		}
-		virtual bool operator <= (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const TupleLiteral &> (literal);
-				return data <= rhs.data;
-			}
-			return false;
-			
-		}
-		
-		TupleLiteral (const BasicArray <Literal> & data) : data (data) {}
-		
-	protected:
-	private:
-		
-		BasicArray <Literal> data;
-		
-};
-
-class ReferenceLiteral : public AbstractLiteral {
-	
-	public:
-	protected:
-	private:
-		
-		AbstractLiteral * referencedData;
-		
-};
-
-class ArrayLiteral : public AbstractLiteral {
-	
-	public:
-		
-		const BasicArray <Literal> & getData () const {return data;}
-		
-		virtual bool operator == (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const ArrayLiteral &> (literal);
-				return data == rhs.data;
-			}
-			return false;
-		}
-		virtual bool operator < (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const ArrayLiteral &> (literal);
-				return data < rhs.data;
-			}
-			return false;
-			
-		}
-		virtual bool operator <= (const AbstractLiteral & literal) const {
-			if (typeid (literal) == typeid (*this)) {
-				auto & rhs = static_cast <const ArrayLiteral &> (literal);
-				return data <= rhs.data;
-			}
-			return false;
-			
-		}
-		
-		ArrayLiteral () : data ({}) {}
-		ArrayLiteral (const BasicArray <Literal> & data) : data (data) {}
-		
-	protected:
-	private:
-		
-		BasicArray <Literal> data;
+		literal_virtual_table * vTable;
+		union {
+			BasicArray <Literal> * array;
+			double fint64;
+			float fint32;
+			int64_t int64;
+			mpq_class * aint0;
+			uint64_t uint64;
+		};
 		
 };

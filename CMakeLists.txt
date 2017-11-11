@@ -85,6 +85,7 @@ set(sources ${sources} "src/parse/tree/typemodifier.cpp")
 set(sources ${sources} "src/parse/tree/variable.cpp")
 set(sources ${sources} "src/utility/alphanumeric.cpp")
 set(sources ${sources} "src/utility/config.cpp")
+set(sources ${sources} "src/utility/literals.cpp")
 set(sources ${sources} "src/utility/report.cpp")
 
 add_library(numbat-static STATIC ${sources})
