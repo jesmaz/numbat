@@ -60,12 +60,7 @@ TypePtr DominantType::operator () () {
 
 
 void DefaultValue::visit (const Array & node) {
-	value = std::make_shared <ArrayVal> (
-		node.getPos (),
-		node.getFile (),
-		std::make_shared <ArrayLiteral> (),
-		type
-	);
+	value = std::make_shared <ArrayLiteral> ();
 }
 
 void DefaultValue::visit (const Numeric & node) {
@@ -77,23 +72,15 @@ void DefaultValue::visit (const ReflectType & node) {
 }
 
 void DefaultValue::visit (const Struct & node) {
-	value = std::make_shared <Record> (
-		node.getPos (),
-		node.getFile (),
-		std::make_shared <TupleLiteral> (node.getMembers ().map <Literal> (
-			[&](auto & m){
-				return DefaultValue ()(m->getType ())->getLiteral ();
-			}
-		)),
-		type
-	);
+	value = std::make_shared <TupleLiteral> (node.getMembers ().map <Literal> ([&](auto & m) {
+		return DefaultValue ()(m->getType ());
+	}));
 }
 
 
-ValPtr DefaultValue::operator () (const TypePtr & type) {
+Literal DefaultValue::operator () (const TypePtr & type) {
 	this->type = type;
 	type->accept (*this);
-	assert (value);
 	return value;
 }
 

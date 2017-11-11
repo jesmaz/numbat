@@ -34,6 +34,8 @@ struct Literal {
 	AbstractLiteral * operator -> () {return lit.get ();}
 	const AbstractLiteral * operator -> () const {return lit.get ();}
 	
+	bool isNil () const {return lit == nullptr;}
+	
 	virtual bool operator == (const Literal & literal) const {return *lit == *literal;}
 	bool operator != (const Literal & literal) const {return *lit != *literal;}
 	virtual bool operator < (const Literal & literal) const {return *lit < *literal;}

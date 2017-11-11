@@ -3,6 +3,7 @@
 
 #include <ast/node.hpp>
 #include <ast/type.hpp>
+#include <utility/literals.hpp>
 
 
 namespace AST {
@@ -32,21 +33,21 @@ class Variable : public Node {
 	
 	public:
 		
-		bool isValue () const {return currentValue != nullptr;}
+		bool isValue () const {return not currentValue.isNil ();}
 		const string & getIden () const {return identifier;}
-		ValPtr & getCurrentValue () {return currentValue;}
-		ValPtr getCurrentValue () const {return currentValue;}
+		Literal & getCurrentValue () {return currentValue;}
+		Literal getCurrentValue () const {return currentValue;}
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
 		Variable (numbat::lexer::position pos, const numbat::File * file, const string & iden, const TypePtr & type);
-		Variable (numbat::lexer::position pos, const numbat::File * file, const string & iden, const TypePtr & type, const ValPtr & currentVal);
+		Variable (numbat::lexer::position pos, const numbat::File * file, const string & iden, const TypePtr & type, const Literal & currentVal);
 		
 	protected:
 	private:
 		
 		string identifier;
-		ValPtr currentValue;
+		Literal currentValue;
 		
 };
 

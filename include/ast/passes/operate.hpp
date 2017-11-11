@@ -3,6 +3,7 @@
 
 #include <ast/literal.hpp>
 #include <ast/passes/shallnot.hpp>
+#include <ast/type.hpp>
 #include <ast/variable.hpp>
 #include <gmpxx.h>
 
@@ -48,10 +49,8 @@ NodePtr OperatePass <parser::OPERATION::ASSIGN>::operator () (const NodePtr & no
 	auto n = args [0].get ();
 	Variable * var = static_cast <Variable *> (args [0].get ());
 	if (var) {
-		assert (var->getType () == args [1]->getType ());
-		if (args [1]->isValue ()) {
-			var->getCurrentValue () = std::dynamic_pointer_cast <Value> (args [1]);
-		} else if (typeid (args [1].get ()) == typeid (Variable*)) {
+		assert (var->getType ()->getRegType () == args [1]->getType ()->getRegType ());
+		if (typeid (args [1].get ()) == typeid (Variable*)) {
 			Variable * rhs = static_cast <Variable *> (args [1].get ());
 			var->getCurrentValue () = rhs->getCurrentValue ();
 		} else {

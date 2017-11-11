@@ -2,6 +2,7 @@
 
 
 #include <ast/passes/shallnot.hpp>
+#include <utility/literals.hpp>
 
 
 namespace AST {
@@ -44,7 +45,7 @@ class DefaultValue : public ShallNotPass {
 		virtual void visit (const Struct & node);
 		
 		
-		ValPtr operator () (const TypePtr & type);
+		Literal operator () (const TypePtr & type);
 		
 	protected:
 	private:
@@ -52,7 +53,7 @@ class DefaultValue : public ShallNotPass {
 		NodePtr operator () (const NodePtr & node) {abort ();}
 		
 		TypePtr type;
-		ValPtr value;
+		Literal value;
 		
 };
 
