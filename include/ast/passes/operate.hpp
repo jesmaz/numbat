@@ -50,9 +50,12 @@ NodePtr OperatePass <parser::OPERATION::ASSIGN>::operator () (const NodePtr & no
 	Variable * var = static_cast <Variable *> (args [0].get ());
 	if (var) {
 		assert (var->getType ()->getRegType () == args [1]->getType ()->getRegType ());
-		if (typeid (args [1].get ()) == typeid (Variable*)) {
+		if (typeid (*args [1].get ()) == typeid (Variable)) {
 			Variable * rhs = static_cast <Variable *> (args [1].get ());
 			var->getCurrentValue () = rhs->getCurrentValue ();
+		} else if (typeid (*args [1].get ()) == typeid (Value)) {
+			Value * rhs = static_cast <Value *> (args [1].get ());
+			var->getCurrentValue () = rhs->getLiteral ();
 		} else {
 			abort ();
 		}
