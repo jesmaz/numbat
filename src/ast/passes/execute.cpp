@@ -30,9 +30,8 @@ NodePtr group (const BasicArray <NodePtr> & arr) {
 
 void FoldConstPass::visit (const Basic_Operation & node) {
 	bool allValues = true;
-	readVar = false;
 	auto args = node.getArgs ().map <NodePtr> ([&](const NodePtr & n) -> NodePtr {
-		auto arg = visit (n);
+		auto arg = visit (n, false);
 		allValues &= arg->isValue ();
 		return arg;
 	});
@@ -273,9 +272,14 @@ void FoldConstPass::visit (const Sequence & node) {
 
 void FoldConstPass::visit (const StaticIndex & node) {
 	
-	auto parent = visit (node.getParent ());
+	auto parent = visit (node.getParent (), true);
 	if (parent->isValue ()) {
-		abort ();
+		auto & lit = std::static_pointer_cast <Value> (parent)->getLiteral ();
+		if (readVar) {
+			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit [node.getIndex ()]);
+		} else {
+			nPtr = std::make_shared <Variable> (node.getPos (), node.getFile (), "", node.getType (), lit [node.getIndex ()]);
+		}
 		
 	} else {
 		nPtr = std::make_shared <StaticIndex> (node.getPos (), node.getFile (), node.getType (), parent, node.getIndex ());
