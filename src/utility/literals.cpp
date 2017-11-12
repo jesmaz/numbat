@@ -43,7 +43,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	[](const Literal &, text::PrintMode) -> std::string {return "nil";},
 	
 	// assign
-	[](Literal &, const Literal &) {},
+	[](Literal & lhs, const Literal & rhs) {
+		rhs.vTable->copy_ctr (lhs, rhs);
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal &) {lhs.vTable = &type_nil; lhs.uint64 = 0;},
 	// destroy
