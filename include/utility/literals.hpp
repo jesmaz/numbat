@@ -29,7 +29,9 @@ struct literal_virtual_table {
 	Literal (*op_mul) (const Literal &, const Literal &);
 	Literal (*op_sub) (const Literal &, const Literal &);
 	
+	void (*assign) (Literal &, const Literal &);
 	void (*copy_ctr) (Literal &, const Literal &);
+	
 	void (*destroy) (Literal &);
 	
 	static literal_virtual_table type_nil, type_array, type_array_index, type_fint64, type_fint32, type_int64, type_aint0, type_uint64;
@@ -66,6 +68,8 @@ struct Literal {
 		int64_t to_int64 (bool * success=nullptr) const;
 		uint64_t to_uint64 (bool * success=nullptr) const;
 		
+		void destroy () {vTable->destroy (*this); vTable = &literal_virtual_table::type_nil; uint64 = 0;}
+		
 		Literal () : vTable (&literal_virtual_table::type_nil), uint64 (0) {}
 		Literal (const Literal & rhs) {rhs.vTable->copy_ctr (*this, rhs);}
 		Literal (double val) : vTable (&literal_virtual_table::type_fint64), fint64 (val) {}
@@ -81,7 +85,7 @@ struct Literal {
 		Literal (const mpq_class & val) : vTable (&literal_virtual_table::type_aint0), aint0 (new mpq_class (val)) {}
 		Literal (const BasicArray <Literal> & val) : vTable (&literal_virtual_table::type_array), array (new ArrayRef {val, 1}) {}
 		
-		const Literal & operator = (const Literal & rhs) {vTable->destroy (*this); rhs.vTable->copy_ctr (*this, rhs); return *this;}
+		const Literal & operator = (const Literal & rhs) {vTable->assign (*this, rhs); return *this;}
 		~Literal () {vTable->destroy (*this);}
 		
 	protected:

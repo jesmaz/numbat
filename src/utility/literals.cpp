@@ -39,6 +39,8 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// op_sub
 	[](const Literal &, const Literal &) {return Literal ();},
 	
+	// assign
+	[](Literal &, const Literal &) {},
 	// copy_ctr
 	[](Literal & lhs, const Literal &) {lhs.vTable = &type_nil; lhs.uint64 = 0;},
 	// destroy
@@ -118,10 +120,17 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// op_sub
 	[](const Literal &, const Literal &) {return Literal ();},
 	
+	// assign
+	[](Literal & lhs, const Literal & rhs) {
+		if (&type_array == rhs.vTable) {
+			lhs.array->data = rhs.array->data;
+		}
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {
 		lhs.vTable = rhs.vTable;
 		lhs.array = new Literal::ArrayRef (*rhs.array);
+		lhs.array->owners = 1;
 	},
 	// destroy
 	[](Literal & self) {
@@ -220,6 +229,11 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		return arg.vTable->op_sub (arg, rhs);
 	},
 	
+	// assign
+	[](Literal & lhs, const Literal & rhs) {
+		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
+		arg.vTable->assign (arg, rhs);
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {
 		lhs.vTable = rhs.vTable;
@@ -350,6 +364,20 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// assign
+	[](Literal & lhs, const Literal & rhs) {
+		if (&type_fint64 == rhs.vTable) {
+			lhs.fint64 = rhs.fint64;
+		} else {
+			Literal l = rhs.vTable->conv_double (rhs);
+			if (l.isNil ()) {
+				lhs.vTable = rhs.vTable;
+				lhs.uint64 = rhs.uint64;
+			} else {
+				lhs.fint64 = l.fint64;
+			}
+		}
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {lhs.vTable = &type_fint64; lhs.fint64 = rhs.fint64;},
 	// destroy
@@ -471,6 +499,19 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	[](Literal & lhs, const Literal & rhs) {
+		if (&type_fint32 == rhs.vTable) {
+			lhs.fint32 = rhs.fint32;
+		} else {
+			Literal l = rhs.vTable->conv_double (rhs);
+			if (l.isNil ()) {
+				lhs.vTable = rhs.vTable;
+				lhs.uint64 = rhs.uint64;
+			} else {
+				lhs.fint32 = l.fint64;
+			}
+		}
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {lhs.vTable = &type_fint32; lhs.fint64 = rhs.fint64;},
 	// destroy
@@ -625,6 +666,20 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// assign
+	[](Literal & lhs, const Literal & rhs) {
+		if (&type_int64 == rhs.vTable) {
+			lhs.int64 = rhs.int64;
+		} else {
+			Literal l = rhs.vTable->conv_int64 (rhs);
+			if (l.isNil ()) {
+				lhs.vTable = rhs.vTable;
+				lhs.uint64 = rhs.uint64;
+			} else {
+				lhs.int64 = l.int64;
+			}
+		}
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {lhs.vTable = &type_int64; lhs.int64 = rhs.int64;},
 	// destroy
@@ -746,13 +801,30 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// assign
+	[](Literal & lhs, const Literal & rhs) {
+		if (&type_aint0 == rhs.vTable) {
+			*lhs.aint0 = *rhs.aint0;
+		} else {
+			Literal l = rhs.vTable->conv_aint (rhs);
+			if (l.isNil ()) {
+				delete lhs.aint0;
+				lhs.vTable = rhs.vTable;
+				lhs.uint64 = rhs.uint64;
+			} else {
+				*lhs.aint0 = *l.aint0;
+			}
+		}
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {
 		lhs.vTable = &type_aint0;
 		lhs.aint0 = new mpq_class (*rhs.aint0);
 	},
 	// destroy
-	[](Literal &) {}
+	[](Literal & self) {
+		delete self.aint0;
+	}
 	
 }, literal_virtual_table::type_uint64 = {
 	
@@ -903,6 +975,20 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// assign
+	[](Literal & lhs, const Literal & rhs) {
+		if (&type_uint64 == rhs.vTable) {
+			lhs.uint64 = rhs.uint64;
+		} else {
+			Literal l = rhs.vTable->conv_uint64 (rhs);
+			if (l.isNil ()) {
+				lhs.vTable = rhs.vTable;
+				lhs.uint64 = rhs.uint64;
+			} else {
+				lhs.uint64 = l.uint64;
+			}
+		}
+	},
 	// copy_ctr
 	[](Literal & lhs, const Literal & rhs) {lhs.vTable = &type_uint64; lhs.uint64 = rhs.uint64;},
 	// destroy
