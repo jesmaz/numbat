@@ -39,6 +39,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// op_sub
 	[](const Literal &, const Literal &) {return Literal ();},
 	
+	// to_string
+	[](const Literal &, text::PrintMode) -> std::string {return "nil";},
+	
 	// assign
 	[](Literal &, const Literal &) {},
 	// copy_ctr
@@ -119,6 +122,17 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_sub
 	[](const Literal &, const Literal &) {return Literal ();},
+	
+	// to_string
+	[](const Literal & self, text::PrintMode mode) -> std::string {
+		if (self.array->data.empty ()) return "[]";
+		std::string s = "[";
+		for (size_t i=0, l=self.array->data.size ()-1; i<l; ++i) {
+			s += self.array->data [i].toString (mode) + ", ";
+		}
+		s += self.array->data.back ().toString (mode) + "]";
+		return s;
+	},
 	
 	// assign
 	[](Literal & lhs, const Literal & rhs) {
@@ -227,6 +241,11 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	[](const Literal & lhs, const Literal & rhs) {
 		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
 		return arg.vTable->op_sub (arg, rhs);
+	},
+	
+	// to_string
+	[](const Literal & self, text::PrintMode mode) -> std::string {
+		return "[..., " + self.arr_index->array->data [self.arr_index->index].toString (mode) + ", ...]";
 	},
 	
 	// assign
@@ -364,6 +383,11 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// to_string
+	[](const Literal & self, text::PrintMode mode) -> std::string {
+		return std::to_string (self.fint64);
+	},
+	
 	// assign
 	[](Literal & lhs, const Literal & rhs) {
 		if (&type_fint64 == rhs.vTable) {
@@ -499,6 +523,12 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// to_string
+	[](const Literal & self, text::PrintMode mode) -> std::string {
+		return std::to_string (self.fint32);
+	},
+	
+	// assign
 	[](Literal & lhs, const Literal & rhs) {
 		if (&type_fint32 == rhs.vTable) {
 			lhs.fint32 = rhs.fint32;
@@ -666,6 +696,11 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// to_string
+	[](const Literal & self, text::PrintMode mode) -> std::string {
+		return std::to_string (self.int64);
+	},
+	
 	// assign
 	[](Literal & lhs, const Literal & rhs) {
 		if (&type_int64 == rhs.vTable) {
@@ -799,6 +834,11 @@ literal_virtual_table literal_virtual_table::type_nil = {
 				return Literal (*lhs.aint0 - *l.aint0);
 			}
 		}
+	},
+	
+	// to_string
+	[](const Literal & self, text::PrintMode mode) -> std::string {
+		return self.aint0->get_str (10);
 	},
 	
 	// assign
@@ -975,6 +1015,11 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// to_string
+	[](const Literal & self, text::PrintMode mode) -> std::string {
+		return std::to_string (self.uint64);
+	},
+	
 	// assign
 	[](Literal & lhs, const Literal & rhs) {
 		if (&type_uint64 == rhs.vTable) {
@@ -996,10 +1041,6 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	
 };
 
-
-std::string Literal::toString (text::PrintMode mode) const {
-	return "literal";
-}
 
 mpq_class Literal::to_aint0 (bool * success) const {
 	auto l = vTable->conv_aint (*this);
