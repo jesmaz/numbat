@@ -1,5 +1,6 @@
 #include <ast/context.hpp>
 #include <ast/node.hpp>
+#include <ast/passes/callgraph.hpp>
 #include <ast/passes/execute.hpp>
 #include <ast/passes/metatagswizzle.hpp>
 #include <ast/passes/prunedead.hpp>
@@ -31,6 +32,12 @@ NodePtr transform (const NodePtr & node) {
 	for (auto & f : funcs) {
 		if (f->getBody ()) {
 			f->replaceBody (ReflectPass () (f->getBody ()));
+		}
+	}
+	
+	for (auto & f : funcs) {
+		if (f->getBody ()) {
+			CallGraph (f).analyse (f->getBody ());
 		}
 	}
 	
