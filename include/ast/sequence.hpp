@@ -11,6 +11,8 @@ class Return : public Node {
 	
 	public:
 		
+		const NodePtr & getRetVal () const {return retVal;}
+		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
