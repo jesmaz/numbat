@@ -2,6 +2,7 @@
 
 
 #include <ast/passes/shallnot.hpp>
+#include <utility/literalstack.hpp>
 
 
 namespace AST {
@@ -31,12 +32,17 @@ class FoldConstPass : public ShallNotPass {
 		virtual void visit (const Value &) {}
 		virtual void visit (const Variable &);
 		
-		FoldConstPass (bool readVar=true) : readVar (readVar) {}
+		FoldConstPass (bool readVar=true, const std::shared_ptr <LiteralStack> & stack=nullptr) : readVar (readVar), executionStack (stack) {
+			if (not executionStack) {
+				executionStack = std::make_shared <LiteralStack> ();
+			}
+		}
 		
 	protected:
 	private:
 		
 		bool readVar=true;
+		std::shared_ptr <LiteralStack> executionStack;
 		
 };
 
