@@ -12,7 +12,7 @@ std::map <TypePtr, size_t> typeIDmap;
 DynArray <TypePtr> reverseTypeIDmap;
 
 
-std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>, const CallingData &)> & func) {
+std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <Literal>(const BasicArray <Literal>, const CallingData &)> & func) {
 	auto fPtr = std::make_shared <Function> ();
 	fPtr->iden = iden;
 	fPtr->nativeFunction = func;
@@ -42,30 +42,25 @@ void Reflect::initAPI () {
 		"AST.Pointer",
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
-		[](const BasicArray <NodePtr> args, const CallingData &) -> const BasicArray <NodePtr> {
+		[](const BasicArray <Literal> args, const CallingData &) -> const BasicArray <Literal> {
 			assert (args.size () == 1);
-			assert (typeid (*(args [0].get ())) == typeid (AST::Value));
-			auto number = reinterpret_cast <const AST::Value*> (args [0].get ());
-			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::INT, 0));
-			auto in = number->getLiteral ().to_uint64 ();
+			//TODO: use a pointer sized type
+			auto in = args [0].to_int64 ();
 			auto baseType = reverseTypeIDmap [in];
 			auto refType = Ref::get (baseType);
 			size_t typeID = reverseTypeIDmap.size ();
 			typeIDmap [refType] = typeID;
 			reverseTypeIDmap.push_back (refType);
-			return {std::make_shared <AST::Value> (number->getPos (), number->getFile (), number->getType (), typeID)};
+			return {typeID};
 		}
 	));
 	apiFuncs.insert (APIfunc (
 		"static_assert",
 		{Numeric::get (Numeric::ArithmaticType::UINT, 1)},
 		{Numeric::get (Numeric::ArithmaticType::UINT, 1)},
-		[](const BasicArray <NodePtr> args, const CallingData & callingData) -> const BasicArray <NodePtr> {
+		[](const BasicArray <Literal> args, const CallingData & callingData) -> const BasicArray <Literal> {
 			assert (args.size () == 1);
-			auto number = static_cast <const AST::Value*> (args [0].get ());
-			assert (number);
-			assert (number->getType () == Numeric::get (Numeric::ArithmaticType::UINT, 1));
-			bool assertion = number->getLiteral ().to_uint64 ();
+			bool assertion = args [0].to_uint64 ();
 			if (not assertion) {
 				auto msg = "Static assertion failed: " + report::retrieveLine (callingData.file, callingData.position.line);
 				report::logMessage (report::Severity::ERROR, callingData.file, callingData.position, msg);

@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <utility/array.hpp>
+#include <utility/literals.hpp>
 
 
 namespace AST {
@@ -26,7 +27,7 @@ struct Function {
 		const BasicArray <TypePtr> getRetVals () const {return retVals;}
 		const NodePtr getBody () const {return body;}
 		const numbat::lexer::position getPos () const {return pos;}
-		const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>, const CallingData &)> & getNative () const {return nativeFunction;}
+		const std::function <const BasicArray <Literal> (const BasicArray <Literal>, const CallingData &)> & getNative () const {return nativeFunction;}
 		std::map <std::string, std::string> & getMetaData () {return metaData;}
 		const std::map <std::string, std::string> & getMetaData () const {return metaData;}
 		const string & getIden () const {return iden;}
@@ -37,7 +38,7 @@ struct Function {
 		
 		friend AST::Context;
 		friend parser::Function;
-		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>, const CallingData &)> &func);
+		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <Literal>(const BasicArray <Literal>, const CallingData &)> &func);
 		
 		BasicArray <TypePtr> params, retVals;
 		BasicArray <NodePtr> defParams, defRets;
@@ -48,7 +49,7 @@ struct Function {
 		string iden;
 		NodePtr body;
 		numbat::lexer::position pos;
-		std::function <const BasicArray <NodePtr>(const BasicArray <NodePtr>, const CallingData &)> nativeFunction;
+		std::function <const BasicArray <Literal>(const BasicArray <Literal>, const CallingData &)> nativeFunction;
 		
 };
 

@@ -28,6 +28,16 @@ NodePtr group (const BasicArray <NodePtr> & arr) {
 	}
 }
 
+Literal group (const BasicArray <Literal> & arr) {
+	if (arr.empty ()) {
+		return Literal ();
+	} else if (arr.size () == 1) {
+		return arr [0];
+	} else {
+		return Literal (arr);
+	}
+}
+
 void FoldConstPass::visit (const Basic_Operation & node) {
 	bool allValues = true;
 	auto args = node.getArgs ().map <NodePtr> ([&](const NodePtr & n) -> NodePtr {
@@ -136,7 +146,7 @@ void FoldConstPass::visit (const Call_0 & node) {
 	if (foldable (node.getFunc ())) {
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({}, {node.getPos (), node.getFile ()}));
+			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), group (native ({}, {node.getPos (), node.getFile ()})));
 		} else {
 			abort ();
 		}
@@ -149,7 +159,8 @@ void FoldConstPass::visit (const Call_1 & node) {
 		if (!arg->isValue ()) return;
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({arg}, {node.getPos (), node.getFile ()}));
+			auto lit = group (native ({static_cast <Value *> (arg.get ())->getLiteral (*executionStack)}, {node.getPos (), node.getFile ()}));
+			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit);
 		} else {
 			abort ();
 		}
@@ -163,7 +174,11 @@ void FoldConstPass::visit (const Call_2 & node) {
 		if (!lhs->isValue () or !rhs->isValue ()) return;
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = group (native ({lhs, rhs}, {node.getPos (), node.getFile ()}));
+			auto lit = group (native ({
+				static_cast <Value *> (lhs.get ())->getLiteral (*executionStack), 
+				static_cast <Value *> (rhs.get ())->getLiteral (*executionStack)
+			}, {node.getPos (), node.getFile ()}));
+			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit);
 		} else {
 			abort ();
 		}
