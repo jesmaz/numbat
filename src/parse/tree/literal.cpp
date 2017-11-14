@@ -1,5 +1,4 @@
 #include <ast/call.hpp>
-#include <ast/literal.hpp>
 #include <ast/type.hpp>
 #include <ast/variable.hpp>
 #include <nir/scope.hpp>
@@ -39,7 +38,7 @@ AST::NodePtr ParseTreeLiteral::createAST (AST::Context & ctx) {
 				AST::Array::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)),
 				data
 			);
-			auto var = std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), literal, AST::Const::get (ctx.resolveType ("string")));
+			auto var = std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), AST::Const::get (ctx.resolveType ("string")), AST::Value::globalContex.reserve (), AST::Value::LOCATION::GLOBAL, "");
 			return std::make_shared <AST::Unresolved_Constructor> (getPos (), ctx.getSourceFile (), var, BasicArray <AST::NodePtr> {arg});
 		}
 		

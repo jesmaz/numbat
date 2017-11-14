@@ -43,6 +43,10 @@ struct Context {
 		
 		Context * getRootContext () const {return rootContex;}
 		
+		const Function * getOwner () const {return owner;}
+		
+		size_t allocStack () {return stackPos++;}
+		
 		NodePtr resolve (const string & str) const;
 		TypePtr resolveType (const string & str) const;
 		
@@ -65,7 +69,22 @@ struct Context {
 		             ownFunc (false),
 		             ownType (false),
 		             ownVar (false),
-		             rootContex (this) {}
+		             rootContex (this),
+		             owner (nullptr),
+		             stackPos (0) {}
+		             
+		Context (const Context & other, const Function * owner) : imports (other.imports),
+		             functions (other.functions),
+		             types (other.types),
+		             variables (other.variables),
+		             sourceFile (other.sourceFile),
+		             ownImp (false),
+		             ownFunc (false),
+		             ownType (false),
+		             ownVar (false),
+		             rootContex (this),
+		             owner (owner),
+		             stackPos (0) {}
 		             
 		Context (const Context & other, const numbat::File * source) : Context (other) {sourceFile = source;}
 		
@@ -75,6 +94,7 @@ struct Context {
 		const Context & operator = (const Context &)=delete;
 		
 		static std::set <FuncPtr> allFunctions;
+		
 		std::shared_ptr <std::map <string, Context *>> imports;
 		std::shared_ptr <std::map <string, std::shared_ptr <function_t>>> functions;
 		std::shared_ptr <std::map <string, std::shared_ptr <type_t>>> types;
@@ -83,6 +103,8 @@ struct Context {
 		bool ownImp, ownFunc, ownType, ownVar;
 		
 		Context * rootContex=nullptr;
+		const Function * owner=nullptr;
+		size_t stackPos=0;
 		
 };
 

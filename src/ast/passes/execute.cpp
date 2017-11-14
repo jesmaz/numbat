@@ -1,6 +1,5 @@
 #include <ast/call.hpp>
 #include <ast/function.hpp>
-#include <ast/literal.hpp>
 #include <ast/operation.hpp>
 #include <ast/passes/execute.hpp>
 #include <ast/passes/operate.hpp>
@@ -51,80 +50,80 @@ void FoldConstPass::visit (const Basic_Operation & node) {
 				abort ();
 				break;
 			case parser::OPERATION::ADD:
-				nPtr = OperatePass <parser::OPERATION::ADD> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::ADD> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::AS:
-				nPtr = OperatePass <parser::OPERATION::AS> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::AS> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::ASSIGN:
-				nPtr = OperatePass <parser::OPERATION::ASSIGN> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::ASSIGN> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::BAND:
-				nPtr = OperatePass <parser::OPERATION::BAND> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::BAND> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::BNOT:
-				nPtr = OperatePass <parser::OPERATION::BNOT> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::BNOT> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::BOR:
-				nPtr = OperatePass <parser::OPERATION::BOR> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::BOR> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::BXOR:
-				nPtr = OperatePass <parser::OPERATION::BXOR> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::BXOR> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPEQ:
-				nPtr = OperatePass <parser::OPERATION::CMPEQ> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::CMPEQ> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPGT:
-				nPtr = OperatePass <parser::OPERATION::CMPGT> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::CMPGT> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPGTE:
-				nPtr = OperatePass <parser::OPERATION::CMPGTE> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::CMPGTE> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPLT:
-				nPtr = OperatePass <parser::OPERATION::CMPLT> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::CMPLT> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPLTE:
-				nPtr = OperatePass <parser::OPERATION::CMPLTE> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::CMPLTE> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPNE:
-				nPtr = OperatePass <parser::OPERATION::CMPNE> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::CMPNE> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CONCAT:
-				nPtr = OperatePass <parser::OPERATION::CONCAT> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::CONCAT> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::DECREMENT:
-				nPtr = OperatePass <parser::OPERATION::DECREMENT> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::DECREMENT> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::DIV:
-				nPtr = OperatePass <parser::OPERATION::DIV> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::DIV> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::IN:
-				nPtr = OperatePass <parser::OPERATION::IN> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::IN> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::INCREMENT:
-				nPtr = OperatePass <parser::OPERATION::INCREMENT> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::INCREMENT> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::INDEX:
-				nPtr = OperatePass <parser::OPERATION::INDEX> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::INDEX> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::LNOT:
-				nPtr = OperatePass <parser::OPERATION::LNOT> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::LNOT> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::MUL:
-				nPtr = OperatePass <parser::OPERATION::MUL> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::MUL> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::NEG:
-				nPtr = OperatePass <parser::OPERATION::NEG> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::NEG> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::NONE:
 			case parser::OPERATION::OR:
 				abort ();
 				break;
 			case parser::OPERATION::REM:
-				nPtr = OperatePass <parser::OPERATION::REM> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::REM> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::SUB:
-				nPtr = OperatePass <parser::OPERATION::SUB> (args) (node.getType ());
+				nPtr = OperatePass <parser::OPERATION::SUB> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::__COUNT__:
 				abort ();
@@ -222,7 +221,7 @@ void FoldConstPass::visit (const CastToInt & node) {
 		switch (targetType->getArith ()) {
 			case Numeric::ArithmaticType::UNDETERMINED:
 			case Numeric::ArithmaticType::ARBITRARY: {
-				result = arg->getLiteral ().to_aint0 ();
+				result = arg->getLiteral (*executionStack).to_aint0 ();
 				break;
 			}
 			case Numeric::ArithmaticType::DECINT:
@@ -230,31 +229,31 @@ void FoldConstPass::visit (const CastToInt & node) {
 				break;
 			case Numeric::ArithmaticType::FPINT:
 				if (targetType->getMinPrec () <= 32) {
-					result = float (arg->getLiteral ().to_double ());
+					result = float (arg->getLiteral (*executionStack).to_double ());
 				} else {
-					result = arg->getLiteral ().to_double ();
+					result = arg->getLiteral (*executionStack).to_double ();
 				}
 				break;
 			case Numeric::ArithmaticType::INT:
 				if (targetType->getMinPrec () <= 8) {
-					result = int8_t (arg->getLiteral ().to_int64 ());
+					result = int8_t (arg->getLiteral (*executionStack).to_int64 ());
 				} else if (targetType->getMinPrec () <= 16) {
-					result = int16_t (arg->getLiteral ().to_int64 ());
+					result = int16_t (arg->getLiteral (*executionStack).to_int64 ());
 				} else if (targetType->getMinPrec () <= 32) {
-					result = int32_t (arg->getLiteral ().to_int64 ());
+					result = int32_t (arg->getLiteral (*executionStack).to_int64 ());
 				} else {
-					result = arg->getLiteral ().to_int64 ();
+					result = arg->getLiteral (*executionStack).to_int64 ();
 				}
 				break;
 			case Numeric::ArithmaticType::UINT:
 				if (targetType->getMinPrec () <= 8) {
-					result = uint8_t (arg->getLiteral ().to_uint64 ());
+					result = uint8_t (arg->getLiteral (*executionStack).to_uint64 ());
 				} else if (targetType->getMinPrec () <= 16) {
-					result = uint16_t (arg->getLiteral ().to_uint64 ());
+					result = uint16_t (arg->getLiteral (*executionStack).to_uint64 ());
 				} else if (targetType->getMinPrec () <= 32) {
-					result = uint32_t (arg->getLiteral ().to_uint64 ());
+					result = uint32_t (arg->getLiteral (*executionStack).to_uint64 ());
 				} else {
-					result = arg->getLiteral ().to_uint64 ();
+					result = arg->getLiteral (*executionStack).to_uint64 ();
 				}
 				break;
 		}
@@ -289,12 +288,8 @@ void FoldConstPass::visit (const StaticIndex & node) {
 	
 	auto parent = visit (node.getParent (), true);
 	if (parent->isValue ()) {
-		auto & lit = std::static_pointer_cast <Value> (parent)->getLiteral ();
-		if (readVar) {
-			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit [node.getIndex ()]);
-		} else {
-			nPtr = std::make_shared <Variable> (node.getPos (), node.getFile (), "", node.getType (), lit [node.getIndex ()]);
-		}
+		auto & lit = std::static_pointer_cast <Value> (parent)->getLiteral (*executionStack);
+		nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit [node.getIndex ()]);
 		
 	} else {
 		nPtr = std::make_shared <StaticIndex> (node.getPos (), node.getFile (), node.getType (), parent, node.getIndex ());
@@ -303,11 +298,7 @@ void FoldConstPass::visit (const StaticIndex & node) {
 	
 }
 
-void FoldConstPass::visit (const Variable & node) {
-	if (readVar) {
-		nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), node.getCurrentValue ());
-	}
-}
+void FoldConstPass::visit (const Variable & node) {}
 
 
 }

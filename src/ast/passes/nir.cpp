@@ -2,7 +2,6 @@
 #include <ast/flowcontrol.hpp>
 #include <ast/function.hpp>
 #include <ast/node.hpp>
-#include <ast/literal.hpp>
 #include <ast/operation.hpp>
 #include <ast/passes/nir.hpp>
 #include <ast/sequence.hpp>
@@ -326,7 +325,8 @@ void NirPass::visit (const Sequence & seq) {
 
 void NirPass::visit (const Value & node) {
 	auto pos = node.getPos ();
-	auto literal = node.getLiteral ().toString (text::PrintMode::PLAIN);
+	LiteralStack stack;
+	auto literal = node.getLiteral (stack).toString (text::PrintMode::PLAIN);
 	const nir::Type * t;
 	switch (static_cast <const Numeric *> (node.getType ().get ())->getArith ()) {
 		case Numeric::ArithmaticType::UNDETERMINED:

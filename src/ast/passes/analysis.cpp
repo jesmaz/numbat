@@ -1,7 +1,6 @@
 #include <ast/call.hpp>
 #include <ast/context.hpp>
 #include <ast/flowcontrol.hpp>
-#include <ast/literal.hpp>
 #include <ast/meta.hpp>
 #include <ast/operation.hpp>
 #include <ast/passes/analysis.hpp>

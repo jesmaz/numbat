@@ -1,7 +1,6 @@
 #pragma once
 
 
-#include <ast/literal.hpp>
 #include <ast/passes/shallnot.hpp>
 #include <ast/type.hpp>
 #include <ast/variable.hpp>
@@ -25,13 +24,14 @@ class OperatePass : public ShallNotPass {
 		virtual void visit (const Numeric & node);
 		virtual void visit (const Struct & node);
 		
-		OperatePass (const BasicArray <NodePtr> & args) : args (args) {}
+		OperatePass (LiteralStack & stack, const BasicArray <NodePtr> & args) : stack (stack), args (args) {}
 		
 		NodePtr operator () (const NodePtr & node);
 		
 	protected:
 	private:
 		
+		LiteralStack & stack;
 		const BasicArray <NodePtr> & args;
 		
 };
@@ -47,28 +47,16 @@ NodePtr OperatePass <OPP>::operator () (const NodePtr & node) {
 template <>
 NodePtr OperatePass <parser::OPERATION::ASSIGN>::operator () (const NodePtr & node) {
 	auto n = args [0].get ();
-	Variable * var = static_cast <Variable *> (args [0].get ());
-	if (var) {
-		assert (var->getType ()->getRegType () == args [1]->getType ()->getRegType ());
-		if (typeid (*args [1].get ()) == typeid (Variable)) {
-			Variable * rhs = static_cast <Variable *> (args [1].get ());
-			var->getCurrentValue () = rhs->getCurrentValue ();
-		} else if (typeid (*args [1].get ()) == typeid (Value)) {
-			Value * rhs = static_cast <Value *> (args [1].get ());
-			var->getCurrentValue () = rhs->getLiteral ();
-		} else {
-			abort ();
-		}
-	} else {
-		abort ();
-	}
+	Literal & lhs = static_cast <Value *> (args [0].get ())->getLiteral (stack);
+	Literal & rhs = static_cast <Value *> (args [1].get ())->getLiteral (stack);
+	lhs = rhs;
 	return args [0];
 }
 
 template <typename FUNCTOR>
-NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, FUNCTOR functr) {
-	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral ();
-	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral ();
+NodePtr bitwiseBinary (const Numeric & type, LiteralStack & stack, const BasicArray <NodePtr> & args, FUNCTOR functr) {
+	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral (stack);
+	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral (stack);
 	auto result = functr (lhs, rhs);
 	switch (type.getArith ()) {
 		case Numeric::ArithmaticType::UNDETERMINED:
@@ -109,9 +97,9 @@ NodePtr bitwiseBinary (const Numeric & type, const BasicArray <NodePtr> & args, 
 }
 
 template <typename FUNCTOR>
-NodePtr standardBinary (const Numeric & type, const BasicArray <NodePtr> & args, FUNCTOR functr) {
-	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral ();
-	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral ();
+NodePtr standardBinary (const Numeric & type, LiteralStack & stack, const BasicArray <NodePtr> & args, FUNCTOR functr) {
+	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral (stack);
+	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral (stack);
 	auto result = functr (lhs, rhs);
 	switch (type.getArith ()) {
 		case Numeric::ArithmaticType::UNDETERMINED:
@@ -152,9 +140,9 @@ NodePtr standardBinary (const Numeric & type, const BasicArray <NodePtr> & args,
 }
 
 template <typename FUNCTOR>
-NodePtr predicateBinary (const BasicArray <NodePtr> & args, FUNCTOR functr) {
-	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral ();
-	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral ();
+NodePtr predicateBinary (LiteralStack & stack, const BasicArray <NodePtr> & args, FUNCTOR functr) {
+	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral (stack);
+	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral (stack);
 	auto result = functr (lhs, rhs);
 	return std::make_shared <Value> (args [0]->getPos (), args [1]->getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), result);
 }
@@ -192,88 +180,88 @@ void OperatePass <OPP>::visit (const Struct & node) {
 
 template <>
 void OperatePass <parser::OPERATION::CONCAT>::visit (const Array & node) {
-	auto lhs = static_cast <const Value *> (args [0].get ())->getLiteral ();
-	auto rhs = static_cast <const Value *> (args [1].get ())->getLiteral ();
+	auto lhs = static_cast <const Value *> (args [0].get ())->getLiteral (stack);
+	auto rhs = static_cast <const Value *> (args [1].get ())->getLiteral (stack);
 	nPtr = std::make_shared <Value> (args [0]->getPos (), args [1]->getFile (), args [0]->getType (), lhs.concat (rhs));
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPEQ>::visit (const Array & node) {
-	nPtr = predicateBinary (args, std::equal_to <> ());
+	nPtr = predicateBinary (stack, args, std::equal_to <> ());
 }
 
 
 template <>
 void OperatePass <parser::OPERATION::ADD>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::plus <> ());
+	nPtr = standardBinary (node, stack, args, std::plus <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::BAND>::visit (const Numeric & node) {
-	nPtr = bitwiseBinary (node, args, std::bit_and <> ());
+	nPtr = bitwiseBinary (node, stack, args, std::bit_and <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::BOR>::visit (const Numeric & node) {
-	nPtr = bitwiseBinary (node, args, std::bit_or <> ());
+	nPtr = bitwiseBinary (node, stack, args, std::bit_or <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::BXOR>::visit (const Numeric & node) {
-	nPtr = bitwiseBinary (node, args, std::bit_xor <> ());
+	nPtr = bitwiseBinary (node, stack, args, std::bit_xor <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPEQ>::visit (const Numeric & node) {
-	nPtr = predicateBinary (args, std::equal_to <> ());
+	nPtr = predicateBinary (stack, args, std::equal_to <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPGT>::visit (const Numeric & node) {
-	nPtr = predicateBinary (args, std::greater <> ());
+	nPtr = predicateBinary (stack, args, std::greater <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPGTE>::visit (const Numeric & node) {
-	nPtr = predicateBinary (args, std::greater_equal <> ());
+	nPtr = predicateBinary (stack, args, std::greater_equal <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPLT>::visit (const Numeric & node) {
-	nPtr = predicateBinary (args, std::less <> ());
+	nPtr = predicateBinary (stack, args, std::less <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPLTE>::visit (const Numeric & node) {
-	nPtr = predicateBinary (args, std::less_equal <> ());
+	nPtr = predicateBinary (stack, args, std::less_equal <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::CMPNE>::visit (const Numeric & node) {
-	nPtr = predicateBinary (args, std::not_equal_to <> ());
+	nPtr = predicateBinary (stack, args, std::not_equal_to <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::DIV>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::divides <> ());
+	nPtr = standardBinary (node, stack, args, std::divides <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::LNOT>::visit (const Numeric & node) {
 	bool val;
 	auto * arg = static_cast <Value *> (args [0].get ());
-	val = not arg->getLiteral ();
+	val = not arg->getLiteral (stack);
 	nPtr = std::make_shared <Value> (arg->getPos (), arg->getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), val);
 }
 
 template <>
 void OperatePass <parser::OPERATION::MUL>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::multiplies <> ());
+	nPtr = standardBinary (node, stack, args, std::multiplies <> ());
 }
 
 template <>
 void OperatePass <parser::OPERATION::SUB>::visit (const Numeric & node) {
-	nPtr = standardBinary (node, args, std::minus <> ());
+	nPtr = standardBinary (node, stack, args, std::minus <> ());
 }
 
 

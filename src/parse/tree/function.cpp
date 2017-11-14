@@ -49,9 +49,11 @@ class SeedParameterPass : public AST::ShallNotPass {
 AST::FuncPtr Function::createFunc (AST::Context & ctx) {
 	
 	if (fPtr) return fPtr;
-	context = std::make_unique <AST::Context> (ctx);
 	
 	fPtr = std::make_shared <AST::Function> ();
+	
+	context = std::make_unique <AST::Context> (ctx, fPtr.get ());
+	
 	fPtr->iden = iden;
 	fPtr->defParams = BasicArray <AST::NodePtr> (params.size ());
 	fPtr->params = params.map <AST::TypePtr> ([&](auto & a) {
@@ -74,7 +76,7 @@ AST::NodePtr Function::createAST (AST::Context & ctx) {
 	auto func = createFunc (ctx);
 	auto type = ctx.resolveType (iden);
 	if (type) {
-		context->var ("this", std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), "this", type, AST::DefaultValue ()(type)));
+		context->var ("this", std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), type, ctx.allocStack (), AST::Value::LOCATION::LOCAL, "this"));
 		type->overloadFunc ("", func);
 	}
 	fPtr->body = body->createAST (*context);

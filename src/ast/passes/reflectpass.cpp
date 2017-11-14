@@ -2,7 +2,6 @@
 #include <ast/passes/execute.hpp>
 #include <ast/passes/reflectpass.hpp>
 #include <ast/passes/resolve.hpp>
-#include <ast/literal.hpp>
 #include <ast/variable.hpp>
 
 
@@ -24,10 +23,11 @@ void ReflectPass::visit (const ReflectType & node) {
 		ReflectType::getTypeId (target)
 	);
 	auto call = MakeCallPass (node.getPos (), node.getFile (), {arg}) (metaTag);
-	auto res = FoldConstPass () (call);
+	auto stack = std::make_shared <LiteralStack> ();
+	auto res = FoldConstPass (true, stack) (call);
 	auto typeID = std::dynamic_pointer_cast <Value> (res);
 	if (typeID) {
-		size_t id = typeID->getLiteral ().to_uint64 ();
+		size_t id = typeID->getLiteral (*stack).to_uint64 ();
 		auto type = ReflectType::getType (id);
 		nPtr = type;
 	} else {
@@ -38,7 +38,7 @@ void ReflectPass::visit (const ReflectType & node) {
 void ReflectPass::visit (const Variable & node) {
 	
 	auto type = std::dynamic_pointer_cast <Type> (ReflectPass () (node.getType ()));
-	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getFile (), node.getIden (), type, node.getCurrentValue ());
+	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getFile (), type, node.getStackIndex (), node.getLocation (), node.getIden ());
 	
 }
 

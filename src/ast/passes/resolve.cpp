@@ -73,7 +73,7 @@ void ResolvePass::visit (const Sequence & node) {
 
 void ResolvePass::visit (const Variable & node) {
 	auto type = ResolveTypePass () (node.getType ());
-	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getFile (), node.getIden (), type, node.getCurrentValue ());
+	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getFile (), type, node.getStackIndex (), node.getLocation (), node.getIden ());
 }
 
 void ResolvePass::visit (const Unresolved_Call & node) {
@@ -184,7 +184,7 @@ void ResolvePass::visit (const Unresolved_IfElse & node) {
 	
 	//TODO: Make sure body & alt types are compatible with the return type
 	
-	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), "tmp", body->getType ());
+	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), body->getType (), Value::globalContex.reserve (), Value::LOCATION::GLOBAL, "tmp");
 	body = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, body}, parser::OPERATION::ASSIGN);
 	if (alt) {
 		alt = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, alt}, parser::OPERATION::ASSIGN);
@@ -368,7 +368,7 @@ NodePtr ConstructorSelectionPass::operator () (const NodePtr & node) {
 	nPtr = var;
 	node->accept (*this);
 	if (replacementType) {
-		*var = Variable (var->getPos (), var->getFile (), var->getIden (), replacementType, var->getCurrentValue ());
+		*var = Variable (var->getPos (), var->getFile (), replacementType, var->getStackIndex (), var->getLocation (), var->getIden ());
 	}
 	return nPtr;
 }

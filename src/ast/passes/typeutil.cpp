@@ -1,4 +1,3 @@
-#include <ast/literal.hpp>
 #include <ast/meta.hpp>
 #include <ast/passes/typeutil.hpp>
 #include <ast/type.hpp>
