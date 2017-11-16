@@ -184,7 +184,7 @@ void ResolvePass::visit (const Unresolved_IfElse & node) {
 	
 	//TODO: Make sure body & alt types are compatible with the return type
 	
-	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), body->getType (), Value::globalContex.reserve (), Value::LOCATION::GLOBAL, "tmp");
+	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), body->getType (), Variable::globalContex.reserve (), Variable::LOCATION::GLOBAL, "tmp");
 	body = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, body}, parser::OPERATION::ASSIGN);
 	if (alt) {
 		alt = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, alt}, parser::OPERATION::ASSIGN);

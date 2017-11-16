@@ -16,7 +16,7 @@ void ReflectPass::visit (const Reflect & node) {
 void ReflectPass::visit (const ReflectType & node) {
 	auto metaTag = node.getMetaTag ();
 	auto target = node.getTarget ();
-	auto arg = std::make_shared <Value> (
+	auto arg = std::make_shared <StaticValue> (
 		node.getPos (),
 		node.getFile (),
 		Numeric::get (Numeric::ArithmaticType::INT, 0),

@@ -76,7 +76,7 @@ AST::NodePtr Function::createAST (AST::Context & ctx) {
 	auto func = createFunc (ctx);
 	auto type = ctx.resolveType (iden);
 	if (type) {
-		context->var ("this", std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), type, ctx.allocStack (), AST::Value::LOCATION::LOCAL, "this"));
+		context->var ("this", std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), type, ctx.allocStack (), AST::Variable::LOCATION::LOCAL, "this"));
 		type->overloadFunc ("", func);
 	}
 	fPtr->body = body->createAST (*context);

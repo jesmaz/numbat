@@ -93,7 +93,7 @@ NodePtr bitwiseBinary (const Numeric & type, LiteralStack & stack, const BasicAr
 			}
 			break;
 	}
-	return std::make_shared <Value> (args [0]->getPos (), args [0]->getFile (), Numeric::get (type.getArith (), type.getMinPrec ()), result);
+	return std::make_shared <StaticValue> (args [0]->getPos (), args [0]->getFile (), Numeric::get (type.getArith (), type.getMinPrec ()), result);
 }
 
 template <typename FUNCTOR>
@@ -136,7 +136,7 @@ NodePtr standardBinary (const Numeric & type, LiteralStack & stack, const BasicA
 			}
 			break;
 	}
-	return std::make_shared <Value> (args [0]->getPos (), args [1]->getFile (), Numeric::get (type.getArith (), type.getMinPrec ()), result);
+	return std::make_shared <StaticValue> (args [0]->getPos (), args [1]->getFile (), Numeric::get (type.getArith (), type.getMinPrec ()), result);
 }
 
 template <typename FUNCTOR>
@@ -144,7 +144,7 @@ NodePtr predicateBinary (LiteralStack & stack, const BasicArray <NodePtr> & args
 	const auto & lhs = static_cast <Value*> (args [0].get ())->getLiteral (stack);
 	const auto & rhs = static_cast <Value*> (args [1].get ())->getLiteral (stack);
 	auto result = functr (lhs, rhs);
-	return std::make_shared <Value> (args [0]->getPos (), args [1]->getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), result);
+	return std::make_shared <StaticValue> (args [0]->getPos (), args [1]->getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), result);
 }
 
 template <parser::OPERATION OPP>
@@ -182,7 +182,7 @@ template <>
 void OperatePass <parser::OPERATION::CONCAT>::visit (const Array & node) {
 	auto lhs = static_cast <const Value *> (args [0].get ())->getLiteral (stack);
 	auto rhs = static_cast <const Value *> (args [1].get ())->getLiteral (stack);
-	nPtr = std::make_shared <Value> (args [0]->getPos (), args [1]->getFile (), args [0]->getType (), lhs.concat (rhs));
+	nPtr = std::make_shared <StaticValue> (args [0]->getPos (), args [1]->getFile (), args [0]->getType (), lhs.concat (rhs));
 }
 
 template <>
@@ -251,7 +251,7 @@ void OperatePass <parser::OPERATION::LNOT>::visit (const Numeric & node) {
 	bool val;
 	auto * arg = static_cast <Value *> (args [0].get ());
 	val = not arg->getLiteral (stack);
-	nPtr = std::make_shared <Value> (arg->getPos (), arg->getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), val);
+	nPtr = std::make_shared <StaticValue> (arg->getPos (), arg->getFile (), Numeric::get (Numeric::ArithmaticType::UINT, 1), val);
 }
 
 template <>

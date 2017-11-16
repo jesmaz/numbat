@@ -145,7 +145,7 @@ void FoldConstPass::visit (const Call_0 & node) {
 	if (foldable (node.getFunc ())) {
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
-			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), group (native ({}, {node.getPos (), node.getFile ()})));
+			nPtr = std::make_shared <StaticValue> (node.getPos (), node.getFile (), node.getType (), group (native ({}, {node.getPos (), node.getFile ()})));
 		} else {
 			abort ();
 		}
@@ -159,7 +159,7 @@ void FoldConstPass::visit (const Call_1 & node) {
 		auto native = node.getFunc ()->getNative ();
 		if (native) {
 			auto lit = group (native ({static_cast <Value *> (arg.get ())->getLiteral (*executionStack)}, {node.getPos (), node.getFile ()}));
-			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit);
+			nPtr = std::make_shared <StaticValue> (node.getPos (), node.getFile (), node.getType (), lit);
 		} else {
 			abort ();
 		}
@@ -177,7 +177,7 @@ void FoldConstPass::visit (const Call_2 & node) {
 				static_cast <Value *> (lhs.get ())->getLiteral (*executionStack), 
 				static_cast <Value *> (rhs.get ())->getLiteral (*executionStack)
 			}, {node.getPos (), node.getFile ()}));
-			nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit);
+			nPtr = std::make_shared <StaticValue> (node.getPos (), node.getFile (), node.getType (), lit);
 		} else {
 			abort ();
 		}
@@ -257,7 +257,7 @@ void FoldConstPass::visit (const CastToInt & node) {
 				}
 				break;
 		}
-		nPtr = std::make_shared <Value> (nPtr->getPos (), nPtr->getFile (), targetType, result);
+		nPtr = std::make_shared <StaticValue> (nPtr->getPos (), nPtr->getFile (), targetType, result);
 	}
 }
 
@@ -287,14 +287,7 @@ void FoldConstPass::visit (const Sequence & node) {
 void FoldConstPass::visit (const StaticIndex & node) {
 	
 	auto parent = visit (node.getParent (), true);
-	if (parent->isValue ()) {
-		auto & lit = std::static_pointer_cast <Value> (parent)->getLiteral (*executionStack);
-		nPtr = std::make_shared <Value> (node.getPos (), node.getFile (), node.getType (), lit [node.getIndex ()]);
-		
-	} else {
-		nPtr = std::make_shared <StaticIndex> (node.getPos (), node.getFile (), node.getType (), parent, node.getIndex ());
-		
-	}
+	nPtr = std::make_shared <StaticIndex> (node.getPos (), node.getFile (), node.getType (), parent, node.getIndex ());
 	
 }
 
