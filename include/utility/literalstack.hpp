@@ -10,7 +10,7 @@ struct LiteralStack {
 	public:
 		
 		Literal & operator [] (size_t index) {
-			if (literals.size () < index) {
+			if (literals.size () <= index) {
 				literals.resize (index + 1);
 			}
 			return literals [index];
