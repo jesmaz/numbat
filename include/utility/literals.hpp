@@ -25,7 +25,7 @@ struct literal_virtual_table {
 	Literal (*op_bxor) (const Literal &, const Literal &);
 	Literal (*op_concat) (const Literal &, const Literal &);
 	Literal (*op_div) (const Literal &, const Literal &);
-	Literal (*op_index) (const Literal &, size_t);
+	Literal & (*op_index) (const Literal &, size_t);
 	Literal (*op_mul) (const Literal &, const Literal &);
 	Literal (*op_sub) (const Literal &, const Literal &);
 	
@@ -59,7 +59,7 @@ struct Literal {
 		Literal operator & (const Literal & other) const {return vTable->op_band (*this, other);}
 		Literal operator ^ (const Literal & other) const {return vTable->op_bxor (*this, other);}
 		Literal operator / (const Literal & other) const {return vTable->op_div (*this, other);}
-		Literal operator [] (size_t i) const {return vTable->op_index (*this, i);}
+		Literal & operator [] (size_t i) const {return vTable->op_index (*this, i);}
 		Literal operator * (const Literal & other) const {return vTable->op_mul (*this, other);}
 		Literal operator - (const Literal & other) const {return vTable->op_sub (*this, other);}
 		

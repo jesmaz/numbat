@@ -1,5 +1,9 @@
 #include <utility/literals.hpp>
 
+
+Literal nilLiteral;
+
+
 literal_virtual_table literal_virtual_table::type_nil = {
 	
 	// op_eq
@@ -33,7 +37,7 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// op_div
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_index
-	[](const Literal &, size_t) {return Literal ();},
+	[](const Literal &, size_t) -> Literal & {nilLiteral = Literal (); return nilLiteral;},
 	// op_mul
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_sub
@@ -113,12 +117,12 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// op_div
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_index
-	[](const Literal & self, size_t i) {
-		Literal l;
-		l.vTable = &type_array_index;
-		l.arr_index = new Literal::ArrayIndex {self.array, i};
-		self.array->owners += 1;
-		return l;
+	[](const Literal & self, size_t i) -> Literal & {
+		if (i < self.array->data.size ()) {
+			return self.array->data [i];
+		} else {
+			nilLiteral = Literal (); return nilLiteral;
+		}
 	},
 	// op_mul
 	[](const Literal &, const Literal &) {return Literal ();},
@@ -230,7 +234,7 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		return arg.vTable->op_div (arg, rhs);
 	},
 	// op_index
-	[](const Literal & self, size_t i) {
+	[](const Literal & self, size_t i) -> Literal & {
 		auto & arg = self.arr_index->array->data [self.arr_index->index];
 		return arg.vTable->op_index (arg, i);
 	},
@@ -357,7 +361,7 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	// op_index
-	[](const Literal &, size_t) {return Literal ();},
+	[](const Literal &, size_t) -> Literal & {nilLiteral = Literal (); return nilLiteral;},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_fint64 == rhs.vTable) {
@@ -497,7 +501,7 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	// op_index
-	[](const Literal &, size_t) {return Literal ();},
+	[](const Literal &, size_t) -> Literal & {nilLiteral = Literal (); return nilLiteral;},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_fint32 == rhs.vTable) {
@@ -670,7 +674,7 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	// op_index
-	[](const Literal &, size_t) {return Literal ();},
+	[](const Literal &, size_t) -> Literal & {nilLiteral = Literal (); return nilLiteral;},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_int64 == rhs.vTable) {
@@ -810,7 +814,7 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	// op_index
-	[](const Literal &, size_t) {return Literal ();},
+	[](const Literal &, size_t) -> Literal & {nilLiteral = Literal (); return nilLiteral;},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_aint0 == rhs.vTable) {
@@ -989,7 +993,7 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	// op_index
-	[](const Literal &, size_t) {return Literal ();},
+	[](const Literal &, size_t) -> Literal & {nilLiteral = Literal (); return nilLiteral;},
 	// op_mul
 	[](const Literal & lhs, const Literal & rhs) {
 		if (&type_uint64 == rhs.vTable) {
