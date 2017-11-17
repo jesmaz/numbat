@@ -161,7 +161,12 @@ void FoldConstPass::visit (const Call_1 & node) {
 			auto lit = group (native ({static_cast <Value *> (arg.get ())->getLiteral (*executionStack)}, {node.getPos (), node.getFile ()}));
 			nPtr = std::make_shared <StaticValue> (node.getPos (), node.getFile (), node.getType (), lit);
 		} else {
-			abort ();
+			auto stack = std::make_shared <LiteralStack> ();
+			(*stack) [0] = static_cast <Value *> (arg.get ())->getLiteral (*executionStack);
+			auto result = this->visit (node.getFunc ()->getBody (), false, stack);
+			assert (result->isValue ());
+			auto lit = static_cast <Value *> (result.get ())->getLiteral (*stack);
+			nPtr = std::make_shared <StaticValue> (node.getPos (), node.getFile (), node.getType (), lit);
 		}
 	}
 }

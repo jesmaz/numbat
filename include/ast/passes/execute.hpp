@@ -14,6 +14,7 @@ class FoldConstPass : public ShallNotPass {
 		
 		virtual NodePtr visit (const NodePtr & node) {return FoldConstPass (*this) (node);}
 		virtual NodePtr visit (const NodePtr & node, bool readVar) {return FoldConstPass (readVar) (node);}
+		virtual NodePtr visit (const NodePtr & node, bool readVar, const std::shared_ptr <LiteralStack> & executionStack) {return FoldConstPass (readVar, executionStack) (node);}
 		
 		virtual void visit (const Basic_Operation & node);
 		virtual void visit (const Call_0 & node);
@@ -53,8 +54,9 @@ class ExecutePass : public FoldConstPass {
 		
 		virtual NodePtr visit (const NodePtr & node) {return ExecutePass (*this) (node);}
 		virtual NodePtr visit (const NodePtr & node, bool readVar) {return ExecutePass (readVar) (node);}
+		virtual NodePtr visit (const NodePtr & node, bool readVar, const std::shared_ptr <LiteralStack> & executionStack) {return ExecutePass (readVar, executionStack) (node);}
 		
-		ExecutePass (bool readVar=true) : FoldConstPass (readVar) {}
+		ExecutePass (bool readVar=true, const std::shared_ptr <LiteralStack> & stack=nullptr) : FoldConstPass (readVar, stack) {}
 		
 	protected:
 	private:
