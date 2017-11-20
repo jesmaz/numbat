@@ -2,6 +2,7 @@
 #include <ast/node.hpp>
 #include <ast/passes/callgraph.hpp>
 #include <ast/passes/execute.hpp>
+#include <ast/passes/functionpurity.hpp>
 #include <ast/passes/metatagswizzle.hpp>
 #include <ast/passes/prunedead.hpp>
 #include <ast/passes/reflectpass.hpp>
@@ -40,6 +41,8 @@ NodePtr transform (const NodePtr & node) {
 			CallGraph (f).analyse (f->getBody ());
 		}
 	}
+	
+	FunctionPurityPass::analyse (funcs);
 	
 	n = FoldConstPass () (n);
 	for (auto & f : funcs) {
