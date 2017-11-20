@@ -1,6 +1,7 @@
 #include <ast/call.hpp>
 #include <ast/flowcontrol.hpp>
 #include <ast/function.hpp>
+#include <ast/memory.hpp>
 #include <ast/meta.hpp>
 #include <ast/node.hpp>
 #include <ast/operation.hpp>
@@ -97,6 +98,17 @@ void IdentityPass::visit (const Numeric & node) {}
 
 void IdentityPass::visit (const Or & node) {
 	nPtr = std::make_shared <Or> (node.getPos (), node.getFile (), this->visit (node.getFirst ()), this->visit (node.getSecond ()));
+}
+
+void IdentityPass::visit (const RawInit & node) {
+	nPtr = std::make_shared <RawInit> (
+		node.getPos (),
+		node.getFile (),
+		node.getVar (),
+		node.getArgs ().map <NodePtr> ([&](auto & n) {
+			return this->visit (n);
+		})
+	);
 }
 
 void IdentityPass::visit (const Ref & node) {}

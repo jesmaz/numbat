@@ -1,6 +1,7 @@
 #include <ast/call.hpp>
 #include <ast/context.hpp>
 #include <ast/flowcontrol.hpp>
+#include <ast/memory.hpp>
 #include <ast/meta.hpp>
 #include <ast/operation.hpp>
 #include <ast/passes/analysis.hpp>
@@ -110,6 +111,13 @@ void AnalysisPass::visit (const Or & node) {
 	this->analyse (node.getFirst ());
 	this->analyse (node.getSecond ());
 	this->analyse (node.getType ());
+}
+
+void AnalysisPass::visit (const RawInit & node) {
+	this->analyse (node.getVar ());
+	for (auto & arg : node.getArgs ()) {
+		this->analyse (arg);
+	}
 }
 
 void AnalysisPass::visit (const Ref & node) {

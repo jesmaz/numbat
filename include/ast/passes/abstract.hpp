@@ -28,6 +28,7 @@ class Inferred;
 class Interface;
 class Numeric;
 class Or;
+class RawInit;
 class Ref;
 class Reflect;
 class ReflectType;
@@ -70,6 +71,7 @@ class AbstractPass {
 		virtual void visit (const Interface & node)=0;
 		virtual void visit (const Numeric & node)=0;
 		virtual void visit (const Or & node)=0;
+		virtual void visit (const RawInit & node)=0;
 		virtual void visit (const Ref & node)=0;
 		virtual void visit (const Reflect & node)=0;
 		virtual void visit (const ReflectType & node)=0;
