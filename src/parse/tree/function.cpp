@@ -1,6 +1,8 @@
 #include <ast/call.hpp>
+#include <ast/memory.hpp>
 #include <ast/passes/shallnot.hpp>
 #include <ast/passes/typeutil.hpp>
+#include <ast/sequence.hpp>
 #include <ast/variable.hpp>
 #include <parse/tree/function.hpp>
 
@@ -76,10 +78,16 @@ AST::NodePtr Function::createAST (AST::Context & ctx) {
 	auto func = createFunc (ctx);
 	auto type = ctx.resolveType (iden);
 	if (type) {
-		context->var ("this", std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), type, context->allocStack (), AST::Variable::LOCATION::LOCAL, "this"));
+		auto var = std::make_shared <AST::Variable> (getPos (), ctx.getSourceFile (), type, context->allocStack (), AST::Variable::LOCATION::LOCAL, "this");
+		context->var ("this", var);
 		type->overloadFunc ("", func);
+		fPtr->body = std::make_shared <AST::Sequence> (getPos (), ctx.getSourceFile (), BasicArray <AST::NodePtr> {
+			std::make_shared <AST::RawInit> (getPos (), ctx.getSourceFile (), var, BasicArray <AST::NodePtr> ()),
+			body->createAST (*context)
+		});
+	} else {
+		fPtr->body = body->createAST (*context);
 	}
-	fPtr->body = body->createAST (*context);
 	return std::make_shared <AST::Function_Ptr> (getPos (), ctx.getSourceFile (), std::move (func));
 	
 }
