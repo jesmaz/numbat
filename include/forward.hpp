@@ -25,6 +25,9 @@ typedef std::shared_ptr <Value> ValPtr;
 typedef std::shared_ptr <Variable> VarPtr;
 
 
+const std::string KEY_FUNCTIONAL="functional", VALUE_FALSE="false", VALUE_NIL="", VALUE_TRUE="true";
+
+
 }
 
 
