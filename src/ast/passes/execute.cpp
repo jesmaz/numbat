@@ -1,10 +1,13 @@
 #include <ast/call.hpp>
 #include <ast/function.hpp>
+#include <ast/memory.hpp>
 #include <ast/operation.hpp>
 #include <ast/passes/execute.hpp>
 #include <ast/passes/operate.hpp>
+#include <ast/passes/typeutil.hpp>
 #include <ast/sequence.hpp>
 #include <ast/typecast.hpp>
+#include <iostream>
 
 
 namespace AST {
@@ -71,6 +74,7 @@ void FoldConstPass::visit (const Basic_Operation & node) {
 				nPtr = OperatePass <parser::OPERATION::BXOR> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPEQ:
+				std::cerr << "Comparing: " << args [0]->toString (text::PrintMode::COLOUR) << " with " << args [1]->toString (text::PrintMode::COLOUR) << std::endl;
 				nPtr = OperatePass <parser::OPERATION::CMPEQ> (*executionStack, args) (node.getType ());
 				break;
 			case parser::OPERATION::CMPGT:
@@ -270,6 +274,11 @@ void FoldConstPass::visit (const CastToUint & node) {
 	auto nodeType = std::static_pointer_cast <Numeric> (node.getNode ()->getType ());
 	assert (nodeType);
 	abort ();
+}
+
+void FoldConstPass::visit (const RawInit & node) {
+	node.getVar ()->getLiteral (*executionStack) = DefaultValue () (node.getType ());
+	nPtr = node.getVar ();
 }
 
 void FoldConstPass::visit (const Sequence & node) {
