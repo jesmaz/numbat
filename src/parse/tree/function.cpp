@@ -82,8 +82,9 @@ AST::NodePtr Function::createAST (AST::Context & ctx) {
 		context->var ("this", var);
 		type->overloadFunc ("", func);
 		fPtr->body = std::make_shared <AST::Sequence> (getPos (), ctx.getSourceFile (), BasicArray <AST::NodePtr> {
-			std::make_shared <AST::RawInit> (getPos (), ctx.getSourceFile (), var, BasicArray <AST::NodePtr> ()),
-			body->createAST (*context)
+			std::make_shared <AST::RawInit> (getPos (), ctx.getSourceFile (), var, nullptr),
+			body->createAST (*context),
+			var
 		});
 	} else {
 		fPtr->body = body->createAST (*context);
