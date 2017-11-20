@@ -2,6 +2,7 @@
 #include <deque>
 #include <parse/handparser.hpp>
 #include <parse/tree.hpp>
+#include <parse/tree/braceinitaliser.hpp>
 #include <parse/tree/call.hpp>
 #include <parse/tree/error.hpp>
 #include <parse/tree/identifier.hpp>
@@ -440,6 +441,13 @@ PTNode parseAtom (CodeQueue * queue) {
 		
 		oldAtom = atom;
 		switch (queue->peak ()) {
+			case Symbol::SYMBOL_BRACE_LEFT: {
+				// Brace initaliser
+				auto pos = queue->popToken ().pos;
+				auto body = parseBlock (queue);
+				atom = new ParseTreeBraceInitaliser (pos, atom, body);
+				break;
+			}
 			case Symbol::SYMBOL_PARENRHESES_LEFT: {
 				// Function call
 				queue->shiftPop ();
