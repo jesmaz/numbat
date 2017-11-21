@@ -277,8 +277,39 @@ void FoldConstPass::visit (const CastToUint & node) {
 }
 
 void FoldConstPass::visit (const RawInit & node) {
-	node.getVar ()->getLiteral (*executionStack) = DefaultValue () (node.getType ());
-	nPtr = node.getVar ();
+	
+	if (node.getArgs ().empty ()) {
+		node.getVar ()->getLiteral (*executionStack) = DefaultValue () (node.getType ());
+		nPtr = node.getVar ();
+		
+	} else {
+		bool allValues=true;
+		auto args = node.getArgs ().map <NodePtr> ([&](const NodePtr & n) -> NodePtr {
+			auto arg = visit (n);
+			allValues &= arg->isValue ();
+			return arg;
+		});
+		
+		if (allValues) {
+			auto lit = DefaultValue () (node.getType ());
+			size_t i=0;
+			for (auto & a : args) {
+				auto l = static_cast <Value*> (a.get ())->getLiteral (*executionStack);
+				if (not l.isNil ()) {
+					lit [i] = l;
+				}
+				++i;
+			}
+			node.getVar ()->getLiteral (*executionStack) = lit;
+			nPtr = node.getVar ();
+			
+		} else {
+			nPtr = std::make_shared <RawInit> (node.getPos (), node.getFile (), node.getVar (), args);
+			
+		}
+		
+	}
+	
 }
 
 void FoldConstPass::visit (const Sequence & node) {
