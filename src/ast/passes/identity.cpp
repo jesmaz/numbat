@@ -101,14 +101,14 @@ void IdentityPass::visit (const Or & node) {
 }
 
 void IdentityPass::visit (const RawInit & node) {
-	if (node.getInit ()) {
-		nPtr = std::make_shared <RawInit> (
-			node.getPos (),
-			node.getFile (),
-			node.getVar (),
-			this->visit (node.getInit ())
-		);
-	}
+	nPtr = std::make_shared <RawInit> (
+		node.getPos (),
+		node.getFile (),
+		node.getVar (),
+		node.getArgs ().map <NodePtr> ([&](auto & n) {
+			return this->visit (n);
+		})
+	);
 }
 
 void IdentityPass::visit (const Ref & node) {}

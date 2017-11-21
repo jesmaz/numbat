@@ -115,8 +115,8 @@ void AnalysisPass::visit (const Or & node) {
 
 void AnalysisPass::visit (const RawInit & node) {
 	this->analyse (node.getVar ());
-	if (node.getInit ()) {
-		this->analyse (node.getInit ());
+	for (auto & arg : node.getArgs ()) {
+		this->analyse (arg);
 	}
 }
 

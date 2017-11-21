@@ -12,19 +12,19 @@ class RawInit : public Node {
 	
 	public:
 		
-		const NodePtr & getInit () const {return init;}
+		const BasicArray <NodePtr> & getArgs () const {return args;}
 		const VarPtr & getVar () const {return var;}
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		string toString (text::PrintMode mode) const;
 		
-		RawInit (numbat::lexer::position pos, const numbat::File * file, const VarPtr & var, const NodePtr & init) : Node (pos, file, var->getType ()), var (var), init (init) {}
+		RawInit (numbat::lexer::position pos, const numbat::File * file, const VarPtr & var, const BasicArray <NodePtr> & args) : Node (pos, file, var->getType ()), var (var), args (args) {}
 		
 	protected:
 	private:
 		
 		VarPtr var;
-		NodePtr init;
+		BasicArray <NodePtr> args;
 		
 };
 

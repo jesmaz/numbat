@@ -14,16 +14,17 @@ class ParseTreeBraceInitaliser : public ParseTreeNode {
 		
 		AST::NodePtr createAST (AST::Context & ctx);
 		
-		ParseTreeBraceInitaliser (numbat::lexer::position pos, PTNode type, PTNode body) : ParseTreeNode (pos), type (type), body (body) {}
+		ParseTreeBraceInitaliser (numbat::lexer::position pos, PTNode type, const BasicArray <PTNode> & args) : ParseTreeNode (pos), type (type), args (args) {}
 		
-		virtual ~ParseTreeBraceInitaliser () {delete type; delete body;}
+		virtual ~ParseTreeBraceInitaliser () {delete type; delAll (args);}
 		
 	protected:
 	private:
 		
 		virtual string strDump (text::PrintMode mode);
 		
-		PTNode type, body;
+		PTNode type;
+		BasicArray <PTNode> args;
 		
 };
 

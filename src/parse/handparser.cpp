@@ -444,8 +444,8 @@ PTNode parseAtom (CodeQueue * queue) {
 			case Symbol::SYMBOL_BRACE_LEFT: {
 				// Brace initaliser
 				auto pos = queue->popToken ().pos;
-				auto body = parseBlock (queue);
-				atom = new ParseTreeBraceInitaliser (pos, atom, body);
+				auto args = parseParameterList (queue);
+				atom = new ParseTreeBraceInitaliser (pos, atom, args);
 				break;
 			}
 			case Symbol::SYMBOL_PARENRHESES_LEFT: {
