@@ -1,0 +1,10 @@
+struct string {uint8 [] data}
+
+
+def string (ref uint8 [] data) -> (string) {
+	string {data}
+}
+
+def string () -> (string) {
+	string {''}
+}
