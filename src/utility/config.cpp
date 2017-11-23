@@ -30,6 +30,9 @@ void Config::initalise (int argl, char ** args) {
 				if (std::strcmp (str, "-emit-llvm") == 0) {
 					config.emitLLVM = true;
 					continue;
+				} else if (std::strcmp (str, "-interpret") == 0) {
+					config.interpret = true;
+					continue;
 				} else if (std::strcmp (str, "-jit") == 0) {
 					config.jit = true;
 					continue;

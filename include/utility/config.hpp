@@ -12,9 +12,10 @@ struct Config {
 	
 	std::string outfile = "a.out", coreLibDir = "";
 	bool emitAssembly = false;
-	bool link = true;
 	bool emitLLVM = false;
+	bool interpret = false;
 	bool jit = false;
+	bool link = true;
 	text::PrintMode printMode = text::PLAIN, printModeSTDERR = text::PLAIN;
 	std::set <std::string> files;
 	
