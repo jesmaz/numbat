@@ -7,6 +7,7 @@
 #include <ast/passes/prunedead.hpp>
 #include <ast/passes/reflectpass.hpp>
 #include <ast/passes/resolve.hpp>
+#include <utility/config.hpp>
 
 namespace AST {
 
@@ -44,11 +45,15 @@ NodePtr transform (const NodePtr & node) {
 	
 	FunctionPurityPass::analyse (funcs);
 	
-	n = FoldConstPass () (n);
-	for (auto & f : funcs) {
-		if (f->getBody ()) {
-			f->replaceBody (FoldConstPass () (f->getBody ()));
+	if (Config::globalConfig ().const_folding) {
+		
+		n = FoldConstPass () (n);
+		for (auto & f : funcs) {
+			if (f->getBody ()) {
+				f->replaceBody (FoldConstPass () (f->getBody ()));
+			}
 		}
+		
 	}
 	
 	n = PruneDeadCodePass () (n);

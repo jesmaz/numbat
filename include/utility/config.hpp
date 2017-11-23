@@ -11,6 +11,7 @@ struct Config {
 	static void initalise (int argl, char ** args);
 	
 	std::string outfile = "a.out", coreLibDir = "";
+	bool const_folding = true;
 	bool emitAssembly = false;
 	bool emitLLVM = false;
 	bool interpret = false;
