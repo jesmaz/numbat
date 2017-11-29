@@ -25,6 +25,7 @@ class PruneDeadCodePass : public ShallNotPass {
 		virtual void visit (const CastToInt &) {nPtr = nullptr;}
 		virtual void visit (const CastToUint &) {nPtr = nullptr;}
 		virtual void visit (const Function_Ptr &) {nPtr = nullptr;}
+		virtual void visit (const RawInit &) {}
 		virtual void visit (const Sequence & seq);
 		virtual void visit (const Struct &) {nPtr = nullptr;}
 		virtual void visit (const Value &) {nPtr = nullptr;}
