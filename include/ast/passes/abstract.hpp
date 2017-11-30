@@ -35,13 +35,13 @@ class ReflectType;
 class Return;
 class Sequence;
 class StaticIndex;
+class StaticValue;
 class Struct;
 class Unresolved_Call;
 class Unresolved_Constructor;
 class Unresolved_Get_Member;
 class Unresolved_IfElse;
 class Unresolved_Operation;
-class Value;
 class Variable;
 
 class AbstractPass {
@@ -78,13 +78,13 @@ class AbstractPass {
 		virtual void visit (const Return & node)=0;
 		virtual void visit (const Sequence & node)=0;
 		virtual void visit (const StaticIndex & node)=0;
+		virtual void visit (const StaticValue & node)=0;
 		virtual void visit (const Struct & node)=0;
 		virtual void visit (const Unresolved_Call & node)=0;
 		virtual void visit (const Unresolved_Constructor & node)=0;
 		virtual void visit (const Unresolved_Get_Member & node)=0;
 		virtual void visit (const Unresolved_IfElse & node)=0;
 		virtual void visit (const Unresolved_Operation & node)=0;
-		virtual void visit (const Value & node)=0;
 		virtual void visit (const Variable & node)=0;
 		
 		NodePtr operator () (const NodePtr & node);

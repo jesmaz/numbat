@@ -151,6 +151,10 @@ void AnalysisPass::visit (const StaticIndex & node) {
 	this->analyse (node.getType ());
 }
 
+void AnalysisPass::visit (const StaticValue & node) {
+	this->analyse (node.getType ());
+}
+
 void AnalysisPass::visit (const Struct & node) {
 	for (auto & t : node.getMembers ()) {
 		this->analyse (t);
@@ -184,10 +188,6 @@ void AnalysisPass::visit (const Unresolved_Operation & node) {
 	for (auto & arg : node.getArgs ()) {
 		this->analyse (arg);
 	}
-}
-
-void AnalysisPass::visit (const Value & node) {
-	this->analyse (node.getType ());
 }
 
 void AnalysisPass::visit (const Variable & node) {

@@ -30,8 +30,8 @@ class FoldConstPass : public ShallNotPass {
 		virtual void visit (const RawInit & node);
 		virtual void visit (const Sequence & node);
 		virtual void visit (const StaticIndex &);
+		virtual void visit (const StaticValue &) {}
 		virtual void visit (const Struct &) {}
-		virtual void visit (const Value &) {}
 		virtual void visit (const Variable &);
 		
 		FoldConstPass (bool readVar=true, const std::shared_ptr <LiteralStack> & stack=nullptr) : readVar (readVar), executionStack (stack) {

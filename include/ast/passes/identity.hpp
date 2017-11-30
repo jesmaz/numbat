@@ -42,13 +42,13 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const Return & node) {}
 		virtual void visit (const Sequence & node);
 		virtual void visit (const StaticIndex & node);
+		virtual void visit (const StaticValue & node) {}
 		virtual void visit (const Struct & node);
 		virtual void visit (const Unresolved_Call & node);
 		virtual void visit (const Unresolved_Constructor & node);
 		virtual void visit (const Unresolved_Get_Member & node);
 		virtual void visit (const Unresolved_IfElse & node);
 		virtual void visit (const Unresolved_Operation & node);
-		virtual void visit (const Value & node) {}
 		virtual void visit (const Variable & node);
 		
 	protected:
