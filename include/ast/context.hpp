@@ -39,12 +39,15 @@ struct Context {
 		
 		static const std::set <FuncPtr> & getAllFunctions () {return allFunctions;}
 		
+		const DynArray <VarPtr> & getLocalStack () const {return localStack;}
+		
 		const numbat::File * getSourceFile () const {return sourceFile;}
 		
 		Context * getRootContext () const {return rootContex;}
 		
 		const Function * getOwner () const {return owner;}
 		
+		void allocStack (const VarPtr & var) {localStack.push_back (var);}
 		size_t allocStack () {return stackPos++;}
 		
 		NodePtr resolve (const string & str) const;
@@ -99,6 +102,7 @@ struct Context {
 		std::shared_ptr <std::map <string, std::shared_ptr <function_t>>> functions;
 		std::shared_ptr <std::map <string, std::shared_ptr <type_t>>> types;
 		std::shared_ptr <std::map <string, std::shared_ptr <variable_t>>> variables;
+		DynArray <VarPtr> localStack;
 		const numbat::File * sourceFile=nullptr;
 		bool ownImp, ownFunc, ownType, ownVar;
 		
