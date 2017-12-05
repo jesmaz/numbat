@@ -17,7 +17,7 @@ class Call_n : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_n (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func, const BasicArray <NodePtr> & args) : Node (pos, file), func (func), args (args) {}
+		Call_n (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const FuncPtr & func, const BasicArray <NodePtr> & args) : Node (pos, file, type), func (func), args (args) {}
 		
 	protected:
 	private:
@@ -36,7 +36,7 @@ class Call_0 : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_0 (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func) : Node (pos, file), func (func) {}
+		Call_0 (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const FuncPtr & func) : Node (pos, file, type), func (func) {}
 		
 	protected:
 	private:
@@ -55,7 +55,7 @@ class Call_1 : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_1 (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func, const NodePtr & arg) : Node (pos, file), func (func), arg (arg) {}
+		Call_1 (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const FuncPtr & func, const NodePtr & arg) : Node (pos, file, type), func (func), arg (arg) {}
 		
 	protected:
 	private:
@@ -76,7 +76,7 @@ class Call_2 : public Node {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
-		Call_2 (numbat::lexer::position pos, const numbat::File * file, const FuncPtr & func, const NodePtr & lhs, const NodePtr & rhs) : Node (pos, file), func (func), lhs (lhs), rhs (rhs) {}
+		Call_2 (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const FuncPtr & func, const NodePtr & lhs, const NodePtr & rhs) : Node (pos, file, type), func (func), lhs (lhs), rhs (rhs) {}
 		
 	protected:
 	private:

@@ -26,18 +26,20 @@ NodePtr createCall (numbat::lexer::position pos, const numbat::File * file, cons
 		score += imp.getScore ();
 	}
 	
+	auto type = Struct::tuple (func->getRetVals ());
+	
 	switch (processed.size ()) {
 		case 0:
-			return std::make_shared <Call_0> (pos, file, func);
+			return std::make_shared <Call_0> (pos, file, type, func);
 			break;
 		case 1:
-			return std::make_shared <Call_1> (pos, file, func, processed [0]);
+			return std::make_shared <Call_1> (pos, file, type, func, processed [0]);
 			break;
 		case 2:
-			return std::make_shared <Call_2> (pos, file, func, processed [0], processed [1]);
+			return std::make_shared <Call_2> (pos, file, type, func, processed [0], processed [1]);
 			break;
 		default:
-			return std::make_shared <Call_n> (pos, file, func, processed);
+			return std::make_shared <Call_n> (pos, file, type, func, processed);
 			break;
 	}
 	

@@ -46,7 +46,7 @@ void IdentityPass::visit (const Call_0 & node) {}
 void IdentityPass::visit (const Call_1 & node) {
 	auto arg = this->visit (node.getArg ());
 	if (node.getArg () != arg) {
-		nPtr = std::make_shared <Call_1> (node.getPos (), node.getFile (), node.getFunc (), arg);
+		nPtr = std::make_shared <Call_1> (node.getPos (), node.getFile (), node.getType (), node.getFunc (), arg);
 	}
 }
 
@@ -54,7 +54,7 @@ void IdentityPass::visit (const Call_2 & node) {
 	auto lhs = this->visit (node.getLhs ());
 	auto rhs = this->visit (node.getRhs ());
 	if (lhs != node.getLhs () or rhs != node.getRhs ()) {
-		nPtr = std::make_shared <Call_2> (node.getPos (), node.getFile (), node.getFunc (), lhs, rhs);
+		nPtr = std::make_shared <Call_2> (node.getPos (), node.getFile (), node.getType (), node.getFunc (), lhs, rhs);
 	}
 }
 
@@ -68,7 +68,7 @@ void IdentityPass::visit (const Call_n & node) {
 		return a;
 	});
 	if (changed) {
-		nPtr = std::make_shared <Call_n> (node.getPos (), node.getFile (), node.getFunc (), args);
+		nPtr = std::make_shared <Call_n> (node.getPos (), node.getFile (), node.getType (), node.getFunc (), args);
 	}
 }
 

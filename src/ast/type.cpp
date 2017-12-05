@@ -1,4 +1,7 @@
+#include <ast/flowcontrol.hpp>
+#include <ast/function.hpp>
 #include <ast/type.hpp>
+#include <ast/variable.hpp>
 #include <file.hpp>
 
 
@@ -41,6 +44,7 @@ string Struct::toString (text::PrintMode mode) const {
 }
 
 
+std::map <BasicArray <TypePtr>, TypePtr> tuples;
 std::map <TypePtr, TypePtr> arrayMap, constMap, refMap;
 std::map <uint64_t, TypePtr> numericMap;
 
@@ -85,6 +89,25 @@ TypePtr Numeric::get (ArithmaticType arith, uint32_t minPrecision) {
 	} else {
 		return numericMap [converter.key] = TypePtr (new Numeric ({0, 0}, numbat::File::builtIn (), arith, minPrecision));
 	}
+}
+
+TypePtr Struct::tuple (const BasicArray <TypePtr> & vals) {
+	auto itt = tuples.find (vals);
+	if (itt != tuples.end ()) {
+		return itt->second;
+	}
+	
+	string iden = "tuple_";
+	for (auto & t : vals) {
+		iden += t->toString (text::PrintMode::PLAIN);
+	}
+	
+	auto s = std::make_shared <Struct> (numbat::lexer::position {0, 0}, numbat::File::builtIn (), iden);
+	s->members = vals.map <NodePtr> ([](auto&n){return std::make_shared <Variable> (numbat::lexer::position {0, 0}, numbat::File::builtIn (), n, 0, Variable::LOCATION::LOCAL, "");});
+	for (size_t i=0, l=vals.size (); i<l; ++i) {
+		s->positionMap ["_" + std::to_string (i)] = i;
+	}
+	return s;
 }
 
 }

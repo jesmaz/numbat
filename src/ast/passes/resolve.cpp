@@ -210,44 +210,26 @@ void MakeCallPass::visit (const Function_Ptr & node) {
 
 void MakeCallPass::visit (const Function_Set & node) {
 	
-	FuncPtr f;
-	BasicArray <NodePtr> params = args;
-	for (auto & func : node.getSet ().funcs) {
-		bool accept = true;
-		BasicArray <NodePtr> tmpParams = func.first->getParams ().map <NodePtr> ([&](const NodePtr & ptr, size_t i) {
-			if (i < args.size ()) {
-				//TODO: check for type compatibility
-				return args [i];
-			} else {
-				accept = false;
+	size_t winningScore = __UINT64_MAX__;
+	NodePtr winner;
+	for (auto & f : node.getSet ().funcs) {
+		size_t score;
+		auto c = createCall (pos, file, f.first, args, score);
+		if (c) {
+			if (score < winningScore) {
+				winner = c;
+			} else if (score == winningScore) {
+				winner = nullptr;
 			}
-			return ptr;
-		});
-		if (accept) {
-			f = func.first;
-			params = tmpParams;
 		}
 	}
 	
-	if (!f) {
-		//TODO: print error
+	if (winner) {
+		nPtr = winner;
 	} else {
-		
-		switch (params.size ()) {
-			case 0:
-				nPtr = std::make_shared <Call_0> (pos, file, f);
-				break;
-			case 1:
-				nPtr = std::make_shared <Call_1> (pos, file, f, params [0]);
-				break;
-			case 2:
-				nPtr = std::make_shared <Call_2> (pos, file, f, params [0], params [1]);
-				break;
-			default:
-				nPtr = std::make_shared <Call_n> (pos, file, f, params);
-				break;
-		}
+		abort ();
 	}
+	
 }
 
 void MakeCallPass::visit (const Struct & node) {
