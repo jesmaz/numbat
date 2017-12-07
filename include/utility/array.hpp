@@ -153,6 +153,7 @@ struct BasicArray {
 			iterator operator ++ () {++ptr; return *this;}
 			iterator operator -- () {--ptr; return *this;}
 			iterator operator + (ssize_t other) const {return ptr + other;}
+			iterator & operator += (ssize_t other) {ptr += other; return *this;}
 			size_t operator - (iterator other) const {return ptr - other.ptr;}
 			iterator operator - (ssize_t other) const {return ptr - other;}
 			operator const void * () const {return ptr;}
@@ -180,6 +181,7 @@ struct BasicArray {
 			const_iterator operator ++ () {++ptr; return *this;}
 			const_iterator operator -- () {--ptr; return *this;}
 			const_iterator operator + (ssize_t other) const {return ptr + other;}
+			const_iterator & operator += (ssize_t other) {ptr += other; return *this;}
 			size_t operator - (const_iterator other) const {return ptr - other.ptr;}
 			const_iterator operator - (ssize_t other) const {return ptr - other;}
 			operator const void * () const {return ptr;}
@@ -209,6 +211,7 @@ struct BasicArray {
 			reverse_iterator operator ++ () {--ptr; return *this;}
 			reverse_iterator operator -- () {--ptr; return *this;}
 			reverse_iterator operator + (ssize_t other) const {return ptr - other;}
+			reverse_iterator & operator += (ssize_t other) {ptr -= other; return *this;}
 			size_t operator - (reverse_iterator other) const {return other.ptr - ptr;}
 			reverse_iterator operator - (ssize_t other) const {return ptr + other;}
 			operator const void * () const {return ptr;}
@@ -236,6 +239,7 @@ struct BasicArray {
 			reverse_const_iterator operator ++ () {--ptr; return *this;}
 			reverse_const_iterator operator -- () {--ptr; return *this;}
 			reverse_const_iterator operator + (ssize_t other) const {return ptr - other;}
+			reverse_const_iterator & operator += (ssize_t other) {ptr -= other; return *this;}
 			size_t operator - (reverse_const_iterator other) const {return other.ptr - ptr;}
 			reverse_const_iterator operator - (ssize_t other) const {return ptr + other;}
 			operator const void * () const {return ptr;}
@@ -300,7 +304,7 @@ struct DynArray : public BasicArray <T> {
 			size_t extraSpace = in_end - in_start;
 			if (this->size () + extraSpace >= capacity) {
 				size_t offset = pos - this->data;
-				resize (this->size () + extraSpace);
+				realloc (this->size () + extraSpace);
 				pos = this->data + offset;
 			}
 			typename BasicArray <T>::const_iterator end (this->end ());
@@ -316,10 +320,22 @@ struct DynArray : public BasicArray <T> {
 		
 		void push_back (const T & d) {
 			if (this->size () == capacity) {
-				resize (capacity + 1);
+				realloc (capacity + 1);
 			}
 			this->data [this->len] = d;
 			this->len += 1;
+		}
+		
+		void pop_back () {
+			if (this->len) this->len -= 1;
+		}
+		
+		void pop_back (size_t amount) {
+			if (this->len < amount) {
+				this->len = 0;
+			} else {
+				this->len -= amount;
+			}
 		}
 		
 		void clear () {
@@ -327,9 +343,24 @@ struct DynArray : public BasicArray <T> {
 			capacity = 0;
 		}
 		
+		void resize (size_t n) {
+			reserve (n);
+			this->len = n;
+		}
+		
+		void resize (size_t n, const T & fill) {
+			reserve (n);
+			if (this->len < n){
+				for (size_t i=this->len; i<n; ++i) {
+					(this->data) [i] = fill;
+				}
+			}
+			this->len = n;
+		}
+		
 		void reserve (size_t n) {
 			if (capacity < n) {
-				resize (n);
+				realloc (n);
 			}
 		}
 		
@@ -347,7 +378,7 @@ struct DynArray : public BasicArray <T> {
 	protected:
 	private:
 		
-		void resize (size_t min) {
+		void realloc (size_t min) {
 			capacity = min + (GROWTH - min % GROWTH);
 			T * ptr = new T [capacity];
 			std::copy (this->data, this->data + this->len, ptr);
@@ -358,6 +389,14 @@ struct DynArray : public BasicArray <T> {
 		size_t capacity;
 		
 };
+
+template <typename T>
+inline BasicArray <T> operator + (const BasicArray <T> & lhs, const BasicArray <T> & rhs) {
+	BasicArray <T> res (lhs.size () + rhs.size ());
+	auto mid = std::copy (lhs.begin (), lhs.end (), res.begin ());
+	std::copy (rhs.begin (), rhs.end (), mid);
+	return res;
+}
 
 template <typename R, typename T, typename Y>
 inline BasicArray <R> combine (const BasicArray <T> & lhs, const BasicArray <Y> & rhs) {
