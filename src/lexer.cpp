@@ -6,57 +6,56 @@ namespace lexer {
 
 
 std::string next (const char * source, size_t & pos, size_t length) {
-    std::string str;
-    if (pos < length) {
-        while (pos < length and isspace (source [pos])) {
-            if (source [pos] == '\r' or source [pos] == '\n') {
-                return "\n";
-            }
-			str += source [pos];
-            ++pos;
-        }
+	std::string str;
+	if (pos < length) {
+		while (pos < length and isspace (source [pos])) {
+			if (source [pos] == '\r' or source [pos] == '\n') {
+				return "\n";
+			}
+			++pos;
+		}
 		if (str != "") {
 			return str;
 		}
-        if (source [pos] == '#') {
+		if (source [pos] == '#') {
 			while (++pos < length and source [pos] != '\r' and source [pos] != '\n');
 			return "\n";
-        }
-        char quote = 0;
-        if (source [pos] == '\'' or source [pos] == '"') {
-            quote = source [pos];
-            str += quote;
-            char last = quote;
-            ++pos;
-            while (pos < length and !(last != '\\' and source [pos] == quote)) {
-                str += source [pos];
+		}
+		char quote = 0;
+		if (source [pos] == '\'' or source [pos] == '"') {
+			quote = source [pos];
+			str += quote;
+			char last = quote;
+			++pos;
+			while (pos < length and !(last != '\\' and source [pos] == quote)) {
+				str += source [pos];
 				last = source [pos];
-                ++pos;
-            }
-            if (pos < length) {
-               str += source [pos];
-               ++pos;
-            }
-        } else {
-            if (!isalnum (source [pos]) and source [pos] != '_') {
-                str += source [pos];
-                ++pos;
+				++pos;
+			}
+			if (pos < length) {
+				str += source [pos];
+				++pos;
+			}
+		} else {
+			if (!isalnum (source [pos]) and source [pos] != '_') {
+				str += source [pos];
+				++pos;
 			} else if (isdigit (source [pos])) {
 				while (isdigit (source [pos]) or source [pos] == '.' or source [pos] == 'x' or source [pos] == 'X' or source [pos] == 'q' or source [pos] == 'Q' or (source [pos] >= 'a' and source [pos] <= 'f') or (source [pos] >= 'A' and source [pos] <= 'F')) {
 					str += source [pos];
 					++pos;
 				}
 			} else {
-                while (pos < length and (isalnum (source [pos]) or source [pos] == '_')) {
-                    str += source [pos];
-                    ++pos;
-                }
-            }
-        }
-    } else {
-        return "\n";
-    }
-    return str;
+				while (pos < length and (isalnum (source [pos]) or source [pos] == '_')) {
+					str += source [pos];
+					++pos;
+				}
+			}
+		}
+	} else {
+		return "\n";
+	}
+	return str;
 }
 
 tkstring lex (const char * source, size_t length) {
