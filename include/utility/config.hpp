@@ -18,6 +18,7 @@ struct Config {
 	bool interpret = false;
 	bool jit = false;
 	bool link = true;
+	bool prune_dead_code = true;
 	text::PrintMode printMode = text::PLAIN, printModeSTDERR = text::PLAIN;
 	std::set <std::string> files;
 	

@@ -17,6 +17,7 @@ NodePtr transform (const NodePtr & node) {
 	auto & funcs = Context::getAllFunctions ();
 	
 	auto n = MetaTagSwizzlePass () (node);
+	assert (n);
 	for (auto & f : funcs) {
 		if (f->getBody ()) {
 			f->replaceBody (MetaTagSwizzlePass () (f->getBody ()));
@@ -24,6 +25,7 @@ NodePtr transform (const NodePtr & node) {
 	}
 	
 	n = ResolvePass () (n);
+	assert (n);
 	for (auto & f : funcs) {
 		if (f->getBody ()) {
 			f->replaceBody (ResolvePass () (f->getBody ()));
@@ -31,6 +33,7 @@ NodePtr transform (const NodePtr & node) {
 	}
 	
 	n = ReflectPass () (n);
+	assert (n);
 	for (auto & f : funcs) {
 		if (f->getBody ()) {
 			f->replaceBody (ReflectPass () (f->getBody ()));
@@ -48,6 +51,7 @@ NodePtr transform (const NodePtr & node) {
 	if (Config::globalConfig ().const_folding) {
 		
 		n = FoldConstPass () (n);
+		assert (n);
 		for (auto & f : funcs) {
 			if (f->getBody ()) {
 				f->replaceBody (FoldConstPass () (f->getBody ()));
@@ -56,10 +60,13 @@ NodePtr transform (const NodePtr & node) {
 		
 	}
 	
-	n = PruneDeadCodePass () (n);
-	for (auto & f : funcs) {
-		if (f->getBody ()) {
-			f->replaceBody (PruneDeadCodePass () (f->getBody ()));
+	if (Config::globalConfig ().prune_dead_code) {
+		n = PruneDeadCodePass () (n);
+		assert (n);
+		for (auto & f : funcs) {
+			if (f->getBody ()) {
+				f->replaceBody (PruneDeadCodePass () (f->getBody ()));
+			}
 		}
 	}
 	
