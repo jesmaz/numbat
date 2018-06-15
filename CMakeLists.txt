@@ -109,7 +109,7 @@ add_library(numbat-static STATIC ${sources})
 
 set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl z tinfo gmpxx gmp)
 
-add_executable(numbat src/main.cpp src/codegen/llvm.cpp)
+add_executable(numbat src/main.cpp src/numbatmain.cpp src/codegen/llvm.cpp)
 
 target_link_libraries(numbat ${libs})
 
