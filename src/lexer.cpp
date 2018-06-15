@@ -83,15 +83,9 @@ tkstring lexline (const char * source, size_t & pos, size_t length, uint32_t lin
 	std::string buffer;
 	size_t lineStart = pos;
 	
-	token init;
-	init.type = TOKEN::indent;
-	init.iden = "";
-	init.pos = {line, 0};
 	while (pos < length and (source [pos] == ' ' or source [pos] == '\t')) {
-		init.iden += source [pos];
 		++pos;
 	}
-	str += init;
 	
 	while ((buffer = next (source, pos, length)) != "\n") {
 		//std::cout << buffer << std::endl;
