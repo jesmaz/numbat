@@ -1,8 +1,20 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 project(numbat)
 
 
 #option(debug "debug" ON)
+enable_testing()
+
+include(ExternalProject)
+include(GoogleTest)
+ExternalProject_Add (
+	googletest
+	GIT_REPOSITORY https://github.com/google/googletest.git
+	GIT_TAG "release-1.8.0"
+	PREFIX "${CMAKE_BINARY_DIR}/gtest"
+	INSTALL_COMMAND ""
+)
+ExternalProject_Get_Property (googletest source_dir binary_dir)
 
 
 execute_process(COMMAND llvm-config-5.0 --includedir OUTPUT_VARIABLE LLVM_INCLUDE_DIRS OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -11,7 +23,7 @@ execute_process(COMMAND llvm-config-5.0 --libs all OUTPUT_VARIABLE REQ_LLVM_LIBR
 execute_process(COMMAND llvm-config-5.0 --ldflags OUTPUT_VARIABLE LLVM_LINKER_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND llvm-config-5.0 --cppflags OUTPUT_VARIABLE LLVM_FLAGS OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-include_directories(${LLVM_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/include")
+include_directories(${LLVM_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/include" "${source_dir}/googletest/include")
 link_directories(${LLVM_LIBRARY_DIRS})
 
 set(CMAKE_CXX_FLAGS "-Wall -std=c++14 -DUSE_LLVM=1 -g -pthread -march=native ${LLVM_FLAGS}")
@@ -37,6 +49,7 @@ set(sources ${sources} "src/ast/passes/nir.cpp")
 set(sources ${sources} "src/ast/passes/prunedead.cpp")
 set(sources ${sources} "src/ast/passes/reflectpass.cpp")
 set(sources ${sources} "src/ast/passes/resolve.cpp")
+set(sources ${sources} "src/ast/passes/stackmachinepass.cpp")
 set(sources ${sources} "src/ast/passes/typecastpass.cpp")
 set(sources ${sources} "src/ast/passes/typeutil.cpp")
 set(sources ${sources} "src/ast/sequence.cpp")
@@ -96,40 +109,18 @@ add_library(numbat-static STATIC ${sources})
 
 set(libs ${libs} ${REQ_LLVM_LIBRARIES} ${LLVM_LINKER_FLAGS} numbat-static dl z tinfo gmpxx gmp)
 
-add_executable(asttest test/ast.cpp)
-add_executable(console src/console.cpp)
-add_executable(interpreter src/console.cpp)
 add_executable(numbat src/main.cpp src/codegen/llvm.cpp)
-add_executable(nirtest test/nir.cpp src/nir/block.cpp)
-add_executable(nirtest-dbg test/nir.cpp src/nir/block.cpp)
-add_executable(parsertest test/parser.cpp)
-add_executable(parsertest-dbg test/parser.cpp)
 
-target_link_libraries(asttest ${libs})
-target_link_libraries(console ${libs})
-target_link_libraries(interpreter ${libs})
 target_link_libraries(numbat ${libs})
-target_link_libraries(nirtest ${libs})
-target_link_libraries(nirtest-dbg ${libs})
-target_link_libraries(parsertest ${libs})
-target_link_libraries(parsertest-dbg ${libs})
 
-set_target_properties(asttest PROPERTIES COMPILE_FLAGS "-DD_PRINT")
-set_target_properties(nirtest PROPERTIES COMPILE_FLAGS "-DD_PRINT")
-set_target_properties(nirtest-dbg PROPERTIES COMPILE_FLAGS "-DDEBUG -DD_PRINT")
-set_target_properties(parsertest-dbg PROPERTIES COMPILE_FLAGS "-DDEBUG")
-set_target_properties(interpreter PROPERTIES COMPILE_FLAGS "-DN_PROMPT")
+
+add_executable(tests test/test.cpp test/lexer.cpp)
+add_dependencies(tests googletest)
+target_link_libraries(tests ${libs} "${binary_dir}/googlemock/gtest/libgtest.a" "${binary_dir}/googlemock/gtest/libgtest_main.a")
+
+gtest_add_tests(TARGET tests AUTO)
+
 
 install(FILES numbat.xml DESTINATION /usr/share/katepart5/syntax/)
 install(DIRECTORY "libnbt/" DESTINATION /usr/include/numbat)
 install(TARGETS numbat numbat-static numbat-static RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib/static)
-
-
-
-add_custom_command(
-	OUTPUT regression.passed
-	COMMAND numbat -core-lib-dir=${CMAKE_CURRENT_SOURCE_DIR}/libnbt/core -o regression.passed ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
-	DEPENDS numbat ${CMAKE_CURRENT_SOURCE_DIR}/test/regression.nbt
-)
-
-add_custom_target(regression.run ALL DEPENDS regression.passed)
