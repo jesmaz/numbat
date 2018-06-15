@@ -114,12 +114,17 @@ add_executable(numbat src/main.cpp src/codegen/llvm.cpp)
 target_link_libraries(numbat ${libs})
 
 
-add_executable(tests test/test.cpp test/lexer.cpp)
+set(test_sources test/test.cpp test/arithmatic.cpp test/lexer.cpp)
+set(test_libs ${libs} "${binary_dir}/googlemock/gtest/libgtest.a" "${binary_dir}/googlemock/gtest/libgtest_main.a")
+add_executable(tests ${test_sources})
+add_executable(tests-build ${test_sources})
 add_dependencies(tests googletest)
-target_link_libraries(tests ${libs} "${binary_dir}/googlemock/gtest/libgtest.a" "${binary_dir}/googlemock/gtest/libgtest_main.a")
+add_dependencies(tests-build googletest)
+target_link_libraries(tests ${test_libs})
+target_link_libraries(tests-build ${test_libs})
 
 add_custom_command(
-	TARGET tests
+	TARGET tests-build
 	COMMENT "Run tests"
 	POST_BUILD 
 	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
