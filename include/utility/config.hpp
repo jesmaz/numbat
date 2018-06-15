@@ -7,6 +7,7 @@
 
 struct Config {
 	
+	static Config & mutableGlobalConfig ();
 	static const Config & globalConfig ();
 	static void initalise (int argl, char ** args);
 	
