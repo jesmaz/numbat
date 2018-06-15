@@ -118,7 +118,13 @@ add_executable(tests test/test.cpp test/lexer.cpp)
 add_dependencies(tests googletest)
 target_link_libraries(tests ${libs} "${binary_dir}/googlemock/gtest/libgtest.a" "${binary_dir}/googlemock/gtest/libgtest_main.a")
 
-gtest_add_tests(TARGET tests AUTO)
+add_custom_command(
+	TARGET tests
+	COMMENT "Run tests"
+	POST_BUILD 
+	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	COMMAND tests
+)
 
 
 install(FILES numbat.xml DESTINATION /usr/share/katepart5/syntax/)
