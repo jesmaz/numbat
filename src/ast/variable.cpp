@@ -31,7 +31,7 @@ ValPtr StaticValue::parseNumber (numbat::lexer::position pos, const numbat::File
 		} else {
 			l = v;
 		}
-		return std::make_shared <StaticValue> (pos, file, Numeric::get (Numeric::ArithmaticType::ARBITRARY, 0), mpq_class (l));
+		return std::make_shared <StaticValue> (pos, file, Numeric::get (Numeric::ArithmaticType::ARBITRARY, 0), mpq_class (l, 10));
 	} else {
 		string::size_type p;
 		string l;
@@ -40,7 +40,7 @@ ValPtr StaticValue::parseNumber (numbat::lexer::position pos, const numbat::File
 		} else {
 			l = num;
 		}
-		return std::make_shared <StaticValue> (pos, file, Numeric::get (Numeric::ArithmaticType::UNDETERMINED, 0), mpq_class (l));
+		return std::make_shared <StaticValue> (pos, file, Numeric::get (Numeric::ArithmaticType::UNDETERMINED, 0), mpq_class (l, 10));
 	}
 }
 
