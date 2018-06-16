@@ -21,6 +21,17 @@ TEST_F (InterpreterTest, integer_addition) {
 	
 }
 
+TEST_F (InterpreterTest, integer_bodmas) {
+	
+	EXPECT_EQ (interpret ("1 + 1 - 2"), "0");
+	EXPECT_EQ (interpret ("1 + 1 * 2"), "3");
+	EXPECT_EQ (interpret ("2 * 1 + 1"), "3");
+	EXPECT_EQ (interpret ("2 * (1 + 1)"), "4");
+	EXPECT_EQ (interpret ("2 * (1 + 1) / 2"), "2");
+	EXPECT_EQ (interpret ("2 * (1 + 4 / 2)"), "6");
+	
+}
+
 TEST_F (InterpreterTest, integer_subtraction) {
 	
 	EXPECT_EQ (interpret ("1 - 1"), "0");
