@@ -7,7 +7,7 @@ class InterpreterTest : public ::testing::Test {
 	
 	public:
 		
-		string interpret (const std::string & str);
+		void interpret (const string & str, const string & expected);
 		
 		InterpreterTest ();
 		~InterpreterTest () {}
