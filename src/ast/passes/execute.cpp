@@ -319,14 +319,11 @@ void FoldConstPass::visit (const Sequence & node) {
 		allValues &= arg->isValue ();
 		return arg;
 	});
-	if (args.size () == 1) {
-		nPtr = args [0];
-	} else if (args.size () > 1 and allValues) {
+	if (not args.empty () and (args.size () == 1 or allValues)) {
 		nPtr = args.back ();
 	} else {
-		nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), args);
+		nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), node.getLocalStack (), args);
 	}
-	//TODO: chain onto a pruning pass (might as well do it here)
 }
 
 void FoldConstPass::visit (const StaticIndex & node) {

@@ -29,7 +29,7 @@ AST::NodePtr ParseTree::createAST (AST::Context & ctx) {
 	
 	auto * context = createContext (ctx);
 	auto arr = body.map <AST::NodePtr> ([&](auto & a){return a->createAST (*context);});
-	return std::make_shared <AST::Sequence> (getPos (), ctx.getSourceFile (), arr);
+	return std::make_shared <AST::Sequence> (getPos (), ctx.getSourceFile (), context->getLocalStack (), arr);
 	
 }
 
@@ -44,7 +44,7 @@ AST::NodePtr ParseTree::extendAST (AST::Context & ctx) {
 	}
 	
 	auto arr = body.map <AST::NodePtr> ([&](auto & a){return a->extendAST (ctx);});
-	return std::make_shared <AST::Sequence> (getPos (), ctx.getSourceFile (), arr);
+	return std::make_shared <AST::Sequence> (getPos (), ctx.getSourceFile (), ctx.getLocalStack (), arr);
 	
 }
 

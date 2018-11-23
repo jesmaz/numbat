@@ -12,7 +12,7 @@ class AnalysisPass : public AbstractPass {
 	public:
 		
 		virtual NodePtr visit (const NodePtr & node) {this->analyse (node); return nullptr;}
-		virtual void analyse (const NodePtr & node)=0;
+		virtual void analyse (const NodePtr & node) {node->accept (*this);}
 		
 		virtual void visit (const And & node);
 		virtual void visit (const Array & node);
@@ -44,6 +44,7 @@ class AnalysisPass : public AbstractPass {
 		virtual void visit (const StaticIndex & node);
 		virtual void visit (const StaticValue & node);
 		virtual void visit (const Struct & node);
+		virtual void visit (const SystemCall & node);
 		virtual void visit (const Unresolved_Call & node);
 		virtual void visit (const Unresolved_Constructor & node);
 		virtual void visit (const Unresolved_Get_Member & node);

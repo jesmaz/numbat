@@ -10,6 +10,9 @@
 #include <utility/literals.hpp>
 
 
+int main (int, char **);
+
+
 namespace AST {
 
 struct CallingData {
@@ -25,6 +28,7 @@ struct Function {
 		const DynArray <FuncPtr> & getDirectlyCalled () const {return directlyCalled;}
 		const BasicArray <TypePtr> getParams () const {return params;}
 		const BasicArray <TypePtr> getRetVals () const {return retVals;}
+		const BasicArray <VarPtr> & getInitialStack () const {return initialStack;}
 		const NodePtr getBody () const {return body;}
 		const numbat::lexer::position getPos () const {return pos;}
 		const std::function <const BasicArray <Literal> (const BasicArray <Literal>, const CallingData &)> & getNative () const {return nativeFunction;}
@@ -37,11 +41,13 @@ struct Function {
 	private:
 		
 		friend AST::Context;
+		friend int ::main (int, char **);
 		friend parser::Function;
 		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <Literal>(const BasicArray <Literal>, const CallingData &)> &func);
 		
 		BasicArray <TypePtr> params, retVals;
 		BasicArray <NodePtr> defParams, defRets;
+		BasicArray <VarPtr> initialStack;
 		std::map <std::string, std::string> metaData;
 		std::map <std::string, size_t> positions;
 		DynArray <FuncPtr> directlyCalled;

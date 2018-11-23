@@ -97,8 +97,8 @@ void AnalysisPass::visit (const Function_Set & node) {
 void AnalysisPass::visit (const IfElse & node) {
 	this->analyse (node.getCond ());
 	this->analyse (node.getBody ());
-	this->analyse (node.getAlt ());;
-	this->analyse (node.getVar ());
+	if (node.getAlt ()) this->analyse (node.getAlt ());
+	if (node.getVar ()) this->analyse (node.getVar ());
 }
 
 void AnalysisPass::visit (const Inferred &) {}
@@ -159,6 +159,13 @@ void AnalysisPass::visit (const Struct & node) {
 	for (auto & t : node.getMembers ()) {
 		this->analyse (t);
 	}
+}
+
+void AnalysisPass::visit (const SystemCall & node) {
+	for (auto & arg : node.getArgs ()) {
+		this->analyse (arg);
+	}
+	this->analyse (node.getType ());
 }
 
 void AnalysisPass::visit (const Unresolved_Call & node) {

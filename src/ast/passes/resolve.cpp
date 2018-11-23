@@ -64,10 +64,11 @@ void ResolvePass::visit (const Sequence & node) {
 			node.getPos (),
 			node.getFile (),
 			std::make_shared <Struct> (node.getPos (), node.getFile (), ""),
+			node.getLocalStack (),
 			nodes
 		);
 	} else {
-		nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), nodes.back ()->getType (), nodes);
+		nPtr = std::make_shared <Sequence> (node.getPos (), node.getFile (), nodes.back ()->getType (), node.getLocalStack (), nodes);
 	}
 }
 

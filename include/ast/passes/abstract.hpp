@@ -37,6 +37,7 @@ class Sequence;
 class StaticIndex;
 class StaticValue;
 class Struct;
+class SystemCall;
 class Unresolved_Call;
 class Unresolved_Constructor;
 class Unresolved_Get_Member;
@@ -80,6 +81,7 @@ class AbstractPass {
 		virtual void visit (const StaticIndex & node)=0;
 		virtual void visit (const StaticValue & node)=0;
 		virtual void visit (const Struct & node)=0;
+		virtual void visit (const SystemCall & node)=0;
 		virtual void visit (const Unresolved_Call & node)=0;
 		virtual void visit (const Unresolved_Constructor & node)=0;
 		virtual void visit (const Unresolved_Get_Member & node)=0;

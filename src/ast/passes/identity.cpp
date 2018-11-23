@@ -131,7 +131,7 @@ void IdentityPass::visit (const Sequence & seq) {
 		return a;
 	});
 	if (changed) {
-		nPtr = std::make_shared <Sequence> (seq.getPos (), seq.getFile (), nodes);
+		nPtr = std::make_shared <Sequence> (seq.getPos (), seq.getFile (), seq.getLocalStack (), nodes);
 	}
 }
 
@@ -140,6 +140,20 @@ void IdentityPass::visit (const StaticIndex & node) {
 }
 
 void IdentityPass::visit (const Struct & node) {}
+
+void IdentityPass::visit (const SystemCall & node) {
+	bool changed = false;
+	
+	
+	auto args = node.getArgs ().map <NodePtr> ([&](auto & arg) {
+		auto a = this->visit (arg);
+		if (a != arg) {changed = true;}
+		return a;
+	});
+	if (changed) {
+		nPtr = std::make_shared <SystemCall> (node.getPos (), node.getFile (), node.getType (), node.getSysName (), args);
+	}
+}
 
 void IdentityPass::visit (const Unresolved_Call & node) {
 	

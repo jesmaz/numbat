@@ -81,7 +81,7 @@ File * File::builtIn () {
 				delete parseTree;
 			}
 		}
-		f->ast = std::make_shared <AST::Sequence> (numbat::lexer::position {0, 0}, f, seq);
+		f->ast = std::make_shared <AST::Sequence> (numbat::lexer::position {0, 0}, f, BasicArray <AST::VarPtr> {}, seq);
 	}
 	return builtInPtr.get ();
 }

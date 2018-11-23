@@ -14,7 +14,7 @@ void PruneDeadCodePass::visit (const Sequence & seq) {
 			nodes.push_back (a);
 		}
 	}
-	nPtr = std::make_shared <Sequence> (seq.getPos (), seq.getFile (), nodes);
+	nPtr = std::make_shared <Sequence> (seq.getPos (), seq.getFile (), seq.getLocalStack (), nodes);
 }
 
 NodePtr PruneDeadCodePass::operator () (const NodePtr & node) {

@@ -86,6 +86,26 @@ class Call_2 : public Node {
 		
 };
 
+class SystemCall : public Node {
+	
+	public:
+		
+		const string & getSysName () const {return sysName;}
+		const BasicArray <NodePtr> & getArgs () const {return args;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		SystemCall (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, const string & sysName, const BasicArray <NodePtr> & args) : Node (pos, file, type), sysName (sysName), args (args) {}
+		
+	protected:
+	private:
+		
+		string sysName;
+		BasicArray <NodePtr> args;
+	
+};
+
 class Unresolved_Call : public Node {
 	
 	public:

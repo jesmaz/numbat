@@ -21,6 +21,19 @@ string Call_2::toString (text::PrintMode mode) const {
 	return func->getIden () + " (" + lhs->toString (mode) + ", " + rhs->toString (mode) + ")";
 }
 
+string SystemCall::toString (text::PrintMode mode) const {
+	
+	string s = "[system] " + sysName + " (";
+	if (not args.empty ()) {
+		s += args.front ()->toString (mode);
+		for (size_t i=1; i<args.size (); ++i) {
+			s += ", " + args [i]->toString (mode);
+		}
+	}
+	return s + ")";
+	
+}
+
 string Unresolved_Call::toString (text::PrintMode mode) const {
 	
 	string s = "[unresolved] " + callee->toString (mode) + " (";
