@@ -8,12 +8,16 @@
 
 namespace AST {
 
+
+std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <Literal>(const BasicArray <Literal>, const CallingData &)> & func);
+
+
 class Reflect : public Node {
 	
 	public:
 		
 		static FuncPtr api (const string & iden);
-		static void initAPI ();
+		static void initAPI (const BasicArray <std::pair <string, FuncPtr>> & extraAPIfuncs = {});
 		
 		NodePtr getMetaTag () const {return metaTag;}
 		NodePtr getTarget () const {return target;}
