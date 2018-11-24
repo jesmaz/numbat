@@ -51,6 +51,8 @@ void InterpreterTest::interpret (const string & str, const string & expected) {
 	std::ostringstream sout;
 	stackmachine::StackInterpreter interpreter;
 	std::cerr << ast->toString (text::PrintMode::PLAIN) << "\n";
+	stackmachine::StackPrinter printer;
+	printer.run (chunk, std::cerr);
 	interpreter.run (chunk, std::cerr);
 	
 	EXPECT_EQ (interpreter.getTop ().toString (text::PrintMode::PLAIN), expected) << "Input for this operation was: " << str;
