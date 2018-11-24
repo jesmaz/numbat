@@ -100,6 +100,7 @@ set(sources ${sources} "src/parse/tree/struct.cpp")
 set(sources ${sources} "src/parse/tree/symbol.cpp")
 set(sources ${sources} "src/parse/tree/typemodifier.cpp")
 set(sources ${sources} "src/parse/tree/variable.cpp")
+set(sources ${sources} "src/stackmachine/instruction.cpp")
 set(sources ${sources} "src/utility/alphanumeric.cpp")
 set(sources ${sources} "src/utility/config.cpp")
 set(sources ${sources} "src/utility/literals.cpp")
@@ -114,7 +115,7 @@ add_executable(numbat src/main.cpp src/numbatmain.cpp src/codegen/llvm.cpp)
 target_link_libraries(numbat ${libs})
 
 
-set(test_sources test/test.cpp test/arithmatic.cpp test/interpretertest.cpp test/lexer.cpp)
+set(test_sources test/test.cpp test/arithmatic.cpp test/interpretertest.cpp test/lexer.cpp test/stackmachinetests.cpp)
 set(test_libs ${libs} "${binary_dir}/googlemock/gtest/libgtest.a" "${binary_dir}/googlemock/gtest/libgtest_main.a")
 add_executable(tests ${test_sources})
 add_executable(tests-build ${test_sources})
@@ -127,7 +128,7 @@ add_custom_command(
 	TARGET tests-build
 	COMMENT "Run tests"
 	POST_BUILD 
-	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+	WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/test/"
 	COMMAND tests
 )
 
