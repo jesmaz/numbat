@@ -1,5 +1,6 @@
 #include <ast/call.hpp>
 #include <ast/memory.hpp>
+#include <ast/passes/metatagswizzle.hpp>
 #include <ast/passes/shallnot.hpp>
 #include <ast/passes/typeutil.hpp>
 #include <ast/sequence.hpp>
@@ -60,7 +61,8 @@ AST::FuncPtr Function::createFunc (AST::Context & ctx) {
 	fPtr->defParams = BasicArray <AST::NodePtr> (params.size ());
 	fPtr->params = params.map <AST::TypePtr> ([&](auto & a) {
 		static size_t index=0;
-		return SeedParameterPass (fPtr->defParams, fPtr->positions, index++, *context).getType (a->createASTparam (*context));
+		AST::MetaTagSwizzlePass swizzlePass;
+		return SeedParameterPass (fPtr->defParams, fPtr->positions, index++, *context).getType (swizzlePass.visit (a->createASTparam (*context)));
 	});
 	fPtr->defRets = BasicArray <AST::NodePtr> (type.size ());
 	fPtr->retVals = type.map <AST::TypePtr> ([&](auto & a) {
