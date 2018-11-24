@@ -234,7 +234,12 @@ namespace stackmachine {
 		}
 		
 		void op_div (const Instruction & inst, std::ostream & out) {
-			abort ();
+			auto layout = stackDataLayout [dataLayoutPos - 1];
+			auto rhs = popTop ();
+			auto lhs = popTop ();
+			layout.literalToData (lhs / rhs, &(stack [stackPos]));
+			stackDataLayout [dataLayoutPos++] = layout;
+			stackPos += layout.getSize ();
 		}
 		
 		void op_mul (const Instruction & inst, std::ostream & out) {
@@ -421,8 +426,8 @@ namespace stackmachine {
 						op_cmp_ne (inst, out);
 						break;
 					case OP_CODE::OP_DIV:
-						op_div (inst, out);
 						pe.op_div (inst, out);
+						op_div (inst, out);
 						break;
 					case OP_CODE::OP_MUL:
 						pe.op_mul (inst, out);
