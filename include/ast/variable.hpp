@@ -59,6 +59,7 @@ class StaticValue : public Value {
 	
 	public:
 		
+		Literal & getLiteral () const {return literal;}
 		Literal & getLiteral (LiteralStack & stack) const {return literal;}
 		
 		virtual bool isValue () const {return true;}
