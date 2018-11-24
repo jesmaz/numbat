@@ -36,7 +36,12 @@ FuncPtr Reflect::api (const string & iden) {
 }
 
 
-void Reflect::initAPI () {
+void Reflect::initAPI (const BasicArray <std::pair <string, FuncPtr>> & extraAPIfuncs) {
+	
+	for (auto p : extraAPIfuncs) {
+		apiFuncs.insert (p);
+	}
+	
 	apiFuncs.insert (APIfunc (
 		"AST.Pointer",
 		{Numeric::get (Numeric::ArithmaticType::INT, 0)},
@@ -53,6 +58,7 @@ void Reflect::initAPI () {
 			return {typeID};
 		}
 	));
+	
 	apiFuncs.insert (APIfunc (
 		"static_assert",
 		{Numeric::get (Numeric::ArithmaticType::UINT, 1)},
@@ -67,6 +73,7 @@ void Reflect::initAPI () {
 			return args;
 		}
 	));
+	
 }
 
 
