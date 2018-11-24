@@ -238,7 +238,12 @@ namespace stackmachine {
 		}
 		
 		void op_mul (const Instruction & inst, std::ostream & out) {
-			abort ();
+			auto layout = stackDataLayout [dataLayoutPos - 1];
+			auto rhs = popTop ();
+			auto lhs = popTop ();
+			layout.literalToData (lhs * rhs, &(stack [stackPos]));
+			stackDataLayout [dataLayoutPos++] = layout;
+			stackPos += layout.getSize ();
 		}
 		
 		void op_not (const Instruction & inst, std::ostream & out) {
