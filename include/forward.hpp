@@ -15,6 +15,7 @@ class Node;
 class Value;
 class Variable;
 
+struct CallingData;
 struct Context;
 struct Function;
 
