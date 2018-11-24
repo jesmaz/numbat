@@ -1,3 +1,4 @@
+#include <ast/function.hpp>
 #include <utility/literals.hpp>
 
 
@@ -552,6 +553,62 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	[](Literal & lhs, const Literal & rhs) {lhs.vTable = &type_fint32; lhs.fint64 = rhs.fint64;},
 	// destroy
 	[](Literal &) {}
+	
+}, literal_virtual_table::type_function = {
+	
+	// op_eq
+	[](const Literal & lhs, const Literal & rhs) {return false;},
+	// op_lt
+	[](const Literal &, const Literal &) {return false;},
+	// op_lte
+	[](const Literal &, const Literal &) {return false;},
+	// op_not
+	[](const Literal &) {return false;},
+	
+	// conv_double
+	[](const Literal &) {return Literal ();},
+	// conv_int64
+	[](const Literal &) {return Literal ();},
+	// conv_uint64
+	[](const Literal &) {return Literal ();},
+	// conv_aint
+	[](const Literal &) {return Literal ();},
+	
+	// op_add
+	[](const Literal &, const Literal &) {return Literal ();},
+	// op_band
+	[](const Literal &, const Literal &) {return Literal ();},
+	// op_bor
+	[](const Literal &, const Literal &) {return Literal ();},
+	// op_bxor
+	[](const Literal &, const Literal &) {return Literal ();},
+	// op_concat
+	[](const Literal &, const Literal &) {return Literal ();},
+	// op_div
+	[](const Literal &, const Literal &) {return Literal ();},
+	// op_index
+	[](const Literal &, size_t) -> Literal & {nilLiteral = Literal (); return nilLiteral;},
+	// op_mul
+	[](const Literal &, const Literal &) {return Literal ();},
+	// op_sub
+	[](const Literal &, const Literal &) {return Literal ();},
+	
+	// to_string
+	[](const Literal &, text::PrintMode) -> std::string {return "function";},
+	
+	// assign
+	[](Literal & lhs, const Literal & rhs) {
+		delete lhs.fptr;
+		rhs.vTable->copy_ctr (lhs, rhs);
+	},
+	// copy_ctr
+	[](Literal & lhs, const Literal & rhs) {
+		lhs.vTable = &type_function; lhs.fptr = new std::function <const BasicArray <Literal>(const BasicArray <Literal>, const AST::CallingData &)> (*rhs.fptr);
+	},
+	// destroy
+	[](Literal & arg) {
+		delete arg.fptr;
+	}
 	
 }, literal_virtual_table::type_int64 = {
 	

@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <forward.hpp>
 #include <gmpxx.h>
 #include <utility/array.hpp>
 #include <utility/text.hpp>
@@ -36,7 +37,7 @@ struct literal_virtual_table {
 	
 	void (*destroy) (Literal &);
 	
-	static literal_virtual_table type_nil, type_array, type_array_index, type_fint64, type_fint32, type_int64, type_aint0, type_uint64;
+	static literal_virtual_table type_nil, type_array, type_array_index, type_fint64, type_fint32, type_function, type_int64, type_aint0, type_uint64;
 };
 
 struct Literal {
@@ -70,6 +71,8 @@ struct Literal {
 		int64_t to_int64 (bool * success=nullptr) const;
 		uint64_t to_uint64 (bool * success=nullptr) const;
 		
+		std::function <const BasicArray <Literal>(const BasicArray <Literal>, const AST::CallingData &)> * getFunctionPointer () {return vTable == &literal_virtual_table::type_function ? fptr : nullptr;}
+		
 		void destroy () {vTable->destroy (*this); vTable = &literal_virtual_table::type_nil; uint64 = 0;}
 		
 		Literal () : vTable (&literal_virtual_table::type_nil), uint64 (0) {}
@@ -86,6 +89,7 @@ struct Literal {
 		Literal (uint64_t val) : vTable (&literal_virtual_table::type_uint64), uint64 (val) {}
 		Literal (const mpq_class & val) : vTable (&literal_virtual_table::type_aint0), aint0 (new mpq_class (val)) {}
 		Literal (const BasicArray <Literal> & val) : vTable (&literal_virtual_table::type_array), array (new ArrayRef {val, 1}) {}
+		Literal (const std::function <const BasicArray <Literal>(const BasicArray <Literal>, const AST::CallingData &)> & val) : vTable (&literal_virtual_table::type_function), fptr (new std::function <const BasicArray <Literal>(const BasicArray <Literal>, const AST::CallingData &)> (val)) {}
 		
 		const Literal & operator = (const Literal & rhs) {vTable->assign (*this, rhs); return *this;}
 		~Literal () {vTable->destroy (*this);}
@@ -112,6 +116,7 @@ struct Literal {
 			float fint32;
 			int64_t int64;
 			mpq_class * aint0;
+			std::function <const BasicArray <Literal>(const BasicArray <Literal>, const AST::CallingData &)> * fptr;
 			uint64_t uint64;
 		};
 		
