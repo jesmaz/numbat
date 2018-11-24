@@ -180,6 +180,10 @@ struct PrintingEngine {
 			out << "\tor\n";
 		}
 		
+		void op_sub (const Instruction & inst, std::ostream & out) {
+			out << "\tsub\n";
+		}
+		
 		void op_xor (const Instruction & inst, std::ostream & out) {
 			out << "\txor\n";
 		}
