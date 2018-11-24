@@ -55,7 +55,15 @@ void InterpreterTest::interpret (const string & str, const string & expected) {
 	printer.run (chunk, std::cerr);
 	interpreter.run (chunk, std::cerr);
 	
-	EXPECT_EQ (interpreter.getTop ().toString (text::PrintMode::PLAIN), expected) << "Input for this operation was: " << str;
+	string::size_type p;
+	string l;
+	if ((p = expected.find ('.')) != string::npos) {
+		l = expected.substr (0, p) + expected.substr (p + 1) + "/1" + string (expected.length () - (p+1), '0');
+	} else {
+		l = expected;
+	}
+	EXPECT_EQ (interpreter.getTop (), mpq_class (l, 10)) << "Input for this operation was: " << str;
+	//EXPECT_EQ (interpreter.getTop ().toString (text::PrintMode::PLAIN), expected) << "Input for this operation was: " << str;
 	
 }
 
