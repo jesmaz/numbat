@@ -1,4 +1,5 @@
 #include <ast/passes/execute.hpp>
+#include <ast/passes/stackmachine.hpp>
 #include <parse/handparser.hpp>
 #include <stackmachine/interpreter.hpp>
 #include <typeinfo>
@@ -42,6 +43,17 @@ void InterpreterTest::interpret (const string & str, const string & expected) {
 	}
 	
 	EXPECT_EQ (val->toString (text::PrintMode::PLAIN), expected) << "Input for this operation was: " << str;
+	
+	auto chunk = stackMachinePass (ast);
+	for (auto f : AST::Context::getAllFunctions ()) {
+		chunk += stackMachinePass (f);
+	}
+	std::ostringstream sout;
+	stackmachine::StackInterpreter interpreter;
+	std::cerr << ast->toString (text::PrintMode::PLAIN) << "\n";
+	interpreter.run (chunk, std::cerr);
+	
+	EXPECT_EQ (interpreter.getTop ().toString (text::PrintMode::PLAIN), expected) << "Input for this operation was: " << str;
 	
 }
 
