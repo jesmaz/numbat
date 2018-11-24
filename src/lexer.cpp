@@ -41,7 +41,7 @@ std::string next (const char * source, size_t & pos, size_t length) {
 				str += source [pos];
 				++pos;
 			} else if (isdigit (source [pos])) {
-				while (isdigit (source [pos]) or source [pos] == '.' or source [pos] == 'x' or source [pos] == 'X' or source [pos] == 'q' or source [pos] == 'Q' or (source [pos] >= 'a' and source [pos] <= 'f') or (source [pos] >= 'A' and source [pos] <= 'F')) {
+				while (isdigit (source [pos]) or source [pos] == '.' or source [pos] == 'x' or source [pos] == 'X' or source [pos] == 'q' or source [pos] == 'Q' or source [pos] == 'd' or source [pos] == 'D' or source [pos] == 'f' or source [pos] == 'F' or source [pos] == 'u' or source [pos] == 'U' or (source [pos] >= 'a' and source [pos] <= 'f') or (source [pos] >= 'A' and source [pos] <= 'F')) {
 					str += source [pos];
 					++pos;
 				}
@@ -95,23 +95,27 @@ tkstring lexline (const char * source, size_t & pos, size_t length, uint32_t lin
 		}
 	}
 	
-	std::string s;
-	switch (str.back ().type) {
-		default:
-			break;
-		case TOKEN::symbol:
-			s = str.back ().iden;
-			if (s != ":" and s != "}" and s != "]" and s != ")") break;
-		case TOKEN::chararrayliteral:
-		case TOKEN::identifier:
-		case TOKEN::numericliteral:
-		case TOKEN::ret:
-		case TOKEN::stringliteral:
-			token t;
-			t.type = TOKEN::semicolon;
-			t.iden = "";
-			t.pos = {line, uint32_t (pos + 1 - lineStart)};
-			str += t;
+	if (not str.empty ()) {
+		
+		std::string s;
+		switch (str.back ().type) {
+			default:
+				break;
+			case TOKEN::symbol:
+				s = str.back ().iden;
+				if (s != ":" and s != "}" and s != "]" and s != ")") break;
+			case TOKEN::chararrayliteral:
+			case TOKEN::identifier:
+			case TOKEN::numericliteral:
+			case TOKEN::ret:
+			case TOKEN::stringliteral:
+				token t;
+				t.type = TOKEN::semicolon;
+				t.iden = "";
+				t.pos = {line, uint32_t (pos + 1 - lineStart)};
+				str += t;
+		}
+		
 	}
 	
 	++pos;
