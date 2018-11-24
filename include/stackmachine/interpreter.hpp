@@ -262,6 +262,15 @@ namespace stackmachine {
 			abort ();
 		}
 		
+		void op_sub (const Instruction & inst, std::ostream & out) {
+			auto layout = stackDataLayout [dataLayoutPos - 1];
+			auto rhs = popTop ();
+			auto lhs = popTop ();
+			layout.literalToData (lhs - rhs, &(stack [stackPos]));
+			stackDataLayout [dataLayoutPos++] = layout;
+			stackPos += layout.getSize ();
+		}
+		
 		void op_xor (const Instruction & inst, std::ostream & out) {
 			abort ();
 		}
@@ -440,6 +449,10 @@ namespace stackmachine {
 					case OP_CODE::OP_OR:
 						pe.op_or (inst, out);
 						op_or (inst, out);
+						break;
+					case OP_CODE::OP_SUB:
+						pe.op_sub (inst, out);
+						op_sub (inst, out);
 						break;
 					case OP_CODE::OP_XOR:
 						pe.op_xor (inst, out);
