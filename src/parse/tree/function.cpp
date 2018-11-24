@@ -82,8 +82,10 @@ AST::NodePtr Function::createAST (AST::Context & ctx) {
 	if (type) {
 		type->overloadFunc ("", func);
 	}
-	fPtr->body = body->createAST (*context);
-	fPtr->initialStack = context->getLocalStack ();
+	if (body) {
+		fPtr->body = body->createAST (*context);
+		fPtr->initialStack = context->getLocalStack ();
+	}
 	return std::make_shared <AST::Function_Ptr> (getPos (), ctx.getSourceFile (), std::move (func));
 	
 }
