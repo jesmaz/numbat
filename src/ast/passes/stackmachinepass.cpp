@@ -241,12 +241,18 @@ void StackMachinePass::visit (const Sequence & node) {
 
 void StackMachinePass::visit (const StaticValue & node) {
 	
-	auto id = "literal_" + std::to_string (size_t (&node));
+	auto layout = getLayout (node.getType ());
+	Literal l = node.getLiteral ();
+	assert (l == node.getLiteral ());
+	auto id = "literal_" + *layout + "_" + node.getLiteral ().toString (text::PrintMode::PLAIN);
+	assert (l == node.getLiteral ());
 	if (c.globals.find (id) == c.globals.end ()) {
-		c.globals [id] = std::make_pair (getLayout (node.getType ()), node.getLiteral ());
+		c.globals [id] = std::make_pair (layout, node.getLiteral ());
 	}
+	assert (l == node.getLiteral ());
+	assert (l == c.globals [id].second);
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, id});
-	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
+	push ({stackmachine::OP_CODE::LOAD, layout});
 	
 }
 
