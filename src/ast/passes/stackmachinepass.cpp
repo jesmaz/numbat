@@ -173,7 +173,20 @@ void StackMachinePass::visit (const Call_1 & node) {
 
 void StackMachinePass::visit (const Call_2 & node) {abort ();}
 
-void StackMachinePass::visit (const Call_n & node) {abort ();}
+void StackMachinePass::visit (const Call_n & node) {
+	if (node.getFunc ()->getNative () != nullptr) {
+		auto id = "native_" + node.getFunc ()->getIden ();
+		if (c.globals.find (id) == c.globals.end ()) {
+			c.globals [id] = std::make_pair (getLayout (node.getType ()), Literal (node.getFunc ()->getNative ()));
+		}
+	}
+	
+	for (auto & a : node.getArgs ()) {
+		load (a);
+	}
+	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, node.getFunc ()->getIden ()});
+	push ({stackmachine::OP_CODE::CALL, getLayout (node.getFunc ())});
+}
 
 void StackMachinePass::visit (const Function_Ptr & node) {
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, node.getFunc ()->getIden ()});
