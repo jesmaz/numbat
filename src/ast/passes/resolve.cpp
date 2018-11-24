@@ -17,7 +17,15 @@ namespace AST {
 
 
 void ResolveMemberPass::visit (const Array & node) {
-	abort ();
+	if (iden == "data" or iden == "d") {
+		index = 0;
+		type = Const::get (Ref::get (node.getBaseType ()));
+	} else if (iden == "length" or iden == "len" or iden == "l") {
+		index = 1;
+		type = Const::get (Numeric::get (Numeric::ArithmaticType::UINT, 0));
+	} else {
+		index = -1;
+	}
 }
 
 void ResolveMemberPass::visit (const Const & node) {
