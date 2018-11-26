@@ -37,6 +37,8 @@ struct File {
 		// Searches the system and provided path for the requested file and compile it
 		static File * import (const string & dir, const string & path);
 		
+		static std::pair <File *, AST::Context *> newBuiltinModule (const string & name);
+		
 		static void addIncludeDir (const string & dir) {includeDirs.push_back (dir);}
 		
 	protected:

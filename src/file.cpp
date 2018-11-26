@@ -3,6 +3,7 @@
 #include <ast/context.hpp>
 #include <ast/passes/nir.hpp>
 #include <ast/sequence.hpp>
+#include <builtinmodules.hpp>
 #include <nir/module.hpp>
 #include <nir/scope.hpp>
 #include <mutex>
@@ -144,13 +145,22 @@ File * File::import (const string & dir, const string & path) {
 
 File * File::import (const string & path) {
 	
-	File * f;
+	File * f = modules::builtin::findContext (path);
+	if (f) return f;
 	for (const string & dir : includeDirs) {
 		if ((f = compile (joinPaths (dir, path + ".nbt")))) {
 			return f;
 		}
 	}
 	return nullptr;
+	
+}
+
+std::pair <File *, AST::Context *> File::newBuiltinModule (const string & name) {
+	
+	File * f = getFile (name);
+	f->context = std::make_unique <AST::Context> (*builtIn ()->context, f);
+	return std::make_pair (f, f->context.get ());
 	
 }
 
