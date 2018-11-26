@@ -3,6 +3,7 @@
 
 #include <ast/node.hpp>
 #include <ast/type.hpp>
+#include <builtinmodules.hpp>
 #include <functional>
 #include <map>
 #include <set>
@@ -42,6 +43,8 @@ struct Function {
 		
 		friend AST::Context;
 		friend int ::main (int, char **);
+		friend NodePtr transform (const NodePtr & node);
+		friend numbat::File * numbat::modules::builtin::linuxModule ();
 		friend parser::Function;
 		friend std::pair <string, FuncPtr> APIfunc (const string & iden, const BasicArray <TypePtr> & params, const BasicArray <TypePtr> & retVals, const std::function <const BasicArray <Literal>(const BasicArray <Literal>, const CallingData &)> &func);
 		
