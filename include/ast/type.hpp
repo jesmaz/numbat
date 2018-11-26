@@ -141,6 +141,7 @@ class Import : public Type {
 	
 	public:
 		
+		const numbat::File * getImport () const {return import;}
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
