@@ -24,6 +24,7 @@ class Const;
 class Function_Ptr;
 class Function_Set;
 class IfElse;
+class Import;
 class Inferred;
 class Interface;
 class Numeric;
@@ -68,6 +69,7 @@ class AbstractPass {
 		virtual void visit (const Function_Ptr & node)=0;
 		virtual void visit (const Function_Set & node)=0;
 		virtual void visit (const IfElse & node)=0;
+		virtual void visit (const Import & node)=0;
 		virtual void visit (const Inferred & node)=0;
 		virtual void visit (const Interface & node)=0;
 		virtual void visit (const Numeric & node)=0;

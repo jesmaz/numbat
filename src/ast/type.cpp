@@ -28,6 +28,10 @@ string ArrayInit::toString (text::PrintMode mode) const {
 	return base->toString (mode) + " [" + length->toString (mode) + "] (" + val->toString (mode) + ")";
 }
 
+string Import::toString (text::PrintMode mode) const {
+	return "import " + import->getFileName ();
+}
+
 string Numeric::toString (text::PrintMode mode) const {
 	return std::string () + char (arith) + "int" + std::to_string (minPrecision);
 }

@@ -101,6 +101,8 @@ void AnalysisPass::visit (const IfElse & node) {
 	if (node.getVar ()) this->analyse (node.getVar ());
 }
 
+void AnalysisPass::visit (const Import &) {}
+
 void AnalysisPass::visit (const Inferred &) {}
 
 void AnalysisPass::visit (const Interface &) {}

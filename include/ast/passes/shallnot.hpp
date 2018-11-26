@@ -31,6 +31,7 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const Function_Ptr &)  {abort ();}
 		virtual void visit (const Function_Set &)  {abort ();}
 		virtual void visit (const IfElse &)  {abort ();}
+		virtual void visit (const Import &)  {abort ();}
 		virtual void visit (const Inferred &)  {abort ();}
 		virtual void visit (const Interface &)  {abort ();}
 		virtual void visit (const Numeric &)  {abort ();}

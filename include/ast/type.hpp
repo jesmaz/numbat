@@ -137,6 +137,23 @@ class Ref : public Type {
 		
 };
 
+class Import : public Type {
+	
+	public:
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		Import (numbat::lexer::position pos, const numbat::File * parent, const numbat::File * import) : Type (pos, parent), import (import) {}
+		
+	protected:
+	private:
+		
+		const numbat::File * import;
+		
+	
+};
+
 class Interface : public Type {
 	
 	public:

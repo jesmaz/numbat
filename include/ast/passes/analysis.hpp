@@ -31,6 +31,7 @@ class AnalysisPass : public AbstractPass {
 		virtual void visit (const Function_Ptr & node);
 		virtual void visit (const Function_Set & node);
 		virtual void visit (const IfElse & node);
+		virtual void visit (const Import & node);
 		virtual void visit (const Inferred & node);
 		virtual void visit (const Interface & node);
 		virtual void visit (const Numeric & node);
