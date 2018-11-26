@@ -119,6 +119,7 @@ struct Layout {
 		Literal dataToLiteral (const uint8_t * data) const;
 		size_t literalToData (const Literal & literal, uint8_t * data) const;
 		
+		uint32_t getOffset (size_t pos) const {return offsets [pos];}
 		uint32_t getAlignment () const {return alignment;}
 		uint32_t getSize () const {return size;}
 		

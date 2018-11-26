@@ -184,8 +184,14 @@ namespace stackmachine {
 		}
 		
 		void op_offset (const Instruction & inst, std::ostream & out) {
-			abort ();
-			out << "\toffset " << inst.size << " " << *inst.symbol << "\n";
+			auto layout = layouts [inst.symbol];
+			size_t offset = layout.getOffset (inst.size);
+			if (offset) {
+				auto l = popTop ();
+				auto lay = stackDataLayout [dataLayoutPos++];
+				lay.literalToData (l + offset, &(stack [stackPos]));
+				stackPos += lay.getSize ();
+			}
 		}
 		
 		void op_add (const Instruction & inst, std::ostream & out) {
