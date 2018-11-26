@@ -35,6 +35,11 @@ NodePtr transform (const NodePtr & node) {
 	n = ReflectPass () (n);
 	assert (n);
 	for (auto & f : funcs) {
+		f->params = f->getParams ().map <TypePtr> ([](auto & p) {
+			auto t = std::dynamic_pointer_cast <Type> (ReflectPass () (p));
+			assert (t);
+			return t;
+		});
 		if (f->getBody ()) {
 			f->replaceBody (ReflectPass () (f->getBody ()));
 		}
