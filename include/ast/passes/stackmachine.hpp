@@ -39,6 +39,7 @@ class StackMachinePass : public ShallNotPass {
 		virtual void visit (const IfElse & node);
 		virtual void visit (const RawInit & node);
 		virtual void visit (const Sequence & node);
+		virtual void visit (const StaticIndex & node);
 		virtual void visit (const StaticValue & node);
 		virtual void visit (const SystemCall & node);
 		virtual void visit (const Variable & node);
@@ -66,6 +67,8 @@ class StackMachineLoadPass : public StackMachinePass {
 		
 		virtual void visit (const Basic_Operation & node);
 		virtual void visit (const RawInit & node);
+		virtual void visit (const StaticIndex & node);
+		virtual void visit (const StaticValue & node);
 		virtual void visit (const Variable & node);
 		
 		StackMachineLoadPass (Chunk & c) : StackMachinePass (c) {}

@@ -252,6 +252,17 @@ void StackMachinePass::visit (const Sequence & node) {
 	
 }
 
+void StackMachinePass::visit (const StaticIndex & node) {
+	
+	push (node.getParent ());
+	if (node.getParent ()->getType ()->isRef ()) {
+		auto layout = getLayout (node.getParent ()->getType ());
+		push ({stackmachine::OP_CODE::LOAD, layout});
+	}
+	push ({stackmachine::OP_CODE::OFFSET, int (node.getIndex ()), getLayout (node.getParent ()->getType ())});
+	
+}
+
 void StackMachinePass::visit (const StaticValue & node) {
 	
 	auto layout = getLayout (node.getType ());
@@ -265,7 +276,6 @@ void StackMachinePass::visit (const StaticValue & node) {
 	assert (l == node.getLiteral ());
 	assert (l == c.globals [id].second);
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, id});
-	push ({stackmachine::OP_CODE::LOAD, layout});
 	
 }
 
@@ -325,8 +335,10 @@ class StackTypePass : public ShallNotPass {
 		virtual NodePtr visit (const NodePtr &) {abort ();}
 		
 		virtual void visit (const Array &) {
+			layout.push_back (stackmachine::TYPE::_META_STRUCT_BEGIN);
 			layout.push_back (stackmachine::TYPE::usize);
 			layout.push_back (stackmachine::TYPE::usize);
+			layout.push_back (stackmachine::TYPE::_META_STRUCT_END);
 		}
 		
 		virtual void visit (const Const & node) {
@@ -451,6 +463,16 @@ void StackMachineLoadPass::visit (const Basic_Operation & node) {
 }
 
 void StackMachineLoadPass::visit (const RawInit & node) {
+	StackMachinePass::visit (node);
+	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
+}
+
+void StackMachineLoadPass::visit (const StaticIndex & node) {
+	StackMachinePass::visit (node);
+	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
+}
+
+void StackMachineLoadPass::visit (const StaticValue & node) {
 	StackMachinePass::visit (node);
 	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
 }
