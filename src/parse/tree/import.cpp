@@ -1,3 +1,4 @@
+#include <ast/variable.hpp>
 #include <nir/scope.hpp>
 #include <parse/tree/import.hpp>
 #include <utility/report.hpp>
@@ -23,18 +24,23 @@ AST::NodePtr ParseTreeImport::createAST (AST::Context & ctx) {
 	string relPath = joinPath (args);
 	
 	const numbat::File * parent = ctx.getSourceFile ();
-	if (parent) {
-		//sourceFile = numbat::File::import (parent->getDirectory (), relPath, scope->getModule ());
-	} else {
-		//sourceFile = numbat::File::import (relPath, scope->getModule ());
-	}
+	sourceFile = numbat::File::import (parent->getDirectory (), relPath);
 	
 	if (not sourceFile) {
-		//report::logMessage (report::ERROR, scope->getSourceFile (), getPos (), "Failed to import '" + relPath + "'");
+		report::logMessage (report::ERROR, parent, getPos (), "Failed to import '" + relPath + "'");
+		return nullptr;
 	}
 	
-	//TODO: return an import handle
-	return nullptr;
+	auto importType = std::make_shared <AST::Import> (getPos (), parent, sourceFile);
+	auto val = std::make_shared <AST::StaticValue> (getPos (), parent, importType, Literal ());
+	
+	if (iden) {
+		ctx.var (iden->getIden (), val);
+	} else {
+		ctx.var (args.back ()->getIden (), val);
+	}
+	
+	return val;
 	
 }
 
