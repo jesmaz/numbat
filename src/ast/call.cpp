@@ -6,7 +6,14 @@ namespace AST {
 
 
 string Call_n::toString (text::PrintMode mode) const {
-	return "<unimplemented>";
+	string s = func->getIden () + " (";
+	if (not args.empty ()) {
+		s += args.front ()->toString (mode);
+		for (size_t i=1; i<args.size (); ++i) {
+			s += ", " + args [i]->toString (mode);
+		}
+	}
+	return s + ")";
 }
 
 string Call_0::toString (text::PrintMode mode) const {
