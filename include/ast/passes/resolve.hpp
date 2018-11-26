@@ -16,6 +16,7 @@ class ResolveMemberPass : public ShallNotPass {
 		
 		virtual void visit (const Array & node);
 		virtual void visit (const Const & node);
+		virtual void visit (const Import & node);
 		virtual void visit (const Interface & node);
 		virtual void visit (const Numeric & node);
 		virtual void visit (const Ref & node);

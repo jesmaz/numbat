@@ -32,6 +32,13 @@ void ResolveMemberPass::visit (const Const & node) {
 	abort ();
 }
 
+void ResolveMemberPass::visit (const Import & node) {
+	nPtr = node.getFile ()->getContext ().resolveType (iden);
+	if (not nPtr) {
+		nPtr = node.getFile ()->getContext ().resolve (iden);
+	}
+}
+
 void ResolveMemberPass::visit (const Interface & node) {
 	abort ();
 }
@@ -54,6 +61,7 @@ void ResolveMemberPass::visit (const Struct & node) {
 
 NodePtr ResolveMemberPass::operator ()(numbat::lexer::position pos, const numbat::File * file, const NodePtr & node) {
 	node->getType ()->accept (*this);
+	if (nPtr) return nPtr;
 	if (index >= 0) {
 		return std::make_shared <StaticIndex> (pos, file, type, node, index);
 	} else {
