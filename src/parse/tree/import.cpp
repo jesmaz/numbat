@@ -32,7 +32,7 @@ AST::NodePtr ParseTreeImport::createAST (AST::Context & ctx) {
 	}
 	
 	auto importType = std::make_shared <AST::Import> (getPos (), parent, sourceFile);
-	auto val = std::make_shared <AST::StaticValue> (getPos (), parent, importType, Literal ());
+	auto val = std::make_shared <AST::StaticValue> (getPos (), parent, importType, Literal (size_t (sourceFile)));
 	
 	if (iden) {
 		ctx.var (iden->getIden (), val);
