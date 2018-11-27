@@ -345,6 +345,10 @@ class StackTypePass : public ShallNotPass {
 			node.getRegType ()->accept (*this);
 		}
 		
+		virtual void visit (const Import & node) {
+			layout.push_back (stackmachine::TYPE::usize);
+		}
+		
 		virtual void visit (const Numeric & node) {
 			switch (node.getArith ()) {
 				case Numeric::ArithmaticType::ARBITRARY:
