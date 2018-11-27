@@ -97,7 +97,8 @@ void ResolvePass::visit (const Unresolved_Call & node) {
 	auto args = node.getArgs ().map <NodePtr> ([&](auto & arg) {
 		return this->visit (arg);
 	});
-	nPtr = MakeCallPass (node.getPos (), node.getFile (), args) (node.getCallee ());
+	auto callee = ResolvePass () (node.getCallee ());
+	nPtr = MakeCallPass (node.getPos (), node.getFile (), args) (callee);
 	assert (nPtr);
 }
 
