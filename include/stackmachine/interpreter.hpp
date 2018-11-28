@@ -1,10 +1,12 @@
 #pragma once
 
 
+#include <fcntl.h>
 #include <map>
 #include <memory>
 #include <stackmachine/abstract.hpp>
 #include <stackmachine/printer.hpp>
+#include <unistd.h>
 #include <utility/literals.hpp>
 
 
@@ -97,6 +99,15 @@ namespace stackmachine {
 			if (*inst.symbol == "exit") {
 				textRegister = textLength + 1;
 				exitCode = popTop ().to_int64 ();
+			} else if (*inst.symbol == "open") {
+				auto mode = popTop ().to_int64 ();
+				auto flags = popTop ().to_int64 ();
+				auto name = (char *) (size_t (popTop ().to_uint64 ()));
+				auto fd = open (name, flags, mode);
+				Layout lay (TYPE::u32);
+				stackDataLayout [dataLayoutPos++] = lay;
+				lay.literalToData (fd, &(stack [stackPos]));
+				stackPos += lay.getSize ();
 			} else {
 				abort ();
 			}
