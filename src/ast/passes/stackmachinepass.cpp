@@ -471,6 +471,34 @@ void StackMachineLoadPass::visit (const RawInit & node) {
 	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
 }
 
+void StackMachineLoadPass::visit (const Sequence & node) {
+	size_t top = c.tracker.getStackSize ();
+	for (auto v : node.getLocalStack ()) {
+		if (v->getLocation () == Variable::LOCATION::LOCAL) {
+			if (c.stackVariables.find (v.get ()) == c.stackVariables.end ()) {
+				c.stackVariables [v.get ()] = c.push ({stackmachine::OP_CODE::RESERVE, c.getLayout (v->getType ())});
+				c.push ({stackmachine::OP_CODE::LABEL, symbol_t ("Allocating space for " + v->getIden () + " at offset " + std::to_string (c.stackVariables [v.get ()]))});
+			} else {
+				c.push ({stackmachine::OP_CODE::LABEL, symbol_t ("Already allocated space for " + v->getIden () + " at offset " + std::to_string (c.stackVariables [v.get ()]))});
+			}
+		}
+	}
+	
+	if (node.getNodes ().empty ()) {
+		size = 0;
+		
+	} else {
+		
+		for (size_t i=0, l=node.getNodes ().size ()-1; i<l; ++i) {
+			push (node.getNodes () [i]);
+			//push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - top)});
+		}
+		
+		load (node.getNodes ().back ());
+		
+	}
+}
+
 void StackMachineLoadPass::visit (const StaticIndex & node) {
 	StackMachinePass::visit (node);
 	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
@@ -547,14 +575,14 @@ stackmachine::Chunk stackMachinePass (FuncPtr func) {
 stackmachine::Chunk stackMachinePass (NodePtr body) {
 	
 	StackMachinePass::Chunk c;
-	StackMachinePass pass (c);
-	body->accept (pass);
+	StackMachineLoadPass loadPass (c);
+	body->accept (loadPass);
 	StaticValue (
 		{},
 		body->getFile (),
 		Numeric::get (Numeric::ArithmaticType::INT, 32),
 		0
-	).accept (pass);
+	).accept (loadPass);
 	c.push ({stackmachine::OP_CODE::CALL_SYS, std::string ("exit")});
 	
 	
