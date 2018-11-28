@@ -17,16 +17,19 @@ File * linuxModule () {
 	auto pair = File::newBuiltinModule ("linux");
 	
 	auto context = pair.second;
+	auto cInt = AST::Numeric::get (AST::Numeric::ArithmaticType::INT, 32);
+	auto cStr = AST::Ref::get (AST::Const::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)));
 	
-	{
+	auto createSysCall = [&](const string & callName, const BasicArray <std::pair <string, AST::TypePtr>> & args, const AST::TypePtr & ret) {
 		
 		auto fPtr = std::make_shared <AST::Function> ();
 		auto pos = numbat::lexer::position {0, 0};
 		auto f = context->getSourceFile ();
-		auto cInt = AST::Numeric::get (AST::Numeric::ArithmaticType::INT, 32);
 		auto counter = 0;
 		
-		auto makeParam = [&] (const AST::TypePtr & type, const string & name) {
+		auto makeParam = [&] (const std::pair <string, AST::TypePtr> & pair) {
+			const string & name = pair.first;
+			const AST::TypePtr & type = pair.second;
 			auto loc = AST::Variable::LOCATION::LOCAL;
 			auto var = std::make_shared <AST::Variable> (pos, f, type, 0, loc, name);
 			context->var (name, var);
@@ -35,24 +38,22 @@ File * linuxModule () {
 			return var;
 		};
 		
-		auto pathNameParam = makeParam (
-			AST::Ref::get (AST::Const::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8))),
-			"pathname"
-		);
-		auto flagsParam = makeParam (cInt, "flags");
-		auto modeParam = makeParam (cInt,"mode");
+		auto params = args.map <AST::NodePtr> (makeParam);
 		
-		auto sysCall = std::make_shared <AST::SystemCall> (pos, f, cInt, "open", BasicArray <AST::NodePtr> {pathNameParam, flagsParam, modeParam});
+		auto sysCall = std::make_shared <AST::SystemCall> (pos, f, cInt, callName, params);
 		
-		fPtr->params = {pathNameParam->getType (), flagsParam->getType (), modeParam->getType ()};
-		fPtr->retVals = {cInt};
+		fPtr->params = params.map <AST::TypePtr> ([](auto & p){return p->getType ();});
+		fPtr->retVals = {ret};
 		fPtr->replaceBody (sysCall);
-		fPtr->iden = "open";
+		fPtr->iden = callName;
 		fPtr->initialStack = context->getLocalStack ();
 		
-		numbat::File::builtIn ()->getContext ().getRootContext ()->func ("open", fPtr);
+		numbat::File::builtIn ()->getContext ().getRootContext ()->func (callName, fPtr);
 		
-	}
+	};
+	
+	createSysCall ("close", {{"fd", cInt}}, cInt);
+	createSysCall ("open", {{"pathname", cStr}, {"flags", cInt}, {"mode", cInt}}, cInt);
 	
 	return pair.first;
 	
