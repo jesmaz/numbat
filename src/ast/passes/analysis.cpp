@@ -139,7 +139,9 @@ void AnalysisPass::visit (const ReflectType & node) {
 }
 
 void AnalysisPass::visit (const Return & node) {
-	this->analyse (node.getRetVal ());
+	if (node.getRetVal ()) {
+		this->analyse (node.getRetVal ());
+	}
 }
 
 void AnalysisPass::visit (const Sequence & node) {
