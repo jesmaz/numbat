@@ -196,6 +196,10 @@ struct PrintingEngine {
 			out << "\treserve " << *inst.symbol << "\n";
 		}
 		
+		void op_ret (const Instruction & inst, std::ostream & out) {
+			out << "\tret " << inst.size << "\n";
+		}
+		
 		void op_size_of (const Instruction & inst, std::ostream & out) {
 			out << "\treserve " << *inst.symbol << "\n";
 		}

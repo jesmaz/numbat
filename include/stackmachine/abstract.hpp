@@ -134,6 +134,9 @@ class GeneralStackMachine : public AbstractStackMachine {
 					case OP_CODE::RESERVE:
 						e.op_reserve (inst, out);
 						break;
+					case OP_CODE::RET:
+						e.op_ret (inst, out);
+						break;
 					case OP_CODE::SIZE_OF:
 						e.op_size_of (inst, out);
 						break;

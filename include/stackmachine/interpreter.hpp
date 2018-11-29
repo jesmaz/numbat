@@ -304,7 +304,7 @@ namespace stackmachine {
 		}
 		
 		void op_ret (const Instruction & inst, std::ostream & out) {
-			abort ();
+			textRegister = textLength;
 		}
 		
 		void op_size_of (const Instruction & inst, std::ostream & out) {
@@ -484,9 +484,8 @@ namespace stackmachine {
 						op_reserve (inst, out);
 						break;
 					case OP_CODE::RET:
-						//pe.op_ret (inst, out);
+						pe.op_ret (inst, out);
 						op_ret (inst, out);
-						abort ();
 						break;
 					case OP_CODE::SIZE_OF:
 						pe.op_size_of (inst, out);
