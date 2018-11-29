@@ -4,7 +4,11 @@
 namespace AST {
 
 string Return::toString (text::PrintMode mode) const {
-	return "(return " + retVal->toString (mode) + ")";
+	if (retVal) {
+		return "(return " + retVal->toString (mode) + ")";
+	} else {
+		return "(return)";
+	}
 }
 
 string Sequence::toString (text::PrintMode mode) const {
