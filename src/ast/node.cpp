@@ -7,6 +7,8 @@
 #include <ast/passes/prunedead.hpp>
 #include <ast/passes/reflectpass.hpp>
 #include <ast/passes/resolve.hpp>
+#include <ast/passes/returnpass.hpp>
+#include <ast/sequence.hpp>
 #include <utility/config.hpp>
 
 namespace AST {
@@ -47,6 +49,11 @@ NodePtr transform (const NodePtr & node) {
 	
 	for (auto & f : funcs) {
 		if (f->getBody ()) {
+			FunctionReturnsPass funcReturns;
+			funcReturns (f->getBody ());
+			if (not funcReturns.funcReturns ()) {
+				f->replaceBody (std::make_shared <AST::Return> (f->getBody ()->getPos (), f->getBody ()->getFile (), f->getBody ()));
+			}
 			CallGraph (f).analyse (f->getBody ());
 		}
 	}
