@@ -222,6 +222,15 @@ void StackMachinePass::visit (const RawInit & node) {
 	push ({stackmachine::OP_CODE::COPY, getLayout (node.getType ())});
 }
 
+void StackMachinePass::visit (const Return & node) {
+	if (node.getRetVal ()) {
+		load (node.getRetVal ());
+		push ({stackmachine::OP_CODE::RET, 1});
+	} else {
+		push ({stackmachine::OP_CODE::RET, 0});
+	}
+}
+
 void StackMachinePass::visit (const Sequence & node) {
 	
 	size_t top = c.tracker.getStackSize ();
