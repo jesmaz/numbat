@@ -1,4 +1,5 @@
 #include <ast/flowcontrol.hpp>
+#include <ast/function.hpp>
 #include <ast/passes/returnpass.hpp>
 #include <ast/sequence.hpp>
 
@@ -44,6 +45,31 @@ void FunctionReturnsPass::visit (const Sequence & node) {
 			returns = true;
 			return;
 		}
+	}
+}
+
+
+
+void InsertReturnPass::visit (const IfElse & node) {
+	if (func->getRetVals ().empty ()) {
+		auto ret = std::make_shared <AST::Return> (node.getPos (), node.getFile ());
+		nPtr = std::make_shared <AST::Sequence> (node.getPos (), node.getFile (), node.getType (), BasicArray <VarPtr> {}, BasicArray <NodePtr> {nPtr, ret});
+	} else {
+		nPtr = std::make_shared <AST::Return> (node.getPos (), node.getFile (), nPtr);
+	}
+}
+
+void InsertReturnPass::visit (const Sequence & node) {
+	if (func->getRetVals ().empty ()) {
+		DynArray <NodePtr> arr (node.getNodes ());
+		if (arr.empty ()) {
+			arr.push_back (std::make_shared <AST::Return> (node.getPos (), node.getFile ()));
+		} else {
+			arr.push_back (std::make_shared <AST::Return> (arr.back ()->getPos (), arr.back ()->getFile ()));
+		}
+		nPtr = std::make_shared <AST::Sequence> (node.getPos (), node.getFile (), node.getType (), node.getLocalStack (), arr);
+	} else {
+		nPtr = std::make_shared <AST::Return> (node.getPos (), node.getFile (), nPtr);
 	}
 }
 

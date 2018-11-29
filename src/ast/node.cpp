@@ -52,7 +52,7 @@ NodePtr transform (const NodePtr & node) {
 			FunctionReturnsPass funcReturns;
 			funcReturns (f->getBody ());
 			if (not funcReturns.funcReturns ()) {
-				f->replaceBody (std::make_shared <AST::Return> (f->getBody ()->getPos (), f->getBody ()->getFile (), f->getBody ()));
+				f->replaceBody (InsertReturnPass (f) (f->getBody ()));
 			}
 			CallGraph (f).analyse (f->getBody ());
 		}

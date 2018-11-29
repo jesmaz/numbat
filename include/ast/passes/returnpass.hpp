@@ -2,13 +2,14 @@
 
 
 #include <ast/passes/analysis.hpp>
+#include <ast/passes/shallnot.hpp>
 
 
 namespace AST {
 
 
 class FunctionReturnsPass : public AnalysisPass {
-		
+	
 	public:
 		
 		const bool funcReturns () {return returns;}
@@ -25,6 +26,25 @@ class FunctionReturnsPass : public AnalysisPass {
 	private:
 		
 		bool returns = false;
+		
+};
+
+
+class InsertReturnPass : public ShallNotPass {
+	
+	public:
+		
+		virtual NodePtr visit (const NodePtr & node) {return InsertReturnPass (*this) (node);}
+		
+		virtual void visit (const IfElse & node);
+		virtual void visit (const Sequence & node);
+		
+		InsertReturnPass (const FuncPtr & func) : func (func) {}
+		
+	protected:
+	private:
+		
+		FuncPtr func;
 		
 };
 
