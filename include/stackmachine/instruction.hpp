@@ -12,13 +12,13 @@ namespace stackmachine {
 enum class OP_CODE {
 	// [args ...][func*] (function sig) -> [rets ...]
 	CALL,
-	// [args ...] (system call name) -> [ret?]
+	// [args ...] (system call name) -> [ret]
 	CALL_SYS,
 	// [arg] (destType, srcType) -> [arg]
 	CONVERT,
 	// [var*][data] (layout) -> []
 	COPY,
-	// [dest*][src*][bytes] -> []
+	// [dest*][src*][size] -> []
 	COPY_MEMCOPY,
 	
 	// [arg][...] (stack_offset) -> [arg][...][arg]
