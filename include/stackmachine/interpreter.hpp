@@ -300,7 +300,9 @@ namespace stackmachine {
 		}
 		
 		void op_pop (const Instruction & inst, std::ostream & out) {
-			abort ();
+			for (int i=0; i<inst.size; ++i) {
+				stackPos -= stackDataLayout [--dataLayoutPos].getSize ();
+			}
 		}
 		
 		void op_reserve (const Instruction & inst, std::ostream & out) {
