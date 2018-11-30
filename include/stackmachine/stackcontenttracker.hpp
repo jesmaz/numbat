@@ -14,27 +14,47 @@ struct StackContentTracker {
 	public:
 		
 		void addLayout (const symbol_t & sym, const BasicArray <TYPE> & layout) {layouts [sym] = layout;}
+		void addLayout (const symbol_t & sym, const std::pair <BasicArray <symbol_t>, BasicArray <symbol_t>> & layout) {functionLayouts [sym] = layout;}
 		int feed (const Instruction & inst) {
 			int pos = stack.size ();
 			switch (inst.opcode) {
 				case OP_CODE::CALL: {
-					auto & layout = layouts [inst.symbol];
-					auto itt = layout.begin (), end = layout.end ();
-					while (itt != end and *itt != TYPE::_META_FUNC_SPLIT) {
+					auto itt = functionLayouts.find (inst.symbol);
+					assert (itt != functionLayouts.end ());
+					auto & layout = itt->second;
+					for (size_t i=0; i<layout.first.size (); ++i) {
 						stack.pop_back ();
-						++itt;
 					}
 					stack.pop_back ();
-					if (itt != end) ++itt;
-					while (itt != end) {
-						stack.push_back (*itt);
-						++itt;
+					for (size_t i=0; i<layout.second.size (); ++i) {
+						stack.push_back (layout.second [i]);
 					}
 					break;
 				}
-					
+				case OP_CODE::CALL_SYS: {
+					if (*inst.symbol == "close") {
+						//int close (int)
+						//net result: no stack change
+					} else if (*inst.symbol == "exit") {
+						//Exit doesn't actually return, but we pretend it returns an int
+					} else if (*inst.symbol == "open") {
+						stack.pop_back (2);
+						//int open (int, int, int)
+						//net result: -2 int
+					} else {
+						abort ();
+					}
+					break;
+				}
+				
+				case OP_CODE::CONVERT: {
+					// No idea how to deal with this one
+					abort ();
+					break;
+				}
+				
 				case OP_CODE::COPY: {
-					stack.pop_back (layouts [inst.symbol].size () + 1);
+					stack.pop_back (2);
 					break;
 				}
 				
@@ -58,31 +78,28 @@ struct StackContentTracker {
 					break;
 					
 				case OP_CODE::JMP_VAR:
-					stack.pop_back (3);
+					stack.pop_back ();
 					break;
 					
 				case OP_CODE::LABEL:
 					break;
 					
 				case OP_CODE::LOAD: {
-					auto layout = layouts [inst.symbol];
 					stack.pop_back ();
-					for (auto t : layout) {
-						stack.push_back (t);
-					}
+					stack.push_back (inst.symbol);
 					break;
 				}
 				
 				case OP_CODE::LOAD_GLOBAL_ADDR:
-					stack.push_back (TYPE::usize);
+					stack.push_back (inst.symbol);
 					break;
 					
 				case OP_CODE::LOAD_INST_PTR:
-					stack.push_back (TYPE::usize);
+					stack.push_back (symbol_t ("uint0"));
 					break;
 					
 				case OP_CODE::LOAD_STACK_ADDR:
-					stack.push_back (TYPE::usize);
+					stack.push_back (symbol_t ("uint0"));
 					break;
 					
 				case OP_CODE::MOVE:
@@ -90,7 +107,8 @@ struct StackContentTracker {
 					break;
 					
 				case OP_CODE::OFFSET:
-					stack.push_back (TYPE::usize);
+					stack.pop_back ();
+					stack.push_back (inst.symbol);
 					break;
 					
 				case OP_CODE::OP_ADD:
@@ -105,7 +123,7 @@ struct StackContentTracker {
 				case OP_CODE::OP_CMP_LTE:
 				case OP_CODE::OP_CMP_NE:
 					stack.pop_back (2);
-					stack.push_back (TYPE::u8);
+					stack.push_back (symbol_t ("uint1"));
 					break;
 					
 				case OP_CODE::OP_DIV:
@@ -117,6 +135,7 @@ struct StackContentTracker {
 					break;
 					
 				case OP_CODE::OP_OR:
+				case OP_CODE::OP_SUB:
 				case OP_CODE::OP_XOR:
 					stack.pop_back ();
 					break;
@@ -126,15 +145,18 @@ struct StackContentTracker {
 					break;
 					
 				case OP_CODE::RESERVE: {
-					auto layout = layouts [inst.symbol];
-					for (auto t : layout) {
-						stack.push_back (t);
-					}
+					stack.push_back (inst.symbol);
 					break;
 				}
-					
+				
+				case OP_CODE::RET:
+					//A return will not actually pop data in practice
+					//we just pretend it does
+					stack.pop_back (inst.size);
+					break;
+				
 				case OP_CODE::SIZE_OF:
-					stack.push_back (TYPE::usize);
+					stack.push_back (symbol_t ("uint0"));
 					break;
 					
 				case OP_CODE::STORE_INST_PTR:
@@ -148,8 +170,11 @@ struct StackContentTracker {
 	protected:
 	private:
 		
-		DynArray <TYPE> stack;
+		
+		
+		DynArray <symbol_t> stack;
 		std::map <symbol_t, BasicArray <TYPE>> layouts;
+		std::map <symbol_t, std::pair <BasicArray <symbol_t>, BasicArray <symbol_t>>> functionLayouts;
 		
 };
 

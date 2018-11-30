@@ -445,7 +445,7 @@ symbol_t StackMachinePass::Chunk::getLayout (const FuncPtr & type) {
 		for (auto r : type->getRetVals ()) {
 			rets.push_back (getLayout (r));
 		}
-		functionLayouts [s] = std::make_pair (params, rets);
+		tracker.addLayout (s, functionLayouts [s] = std::make_pair (params, rets));
 	}
 	return s;
 	
@@ -481,7 +481,7 @@ void StackMachineLoadPass::visit (const RawInit & node) {
 }
 
 void StackMachineLoadPass::visit (const Sequence & node) {
-	size_t top = c.tracker.getStackSize ();
+	size_t sequenceFrame = c.tracker.getStackSize ();
 	for (auto v : node.getLocalStack ()) {
 		if (v->getLocation () == Variable::LOCATION::LOCAL) {
 			if (c.stackVariables.find (v.get ()) == c.stackVariables.end ()) {
@@ -492,6 +492,7 @@ void StackMachineLoadPass::visit (const Sequence & node) {
 			}
 		}
 	}
+	size_t sequenceFrameEnd = c.tracker.getStackSize ();
 	
 	if (node.getNodes ().empty ()) {
 		size = 0;
@@ -500,7 +501,10 @@ void StackMachineLoadPass::visit (const Sequence & node) {
 		
 		for (size_t i=0, l=node.getNodes ().size ()-1; i<l; ++i) {
 			push (node.getNodes () [i]);
-			//push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - top)});
+			if (c.tracker.getStackSize () > sequenceFrameEnd) {
+				push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - sequenceFrameEnd)});
+			}
+			assert (c.tracker.getStackSize () >= sequenceFrameEnd);
 		}
 		
 		load (node.getNodes ().back ());
