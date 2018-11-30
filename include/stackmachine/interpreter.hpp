@@ -96,7 +96,14 @@ namespace stackmachine {
 		
 		void op_call_sys (const Instruction & inst, std::ostream & out) {
 			
-			if (*inst.symbol == "exit") {
+			if (*inst.symbol == "close") {
+				auto fd = popTop ().to_int64 ();
+				auto e = close (fd);
+				Layout lay (TYPE::u32);
+				stackDataLayout [dataLayoutPos++] = lay;
+				lay.literalToData (e, &(stack [stackPos]));
+				stackPos += lay.getSize ();
+			} else if (*inst.symbol == "exit") {
 				textRegister = textLength + 1;
 				exitCode = popTop ().to_int64 ();
 			} else if (*inst.symbol == "open") {
