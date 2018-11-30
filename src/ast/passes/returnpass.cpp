@@ -1,3 +1,4 @@
+#include <ast/call.hpp>
 #include <ast/flowcontrol.hpp>
 #include <ast/function.hpp>
 #include <ast/passes/returnpass.hpp>
@@ -51,12 +52,7 @@ void FunctionReturnsPass::visit (const Sequence & node) {
 
 
 void InsertReturnPass::visit (const IfElse & node) {
-	if (func->getRetVals ().empty ()) {
-		auto ret = std::make_shared <AST::Return> (node.getPos (), node.getFile ());
-		nPtr = std::make_shared <AST::Sequence> (node.getPos (), node.getFile (), node.getType (), BasicArray <VarPtr> {}, BasicArray <NodePtr> {nPtr, ret});
-	} else {
-		nPtr = std::make_shared <AST::Return> (node.getPos (), node.getFile (), nPtr);
-	}
+	defAction (node);
 }
 
 void InsertReturnPass::visit (const Sequence & node) {
@@ -68,6 +64,19 @@ void InsertReturnPass::visit (const Sequence & node) {
 			arr.push_back (std::make_shared <AST::Return> (arr.back ()->getPos (), arr.back ()->getFile ()));
 		}
 		nPtr = std::make_shared <AST::Sequence> (node.getPos (), node.getFile (), node.getType (), node.getLocalStack (), arr);
+	} else {
+		nPtr = std::make_shared <AST::Return> (node.getPos (), node.getFile (), nPtr);
+	}
+}
+
+void InsertReturnPass::visit (const SystemCall & node) {
+	defAction (node);
+}
+
+void InsertReturnPass::defAction (const Node & node) {
+	if (func->getRetVals ().empty ()) {
+		auto ret = std::make_shared <AST::Return> (node.getPos (), node.getFile ());
+		nPtr = std::make_shared <AST::Sequence> (node.getPos (), node.getFile (), node.getType (), BasicArray <VarPtr> {}, BasicArray <NodePtr> {nPtr, ret});
 	} else {
 		nPtr = std::make_shared <AST::Return> (node.getPos (), node.getFile (), nPtr);
 	}

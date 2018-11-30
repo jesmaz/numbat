@@ -38,11 +38,14 @@ class InsertReturnPass : public ShallNotPass {
 		
 		virtual void visit (const IfElse & node);
 		virtual void visit (const Sequence & node);
+		virtual void visit (const SystemCall & node);
 		
 		InsertReturnPass (const FuncPtr & func) : func (func) {}
 		
 	protected:
 	private:
+		
+		void defAction (const Node & node);
 		
 		FuncPtr func;
 		
