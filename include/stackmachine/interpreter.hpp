@@ -133,8 +133,25 @@ namespace stackmachine {
 		}
 		
 		void op_duplicate (const Instruction & inst, std::ostream & out) {
-			abort ();
-			out << "\tduplicate " << inst.size << "\n";
+			if (inst.size < 0) {
+				size_t offset = 0;
+				for (int i=inst.size; i<0; ++i) {
+					offset += stackDataLayout [dataLayoutPos + i].getSize ();
+				}
+				auto & layout = stackDataLayout [dataLayoutPos+inst.size];
+				stackDataLayout [dataLayoutPos++] = layout;
+				std::copy (&(stack [stackPos - offset]), &(stack [stackPos - offset + layout.getSize ()]), &(stack [stackPos]));
+				stackPos += layout.getSize ();
+			} else {
+				size_t offset = 0;
+				for (int i=0; i+1<inst.size; ++i) {
+					offset += stackDataLayout [layoutFrame + i].getSize ();
+				}
+				auto & layout = stackDataLayout [layoutFrame+inst.size];
+				stackDataLayout [dataLayoutPos++] = layout;
+				std::copy (&(stack [stackFrame + offset]), &(stack [stackFrame + offset + layout.getSize ()]), &(stack [stackPos]));
+				stackPos += layout.getSize ();
+			}
 		}
 		
 		void op_jmp (const Instruction & inst, std::ostream & out) {
