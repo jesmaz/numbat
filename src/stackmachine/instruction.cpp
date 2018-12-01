@@ -33,6 +33,14 @@ Literal Layout::dataToLiteral (const uint8_t * data) const {
 		case TYPE::usize:
 			return *reinterpret_cast <const size_t*> (data);
 			
+		case TYPE::_META_ARRAY_OF: {
+			BasicArray <Literal> members (components.size ());
+			for (size_t i=0, l=2; i<l; ++i) {
+				members [i] = components [i].dataToLiteral (data + offsets [i]);
+			}
+			return members;
+		}
+		
 		case TYPE::_META_FUNC_SPLIT:
 		case TYPE::_META_STRUCT_BEGIN:
 		case TYPE::_META_STRUCT_END: {
@@ -48,7 +56,7 @@ Literal Layout::dataToLiteral (const uint8_t * data) const {
 	
 }
 
-size_t Layout::literalToData (const Literal & literal, uint8_t * data) const {
+size_t Layout::literalToData (const Literal & literal, uint8_t * data, bool init) const {
 	
 	switch (type) {
 		case TYPE::f16:
@@ -87,6 +95,21 @@ size_t Layout::literalToData (const Literal & literal, uint8_t * data) const {
 			break;
 		case TYPE::usize:
 			*reinterpret_cast <size_t*> (data) = literal.to_uint64 ();
+			break;
+			
+		case TYPE::_META_ARRAY_OF:
+			
+			if (init) {
+				
+				*reinterpret_cast <uint8_t**> (data) = new uint8_t [literal.length () * components [2].getSize ()];
+				*reinterpret_cast <size_t*> (data + sizeof (size_t)) = literal.length ();
+				
+			} else {
+				for (size_t i=0, l=2; i<l; ++i) {
+					components [i].literalToData (literal [i], data + offsets [i]);
+				}
+			}
+			
 			break;
 			
 		case TYPE::_META_FUNC_SPLIT:
@@ -144,6 +167,7 @@ Layout::Layout (const TYPE type) : type (type) {
 			size = alignment = sizeof (size_t);
 			break;
 			
+		case TYPE::_META_ARRAY_OF:
 		case TYPE::_META_FUNC_SPLIT:
 		case TYPE::_META_STRUCT_BEGIN:
 		case TYPE::_META_STRUCT_END:
@@ -179,6 +203,28 @@ Layout::Layout (BasicArray <TYPE>::const_iterator * beg, const BasicArray <TYPE>
 			components = m;
 			offsets = off;
 			type = TYPE::_META_STRUCT_BEGIN;
+			
+		} else if (**beg == TYPE::_META_ARRAY_OF) {
+			
+			++*beg;
+			DynArray <Layout> m;
+			DynArray <uint32_t> off;
+			off.push_back (0);
+			
+			m.push_back (Layout (TYPE::usize));
+			size += m.back ().size;
+			off.push_back (size);
+			
+			m.push_back (Layout (TYPE::usize));
+			size += m.back ().size;
+			off.push_back (size);
+			
+			Layout layout (beg, end);
+			m.push_back (layout);
+			off.push_back (0);
+			components = m;
+			offsets = off;
+			type = TYPE::_META_ARRAY_OF;
 			
 		} else {
 			

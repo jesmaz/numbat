@@ -87,6 +87,7 @@ enum class TYPE : uint16_t {
 	i8, i16, i32, i64, isize,
 	u8, u16, u32, u64, usize,
 	
+	_META_ARRAY_OF,
 	_META_FUNC_SPLIT,
 	_META_STRUCT_BEGIN,
 	_META_STRUCT_END
@@ -117,7 +118,7 @@ struct Layout {
 	public:
 		
 		Literal dataToLiteral (const uint8_t * data) const;
-		size_t literalToData (const Literal & literal, uint8_t * data) const;
+		size_t literalToData (const Literal & literal, uint8_t * data, bool init=false) const;
 		
 		uint32_t getOffset (size_t pos) const {return offsets [pos];}
 		uint32_t getAlignment () const {return alignment;}
