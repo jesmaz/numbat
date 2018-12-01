@@ -48,8 +48,7 @@ struct StackContentTracker {
 				}
 				
 				case OP_CODE::CONVERT: {
-					// No idea how to deal with this one
-					abort ();
+					stack.back () = inst.symbol;
 					break;
 				}
 				

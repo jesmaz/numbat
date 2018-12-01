@@ -7,6 +7,7 @@
 #include <ast/passes/stackmachine.hpp>
 #include <ast/sequence.hpp>
 #include <ast/type.hpp>
+#include <ast/typecast.hpp>
 #include <ast/variable.hpp>
 
 
@@ -187,6 +188,12 @@ void StackMachinePass::visit (const Call_n & node) {
 	}
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, node.getFunc ()->getIden ()});
 	push ({stackmachine::OP_CODE::CALL, getLayout (node.getFunc ())});
+}
+
+void StackMachinePass::visit (const CastToInt & node) {
+	load (node.getNode ());
+	auto destType = getLayout (node.getType ());
+	push ({stackmachine::OP_CODE::CONVERT, destType});
 }
 
 void StackMachinePass::visit (const Function_Ptr & node) {

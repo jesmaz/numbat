@@ -14,7 +14,7 @@ enum class OP_CODE {
 	CALL,
 	// [args ...] (system call name) -> [ret]
 	CALL_SYS,
-	// [arg] (destType, srcType) -> [arg]
+	// [arg] (destination layout) -> [arg]
 	CONVERT,
 	// [var*][data] (layout) -> []
 	COPY,
