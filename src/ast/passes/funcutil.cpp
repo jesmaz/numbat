@@ -26,7 +26,13 @@ NodePtr createCall (numbat::lexer::position pos, const numbat::File * file, cons
 		score += imp.getScore ();
 	}
 	
-	auto type = Struct::tuple (func->getRetVals ());
+	TypePtr type;
+	
+	if (func->getRetVals ().size () == 1) {
+		type = func->getRetVals ().front ();
+	} else {
+		type = Struct::tuple (func->getRetVals ());
+	}
 	
 	switch (processed.size ()) {
 		case 0:
