@@ -126,6 +126,14 @@ namespace stackmachine {
 			
 		}
 		
+		void op_convert (const Instruction & inst, std::ostream & out) {
+			auto l = popTop ();
+			auto layout = layouts [inst.symbol];
+			stackDataLayout [dataLayoutPos++] = layout;
+			layout.literalToData (l, &(stack [stackPos]));
+			stackPos += layout.getSize ();
+		}
+		
 		void op_copy (const Instruction & inst, std::ostream & out) {
 			
 			auto & dest = stack [stackPos--];
@@ -397,6 +405,10 @@ namespace stackmachine {
 					case OP_CODE::CALL_SYS:
 						pe.op_call_sys (inst, out);
 						op_call_sys (inst, out);
+						break;
+					case OP_CODE::CONVERT:
+						pe.op_convert (inst, out);
+						op_convert (inst, out);
 						break;
 					case OP_CODE::COPY:
 						pe.op_copy (inst, out);
