@@ -6,6 +6,7 @@
 #include <ast/passes/analysis.hpp>
 #include <ast/passes/stackmachine.hpp>
 #include <ast/sequence.hpp>
+#include <ast/type.hpp>
 #include <ast/variable.hpp>
 
 
@@ -343,11 +344,9 @@ class StackTypePass : public ShallNotPass {
 		
 		virtual NodePtr visit (const NodePtr &) {abort ();}
 		
-		virtual void visit (const Array &) {
-			layout.push_back (stackmachine::TYPE::_META_STRUCT_BEGIN);
-			layout.push_back (stackmachine::TYPE::usize);
-			layout.push_back (stackmachine::TYPE::usize);
-			layout.push_back (stackmachine::TYPE::_META_STRUCT_END);
+		virtual void visit (const Array & node) {
+			layout.push_back (stackmachine::TYPE::_META_ARRAY_OF);
+			(*this) (node.getBaseType ());
 		}
 		
 		virtual void visit (const Const & node) {
