@@ -207,7 +207,7 @@ namespace stackmachine {
 			
 			assert (inst.size >= 0);
 			size_t offset = 0;
-			for (int i=0; i+1<inst.size; ++i) {
+			for (int i=0; i<inst.size; ++i) {
 				offset += stackDataLayout [layoutFrame + i].getSize ();
 			}
 			
