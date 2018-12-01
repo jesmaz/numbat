@@ -5,13 +5,9 @@
 namespace AST {
 
 
-void CastToNumberPass::visit (const Array & node) {
-	abort ();
-}
+void CastToNumberPass::visit (const Array & node) {nPtr = nullptr;}
 
-void CastToNumberPass::visit (const ArrayInit & node) {
-	abort ();
-}
+void CastToNumberPass::visit (const ArrayInit & node) {nPtr = nullptr;}
 
 void CastToNumberPass::visit (const Const & node) {
 	abort ();
@@ -56,9 +52,7 @@ void CastToNumberPass::visit (const Ref & node) {
 	abort ();
 }
 
-void CastToNumberPass::visit (const ReflectType & node) {
-	abort ();
-}
+void CastToNumberPass::visit (const ReflectType & node) {nPtr = nullptr;}
 
 void CastToNumberPass::visit (const Struct & node) {
 	abort ();
@@ -69,7 +63,6 @@ NodePtr CastToNumberPass::operator () (const NodePtr & node) {
 	assert (nPtr = node);
 	assert (node->getType ());
 	node->getType ()->accept (*this);
-	assert (nPtr);
 	return nPtr;
 }
 
@@ -83,7 +76,10 @@ void ImplicitCastPass::visit (const Inferred & node) {}
 
 void ImplicitCastPass::visit (const Interface & node) {}
 
-void ImplicitCastPass::visit (const Numeric & node) {}
+void ImplicitCastPass::visit (const Numeric & node) {
+	CastToNumberPass pass (node);
+	nPtr = pass (nPtr);
+}
 
 void ImplicitCastPass::visit (const Ref & node) {}
 
@@ -122,7 +118,7 @@ NodePtr ImplicitCastPass::operator () (const NodePtr & node) {
 	}
 	
 	nPtr = node;
-	t->accept (*this);
+	target->accept (*this);
 	return nPtr;
 	
 }
