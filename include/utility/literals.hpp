@@ -30,6 +30,8 @@ struct literal_virtual_table {
 	Literal (*op_mul) (const Literal &, const Literal &);
 	Literal (*op_sub) (const Literal &, const Literal &);
 	
+	size_t (*length) (const Literal &);
+	
 	std::string (*to_string) (const Literal &, text::PrintMode);
 	
 	void (*assign) (Literal &, const Literal &);
@@ -44,6 +46,7 @@ struct Literal {
 	
 	public:
 		
+		bool isArray () const {return vTable == &literal_virtual_table::type_array;}
 		bool isNil () const {return vTable == &literal_virtual_table::type_nil;}
 		
 		bool operator == (const Literal & rhs) const {return vTable->op_eq (*this, rhs);}
@@ -63,6 +66,8 @@ struct Literal {
 		Literal & operator [] (size_t i) const {return vTable->op_index (*this, i);}
 		Literal operator * (const Literal & other) const {return vTable->op_mul (*this, other);}
 		Literal operator - (const Literal & other) const {return vTable->op_sub (*this, other);}
+		
+		size_t length () const {return vTable->length (*this);}
 		
 		std::string toString (text::PrintMode mode) const {return vTable->to_string (*this, mode);}
 		

@@ -44,6 +44,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	// op_sub
 	[](const Literal &, const Literal &) {return Literal ();},
 	
+	// length
+	[](const Literal &) {return 0ul;},
+	
 	// to_string
 	[](const Literal &, text::PrintMode) -> std::string {return "nil";},
 	
@@ -129,6 +132,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_sub
 	[](const Literal &, const Literal &) {return Literal ();},
+	
+	// length
+	[](const Literal & self) {return self.array->data.size ();},
 	
 	// to_string
 	[](const Literal & self, text::PrintMode mode) -> std::string {
@@ -249,6 +255,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		auto & arg = lhs.arr_index->array->data [lhs.arr_index->index];
 		return arg.vTable->op_sub (arg, rhs);
 	},
+	
+	// length
+	[](const Literal &) {return 1ul;},
 	
 	// to_string
 	[](const Literal & self, text::PrintMode mode) -> std::string {
@@ -390,6 +399,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// length
+	[](const Literal &) {return 1ul;},
+	
 	// to_string
 	[](const Literal & self, text::PrintMode mode) -> std::string {
 		return std::to_string (self.fint64);
@@ -530,6 +542,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// length
+	[](const Literal &) {return 1ul;},
+	
 	// to_string
 	[](const Literal & self, text::PrintMode mode) -> std::string {
 		return std::to_string (self.fint32);
@@ -592,6 +607,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 	[](const Literal &, const Literal &) {return Literal ();},
 	// op_sub
 	[](const Literal &, const Literal &) {return Literal ();},
+	
+	// length
+	[](const Literal &) {return 1ul;},
 	
 	// to_string
 	[](const Literal &, text::PrintMode) -> std::string {return "function";},
@@ -759,6 +777,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 		}
 	},
 	
+	// length
+	[](const Literal &) {return 1ul;},
+	
 	// to_string
 	[](const Literal & self, text::PrintMode mode) -> std::string {
 		return std::to_string (self.int64);
@@ -898,6 +919,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 			}
 		}
 	},
+	
+	// length
+	[](const Literal &) {return 1ul;},
 	
 	// to_string
 	[](const Literal & self, text::PrintMode mode) -> std::string {
@@ -1077,6 +1101,9 @@ literal_virtual_table literal_virtual_table::type_nil = {
 			}
 		}
 	},
+	
+	// length
+	[](const Literal &) {return 1ul;},
 	
 	// to_string
 	[](const Literal & self, text::PrintMode mode) -> std::string {
