@@ -80,6 +80,10 @@ struct PrintingEngine {
 			out << "\tcall_sys " << *inst.symbol << "\n";
 		}
 		
+		void op_convert (const Instruction & inst, std::ostream & out) {
+			out << "\tconvert " << *inst.symbol << "\n";
+		}
+		
 		void op_copy (const Instruction & inst, std::ostream & out) {
 			out << "\tcopy " << *inst.symbol << "\n";
 		}
