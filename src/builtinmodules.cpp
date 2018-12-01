@@ -16,13 +16,14 @@ File * linuxModule () {
 	
 	auto pair = File::newBuiltinModule ("linux");
 	
-	auto context = pair.second;
+	auto ctx = pair.second;
 	auto cInt = AST::Numeric::get (AST::Numeric::ArithmaticType::INT, 32);
 	auto cStr = AST::Ref::get (AST::Const::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)));
 	
 	auto createSysCall = [&](const string & callName, const BasicArray <std::pair <string, AST::TypePtr>> & args, const AST::TypePtr & ret) {
 		
 		auto fPtr = std::make_shared <AST::Function> ();
+		auto context = std::make_unique <AST::Context> (*ctx, fPtr.get ());
 		auto pos = numbat::lexer::position {0, 0};
 		auto f = context->getSourceFile ();
 		auto counter = 0;
