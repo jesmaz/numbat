@@ -44,7 +44,7 @@ namespace stackmachine {
 		void data (const symbol_t & iden, const symbol_t & type, const Literal & literal, std::ostream & out) {
 			auto layout = layouts [type];
 			uint8_t * data = new uint8_t [layout.getSize ()];
-			layout.literalToData (literal, data);
+			layout.literalToData (literal, data, true);
 			globals [iden] = std::unique_ptr <uint8_t> (data);
 		}
 		
@@ -103,18 +103,23 @@ namespace stackmachine {
 				stackDataLayout [dataLayoutPos++] = lay;
 				lay.literalToData (e, &(stack [stackPos]));
 				stackPos += lay.getSize ();
+				
 			} else if (*inst.symbol == "exit") {
 				textRegister = textLength + 1;
 				exitCode = popTop ().to_int64 ();
+				
 			} else if (*inst.symbol == "open") {
 				auto mode = popTop ().to_int64 ();
 				auto flags = popTop ().to_int64 ();
 				auto name = (char *) (size_t (popTop ().to_uint64 ()));
 				auto fd = open (name, flags, mode);
+				perror (name);
+				std::cerr << std::dec << size_t (name) << std::endl;
 				Layout lay (TYPE::u32);
 				stackDataLayout [dataLayoutPos++] = lay;
 				lay.literalToData (fd, &(stack [stackPos]));
 				stackPos += lay.getSize ();
+				
 			} else {
 				abort ();
 			}
