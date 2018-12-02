@@ -38,9 +38,9 @@ struct StackContentTracker {
 					} else if (*inst.symbol == "exit") {
 						//Exit doesn't actually return, but we pretend it returns an int
 					} else if (*inst.symbol == "open") {
-						stack.pop_back (2);
-						//int open (int, int, int)
-						//net result: -2 int
+						//int open (const char *, int, int)
+						stack.pop_back (3);
+						stack.push_back (symbol_t ("uint0"));
 					} else {
 						abort ();
 					}
