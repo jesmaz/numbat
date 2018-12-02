@@ -28,7 +28,48 @@ std::string next (const char * source, size_t & pos, size_t length) {
 			char last = quote;
 			++pos;
 			while (pos < length and !(last != '\\' and source [pos] == quote)) {
-				str += source [pos];
+				if (last == '\\') {
+					switch (source [pos]) {
+						case '0':
+							str += '\0';
+							break;
+						case 'a':
+							str += '\a';
+							break;
+						case 'b':
+							str += '\b';
+							break;
+						case 'f':
+							str += '\f';
+							break;
+						case 'n':
+							str += '\n';
+							break;
+						case 'r':
+							str += '\r';
+							break;
+						case 't':
+							str += '\t';
+							break;
+						case 'v':
+							str += '\v';
+							break;
+						case '\\':
+							str += '\\';
+							break;
+						case '\'':
+							str += '\'';
+							break;
+						case '"':
+							str += '"';
+							break;
+						default:
+							str += '\\';
+							str += source [pos];
+					}
+				} else if (source [pos] != '\\') {
+					str += source [pos];
+				}
 				last = source [pos];
 				++pos;
 			}
