@@ -101,8 +101,12 @@ size_t Layout::literalToData (const Literal & literal, uint8_t * data, bool init
 			
 			if (init) {
 				
-				*reinterpret_cast <uint8_t**> (data) = new uint8_t [literal.length () * components [2].getSize ()];
+				auto & dataType = components [2];
+				auto d = *reinterpret_cast <uint8_t**> (data) = new uint8_t [literal.length () * dataType.getSize ()];
 				*reinterpret_cast <size_t*> (data + sizeof (size_t)) = literal.length ();
+				for (size_t i=0, l=literal.length (); i<l; ++i) {
+					dataType.literalToData (literal [i], d + i*dataType.getSize (), true);
+				}
 				
 			} else {
 				for (size_t i=0, l=2; i<l; ++i) {
