@@ -115,7 +115,7 @@ namespace stackmachine {
 				auto fd = open (name, flags, mode);
 				perror (name);
 				std::cerr << std::dec << size_t (name) << std::endl;
-				Layout lay (TYPE::u32);
+				Layout lay (TYPE::i32);
 				stackDataLayout [dataLayoutPos++] = lay;
 				lay.literalToData (fd, &(stack [stackPos]));
 				stackPos += lay.getSize ();
