@@ -84,7 +84,7 @@ namespace stackmachine {
 				stackFrame = oldFrame;
 				layoutFrame = oldLayoutFrame;
 				
-				if (textRegister < textLength + 1) {
+				if (textRegister < textLength + 2) {
 					textRegister = resume;
 				}
 				
@@ -105,7 +105,7 @@ namespace stackmachine {
 				stackPos += lay.getSize ();
 				
 			} else if (*inst.symbol == "exit") {
-				textRegister = textLength + 1;
+				textRegister = textLength + 2;
 				exitCode = popTop ().to_int64 ();
 				
 			} else if (*inst.symbol == "open") {
