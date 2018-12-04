@@ -1,0 +1,4 @@
+import linux
+
+var fd : linux.open ('file\0'.data, 66u, 384u)
+linux.close (fd)
