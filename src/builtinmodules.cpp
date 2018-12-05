@@ -19,6 +19,9 @@ File * linuxModule () {
 	auto ctx = pair.second;
 	auto cInt = AST::Numeric::get (AST::Numeric::ArithmaticType::INT, 32);
 	auto cStr = AST::Ref::get (AST::Const::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)));
+	auto size = AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 0);
+	auto ssize = AST::Numeric::get (AST::Numeric::ArithmaticType::INT, 0);
+	auto dataBuffer = AST::Ref::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8));
 	
 	auto createSysCall = [&](const string & callName, const BasicArray <std::pair <string, AST::TypePtr>> & args, const AST::TypePtr & ret) {
 		
@@ -55,6 +58,7 @@ File * linuxModule () {
 	
 	createSysCall ("close", {{"fd", cInt}}, cInt);
 	createSysCall ("open", {{"pathname", cStr}, {"flags", cInt}, {"mode", cInt}}, cInt);
+	createSysCall ("read", {{"fd", cInt}, {"buffer", dataBuffer}, {"bytes", size}}, ssize);
 	
 	return pair.first;
 	
