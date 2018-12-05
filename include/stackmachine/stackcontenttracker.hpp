@@ -41,6 +41,10 @@ struct StackContentTracker {
 						//int open (const char *, int, int)
 						stack.pop_back (3);
 						stack.push_back (symbol_t ("uint0"));
+					} else if (*inst.symbol == "read") {
+						//ssize_t read (int, void *, size_t)
+						stack.pop_back (3);
+						stack.push_back (symbol_t ("uint0"));
 					} else {
 						abort ();
 					}
