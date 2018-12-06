@@ -272,7 +272,12 @@ namespace stackmachine {
 		}
 		
 		void op_cmp_gte (const Instruction & inst, std::ostream & out) {
-			abort ();
+			auto rhs = popTop ();
+			auto lhs = popTop ();
+			Layout boolLayout (TYPE::u8);
+			boolLayout.literalToData (lhs >= rhs, &(stack [stackPos]));
+			stackDataLayout [dataLayoutPos++] = boolLayout;
+			stackPos += boolLayout.getSize ();
 		}
 		
 		void op_cmp_lt (const Instruction & inst, std::ostream & out) {
