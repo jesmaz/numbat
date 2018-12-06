@@ -1,0 +1,9 @@
+import linux
+
+var fd : linux.open ('hello files.txt\0'.data, 0u, 0u)
+uint8 [12] buffer
+assert (fd >= 0u)
+var e : linux.read (fd, buffer.data, 12u)
+assert (e == buffer.len)
+assert (buffer == 'Hello Files!')
+linux.close (fd)

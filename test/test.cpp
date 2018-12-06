@@ -11,7 +11,8 @@
 
 BasicArray <string> executeFiles = {
 	"numbers/unsigned.nbt",
-	"system_calls/open_close.nbt"
+	"system_calls/open_close.nbt",
+	"system_calls/read.nbt"
 };
 
 
