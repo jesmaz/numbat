@@ -120,6 +120,16 @@ namespace stackmachine {
 				lay.literalToData (fd, &(stack [stackPos]));
 				stackPos += lay.getSize ();
 				
+			} else if (*inst.symbol == "read") {
+				auto bytes = popTop ().to_uint64 ();
+				auto buffer = (uint8_t *)(popTop ().to_uint64 ());
+				auto fd = popTop ().to_int64 ();
+				auto n = read (fd, buffer, bytes);
+				Layout lay (TYPE::isize);
+				stackDataLayout [dataLayoutPos++] = lay;
+				lay.literalToData (n, &(stack [stackPos]));
+				stackPos += lay.getSize ();
+				
 			} else {
 				abort ();
 			}
