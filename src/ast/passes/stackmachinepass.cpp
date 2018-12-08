@@ -196,6 +196,12 @@ void StackMachinePass::visit (const CastToInt & node) {
 	push ({stackmachine::OP_CODE::CONVERT, destType});
 }
 
+void StackMachinePass::visit (const CastToUint & node) {
+	load (node.getNode ());
+	auto destType = getLayout (node.getType ());
+	push ({stackmachine::OP_CODE::CONVERT, destType});
+}
+
 void StackMachinePass::visit (const Function_Ptr & node) {
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, node.getFunc ()->getIden ()});
 }
