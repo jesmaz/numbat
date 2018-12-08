@@ -10,7 +10,7 @@ void CastToNumberPass::visit (const Array & node) {nPtr = nullptr;}
 void CastToNumberPass::visit (const ArrayInit & node) {nPtr = nullptr;}
 
 void CastToNumberPass::visit (const Const & node) {
-	abort ();
+	node.getRegType ()->accept (*this);
 }
 
 void CastToNumberPass::visit (const Inferred & node) {
@@ -120,14 +120,6 @@ NodePtr ImplicitCastPass::operator () (const NodePtr & node) {
 	nPtr = node;
 	target->accept (*this);
 	return nPtr;
-	
-}
-
-
-NodePtr StaticCastPass::operator () (const NodePtr & node) {
-	
-	if (node->getType () == target) return node;
-	abort ();
 	
 }
 

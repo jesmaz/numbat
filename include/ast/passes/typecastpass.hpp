@@ -53,7 +53,7 @@ class ImplicitCastPass : public ShallNotPass {
 		
 		size_t getScore () const {return score;}
 		
-		ImplicitCastPass (const TypePtr & target) : target (target) {}	
+		ImplicitCastPass (const TypePtr & target) : target (target) {}
 		
 		NodePtr operator () (const NodePtr & node);
 		
@@ -65,20 +65,16 @@ class ImplicitCastPass : public ShallNotPass {
 		
 };
 
-class StaticCastPass : public ShallNotPass {
+class StaticCastPass : public ImplicitCastPass {
 	
 	public:
 		
 		virtual NodePtr visit (const NodePtr & node) {return StaticCastPass (*this) (node);}
 		
-		StaticCastPass (const TypePtr & target) : target (target) {}
-		
-		NodePtr operator () (const NodePtr & node);
+		StaticCastPass (const TypePtr & target) : ImplicitCastPass (target) {}
 		
 	protected:
 	private:
-		
-		const TypePtr & target;
 		
 };
 
