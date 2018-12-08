@@ -101,9 +101,10 @@ size_t Layout::literalToData (const Literal & literal, uint8_t * data, bool init
 			
 			if (init) {
 				
+				assert (size == sizeof (uint8_t*) + sizeof (size_t));
 				auto & dataType = components [2];
 				auto d = *reinterpret_cast <uint8_t**> (data) = new uint8_t [literal.length () * dataType.getSize ()];
-				*reinterpret_cast <size_t*> (data + sizeof (size_t)) = literal.length ();
+				*reinterpret_cast <size_t*> (data + sizeof (uint8_t*)) = literal.length ();
 				for (size_t i=0, l=literal.length (); i<l; ++i) {
 					dataType.literalToData (literal [i], d + i*dataType.getSize (), true);
 				}
@@ -181,7 +182,7 @@ Layout::Layout (const TYPE type) : type (type) {
 	
 }
 
-Layout::Layout (BasicArray <TYPE>::const_iterator * beg, const BasicArray <TYPE>::const_iterator end) {
+Layout::Layout (BasicArray <TYPE>::const_iterator * beg, const BasicArray <TYPE>::const_iterator end) : Layout () {
 	
 	if (*beg != end ) {
 		
@@ -229,6 +230,8 @@ Layout::Layout (BasicArray <TYPE>::const_iterator * beg, const BasicArray <TYPE>
 			components = m;
 			offsets = off;
 			type = TYPE::_META_ARRAY_OF;
+			
+			assert (size == sizeof (uint8_t*) + sizeof (size_t));
 			
 		} else {
 			
