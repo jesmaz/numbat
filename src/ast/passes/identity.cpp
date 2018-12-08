@@ -23,8 +23,13 @@ void IdentityPass::visit (const Array & node) {
 
 void IdentityPass::visit (const ArrayInit & node) {
 	auto len = this->visit (node.getLength ());
-	auto val = this->visit (node.getVal ());
-	nPtr = std::make_shared <ArrayInit> (node.getPos (), node.getFile (), node.getType (), len, val);
+	if (node.getVal ()) {
+		auto val = this->visit (node.getVal ());
+		nPtr = std::make_shared <ArrayInit> (node.getPos (), node.getFile (), node.getType (), len, val);
+	} else {
+		nPtr = std::make_shared <ArrayInit> (node.getPos (), node.getFile (), node.getType (), len, nullptr);
+	}
+	
 }
 
 void IdentityPass::visit (const Basic_Operation & node) {
