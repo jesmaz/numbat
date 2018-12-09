@@ -146,6 +146,10 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 					}),
 					node.getOpp ()
 				);
+			} else if (typeid (*types [0]) == typeid (Array) and typeid (*types [1]) == typeid (Array)) {
+				
+				
+				
 			} else {
 				auto dom = DominantType (types [0], types [1]) ();
 				nPtr = std::make_shared <Basic_Operation> (

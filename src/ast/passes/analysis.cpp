@@ -107,6 +107,13 @@ void AnalysisPass::visit (const Inferred &) {}
 
 void AnalysisPass::visit (const Interface &) {}
 
+void AnalysisPass::visit (const Loop & node) {
+	this->analyse (node.getInit ());
+	this->analyse (node.getCond ());
+	this->analyse (node.getStep ());
+	this->analyse (node.getBody ());
+}
+
 void AnalysisPass::visit (const Numeric &) {}
 
 void AnalysisPass::visit (const Or & node) {

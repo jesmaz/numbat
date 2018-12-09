@@ -99,6 +99,18 @@ void IdentityPass::visit (const Inferred & node) {}
 
 void IdentityPass::visit (const Interface & node) {}
 
+void IdentityPass::visit (const Loop & node) {
+	nPtr = std::make_shared <Loop> (
+		node.getPos (),
+		node.getFile (),
+		this->visit (node.getInit ()),
+		this->visit (node.getCond ()),
+		this->visit (node.getStep ()),
+		this->visit (node.getBody ()),
+		node.getArray ()
+	);
+}
+
 void IdentityPass::visit (const Numeric & node) {}
 
 void IdentityPass::visit (const Or & node) {

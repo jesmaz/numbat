@@ -54,7 +54,13 @@ class Loop : public Node {
 	
 	public:
 		
-		//void accept (AbstractPass & pass) const {pass.visit (*this);}
+		const NodePtr getInit () const {return init;}
+		const NodePtr getCond () const {return cond;}
+		const NodePtr getStep () const {return step;}
+		const NodePtr getBody () const {return body;}
+		const VarPtr getArray () const {return array;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
 		Loop (numbat::lexer::position pos, const numbat::File * file, const NodePtr & init, const NodePtr & cond, const NodePtr & step, const NodePtr & body, const VarPtr & array) : Node (pos, file), init (init), cond (cond), step (step), body (body), array (array) {}

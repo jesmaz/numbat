@@ -30,6 +30,10 @@ IfElse::IfElse (numbat::lexer::position pos, const numbat::File * file, const Va
 	
 }
 
+string Loop::toString (text::PrintMode mode) const {
+	return "loop (" + init->toString (mode) + ", " + cond->toString (mode) + ", " + step->toString (mode) + ", " + body->toString (mode) + ")";
+}
+
 string Or::toString (text::PrintMode mode) const {
 	return "or (" + first->toString (mode) + ", " + second->toString (mode) + ")";
 }
