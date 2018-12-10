@@ -1,1 +1,8 @@
 assert (1u + 1u == 2u)
+assert (1u - 1u == 0u)
+assert (100u - 1u == 99u)
+assert (10u - 1 == 9u)
+assert (10u * 4 == 40u)
+assert (10u < 40u)
+assert (10u > 4u)
+assert (10u > 4)
