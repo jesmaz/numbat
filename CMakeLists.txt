@@ -117,7 +117,7 @@ add_executable(numbat src/main.cpp src/numbatmain.cpp src/codegen/llvm.cpp)
 target_link_libraries(numbat ${libs})
 
 
-set(test_sources test/test.cpp test/arithmatic.cpp test/interpretertest.cpp test/lexer.cpp test/stackmachinetests.cpp)
+set(test_sources test/test.cpp test/arithmatic.cpp test/interpretertest.cpp test/lexer.cpp test/parser.cpp test/stackmachinetests.cpp)
 set(test_libs ${libs} "${binary_dir}/googlemock/gtest/libgtest.a" "${binary_dir}/googlemock/gtest/libgtest_main.a")
 add_executable(tests ${test_sources})
 add_executable(tests-build ${test_sources})

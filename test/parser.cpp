@@ -1,3 +1,4 @@
+#include <gtest/gtest.h>
 #include <fstream>
 #include <file.hpp>
 #include <iostream>
@@ -6,56 +7,42 @@
 #include <utility/config.hpp>
 
 
-void printHelp (char * cmd) {
-	std::cerr << "Usage: " << cmd << " [Option]... [File...]\n";
-}
+BasicArray <string> parseSrc = {
+	"parser/arithmatic.nbt",
+	"parser/arrays.nbt",
+	"parser/basic.nbt",
+	"parser/bracket.nbt",
+	"parser/control.nbt",
+	"parser/import.nbt",
+	"parser/logic.nbt",
+	"parser/slice.nbt"
+};
 
-void print (parser::PTNode node) {
-	parser::ParseTree * ptree = dynamic_cast <parser::ParseTree *> (node);
-	if (ptree) {
-		for (parser::PTNode n : ptree->getBody ()) {
-			std::cout << n->toString (text::COLOUR) << std::endl;
-		}
-	}
-}
 
-int numbatMain (const Config & cfg) {
+class Parser : public ::testing::TestWithParam <string> {};
+
+TEST_P (Parser, parseCorrectOutput) {
 	
 	numbat::File dummyFile;
+	std::ifstream fin (GetParam ());
+	string buff, prog;
+	while (std::getline (fin, buff)) prog += buff + "\n";
+	auto n = parser::parse (prog, &dummyFile);
+	parser::ParseTree * ptree = dynamic_cast <parser::ParseTree *> (n);
+	ASSERT_NE (ptree, nullptr);
 	
-	if (cfg.files.empty ()) {
-		
-		string line, prog;
-		while (std::getline (std::cin, line)) {
-			if (not line.empty ()) {
-				prog += line + "\n";
-			} else if (not prog.empty ()) {
-				auto n = parser::parse (prog, &dummyFile);
-				print (n);
-				delete n;
-				std::cout << std::endl;
-				prog = line;
-			}
-		}
-		if (not prog.empty()) {
-			auto n = parser::parse (prog, &dummyFile);
-			print (n);
-			delete n;
-		}
-		
-	} else {
-		for (auto & f : cfg.files) {
-			std::ifstream fin (f);
-			string buff, prog;
-			while (std::getline (fin, buff)) prog += buff + "\n";
-			std::cout << "########" << f << "########" << std::endl;
-			auto n = parser::parse (prog, &dummyFile);
-			print (n);
-			delete n;
-			std::cout << "########" << f << "########" << std::endl;
-		}
+	DynArray <string> output, expected;
+	for (parser::PTNode n : ptree->getBody ()) {
+		output.push_back (n->toString (text::COLOUR));
 	}
 	
-	return 0;
+	std::ifstream expectedOutput (GetParam () + ".out");
+	while (std::getline (expectedOutput, buff)) expected.push_back (buff);
+	
+	EXPECT_EQ (output, expected);
+	
+	delete n;
 	
 }
+
+INSTANTIATE_TEST_CASE_P (stackmachine, Parser, testing::ValuesIn (parseSrc.begin (), parseSrc.end ()));
