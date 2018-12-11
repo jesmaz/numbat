@@ -44,29 +44,29 @@ TEST (stackMachine, numericLiterals) {
 	
 }
 
-TEST (stackMachine, interpreter) {
+class StackMachine : public ::testing::TestWithParam <string> {};
+
+TEST_P (StackMachine, interpreter) {
 	
-	for (auto path : executeFiles) {
-		
-		auto * f = numbat::File::compile (path);
-		
-		auto transformed = AST::transform (f->getAST ());
-		
-		auto chunk = stackMachinePass (transformed);
-		for (auto f : AST::Context::getAllFunctions ()) {
-			if (f->getBody ()) {
-				std::cout << f->getBody ()->toString (text::PrintMode::PLAIN) << "\n";
-			}
-			chunk += stackMachinePass (f);
+	auto * f = numbat::File::compile (GetParam ());
+	
+	auto transformed = AST::transform (f->getAST ());
+	
+	auto chunk = stackMachinePass (transformed);
+	for (auto f : AST::Context::getAllFunctions ()) {
+		if (f->getBody ()) {
+			std::cout << f->getBody ()->toString (text::PrintMode::PLAIN) << "\n";
 		}
-		
-		stackmachine::StackPrinter printer;
-		printer.run (chunk, std::cout);
-		std::cout << std::flush;
-		stackmachine::StackInterpreter interpreter;
-		interpreter.run (chunk, std::cout);
-		EXPECT_EQ (0, interpreter.getExitCode ());
-		
+		chunk += stackMachinePass (f);
 	}
 	
+	stackmachine::StackPrinter printer;
+	printer.run (chunk, std::cout);
+	std::cout << std::flush;
+	stackmachine::StackInterpreter interpreter;
+	interpreter.run (chunk, std::cout);
+	EXPECT_EQ (0, interpreter.getExitCode ());
+	
 }
+
+INSTANTIATE_TEST_CASE_P (stackmachine, StackMachine, testing::ValuesIn (executeFiles.begin (), executeFiles.end ()));
