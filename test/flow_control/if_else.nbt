@@ -1,0 +1,15 @@
+var a : 0u
+
+if (1u > 2u) {
+	a = 1u
+}
+
+assert (a == 0u)
+
+if (4u > 10u) {
+	a = 1u
+} else {
+	a = 2u
+}
+
+assert (a == 2u)
