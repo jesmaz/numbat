@@ -54,17 +54,15 @@ TEST_P (StackMachine, interpreter) {
 	
 	auto chunk = stackMachinePass (transformed);
 	for (auto f : AST::Context::getAllFunctions ()) {
-		if (f->getBody ()) {
-			std::cout << f->getBody ()->toString (text::PrintMode::PLAIN) << "\n";
-		}
 		chunk += stackMachinePass (f);
 	}
 	
+	std::ostringstream ostr;
+	
 	stackmachine::StackPrinter printer;
-	printer.run (chunk, std::cout);
-	std::cout << std::flush;
+	printer.run (chunk, ostr);
 	stackmachine::StackInterpreter interpreter;
-	interpreter.run (chunk, std::cout);
+	interpreter.run (chunk, ostr);
 	EXPECT_EQ (0, interpreter.getExitCode ());
 	
 }
