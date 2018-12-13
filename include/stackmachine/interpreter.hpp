@@ -145,9 +145,11 @@ namespace stackmachine {
 		}
 		
 		void op_copy (const Instruction & inst, std::ostream & out) {
-			
-			auto & dest = stack [stackPos--];
-			
+			auto layout = layouts [inst.symbol];
+			auto data = popTop ();
+			auto addr = popTop ();
+			auto dest = (uint8_t*)addr.to_uint64 ();
+			layout.literalToData (data, dest);
 		}
 		
 		void op_copy_memcopy (const Instruction & inst, std::ostream & out) {
