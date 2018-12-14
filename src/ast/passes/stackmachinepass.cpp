@@ -247,6 +247,27 @@ void StackMachinePass::visit (const IfElse & node) {
 	
 }
 
+void StackMachinePass::visit (const Loop & node) {
+	
+	auto condLabel = std::to_string (size_t (&node)) + "_cond";
+	auto endLabel = std::to_string (size_t (&node)) + "_continue";
+	
+	push ({stackmachine::OP_CODE::LABEL, condLabel});
+	load (node.getCond ());
+	push ({stackmachine::OP_CODE::OP_NOT});
+	push ({stackmachine::OP_CODE::JMP_IF, endLabel});
+	
+	size_t ifElseFrameEnd = c.tracker.getStackSize ();
+	push (node.getBody ());
+	if (c.tracker.getStackSize () > ifElseFrameEnd) {
+		push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - ifElseFrameEnd)});
+	}
+	push ({stackmachine::OP_CODE::JMP, condLabel});
+	
+	push ({stackmachine::OP_CODE::LABEL, endLabel});
+	
+}
+
 void StackMachinePass::visit (const RawInit & node) {
 	push (node.getVar ());
 	push ({stackmachine::OP_CODE::DUPLICATE, -1});

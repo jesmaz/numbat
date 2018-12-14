@@ -39,6 +39,7 @@ class StackMachinePass : public ShallNotPass {
 		virtual void visit (const CastToUint & node);
 		virtual void visit (const Function_Ptr & node);
 		virtual void visit (const IfElse & node);
+		virtual void visit (const Loop & node);
 		virtual void visit (const RawInit & node);
 		virtual void visit (const Return & node);
 		virtual void visit (const Sequence & node);
