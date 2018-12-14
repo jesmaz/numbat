@@ -117,7 +117,12 @@ class Unresolved_Loop : public Node {
 	
 	public:
 		
-		//void accept (AbstractPass & pass) const {pass.visit (*this);}
+		const NodePtr getBody () const {return body;}
+		const NodePtr getCond () const {return cond;}
+		const NodePtr getInit () const {return init;}
+		const NodePtr getStep () const {return step;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
 		Unresolved_Loop (numbat::lexer::position pos, const numbat::File * file, const NodePtr & init, const NodePtr & cond, const NodePtr & step, const NodePtr & body) : Node (pos, file), init (init), cond (cond), step (step), body (body) {}

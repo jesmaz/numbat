@@ -202,6 +202,17 @@ void AnalysisPass::visit (const Unresolved_IfElse & node) {
 	this->analyse (node.getAlt ());
 }
 
+void AnalysisPass::visit (const Unresolved_Loop & node) {
+	if (node.getInit ()) {
+		this->analyse (node.getInit ());
+	}
+	this->analyse (node.getCond ());
+	if (node.getStep ()) {
+		this->analyse (node.getStep ());
+	}
+	this->analyse (node.getBody ());
+}
+
 void AnalysisPass::visit (const Unresolved_Operation & node) {
 	for (auto & arg : node.getArgs ()) {
 		this->analyse (arg);

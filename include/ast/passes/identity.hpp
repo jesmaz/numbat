@@ -51,6 +51,7 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const Unresolved_Constructor & node);
 		virtual void visit (const Unresolved_Get_Member & node);
 		virtual void visit (const Unresolved_IfElse & node);
+		virtual void visit (const Unresolved_Loop & node);
 		virtual void visit (const Unresolved_Operation & node);
 		virtual void visit (const Variable & node);
 		

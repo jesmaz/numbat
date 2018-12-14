@@ -54,5 +54,9 @@ string Unresolved_IfElse::toString (text::PrintMode mode) const {
 	}
 }
 
+string Unresolved_Loop::toString (text::PrintMode mode) const {
+	return "loop (" + init->toString (mode) + ", " + cond->toString (mode) + ", " + step->toString (mode) + ", " + body->toString (mode) + ")";
+}
+
 
 }
