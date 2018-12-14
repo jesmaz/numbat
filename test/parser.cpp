@@ -33,7 +33,7 @@ TEST_P (Parser, parseCorrectOutput) {
 	
 	DynArray <string> output, expected;
 	for (parser::PTNode n : ptree->getBody ()) {
-		output.push_back (n->toString (text::COLOUR));
+		output.push_back (n->toString (text::PLAIN));
 	}
 	
 	std::ifstream expectedOutput (GetParam () + ".out");
