@@ -13,3 +13,7 @@ if (4u > 10u) {
 }
 
 assert (a == 2u)
+
+var b : if (1u > 2u) 1u else 56u
+
+assert (b == 56u)
