@@ -208,6 +208,7 @@ void StackMachinePass::visit (const Function_Ptr & node) {
 
 void StackMachinePass::visit (const IfElse & node) {
 	
+	size_t ifElseFrameEnd = c.tracker.getStackSize ();
 	auto endLabel = std::to_string (size_t (&node)) + "_continue";
 	
 	load (node.getCond ());
@@ -216,12 +217,21 @@ void StackMachinePass::visit (const IfElse & node) {
 		auto altLabel = std::to_string (size_t (&node)) + "_alt";
 		push ({stackmachine::OP_CODE::JMP_IF, altLabel});
 		push (node.getBody ());
+		if (c.tracker.getStackSize () > ifElseFrameEnd) {
+			push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - ifElseFrameEnd)});
+		}
 		push ({stackmachine::OP_CODE::JMP, endLabel});
 		push ({stackmachine::OP_CODE::LABEL, altLabel});
 		push (node.getAlt ());
+		if (c.tracker.getStackSize () > ifElseFrameEnd) {
+			push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - ifElseFrameEnd)});
+		}
 	} else {
 		push ({stackmachine::OP_CODE::JMP_IF, endLabel});
 		push (node.getBody ());
+		if (c.tracker.getStackSize () > ifElseFrameEnd) {
+			push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - ifElseFrameEnd)});
+		}
 	}
 	push ({stackmachine::OP_CODE::LABEL, endLabel});
 	
@@ -482,7 +492,7 @@ void StackMachineLoadPass::visit (const Basic_Operation & node) {
 	
 	StackMachinePass::visit (node);
 	if (node.getOpp () == parser::OPERATION::ASSIGN) {
-		push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ()->getRegType ())});
+		push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
 	}
 	
 }
@@ -505,6 +515,7 @@ void StackMachineLoadPass::visit (const Sequence & node) {
 		}
 	}
 	size_t sequenceFrameEnd = c.tracker.getStackSize ();
+	assert (sequenceFrameEnd >= 0);
 	
 	if (node.getNodes ().empty ()) {
 		size = 0;
@@ -516,7 +527,7 @@ void StackMachineLoadPass::visit (const Sequence & node) {
 			if (c.tracker.getStackSize () > sequenceFrameEnd) {
 				push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - sequenceFrameEnd)});
 			}
-			assert (c.tracker.getStackSize () >= sequenceFrameEnd);
+			assert (c.tracker.getStackSize () == sequenceFrameEnd);
 		}
 		
 		load (node.getNodes ().back ());
