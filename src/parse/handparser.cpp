@@ -13,6 +13,7 @@
 #include <parse/tree/keyword.hpp>
 #include <parse/tree/list.hpp>
 #include <parse/tree/literal.hpp>
+#include <parse/tree/loop.hpp>
 #include <parse/tree/metaTags.hpp>
 #include <parse/tree/operator.hpp>
 #include <parse/tree/resolvescope.hpp>
@@ -308,6 +309,7 @@ PTNode parseStatement (CodeQueue * queue);
 PTNode parseStruct (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue);
 PTNode parseVariable (CodeQueue * queue, PTNode type);
+PTNode parseWhile (CodeQueue * queue);
 
 BasicArray <PTNode> parseArguments (CodeQueue * queue);
 BasicArray <PTNode> parseMetaTags (CodeQueue * queue);
@@ -403,7 +405,7 @@ PTNode parseAtom (CodeQueue * queue) {
 			break;
 		}
 		case Symbol::WHILE:
-			//atom = parseWhile (queue);
+			atom = parseWhile (queue);
 			break;
 		case Symbol::SYMBOL_BRACE_LEFT:
 			queue->shiftPop ();
@@ -966,6 +968,29 @@ PTNode parseVariable (CodeQueue * queue, PTNode type) {
 	delete type;
 	return errorUnexpectedToken (queue, "':' or end of expression");;
 	
+}
+
+PTNode parseWhile (CodeQueue * queue) {
+	PROFILE ("parseWhile");
+	// drop if token
+	queue->shiftPop ();
+	
+	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_LEFT) {
+		return errorUnexpectedToken (queue, "'('");
+	}
+	queue->shiftPop ();
+	
+	PTNode cond = parseExpression (queue);
+	
+	if (queue->peak () != Symbol::SYMBOL_PARENRHESES_RIGHT) {
+		delete cond;
+		return errorUnexpectedToken (queue, "')'");
+	}
+	queue->shiftPop ();
+	
+	PTNode body = parseStatement (queue);
+	
+	return new ParseTreeLoop (nullptr, cond, nullptr, body);
 }
 
 
