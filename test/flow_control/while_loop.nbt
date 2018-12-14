@@ -1,0 +1,9 @@
+var n : 15
+var c : 0
+while (n > 0) {
+	c = c + 1
+	n = n - 1
+}
+
+assert (c == 15)
+assert (n == 0)
