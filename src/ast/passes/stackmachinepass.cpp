@@ -208,32 +208,42 @@ void StackMachinePass::visit (const Function_Ptr & node) {
 
 void StackMachinePass::visit (const IfElse & node) {
 	
-	size_t ifElseFrameEnd = c.tracker.getStackSize ();
 	auto endLabel = std::to_string (size_t (&node)) + "_continue";
 	
 	load (node.getCond ());
 	push ({stackmachine::OP_CODE::OP_NOT});
 	if (node.getAlt ()) {
+		
 		auto altLabel = std::to_string (size_t (&node)) + "_alt";
 		push ({stackmachine::OP_CODE::JMP_IF, altLabel});
+		
+		size_t ifElseFrameEnd = c.tracker.getStackSize ();
 		push (node.getBody ());
 		if (c.tracker.getStackSize () > ifElseFrameEnd) {
 			push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - ifElseFrameEnd)});
 		}
+		
 		push ({stackmachine::OP_CODE::JMP, endLabel});
 		push ({stackmachine::OP_CODE::LABEL, altLabel});
+		
+		ifElseFrameEnd = c.tracker.getStackSize ();
 		push (node.getAlt ());
 		if (c.tracker.getStackSize () > ifElseFrameEnd) {
 			push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - ifElseFrameEnd)});
 		}
+		
 	} else {
 		push ({stackmachine::OP_CODE::JMP_IF, endLabel});
+		size_t ifElseFrameEnd = c.tracker.getStackSize ();
 		push (node.getBody ());
 		if (c.tracker.getStackSize () > ifElseFrameEnd) {
 			push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - ifElseFrameEnd)});
 		}
 	}
 	push ({stackmachine::OP_CODE::LABEL, endLabel});
+	if (node.getVar ()) {
+		load (node.getVar ());
+	}
 	
 }
 
