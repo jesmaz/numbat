@@ -117,6 +117,36 @@ void ResolvePass::visit (const Unresolved_Get_Member & node) {
 	
 }
 
+void ResolvePass::visit (const Unresolved_IfElse & node) {
+	auto cond = this->visit (node.getCond ());
+	auto body = this->visit (node.getBody ());
+	auto alt = node.getAlt () ? this->visit (node.getAlt ()) : nullptr;
+	
+	//TODO: Make sure body & alt types are compatible with the return type
+	
+	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), body->getType (), Variable::globalContex.reserve (), Variable::LOCATION::GLOBAL, "tmp");
+	body = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, body}, parser::OPERATION::ASSIGN);
+	if (alt) {
+		alt = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, alt}, parser::OPERATION::ASSIGN);
+	}
+	
+	nPtr = std::make_shared <IfElse> (node.getPos (), node.getFile (), var, cond, body, alt);
+}
+
+void ResolvePass::visit (const Unresolved_Loop & node) {
+	NodePtr i, c, s, b;
+	if (node.getInit ()) {
+		i = this->visit (node.getInit ());
+	}
+	c = this->visit (node.getCond ());
+	if (node.getStep ()) {
+		s = this->visit (node.getStep ());
+	}
+	b = this->visit (node.getBody ());
+	
+	nPtr = std::make_shared <Loop> (node.getPos (), node.getFile (), i, c, s, b, nullptr);
+}
+
 void ResolvePass::visit (const Unresolved_Operation & node) {
 	auto args = node.getArgs ().map <NodePtr> ([&](auto & arg) {
 		return this->visit (arg);
@@ -148,7 +178,20 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 				);
 			} else if (typeid (*types [0]) == typeid (Array) and typeid (*types [1]) == typeid (Array)) {
 				
-				
+				if (node.getOpp () == parser::OPERATION::CMPEQ) {
+					/*auto boolType = Numeric::get (Numeric::ArithmaticType::UINT, 1);
+					auto condArgs = BasicArray <NodePtr> ({
+						ResolveMemberPass ("len") (node.getPos (), node.getFile (), args [0]), 
+						ResolveMemberPass ("len") (node.getPos (), node.getFile (), args [1])
+					});
+					auto cond = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), boolType, node.getIden (), condArgs);
+					auto loopInit = std::make_shared <Variable> (node.getPos (), node.getFile ());
+					auto compareLoop = std::make_shared <Loop> (node.getPos (), node.getFile ());
+					nPtr = std::make_shared <IfElse> (node.getPos (), node.getFile (), cond);*/
+					
+				} else {
+					abort ();
+				}
 				
 			} else {
 				auto dom = DominantType (types [0], types [1]) ();
@@ -197,22 +240,6 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 		
 	}
 	
-}
-
-void ResolvePass::visit (const Unresolved_IfElse & node) {
-	auto cond = this->visit (node.getCond ());
-	auto body = this->visit (node.getBody ());
-	auto alt = node.getAlt () ? this->visit (node.getAlt ()) : nullptr;
-	
-	//TODO: Make sure body & alt types are compatible with the return type
-	
-	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), body->getType (), Variable::globalContex.reserve (), Variable::LOCATION::GLOBAL, "tmp");
-	body = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, body}, parser::OPERATION::ASSIGN);
-	if (alt) {
-		alt = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, alt}, parser::OPERATION::ASSIGN);
-	}
-	
-	nPtr = std::make_shared <IfElse> (node.getPos (), node.getFile (), var, cond, body, alt);
 }
 
 void ResolveTypePass::visit (const ReflectType & node) {
