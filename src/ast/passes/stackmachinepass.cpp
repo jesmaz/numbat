@@ -135,6 +135,19 @@ void StackMachinePass::visit (const Basic_Operation & node) {
 			push (stackmachine::OP_CODE::OP_DIV);
 			break; 
 		}
+		case parser::OPERATION::INDEX: {
+			push (node.getArgs () [0]);
+			if (node.getArgs () [0]->getType ()->isRef ()) {
+				auto layout = getLayout (node.getArgs () [0]->getType ());
+				push ({stackmachine::OP_CODE::LOAD, layout});
+			}
+			push ({stackmachine::OP_CODE::OFFSET, int (0), getLayout (node.getArgs () [0]->getType ())});
+			load (node.getArgs () [1]);
+			push ({stackmachine::OP_CODE::SIZE_OF, getLayout (node.getType ())});
+			push (stackmachine::OP_CODE::OP_MUL);
+			push (stackmachine::OP_CODE::OP_ADD);
+			break; 
+		}
 		case parser::OPERATION::LNOT: {
 			load (node.getArgs () [0]);
 			push (stackmachine::OP_CODE::OP_NOT);
