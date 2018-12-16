@@ -164,7 +164,7 @@ std::map <string, Operator> operators {
 	{" ^= ", {" ^= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
 	{" &= ", {" &= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
 	{" |= ", {" |= ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
-	{" => ", {" => ", 1600, RTL, operatorFactory <OPERATION::ASSIGN>}},
+	{" => ", {" => ", 1600, RTL, operatorFactory <OPERATION::ASSIGN_REF>}},
 	
 	{" <& ", {" <& ", 1580, RTL, operatorFactory <OPERATION::NONE>}},
 	{" &> ", {" &> ", 1550, RTL, operatorFactory <OPERATION::NONE>}},
