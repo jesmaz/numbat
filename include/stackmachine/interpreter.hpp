@@ -370,6 +370,18 @@ namespace stackmachine {
 		}
 		
 		void op_ret (const Instruction & inst, std::ostream & out) {
+			DynArray <std::pair <Literal, Layout>> rets;
+			for (auto i=0, l=inst.size; i<l; ++i) {
+				auto layout = stackDataLayout [dataLayoutPos - 1];
+				rets.push_back (std::make_pair (popTop (), layout));
+			}
+			dataLayoutPos = layoutFrame;
+			stackPos = stackFrame;
+			for (auto itt=rets.rbegin (), end=rets.rend (); itt!=end; ++itt) {
+				itt->second.literalToData (itt->first, &(stack [stackPos]));
+				stackDataLayout [dataLayoutPos++] = itt->second;
+				stackPos += itt->second.getSize ();
+			}
 			textRegister = textLength;
 		}
 		
