@@ -473,6 +473,10 @@ class StackTypePass : public ShallNotPass {
 			}
 		}
 		
+		virtual void visit (const Ptr &) {
+			layout.push_back (stackmachine::TYPE::usize);
+		}
+		
 		virtual void visit (const Ref &) {
 			layout.push_back (stackmachine::TYPE::usize);
 		}
