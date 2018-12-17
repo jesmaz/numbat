@@ -8,32 +8,40 @@
 namespace AST {
 
 
-string Const::toString (text::PrintMode mode) const {
-	return "const " + type->toString (mode);
-}
-
-string Ref::toString (text::PrintMode mode) const {
-	return type->toString (mode) + "*";
-}
-
-string Inferred::toString (text::PrintMode mode) const {
-	return "inferred";
-}
-
 string Array::toString (text::PrintMode mode) const {
 	return base->toString (mode) + " []";
 }
 
 string ArrayInit::toString (text::PrintMode mode) const {
-	return base->toString (mode) + " [" + length->toString (mode) + "] (" + val->toString (mode) + ")";
+	if (val) {
+		return base->toString (mode) + " [" + length->toString (mode) + "] (" + val->toString (mode) + ")";
+	} else {
+		return base->toString (mode) + " [" + length->toString (mode) + "]";
+	}
+}
+
+string Const::toString (text::PrintMode mode) const {
+	return "const " + type->toString (mode);
 }
 
 string Import::toString (text::PrintMode mode) const {
 	return "import " + import->getFileName ();
 }
 
+string Inferred::toString (text::PrintMode mode) const {
+	return "inferred";
+}
+
 string Numeric::toString (text::PrintMode mode) const {
 	return std::string () + char (arith) + "int" + std::to_string (minPrecision);
+}
+
+string Ptr::toString (text::PrintMode mode) const {
+	return type->toString (mode) + "*";
+}
+
+string Ref::toString (text::PrintMode mode) const {
+	return type->toString (mode) + "&";
 }
 
 string Struct::toString (text::PrintMode mode) const {
@@ -49,7 +57,7 @@ string Struct::toString (text::PrintMode mode) const {
 
 
 std::map <BasicArray <TypePtr>, TypePtr> tuples;
-std::map <TypePtr, TypePtr> arrayMap, constMap, refMap;
+std::map <TypePtr, TypePtr> arrayMap, constMap, refMap, ptrMap;
 std::map <uint64_t, TypePtr> numericMap;
 
 TypePtr Array::get (const TypePtr & base) {
@@ -66,14 +74,6 @@ TypePtr Const::get (const TypePtr & base) {
 		return itt->second;
 	}
 	return constMap [base] = TypePtr (new Const (base->getPos (), base->getFile (), base));
-}
-
-TypePtr Ref::get (const TypePtr & base) {
-	auto itt = refMap.find (base);
-	if (itt != refMap.end ()) {
-		return itt->second;
-	}
-	return refMap [base] = TypePtr (new Ref (base->getPos (), base->getFile (), base));
 }
 
 TypePtr Numeric::get (ArithmaticType arith, uint32_t minPrecision) {
@@ -93,6 +93,22 @@ TypePtr Numeric::get (ArithmaticType arith, uint32_t minPrecision) {
 	} else {
 		return numericMap [converter.key] = TypePtr (new Numeric ({0, 0}, numbat::File::builtIn (), arith, minPrecision));
 	}
+}
+
+TypePtr Ptr::get (const TypePtr & base) {
+	auto itt = ptrMap.find (base);
+	if (itt != ptrMap.end ()) {
+		return itt->second;
+	}
+	return ptrMap [base] = TypePtr (new Ptr (base->getPos (), base->getFile (), base));
+}
+
+TypePtr Ref::get (const TypePtr & base) {
+	auto itt = refMap.find (base);
+	if (itt != refMap.end ()) {
+		return itt->second;
+	}
+	return refMap [base] = TypePtr (new Ref (base->getPos (), base->getFile (), base));
 }
 
 TypePtr Struct::tuple (const BasicArray <TypePtr> & vals) {

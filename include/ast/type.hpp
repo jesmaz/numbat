@@ -37,22 +37,6 @@ class Type : public Node {
 };
 
 
-class Inferred : public Type {
-	
-	public:
-		
-		void accept (AbstractPass & pass) const {pass.visit (*this);}
-		virtual string toString (text::PrintMode mode) const;
-		
-		Inferred (numbat::lexer::position pos, const numbat::File * file) : Type (pos, file) {}
-		
-	protected:
-	private:
-		
-		
-		
-};
-
 class Array : public Type {
 	
 	public:
@@ -114,29 +98,6 @@ class Const : public Type {
 		
 };
 
-class Ref : public Type {
-	
-	public:
-		
-		void accept (AbstractPass & pass) const {pass.visit (*this);}
-		TypePtr getRegType () const {return type;}
-		virtual string toString (text::PrintMode mode) const;
-		virtual bool isConst () const {return type->isConst ();}
-		virtual bool isRef () const {return true;}
-		
-		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func);}
-		
-		static TypePtr get (const TypePtr & base);
-		
-	protected:
-	private:
-		
-		Ref (numbat::lexer::position pos, const numbat::File * file, TypePtr type) : Type (pos, file), type (type) {}
-		
-		TypePtr type;
-		
-};
-
 class Import : public Type {
 	
 	public:
@@ -153,6 +114,22 @@ class Import : public Type {
 		const numbat::File * import;
 		
 	
+};
+
+class Inferred : public Type {
+	
+	public:
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		Inferred (numbat::lexer::position pos, const numbat::File * file) : Type (pos, file) {}
+		
+	protected:
+	private:
+		
+		
+		
 };
 
 class Interface : public Type {
@@ -189,6 +166,52 @@ class Numeric : public Type {
 		
 		ArithmaticType arith;
 		uint32_t minPrecision;
+		
+};
+
+class Ptr : public Type {
+	
+	public:
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		TypePtr getRegType () const {return type;}
+		virtual string toString (text::PrintMode mode) const;
+		virtual bool isConst () const {return type->isConst ();}
+		virtual bool isRef () const {return true;}
+		
+		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func);}
+		
+		static TypePtr get (const TypePtr & base);
+		
+	protected:
+	private:
+		
+		Ptr (numbat::lexer::position pos, const numbat::File * file, TypePtr type) : Type (pos, file), type (type) {}
+		
+		TypePtr type;
+		
+};
+
+class Ref : public Type {
+	
+	public:
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		TypePtr getRegType () const {return type;}
+		virtual string toString (text::PrintMode mode) const;
+		virtual bool isConst () const {return type->isConst ();}
+		virtual bool isRef () const {return true;}
+		
+		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func);}
+		
+		static TypePtr get (const TypePtr & base);
+		
+	protected:
+	private:
+		
+		Ref (numbat::lexer::position pos, const numbat::File * file, TypePtr type) : Type (pos, file), type (type) {}
+		
+		TypePtr type;
 		
 };
 
