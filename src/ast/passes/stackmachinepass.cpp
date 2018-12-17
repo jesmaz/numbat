@@ -24,6 +24,13 @@ void StackMachinePass::visit (const Basic_Operation & node) {
 			push ({stackmachine::OP_CODE::COPY, getLayout (node.getArgs () [1]->getType ())});
 			break;
 		}
+		case parser::OPERATION::ASSIGN_REF: {
+			push (node.getArgs () [0]);
+			push ({stackmachine::OP_CODE::DUPLICATE, -1});
+			push (node.getArgs () [1]);
+			push ({stackmachine::OP_CODE::COPY, getLayout (node.getArgs () [0]->getType ())});
+			break;
+		}
 		case parser::OPERATION::ADD: {
 			load (node.getArgs () [0]);
 			load (node.getArgs () [1]);
