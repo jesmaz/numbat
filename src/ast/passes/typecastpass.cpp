@@ -81,6 +81,8 @@ void ImplicitCastPass::visit (const Numeric & node) {
 	nPtr = pass (nPtr);
 }
 
+void ImplicitCastPass::visit (const Ptr & node) {}
+
 void ImplicitCastPass::visit (const Ref & node) {}
 
 void ImplicitCastPass::visit (const ReflectType & node) {}
