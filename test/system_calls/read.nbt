@@ -5,5 +5,9 @@ uint8 [12] buffer
 assert (fd >= 0u)
 var e : linux.read (fd, buffer.data, 12u)
 assert (e == buffer.len)
-assert (buffer == 'Hello Files!')
+var i : 0
+while (i < 12) {
+	assert (buffer [i] == 'Hello Files!' [i])
+	i = i + 1
+}
 linux.close (fd)
