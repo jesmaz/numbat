@@ -15,6 +15,7 @@ class ResolveMemberPass : public ShallNotPass {
 		virtual NodePtr visit (const NodePtr & node) {abort ();}
 		
 		virtual void visit (const Array & node);
+		virtual void visit (const ArrayInit & node);
 		virtual void visit (const Const & node);
 		virtual void visit (const Import & node);
 		virtual void visit (const Interface & node);
@@ -140,6 +141,37 @@ class ConstructorSelectionPass : public ShallNotPass {
 		virtual void visit (const Struct & node);
 		
 		ConstructorSelectionPass (numbat::lexer::position pos, const numbat::File * file, const VarPtr & var, const BasicArray <NodePtr> & args) : pos (pos), file (file), var (var), args (args) {}
+		
+		NodePtr operator () (const NodePtr & node);
+		
+	protected:
+	private:
+		
+		numbat::lexer::position pos;
+		const numbat::File * file;
+		const VarPtr & var;
+		const BasicArray <NodePtr> & args;
+		TypePtr replacementType = nullptr;
+		
+};
+
+class ReferenceConstructorSelectionPass : public ShallNotPass {
+	
+	public:
+		
+		virtual NodePtr visit (const NodePtr & node) {return ReferenceConstructorSelectionPass (*this) (node);}
+		
+		virtual void visit (const Array& node);
+		virtual void visit (const ArrayInit & node);
+		virtual void visit (const Const & node);
+		virtual void visit (const Inferred & node);
+		virtual void visit (const Interface & node);
+		virtual void visit (const Numeric & node);
+		virtual void visit (const Ref & node);
+		virtual void visit (const ReflectType & node);
+		virtual void visit (const Struct & node);
+		
+		ReferenceConstructorSelectionPass (numbat::lexer::position pos, const numbat::File * file, const VarPtr & var, const BasicArray <NodePtr> & args) : pos (pos), file (file), var (var), args (args) {}
 		
 		NodePtr operator () (const NodePtr & node);
 		
