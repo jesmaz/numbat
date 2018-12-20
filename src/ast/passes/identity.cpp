@@ -100,13 +100,20 @@ void IdentityPass::visit (const Inferred & node) {}
 void IdentityPass::visit (const Interface & node) {}
 
 void IdentityPass::visit (const Loop & node) {
+	NodePtr i, c, s, b;
+	if (node.getInit ()) {
+		i = this->visit (node.getInit ());
+	}
+	c = this->visit (node.getCond ());
+	if (node.getStep ()) {
+		s = this->visit (node.getStep ());
+	}
+	b = this->visit (node.getBody ());
+	
 	nPtr = std::make_shared <Loop> (
 		node.getPos (),
 		node.getFile (),
-		this->visit (node.getInit ()),
-		this->visit (node.getCond ()),
-		this->visit (node.getStep ()),
-		this->visit (node.getBody ()),
+		i, c, s, b,
 		node.getArray ()
 	);
 }
