@@ -578,6 +578,8 @@ const Function * Scope::resolve (const string & iden, numbat::lexer::position po
 		}
 	}
 	
+	abort ();
+	
 }
 
 Argument Scope::staticCast (Argument src, const Type * const target, const string & iden) {
