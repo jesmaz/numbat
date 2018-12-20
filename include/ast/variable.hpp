@@ -97,10 +97,11 @@ class Variable : public Value {
 		uint32_t getStackIndex () const {return stackIndex;}
 		
 		const string & getIden () const {return identifier;}
-		void accept (AbstractPass & pass) const {pass.visit (*this);}
-		virtual string toString (text::PrintMode mode) const;
+		string toString (text::PrintMode mode) const;
 		
-		Variable (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, uint32_t stackIndex, LOCATION location, const string & iden);
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		
+		Variable (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, uint32_t stackIndex, LOCATION location, const string & iden) : Value (pos, file, type), stackIndex (stackIndex), location (location), identifier (iden) {}
 		
 		static LiteralStack globalContex;
 		
@@ -111,6 +112,25 @@ class Variable : public Value {
 		uint32_t stackIndex;
 		LOCATION location;
 		string identifier;
+		
+};
+
+class VariableRef : public Node {
+	
+	public:
+		
+		const VarPtr & getVar () const {return var;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		virtual string toString (text::PrintMode mode) const;
+		
+		VariableRef (numbat::lexer::position pos, const numbat::File * file, const VarPtr var) : Node (pos, file, Ref::get (var->getType ())), var (var) {}
+		
+		
+	protected:
+	private:
+		
+		VarPtr var;
 		
 };
 

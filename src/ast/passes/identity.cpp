@@ -124,6 +124,8 @@ void IdentityPass::visit (const Or & node) {
 	nPtr = std::make_shared <Or> (node.getPos (), node.getFile (), this->visit (node.getFirst ()), this->visit (node.getSecond ()));
 }
 
+void IdentityPass::visit (const Ptr & node) {}
+
 void IdentityPass::visit (const RawInit & node) {
 	nPtr = std::make_shared <RawInit> (
 		node.getPos (),
@@ -201,6 +203,8 @@ void IdentityPass::visit (const Unresolved_Operation & node) {
 }
 
 void IdentityPass::visit (const Variable & node) {}
+
+void IdentityPass::visit (const VariableRef & node) {}
 
 
 }

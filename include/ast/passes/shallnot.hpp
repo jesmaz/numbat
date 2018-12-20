@@ -19,42 +19,43 @@ class ShallNotPass : public AbstractPass {
 		virtual void visit (const ArrayInit &) {abort ();}
 		virtual void visit (const Basic_Operation &) {abort ();}
 		virtual void visit (const Call_0 &) {abort ();}
-		virtual void visit (const Call_1 &)  {abort ();}
-		virtual void visit (const Call_2 &)  {abort ();}
-		virtual void visit (const Call_n &)  {abort ();}
+		virtual void visit (const Call_1 &) {abort ();}
+		virtual void visit (const Call_2 &) {abort ();}
+		virtual void visit (const Call_n &) {abort ();}
 		virtual void visit (const CastToArbPrec &) {abort ();}
 		virtual void visit (const CastToInt &) {abort ();}
 		virtual void visit (const CastToDecimal &) {abort ();}
 		virtual void visit (const CastToFloat &) {abort ();}
 		virtual void visit (const CastToUint &) {abort ();}
-		virtual void visit (const Const &)  {abort ();}
-		virtual void visit (const Function_Ptr &)  {abort ();}
-		virtual void visit (const Function_Set &)  {abort ();}
-		virtual void visit (const IfElse &)  {abort ();}
-		virtual void visit (const Import &)  {abort ();}
-		virtual void visit (const Inferred &)  {abort ();}
-		virtual void visit (const Interface &)  {abort ();}
-		virtual void visit (const Loop &)  {abort ();}
-		virtual void visit (const Numeric &)  {abort ();}
+		virtual void visit (const Const &) {abort ();}
+		virtual void visit (const Function_Ptr &) {abort ();}
+		virtual void visit (const Function_Set &) {abort ();}
+		virtual void visit (const IfElse &) {abort ();}
+		virtual void visit (const Import &) {abort ();}
+		virtual void visit (const Inferred &) {abort ();}
+		virtual void visit (const Interface &) {abort ();}
+		virtual void visit (const Loop &) {abort ();}
+		virtual void visit (const Numeric &) {abort ();}
 		virtual void visit (const Or &) {abort ();}
 		virtual void visit (const Ptr &) {abort ();}
 		virtual void visit (const RawInit &) {abort ();}
-		virtual void visit (const Ref &)  {abort ();}
+		virtual void visit (const Ref &) {abort ();}
 		virtual void visit (const Reflect &) {abort ();}
 		virtual void visit (const ReflectType &) {abort ();}
 		virtual void visit (const Return &) {abort ();}
-		virtual void visit (const Sequence &)  {abort ();}
+		virtual void visit (const Sequence &) {abort ();}
 		virtual void visit (const StaticIndex &) {abort ();}
 		virtual void visit (const StaticValue &) {abort ();}
-		virtual void visit (const Struct &)  {abort ();}
-		virtual void visit (const SystemCall &)  {abort ();}
-		virtual void visit (const Unresolved_Call &)  {abort ();}
+		virtual void visit (const Struct &) {abort ();}
+		virtual void visit (const SystemCall &) {abort ();}
+		virtual void visit (const Unresolved_Call &) {abort ();}
 		virtual void visit (const Unresolved_Constructor &) {abort ();}
 		virtual void visit (const Unresolved_Get_Member &) {abort ();}
-		virtual void visit (const Unresolved_IfElse &)  {abort ();}
-		virtual void visit (const Unresolved_Loop &)  {abort ();}
-		virtual void visit (const Unresolved_Operation &)  {abort ();}
-		virtual void visit (const Variable &)  {abort ();}
+		virtual void visit (const Unresolved_IfElse &) {abort ();}
+		virtual void visit (const Unresolved_Loop &) {abort ();}
+		virtual void visit (const Unresolved_Operation &) {abort ();}
+		virtual void visit (const Variable &) {abort ();}
+		virtual void visit (const VariableRef &) {abort ();}
 		
 	protected:
 	private:

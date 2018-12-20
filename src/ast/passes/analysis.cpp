@@ -122,6 +122,10 @@ void AnalysisPass::visit (const Or & node) {
 	this->analyse (node.getType ());
 }
 
+void AnalysisPass::visit (const Ptr & node) {
+	this->analyse (node.getRegType ());
+}
+
 void AnalysisPass::visit (const RawInit & node) {
 	this->analyse (node.getVar ());
 	for (auto & arg : node.getArgs ()) {
@@ -221,6 +225,11 @@ void AnalysisPass::visit (const Unresolved_Operation & node) {
 
 void AnalysisPass::visit (const Variable & node) {
 	this->analyse (node.getType ());
+}
+
+void AnalysisPass::visit (const VariableRef & node) {
+	this->analyse (node.getType ());
+	this->analyse (node.getVar ());
 }
 
 

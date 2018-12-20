@@ -20,7 +20,7 @@ class FunctionPurityPass : public AnalysisPass {
 		virtual void visit (const Call_n & node);
 		virtual void visit (const Function_Ptr & node);
 		virtual void visit (const Function_Set & node);
-		virtual void visit (const Variable & node);
+		virtual void visit (const VariableRef & node);
 		
 		static void analyse (const std::set <FuncPtr> & funcs);
 		

@@ -48,6 +48,7 @@ class Unresolved_IfElse;
 class Unresolved_Loop;
 class Unresolved_Operation;
 class Variable;
+class VariableRef;
 
 class AbstractPass {
 	
@@ -96,6 +97,7 @@ class AbstractPass {
 		virtual void visit (const Unresolved_Loop & node)=0;
 		virtual void visit (const Unresolved_Operation & node)=0;
 		virtual void visit (const Variable & node)=0;
+		virtual void visit (const VariableRef & node)=0;
 		
 		NodePtr operator () (const NodePtr & node);
 		

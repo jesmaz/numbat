@@ -49,7 +49,9 @@ string Variable::toString (text::PrintMode mode) const {
 	return "var (" + getType ()->toString (mode) + ") " + identifier;
 }
 
-Variable::Variable (numbat::lexer::position pos, const numbat::File * file, const TypePtr & type, uint32_t stackIndex, LOCATION location, const string & iden) : Value (pos, file, type), stackIndex (stackIndex), location (location), identifier (iden) {}
+string VariableRef::toString (text::PrintMode mode) const {
+	return "&" + var->toString (mode);
+}
 
 
 }

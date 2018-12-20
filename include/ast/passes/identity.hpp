@@ -55,6 +55,7 @@ class IdentityPass : public AbstractPass {
 		virtual void visit (const Unresolved_Loop & node);
 		virtual void visit (const Unresolved_Operation & node);
 		virtual void visit (const Variable & node);
+		virtual void visit (const VariableRef & node);
 		
 	protected:
 	private:
