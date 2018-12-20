@@ -552,9 +552,17 @@ void StackMachineLoadPass::visit (const Basic_Operation & node) {
 	
 }
 
+void StackMachineLoadPass::visit (const Const & node) {
+	node.getRegType ()->accept (*this);
+}
+
 void StackMachineLoadPass::visit (const RawInit & node) {
 	StackMachinePass::visit (node);
 	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
+}
+
+void StackMachineLoadPass::visit (const Ref & node) {
+	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getRegType ())});
 }
 
 void StackMachineLoadPass::visit (const Sequence & node) {
