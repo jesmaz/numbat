@@ -27,6 +27,7 @@ class IfElse;
 class Import;
 class Inferred;
 class Interface;
+class Load;
 class Loop;
 class Numeric;
 class Ptr;
@@ -76,6 +77,7 @@ class AbstractPass {
 		virtual void visit (const Import & node)=0;
 		virtual void visit (const Inferred & node)=0;
 		virtual void visit (const Interface & node)=0;
+		virtual void visit (const Load & node)=0;
 		virtual void visit (const Loop & node)=0;
 		virtual void visit (const Numeric & node)=0;
 		virtual void visit (const Or & node)=0;

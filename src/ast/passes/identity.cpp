@@ -99,6 +99,13 @@ void IdentityPass::visit (const Inferred & node) {}
 
 void IdentityPass::visit (const Interface & node) {}
 
+void IdentityPass::visit (const Load & node) {
+	auto c = this->visit (node.getChild ());
+	if (c != node.getChild ()) {
+		nPtr = std::make_shared <Load> (node.getPos (), node.getFile (), c);
+	}
+}
+
 void IdentityPass::visit (const Loop & node) {
 	NodePtr i, c, s, b;
 	if (node.getInit ()) {

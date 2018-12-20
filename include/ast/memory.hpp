@@ -8,6 +8,24 @@
 namespace AST {
 
 
+class Load : public Node {
+	
+	public:
+		
+		const NodePtr & getChild () const {return child;}
+		
+		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		string toString (text::PrintMode mode) const;
+		
+		Load (numbat::lexer::position pos, const numbat::File * file, const NodePtr & child) : Node (pos, file, child->getType ()->getDeRefType ()), child (child) {}
+		
+	protected:
+	private:
+		
+		NodePtr child;
+		
+};
+
 class RawInit : public Node {
 	
 	public:

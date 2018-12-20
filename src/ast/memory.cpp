@@ -4,6 +4,10 @@
 namespace AST {
 
 
+string Load::toString (text::PrintMode mode) const {
+	return "*" + child->toString (mode);
+}
+
 string RawInit::toString (text::PrintMode mode) const {
 	if (args.empty ()) {
 		return var->toString (mode) + ": {}";

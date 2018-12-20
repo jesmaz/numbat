@@ -107,6 +107,10 @@ void AnalysisPass::visit (const Inferred &) {}
 
 void AnalysisPass::visit (const Interface &) {}
 
+void AnalysisPass::visit (const Load & node) {
+	this->analyse (node.getChild ());
+}
+
 void AnalysisPass::visit (const Loop & node) {
 	this->analyse (node.getInit ());
 	this->analyse (node.getCond ());
