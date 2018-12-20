@@ -18,10 +18,10 @@ File * linuxModule () {
 	
 	auto ctx = pair.second;
 	auto cInt = AST::Numeric::get (AST::Numeric::ArithmaticType::INT, 32);
-	auto cStr = AST::Ref::get (AST::Const::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)));
+	auto cStr = AST::Ptr::get (AST::Const::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8)));
 	auto size = AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 0);
 	auto ssize = AST::Numeric::get (AST::Numeric::ArithmaticType::INT, 0);
-	auto dataBuffer = AST::Ref::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8));
+	auto dataBuffer = AST::Ptr::get (AST::Numeric::get (AST::Numeric::ArithmaticType::UINT, 8));
 	
 	auto createSysCall = [&](const string & callName, const BasicArray <std::pair <string, AST::TypePtr>> & args, const AST::TypePtr & ret) {
 		
