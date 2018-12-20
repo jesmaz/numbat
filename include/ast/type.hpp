@@ -16,6 +16,7 @@ class Type : public Node {
 	public:
 		
 		string getName () const {return name;}
+		virtual TypePtr getDeRefType () const {return nullptr;}
 		virtual TypePtr getRegType () const {return nullptr;}
 		
 		virtual bool isConst () const {return false;}
@@ -174,6 +175,7 @@ class Ptr : public Type {
 	public:
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		TypePtr getDeRefType () const {return type;}
 		TypePtr getRegType () const {return type;}
 		virtual string toString (text::PrintMode mode) const;
 		virtual bool isConst () const {return type->isConst ();}
@@ -197,6 +199,7 @@ class Ref : public Type {
 	public:
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		TypePtr getDeRefType () const {return type;}
 		TypePtr getRegType () const {return type;}
 		virtual string toString (text::PrintMode mode) const;
 		virtual bool isConst () const {return type->isConst ();}
