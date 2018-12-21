@@ -206,8 +206,8 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 					Numeric::get (Numeric::ArithmaticType::UINT, 1),
 					node.getIden (),
 					BasicArray <NodePtr> ({
-						args [0],
-						args [1]
+						StaticCastPass (types [0]) (args [0]),
+						StaticCastPass (types [0]) (args [1])
 					}),
 					node.getOpp ()
 				);
@@ -504,7 +504,8 @@ void ReferenceConstructorSelectionPass::visit (const Inferred & node) {
 		abort ();
 	} if (args.size () == 1) {
 		std::cerr << args.front ()->toString (text::PrintMode::COLOUR) << std::endl;
-		assert (replacementType = Ref::get (args.front ()->getType ()));
+		replacementType = args.front ()->getType ();
+		assert (replacementType);
 		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " => ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), args.front ()}, parser::OPERATION::ASSIGN_REF);
 	} else {
 		//TODO: Set to tuple
