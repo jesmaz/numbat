@@ -112,9 +112,13 @@ void AnalysisPass::visit (const Load & node) {
 }
 
 void AnalysisPass::visit (const Loop & node) {
-	this->analyse (node.getInit ());
+	if (node.getInit ()) {
+		this->analyse (node.getInit ());
+	}
 	this->analyse (node.getCond ());
-	this->analyse (node.getStep ());
+	if (node.getStep ()) {
+		this->analyse (node.getStep ());
+	}
 	this->analyse (node.getBody ());
 }
 
