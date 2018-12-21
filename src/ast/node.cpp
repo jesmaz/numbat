@@ -8,6 +8,7 @@
 #include <ast/passes/reflectpass.hpp>
 #include <ast/passes/resolve.hpp>
 #include <ast/passes/returnpass.hpp>
+#include <ast/passes/typesafetypass.hpp>
 #include <ast/sequence.hpp>
 #include <utility/config.hpp>
 
@@ -46,6 +47,8 @@ NodePtr transform (const NodePtr & node) {
 			f->replaceBody (ReflectPass () (f->getBody ()));
 		}
 	}
+	
+	TypeSafetyPass ().analyse (n);
 	
 	for (auto & f : funcs) {
 		if (f->getBody ()) {
