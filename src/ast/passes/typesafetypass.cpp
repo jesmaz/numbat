@@ -9,19 +9,19 @@ namespace AST {
 
 void TypeSafetyPass::visit (const Call_1 & node) {
 	assert (node.getFunc ()->getParams ().size () == 1);
-	assert (node.getFunc ()->getParams () [0] == node.getArg ()->getType ());
+	assert (*node.getFunc ()->getParams () [0] == *node.getArg ()->getType ());
 }
 
 void TypeSafetyPass::visit (const Call_2 & node) {
 	assert (node.getFunc ()->getParams ().size () == 2);
-	assert (node.getFunc ()->getParams () [0] == node.getLhs ()->getType ());
-	assert (node.getFunc ()->getParams () [1] == node.getRhs ()->getType ());
+	assert (*node.getFunc ()->getParams () [0] == *node.getLhs ()->getType ());
+	assert (*node.getFunc ()->getParams () [1] == *node.getRhs ()->getType ());
 }
 
 void TypeSafetyPass::visit (const Call_n & node) {
 	assert (node.getFunc ()->getParams ().size () == node.getArgs ().size ());
 	for (size_t i=0, l=node.getArgs ().size (); i<l; ++i) {
-		assert (node.getFunc ()->getParams () [i] == node.getArgs () [i]);
+		assert (*node.getFunc ()->getParams () [i] == *node.getArgs () [i]->getType ());
 	}
 }
 
@@ -30,14 +30,14 @@ void TypeSafetyPass::visit (const Basic_Operation & node) {
 		case parser::OPERATION::ADD:
 		case parser::OPERATION::AND:
 			assert (node.getArgs ().size () == 2);
-			assert (node.getArgs () [0]->getType () == node.getArgs () [1]->getType ());
+			assert (*node.getArgs () [0]->getType () == *node.getArgs () [1]->getType ());
 			break;
 		case parser::OPERATION::AS:
 			break;
 		case parser::OPERATION::ASSIGN:
 		case parser::OPERATION::ASSIGN_REF:
 			assert (node.getArgs ().size () == 2);
-			assert (node.getArgs () [0]->getType () == Ref::get (node.getArgs () [1]->getType ()));
+			assert (*node.getArgs () [0]->getType () == *Ref::get (node.getArgs () [1]->getType ()));
 			break;
 		case parser::OPERATION::BAND:
 		case parser::OPERATION::BNOT:
@@ -50,7 +50,7 @@ void TypeSafetyPass::visit (const Basic_Operation & node) {
 		case parser::OPERATION::CMPLTE:
 		case parser::OPERATION::CMPNE:
 			assert (node.getArgs ().size () == 2);
-			assert (node.getArgs () [0]->getType () == node.getArgs () [1]->getType ());
+			assert (*node.getArgs () [0]->getType () == *node.getArgs () [1]->getType ());
 			break;
 		case parser::OPERATION::CONCAT:
 			break;
@@ -59,7 +59,7 @@ void TypeSafetyPass::visit (const Basic_Operation & node) {
 			break;
 		case parser::OPERATION::DIV:
 			assert (node.getArgs ().size () == 2);
-			assert (node.getArgs () [0]->getType () == node.getArgs () [1]->getType ());
+			assert (*node.getArgs () [0]->getType () == *node.getArgs () [1]->getType ());
 			break;
 		case parser::OPERATION::IN:
 			break;
@@ -73,7 +73,7 @@ void TypeSafetyPass::visit (const Basic_Operation & node) {
 			break;
 		case parser::OPERATION::MUL:
 			assert (node.getArgs ().size () == 2);
-			assert (node.getArgs () [0]->getType () == node.getArgs () [1]->getType ());
+			assert (*node.getArgs () [0]->getType () == *node.getArgs () [1]->getType ());
 			break;
 		case parser::OPERATION::NEG:
 			assert (node.getArgs ().size () == 1);
@@ -84,7 +84,7 @@ void TypeSafetyPass::visit (const Basic_Operation & node) {
 		case parser::OPERATION::REM:
 		case parser::OPERATION::SUB:
 			assert (node.getArgs ().size () == 2);
-			assert (node.getArgs () [0]->getType () == node.getArgs () [1]->getType ());
+			assert (*node.getArgs () [0]->getType () == *node.getArgs () [1]->getType ());
 			break;
 		case parser::OPERATION::__COUNT__:
 			break;

@@ -45,6 +45,8 @@ class ReflectType : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
+		bool operator == (const Type & other) const {return false;}
+		
 		static size_t getTypeId (const TypePtr & type);
 		static TypePtr get (const NodePtr & metaTag, const TypePtr & target);
 		static TypePtr getType (size_t id);

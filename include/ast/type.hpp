@@ -22,6 +22,18 @@ class Type : public Node {
 		virtual bool isConst () const {return false;}
 		virtual bool isRef () const {return false;}
 		
+		virtual bool operator == (const Type & other) const=0;
+		virtual bool operator == (const Array &) const {return false;}
+		virtual bool operator == (const ArrayInit &) const {return false;}
+		virtual bool operator == (const Const &) const {return false;}
+		virtual bool operator == (const Import &) const {return false;}
+		virtual bool operator == (const Inferred &) const {return false;}
+		virtual bool operator == (const Interface &) const {return false;}
+		virtual bool operator == (const Numeric &) const {return false;}
+		virtual bool operator == (const Ptr &) const {return false;}
+		virtual bool operator == (const Ref &) const {return false;}
+		virtual bool operator == (const Struct &) const {return false;}
+		
 		const std::multimap <string, FuncPtr> & getMethods () const {return methods;}
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {methods.insert (std::make_pair (str, func));}
 		
@@ -45,6 +57,10 @@ class Array : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
+		virtual bool operator == (const Type & other) const {return other == *this;}
+		virtual bool operator == (const Array & other) const {return *base == *other.base;}
+		virtual bool operator == (const ArrayInit & other) const;
+		
 		static TypePtr get (const TypePtr & base);
 		TypePtr getBaseType () const {return base;}
 		
@@ -65,6 +81,12 @@ class ArrayInit : public Type {
 		const NodePtr & getVal () const {return val;}
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
+		
+		virtual bool operator == (const Type & other) const {return other == *this;}
+		virtual bool operator == (const Array & other) const {return *base == *other.getBaseType ();}
+		virtual bool operator == (const ArrayInit & other) const {return *base == *other.base;}
+		
+		TypePtr getBaseType () const {return base;}
 		
 		ArrayInit (numbat::lexer::position pos, const numbat::File * file, const TypePtr & base, const NodePtr & length, const NodePtr & val) : Type (pos, file, Array::get (base)), base (base), length (length), val (val) {}
 		
@@ -87,6 +109,18 @@ class Const : public Type {
 		virtual bool isConst () const {return true;}
 		virtual bool isRef () const {return type->isRef ();}
 		
+		virtual bool operator == (const Type & other) const {return *type == other;}
+		virtual bool operator == (const Array & other) const {return *type == other;}
+		virtual bool operator == (const ArrayInit & other) const {return *type == other;}
+		virtual bool operator == (const Const & other) const {return *type == other;}
+		virtual bool operator == (const Import & other) const {return *type == other;}
+		virtual bool operator == (const Inferred & other) const {return *type == other;}
+		virtual bool operator == (const Interface & other) const {return *type == other;}
+		virtual bool operator == (const Numeric & other) const {return *type == other;}
+		virtual bool operator == (const Ptr & other) const {return *type == other;}
+		virtual bool operator == (const Ref & other) const {return *type == other;}
+		virtual bool operator == (const Struct & other) const {return *type == other;}
+		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func); Type::overloadFunc (str, func);}
 		
 		static TypePtr get (const TypePtr & base);
@@ -108,6 +142,8 @@ class Import : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
+		virtual bool operator == (const Type & other) const {return other == *this;}
+		
 		Import (numbat::lexer::position pos, const numbat::File * parent, const numbat::File * import) : Type (pos, parent), import (import) {}
 		
 	protected:
@@ -124,6 +160,8 @@ class Inferred : public Type {
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
+		
+		virtual bool operator == (const Type & other) const {return other == *this;}
 		
 		Inferred (numbat::lexer::position pos, const numbat::File * file) : Type (pos, file) {}
 		
@@ -159,6 +197,9 @@ class Numeric : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		virtual string toString (text::PrintMode mode) const;
 		
+		virtual bool operator == (const Type & other) const {return other == *this;}
+		virtual bool operator == (const Numeric & other) const {return arith == other.arith and minPrecision == other.minPrecision;}
+		
 		static TypePtr get (ArithmaticType arith, uint32_t minPrecision);
 		
 	protected:
@@ -181,6 +222,9 @@ class Ptr : public Type {
 		virtual string toString (text::PrintMode mode) const;
 		virtual bool isConst () const {return type->isConst ();}
 		virtual bool isRef () const {return true;}
+		
+		virtual bool operator == (const Type & other) const {return other == *this;}
+		virtual bool operator == (const Ptr & other) const {return *type == *other.type;}
 		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func);}
 		
@@ -206,6 +250,9 @@ class Ref : public Type {
 		virtual bool isConst () const {return type->isConst ();}
 		virtual bool isRef () const {return true;}
 		
+		virtual bool operator == (const Type & other) const {return other == *this;}
+		virtual bool operator == (const Ref & other) const {return *type == *other.type;}
+		
 		virtual void overloadFunc (const string & str, const FuncPtr & func) {type->overloadFunc (str, func);}
 		
 		static TypePtr get (const TypePtr & base);
@@ -229,6 +276,9 @@ class Struct : public Type {
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
 		string toString (text::PrintMode mode) const;
 		
+		virtual bool operator == (const Type & other) const {return other == *this;}
+		virtual bool operator == (const Struct & other) const {return members == other.members;}
+		
 		static TypePtr tuple (const BasicArray <TypePtr> & vals);
 		
 		Struct (numbat::lexer::position pos, const numbat::File * file, const string & name) : Type (pos, file, name) {}
@@ -242,5 +292,6 @@ class Struct : public Type {
 		BasicArray <NodePtr> members;
 		
 };
+
 
 }
