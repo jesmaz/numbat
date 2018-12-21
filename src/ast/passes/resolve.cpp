@@ -97,6 +97,10 @@ void ResolvePass::visit (const Variable & node) {
 	*std::dynamic_pointer_cast <Variable> (nPtr) = Variable (node.getPos (), node.getFile (), type, node.getStackIndex (), node.getLocation (), node.getIden ());
 }
 
+void ResolvePass::visit (const VariableRef & node) {
+	nPtr = std::make_shared <VariableRef> (node.getPos (), node.getFile (), node.getVar ());
+}
+
 void ResolvePass::visit (const Unresolved_Call & node) {
 	auto args = node.getArgs ().map <NodePtr> ([&](auto & arg) {
 		return this->visit (arg);

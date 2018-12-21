@@ -44,6 +44,7 @@ class ResolvePass : public IdentityPass {
 		
 		virtual void visit (const Sequence & node);
 		virtual void visit (const Variable & node);
+		virtual void visit (const VariableRef & node);
 		virtual void visit (const Unresolved_Call & node);
 		virtual void visit (const Unresolved_Constructor & node);
 		virtual void visit (const Unresolved_Get_Member & node);
