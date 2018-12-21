@@ -17,13 +17,7 @@ namespace AST {
 void StackMachinePass::visit (const Basic_Operation & node) {
 	
 	switch (node.getOpp ()) {
-		case parser::OPERATION::ASSIGN: {
-			push (node.getArgs () [0]);
-			push ({stackmachine::OP_CODE::DUPLICATE, -1});
-			load (node.getArgs () [1]);
-			push ({stackmachine::OP_CODE::COPY, getLayout (node.getArgs () [1]->getType ())});
-			break;
-		}
+		case parser::OPERATION::ASSIGN:
 		case parser::OPERATION::ASSIGN_REF: {
 			push (node.getArgs () [0]);
 			push ({stackmachine::OP_CODE::DUPLICATE, -1});
@@ -32,53 +26,53 @@ void StackMachinePass::visit (const Basic_Operation & node) {
 			break;
 		}
 		case parser::OPERATION::ADD: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_ADD);
 			break;
 		}
 		case parser::OPERATION::CMPEQ: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_CMP_EQ);
 			break;
 		}
 		case parser::OPERATION::CMPGT: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_CMP_GT);
 			break;
 		}
 		case parser::OPERATION::CMPGTE: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_CMP_GTE);
 			break;
 		}
 		case parser::OPERATION::CMPLT: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_CMP_LT);
 			break;
 		}
 		case parser::OPERATION::CMPLTE: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_CMP_LTE);
 			break;
 		}
 		case parser::OPERATION::CMPNE: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_CMP_NE);
 			break;
 		}
 		case parser::OPERATION::CONCAT: {
 			auto base = dynamic_cast <const Array*> (node.getType ().get ())->getBaseType ();
 			
-			load (node.getArgs () [0]);
+			push (node.getArgs () [0]);
 			// [arg0.data*][arg0.len]
-			load (node.getArgs () [1]);
+			push (node.getArgs () [1]);
 			// [arg0.data*][arg0.len][arg1.data*][arg1.len]
 			push ({stackmachine::OP_CODE::DUPLICATE, -3});
 			// [arg0.data*][arg0.len][arg1.data*][arg1.len][arg0.len]
@@ -137,8 +131,8 @@ void StackMachinePass::visit (const Basic_Operation & node) {
 			break;
 		}
 		case parser::OPERATION::DIV: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_DIV);
 			break; 
 		}
@@ -149,26 +143,26 @@ void StackMachinePass::visit (const Basic_Operation & node) {
 				push ({stackmachine::OP_CODE::LOAD, layout});
 			}
 			push ({stackmachine::OP_CODE::OFFSET, int (0), getLayout (node.getArgs () [0]->getType ())});
-			load (node.getArgs () [1]);
+			push (node.getArgs () [1]);
 			push ({stackmachine::OP_CODE::SIZE_OF, getLayout (node.getType ())});
 			push (stackmachine::OP_CODE::OP_MUL);
 			push (stackmachine::OP_CODE::OP_ADD);
 			break; 
 		}
 		case parser::OPERATION::LNOT: {
-			load (node.getArgs () [0]);
+			push (node.getArgs () [0]);
 			push (stackmachine::OP_CODE::OP_NOT);
 			break;
 		}
 		case parser::OPERATION::MUL: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_MUL);
 			break;
 		}
 		case parser::OPERATION::SUB: {
-			load (node.getArgs () [0]);
-			load (node.getArgs () [1]);
+			push (node.getArgs () [0]);
+			push (node.getArgs () [1]);
 			push (stackmachine::OP_CODE::OP_SUB);
 			break;
 		}
@@ -188,7 +182,7 @@ void StackMachinePass::visit (const Call_1 & node) {
 		}
 	}
 	
-	load (node.getArg ());
+	push (node.getArg ());
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, node.getFunc ()->getIden ()});
 	push ({stackmachine::OP_CODE::CALL, getLayout (node.getFunc ())});
 }
@@ -204,20 +198,20 @@ void StackMachinePass::visit (const Call_n & node) {
 	}
 	
 	for (auto & a : node.getArgs ()) {
-		load (a);
+		push (a);
 	}
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, node.getFunc ()->getIden ()});
 	push ({stackmachine::OP_CODE::CALL, getLayout (node.getFunc ())});
 }
 
 void StackMachinePass::visit (const CastToInt & node) {
-	load (node.getNode ());
+	push (node.getNode ());
 	auto destType = getLayout (node.getType ());
 	push ({stackmachine::OP_CODE::CONVERT, destType});
 }
 
 void StackMachinePass::visit (const CastToUint & node) {
-	load (node.getNode ());
+	push (node.getNode ());
 	auto destType = getLayout (node.getType ());
 	push ({stackmachine::OP_CODE::CONVERT, destType});
 }
@@ -230,7 +224,7 @@ void StackMachinePass::visit (const IfElse & node) {
 	
 	auto endLabel = std::to_string (size_t (&node)) + "_continue";
 	
-	load (node.getCond ());
+	push (node.getCond ());
 	push ({stackmachine::OP_CODE::OP_NOT});
 	if (node.getAlt ()) {
 		
@@ -262,7 +256,7 @@ void StackMachinePass::visit (const IfElse & node) {
 	}
 	push ({stackmachine::OP_CODE::LABEL, endLabel});
 	if (node.getVar ()) {
-		load (node.getVar ());
+		push (node.getVar ());
 	}
 	
 }
@@ -273,7 +267,7 @@ void StackMachinePass::visit (const Loop & node) {
 	auto endLabel = std::to_string (size_t (&node)) + "_continue";
 	
 	push ({stackmachine::OP_CODE::LABEL, condLabel});
-	load (node.getCond ());
+	push (node.getCond ());
 	push ({stackmachine::OP_CODE::OP_NOT});
 	push ({stackmachine::OP_CODE::JMP_IF, endLabel});
 	
@@ -292,14 +286,14 @@ void StackMachinePass::visit (const RawInit & node) {
 	push (node.getVar ());
 	push ({stackmachine::OP_CODE::DUPLICATE, -1});
 	for (auto & a : node.getArgs ()) {
-		load (a);
+		push (a);
 	}
 	push ({stackmachine::OP_CODE::COPY, getLayout (node.getType ())});
 }
 
 void StackMachinePass::visit (const Return & node) {
 	if (node.getRetVal ()) {
-		load (node.getRetVal ());
+		push (node.getRetVal ());
 		push ({stackmachine::OP_CODE::RET, 1});
 	} else {
 		push ({stackmachine::OP_CODE::RET, 0});
@@ -360,13 +354,14 @@ void StackMachinePass::visit (const StaticValue & node) {
 	assert (l == node.getLiteral ());
 	assert (l == c.globals [id].second);
 	push ({stackmachine::OP_CODE::LOAD_GLOBAL_ADDR, id});
+	push ({stackmachine::OP_CODE::LOAD, layout});
 	
 }
 
 void StackMachinePass::visit (const SystemCall & node) {
 	
 	for (auto & arg : node.getArgs ()) {
-		load (arg);
+		push (arg);
 	}
 	push ({stackmachine::OP_CODE::CALL_SYS, node.getSysName ()});
 	
@@ -393,12 +388,6 @@ void StackMachinePass::visit (const Variable & node) {
 	
 }
 
-
-int StackMachinePass::load (const NodePtr & node) {
-	StackMachineLoadPass pass (c);
-	node->accept (pass);
-	return pass.size;
-}
 
 int StackMachinePass::push (const NodePtr & node) {
 	StackMachinePass pass (c);
@@ -543,77 +532,6 @@ symbol_t StackMachinePass::Chunk::getLayout (const TypePtr & type) {
 }
 
 
-void StackMachineLoadPass::visit (const Basic_Operation & node) {
-	
-	StackMachinePass::visit (node);
-	if (node.getOpp () == parser::OPERATION::ASSIGN) {
-		push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
-	}
-	
-}
-
-void StackMachineLoadPass::visit (const Const & node) {
-	node.getRegType ()->accept (*this);
-}
-
-void StackMachineLoadPass::visit (const RawInit & node) {
-	StackMachinePass::visit (node);
-	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
-}
-
-void StackMachineLoadPass::visit (const Ref & node) {
-	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getRegType ())});
-}
-
-void StackMachineLoadPass::visit (const Sequence & node) {
-	size_t sequenceFrame = c.tracker.getStackSize ();
-	for (auto v : node.getLocalStack ()) {
-		if (v->getLocation () == Variable::LOCATION::LOCAL) {
-			if (c.stackVariables.find (v.get ()) == c.stackVariables.end ()) {
-				c.stackVariables [v.get ()] = c.push ({stackmachine::OP_CODE::RESERVE, c.getLayout (v->getType ())});
-				c.push ({stackmachine::OP_CODE::LABEL, symbol_t ("Allocating space for " + v->getIden () + " at offset " + std::to_string (c.stackVariables [v.get ()]))});
-			} else {
-				c.push ({stackmachine::OP_CODE::LABEL, symbol_t ("Already allocated space for " + v->getIden () + " at offset " + std::to_string (c.stackVariables [v.get ()]))});
-			}
-		}
-	}
-	size_t sequenceFrameEnd = c.tracker.getStackSize ();
-	assert (sequenceFrameEnd >= 0);
-	
-	if (node.getNodes ().empty ()) {
-		size = 0;
-		
-	} else {
-		
-		for (size_t i=0, l=node.getNodes ().size ()-1; i<l; ++i) {
-			push (node.getNodes () [i]);
-			if (c.tracker.getStackSize () > sequenceFrameEnd) {
-				push ({stackmachine::OP_CODE::POP, int (c.tracker.getStackSize () - sequenceFrameEnd)});
-			}
-			assert (c.tracker.getStackSize () == sequenceFrameEnd);
-		}
-		
-		load (node.getNodes ().back ());
-		
-	}
-}
-
-void StackMachineLoadPass::visit (const StaticIndex & node) {
-	StackMachinePass::visit (node);
-	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
-}
-
-void StackMachineLoadPass::visit (const StaticValue & node) {
-	StackMachinePass::visit (node);
-	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
-}
-
-void StackMachineLoadPass::visit (const Variable & node) {
-	StackMachinePass::visit (node);
-	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
-}
-
-
 stackmachine::Chunk stackMachinePass (FuncPtr func) {
 	
 	if (func->getBody ()) {
@@ -674,14 +592,14 @@ stackmachine::Chunk stackMachinePass (FuncPtr func) {
 stackmachine::Chunk stackMachinePass (NodePtr body) {
 	
 	StackMachinePass::Chunk c;
-	StackMachineLoadPass loadPass (c);
-	body->accept (loadPass);
+	StackMachinePass pass (c);
+	body->accept (pass);
 	StaticValue (
 		{},
 		body->getFile (),
 		Numeric::get (Numeric::ArithmaticType::INT, 32),
 		0
-	).accept (loadPass);
+	).accept (pass);
 	c.push ({stackmachine::OP_CODE::CALL_SYS, std::string ("exit")});
 	
 	

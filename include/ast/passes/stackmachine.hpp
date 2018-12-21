@@ -52,7 +52,6 @@ class StackMachinePass : public ShallNotPass {
 		
 	protected:
 		
-		int load (const NodePtr & node);
 		int push (const NodePtr & node);
 		int push (const stackmachine::Instruction & i) {return c.push (i);}
 		symbol_t getLayout (const FuncPtr & type) {return c.getLayout (type);}
@@ -61,29 +60,6 @@ class StackMachinePass : public ShallNotPass {
 		Chunk & c;
 		int size;
 		
-	private:
-		
-};
-
-class StackMachineLoadPass : public StackMachinePass {
-	
-	public:
-		
-		virtual void visit (const Array & node) {}
-		virtual void visit (const Const & node);
-		virtual void visit (const Basic_Operation & node);
-		virtual void visit (const Numeric & node) {}
-		virtual void visit (const Ptr & node) {}
-		virtual void visit (const RawInit & node);
-		virtual void visit (const Ref & node);
-		virtual void visit (const Sequence & node);
-		virtual void visit (const StaticIndex & node);
-		virtual void visit (const StaticValue & node);
-		virtual void visit (const Variable & node);
-		
-		StackMachineLoadPass (Chunk & c) : StackMachinePass (c) {}
-		
-	protected:
 	private:
 		
 };
