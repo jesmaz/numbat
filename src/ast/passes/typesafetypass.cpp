@@ -9,19 +9,19 @@ namespace AST {
 
 void TypeSafetyPass::visit (const Call_1 & node) {
 	assert (node.getFunc ()->getParams ().size () == 1);
-	assert (node.getFunc ()->getParams () [0] != node.getArg ()->getType ());
+	assert (node.getFunc ()->getParams () [0] == node.getArg ()->getType ());
 }
 
 void TypeSafetyPass::visit (const Call_2 & node) {
 	assert (node.getFunc ()->getParams ().size () == 2);
-	assert (node.getFunc ()->getParams () [0] != node.getLhs ()->getType ());
-	assert (node.getFunc ()->getParams () [1] != node.getRhs ()->getType ());
+	assert (node.getFunc ()->getParams () [0] == node.getLhs ()->getType ());
+	assert (node.getFunc ()->getParams () [1] == node.getRhs ()->getType ());
 }
 
 void TypeSafetyPass::visit (const Call_n & node) {
 	assert (node.getFunc ()->getParams ().size () == node.getArgs ().size ());
 	for (size_t i=0, l=node.getArgs ().size (); i<l; ++i) {
-		assert (node.getFunc ()->getParams () [i] != node.getArgs () [i]);
+		assert (node.getFunc ()->getParams () [i] == node.getArgs () [i]);
 	}
 }
 
