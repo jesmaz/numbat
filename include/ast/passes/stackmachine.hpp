@@ -47,6 +47,7 @@ class StackMachinePass : public ShallNotPass {
 		virtual void visit (const StaticValue & node);
 		virtual void visit (const SystemCall & node);
 		virtual void visit (const Variable & node);
+		virtual void visit (const VariableRef & node);
 		
 		StackMachinePass (Chunk & c) : c (c) {}
 		
@@ -54,6 +55,7 @@ class StackMachinePass : public ShallNotPass {
 		
 		int push (const NodePtr & node);
 		int push (const stackmachine::Instruction & i) {return c.push (i);}
+		void pushRef (const Variable & node);
 		symbol_t getLayout (const FuncPtr & type) {return c.getLayout (type);}
 		symbol_t getLayout (const TypePtr & type) {return c.getLayout (type);}
 		

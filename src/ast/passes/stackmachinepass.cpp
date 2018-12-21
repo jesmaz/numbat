@@ -368,7 +368,27 @@ void StackMachinePass::visit (const SystemCall & node) {
 }
 
 void StackMachinePass::visit (const Variable & node) {
-	
+	pushRef (node);
+	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
+}
+
+void StackMachinePass::visit (const VariableRef & node) {
+	pushRef (*node.getVar ());
+}
+
+
+int StackMachinePass::push (const NodePtr & node) {
+	StackMachinePass pass (c);
+	node->accept (pass);
+	return pass.size;
+}
+
+int StackMachinePass::Chunk::push (const stackmachine::Instruction & i) {
+	inst.push_back (i);
+	return tracker.feed (i);
+}
+
+void StackMachinePass::pushRef (const Variable & node) {
 	stackmachine::Instruction inst;
 	if (node.getLocation () == Variable::LOCATION::GLOBAL) {
 		auto iden = "global_" + node.getIden () + "_" + std::to_string (size_t (&node));
@@ -385,19 +405,6 @@ void StackMachinePass::visit (const Variable & node) {
 		push ({stackmachine::OP_CODE::LOAD_STACK_ADDR, c.stackVariables [&node]});
 		
 	}
-	
-}
-
-
-int StackMachinePass::push (const NodePtr & node) {
-	StackMachinePass pass (c);
-	node->accept (pass);
-	return pass.size;
-}
-
-int StackMachinePass::Chunk::push (const stackmachine::Instruction & i) {
-	inst.push_back (i);
-	return tracker.feed (i);
 }
 
 
