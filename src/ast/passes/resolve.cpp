@@ -133,9 +133,9 @@ void ResolvePass::visit (const Unresolved_IfElse & node) {
 	//TODO: Make sure body & alt types are compatible with the return type
 	
 	VarPtr var = std::make_shared <Variable> (node.getPos (), node.getFile (), body->getType (), Variable::globalContex.reserve (), Variable::LOCATION::GLOBAL, "tmp");
-	body = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, body}, parser::OPERATION::ASSIGN);
+	body = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), body}, parser::OPERATION::ASSIGN);
 	if (alt) {
-		alt = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, alt}, parser::OPERATION::ASSIGN);
+		alt = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), alt}, parser::OPERATION::ASSIGN);
 	}
 	
 	nPtr = std::make_shared <IfElse> (node.getPos (), node.getFile (), var, cond, body, alt);
@@ -376,7 +376,7 @@ void ConstructorSelectionPass::visit (const Array & node) {
 	if (args.empty ()) {
 		abort ();
 	} else if (args.size () == 1) {
-		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " = ", BasicArray <NodePtr> {var, args [0]}, parser::OPERATION::ASSIGN);
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " = ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), args [0]}, parser::OPERATION::ASSIGN);
 	} else {
 		abort ();
 	}
@@ -409,7 +409,7 @@ void ConstructorSelectionPass::visit (const Inferred & node) {
 	} if (args.size () == 1) {
 		std::cerr << args.front ()->toString (text::PrintMode::COLOUR) << std::endl;
 		assert (replacementType = args.front ()->getType ());
-		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {var, args.front ()}, parser::OPERATION::ASSIGN);
+		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " = ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), args.front ()}, parser::OPERATION::ASSIGN);
 	} else {
 		//TODO: Set to tuple
 		abort ();
@@ -425,7 +425,7 @@ void ConstructorSelectionPass::visit (const Numeric & node) {
 	//TODO: Check arguments for compatibility
 	if (args.size () == 1) {
 		auto arg = CastToNumberPass (node) (args [0]);
-		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), " = ", BasicArray <NodePtr> {var, arg}, parser::OPERATION::ASSIGN);
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), " = ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), arg}, parser::OPERATION::ASSIGN);
 	}
 }
 
@@ -460,7 +460,7 @@ void ConstructorSelectionPass::visit (const Struct & node) {
 	}
 	
 	if (winner) {
-		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " = ", BasicArray <NodePtr> {var, winner}, parser::OPERATION::ASSIGN);
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " = ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), winner}, parser::OPERATION::ASSIGN);
 	} else {
 		abort ();
 	}
@@ -471,6 +471,7 @@ NodePtr ConstructorSelectionPass::operator () (const NodePtr & node) {
 	node->accept (*this);
 	if (replacementType) {
 		*var = Variable (var->getPos (), var->getFile (), replacementType, var->getStackIndex (), var->getLocation (), var->getIden ());
+		nPtr = ResolvePass () (nPtr);
 	}
 	return nPtr;
 }
@@ -480,7 +481,7 @@ void ReferenceConstructorSelectionPass::visit (const Array & node) {
 	if (args.empty ()) {
 		abort ();
 	} else if (args.size () == 1) {
-		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " => ", BasicArray <NodePtr> {var, args [0]}, parser::OPERATION::ASSIGN_REF);
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " => ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), args [0]}, parser::OPERATION::ASSIGN_REF);
 	} else {
 		abort ();
 	}
@@ -504,7 +505,7 @@ void ReferenceConstructorSelectionPass::visit (const Inferred & node) {
 	} if (args.size () == 1) {
 		std::cerr << args.front ()->toString (text::PrintMode::COLOUR) << std::endl;
 		assert (replacementType = Ref::get (args.front ()->getType ()));
-		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " => ", BasicArray <NodePtr> {var, args.front ()}, parser::OPERATION::ASSIGN_REF);
+		nPtr = std::make_shared <Basic_Operation> (node.getPos (), node.getFile (), " => ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), args.front ()}, parser::OPERATION::ASSIGN_REF);
 	} else {
 		//TODO: Set to tuple
 		abort ();
@@ -520,7 +521,7 @@ void ReferenceConstructorSelectionPass::visit (const Numeric & node) {
 	//TODO: Check arguments for compatibility
 	if (args.size () == 1) {
 		auto arg = CastToNumberPass (node) (args [0]);
-		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), " => ", BasicArray <NodePtr> {var, arg}, parser::OPERATION::ASSIGN_REF);
+		nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), " => ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), arg}, parser::OPERATION::ASSIGN_REF);
 	}
 }
 
@@ -533,7 +534,7 @@ void ReferenceConstructorSelectionPass::visit (const ReflectType & node) {
 }
 
 void ReferenceConstructorSelectionPass::visit (const Struct & node) {
-	nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " => ", BasicArray <NodePtr> {var, args.front ()}, parser::OPERATION::ASSIGN_REF);
+	nPtr = std::make_shared <Basic_Operation> (var->getPos (), var->getFile (), var->getType (), " => ", BasicArray <NodePtr> {std::make_shared <VariableRef> (var->getPos (), var->getFile (), var), args.front ()}, parser::OPERATION::ASSIGN_REF);
 }
 
 NodePtr ReferenceConstructorSelectionPass::operator () (const NodePtr & node) {
@@ -541,6 +542,7 @@ NodePtr ReferenceConstructorSelectionPass::operator () (const NodePtr & node) {
 	node->accept (*this);
 	if (replacementType) {
 		*var = Variable (var->getPos (), var->getFile (), replacementType, var->getStackIndex (), var->getLocation (), var->getIden ());
+		nPtr = ResolvePass () (nPtr);
 	}
 	return nPtr;
 }
