@@ -81,6 +81,7 @@ class Const : public Type {
 	public:
 		
 		void accept (AbstractPass & pass) const {pass.visit (*this);}
+		TypePtr getDeRefType () const {return type->getDeRefType ();}
 		TypePtr getRegType () const {return type;}
 		virtual string toString (text::PrintMode mode) const;
 		virtual bool isConst () const {return true;}
