@@ -256,9 +256,13 @@ void StackMachinePass::visit (const IfElse & node) {
 	}
 	push ({stackmachine::OP_CODE::LABEL, endLabel});
 	if (node.getVar ()) {
-		push (node.getVar ());
+		pushRef (*node.getVar ());
 	}
 	
+}
+
+void StackMachinePass::visit (const Load & node) {
+	push ({stackmachine::OP_CODE::LOAD, getLayout (node.getType ())});
 }
 
 void StackMachinePass::visit (const Loop & node) {
