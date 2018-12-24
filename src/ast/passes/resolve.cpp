@@ -170,6 +170,43 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 	
 	//TODO: Check for complex types
 	
+	auto resolveAssign = [&] () {
+		assert (args.size () == 2);
+		auto ref = Ref::get (types [0]);
+		assert (StaticCastPass (ref) (args [0]));
+		assert (StaticCastPass (types [0]) (args [1]));
+		nPtr = std::make_shared <Basic_Operation> (
+			node.getPos (),
+			node.getFile (),
+			ref,
+			node.getIden (),
+			BasicArray <NodePtr> ({
+				StaticCastPass (ref) (args [0]),
+				StaticCastPass (types [0]) (args [1])
+			}),
+			node.getOpp ()
+		);
+	};
+	
+	auto resolveAssignRef = [&] () {
+		assert (args.size () == 2);
+		auto src = Ref::get (types [0]);
+		auto ref = Ref::get (src);
+		assert (StaticCastPass (ref) (args [0]));
+		assert (StaticCastPass (src) (args [1]));
+		nPtr = std::make_shared <Basic_Operation> (
+			node.getPos (),
+			node.getFile (),
+			ref,
+			node.getIden (),
+			BasicArray <NodePtr> ({
+				StaticCastPass (ref) (args [0]),
+				StaticCastPass (src) (args [1])
+			}),
+			node.getOpp ()
+		);
+	};
+	
 	auto resolveRegular = [&] () {
 		if (args.size () == 2 and types [0] != types [1]) {
 			if (typeid (*types [0]) == typeid (Numeric) and typeid (*types [1]) == typeid (Numeric)) {
@@ -249,6 +286,11 @@ void ResolvePass::visit (const Unresolved_Operation & node) {
 			abort ();
 			break;
 		case parser::OPERATION::ASSIGN:
+			resolveAssign ();
+			break;
+		case parser::OPERATION::ASSIGN_REF:
+			resolveAssignRef ();
+			break;
 		case parser::OPERATION::BAND:
 		case parser::OPERATION::BNOT:
 		case parser::OPERATION::BOR:
