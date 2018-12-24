@@ -1,3 +1,4 @@
+#include <ast/memory.hpp>
 #include <ast/passes/typecastpass.hpp>
 #include <ast/typecast.hpp>
 
@@ -49,7 +50,10 @@ void CastToNumberPass::visit (const Numeric & node) {
 }
 
 void CastToNumberPass::visit (const Ref & node) {
-	abort ();
+	auto n = std::make_shared <Load> (nPtr->getPos (), nPtr->getFile (), nPtr);
+	assert (n->getType ());
+	nPtr = n;
+	nPtr->getType ()->accept (*this);
 }
 
 void CastToNumberPass::visit (const ReflectType & node) {nPtr = nullptr;}
@@ -62,7 +66,9 @@ void CastToNumberPass::visit (const Struct & node) {
 NodePtr CastToNumberPass::operator () (const NodePtr & node) {
 	assert (nPtr = node);
 	assert (node->getType ());
-	node->getType ()->accept (*this);
+	if (node->getType () != Numeric::get (numeric.getArith (), numeric.getMinPrec ())) {
+		node->getType ()->accept (*this);
+	}
 	return nPtr;
 }
 
