@@ -220,7 +220,6 @@ class Ptr : public Type {
 		TypePtr getDeRefType () const {return type;}
 		TypePtr getRegType () const {return type;}
 		virtual string toString (text::PrintMode mode) const;
-		virtual bool isConst () const {return type->isConst ();}
 		virtual bool isRef () const {return true;}
 		
 		virtual bool operator == (const Type & other) const {return other == *this;}
@@ -247,7 +246,6 @@ class Ref : public Type {
 		TypePtr getDeRefType () const {return type;}
 		TypePtr getRegType () const {return type;}
 		virtual string toString (text::PrintMode mode) const;
-		virtual bool isConst () const {return type->isConst ();}
 		virtual bool isRef () const {return true;}
 		
 		virtual bool operator == (const Type & other) const {return other == *this;}
