@@ -8,6 +8,8 @@
 namespace AST {
 
 
+bool Array::operator == (const ArrayInit & other) const {return *base == *other.getBaseType ();}
+
 string Array::toString (text::PrintMode mode) const {
 	return base->toString (mode) + " []";
 }
